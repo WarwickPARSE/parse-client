@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-project(MY_GRAND_PROJECT)
+project(PARSE)
+set(PCL_DIR "C:\Program Files (x86)\PCL 1.6.0\cmake\PCLConfig.cmake")
 find_package(PCL 1.3 REQUIRED COMPONENTS common io)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
