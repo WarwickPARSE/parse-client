@@ -47,7 +47,6 @@ namespace PARSE
     
             kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
 
-            kinectSensor.ElevationAngle = 0;
         }
 
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
@@ -84,7 +83,7 @@ namespace PARSE
                 imageFrame.Width * Bgr32BytesPerPixel,
                 0);
 
-                this.lastImageFormat = imageFrame.Format;
+                    this.lastImageFormat = imageFrame.Format;
             }
 
             else { }
@@ -100,30 +99,70 @@ namespace PARSE
                 int realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
                 byte Distance = 0;
-                byte distf1 = 0;
-                byte distf2 = 0;
 
                 int MinimumDistance = 800;
                 int MaximumDistance = 4096;
 
-                if (realDepth > MinimumDistance)
+                
+                if (realDepth < 800)
                 {
-
-                    distf1 = (byte) (realDepth-MinimumDistance);
-                    distf2 = (byte) (255 / (MaximumDistance-MinimumDistance));
-                    Distance = (byte) (255 - (distf1 * distf2));
-                   //Distance = (byte)(255-((realDepth – MinimumDistance) * 255 / (MaximumDistance – MinimumDistance)));
-
-                    this.depthFrame32[i32 + RedIndex] = (byte)(Distance);
-                    this.depthFrame32[i32 + GreenIndex] = (byte)(Distance);
-                    this.depthFrame32[i32 + BlueIndex] = (byte)(Distance);
-
+                    this.depthFrame32[i32 + RedIndex] = 75;
+                    this.depthFrame32[i32 + GreenIndex] = 0;
+                    this.depthFrame32[i32 + BlueIndex] = 0;
                 }
-                else
+                else if (realDepth < 1000)
                 {
                     this.depthFrame32[i32 + RedIndex] = 150;
                     this.depthFrame32[i32 + GreenIndex] = 0;
                     this.depthFrame32[i32 + BlueIndex] = 0;
+                }
+                else if (realDepth >= 1000 && realDepth < 1500)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 240;
+                    this.depthFrame32[i32 + GreenIndex] = 100;
+                    this.depthFrame32[i32 + BlueIndex] = 0;
+                }
+                else if (realDepth >= 1500 && realDepth < 2000)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 240;
+                    this.depthFrame32[i32 + GreenIndex] = 100;
+                    this.depthFrame32[i32 + BlueIndex] = 50;
+                }
+                else if (realDepth >= 2000 && realDepth < 2500)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 240;
+                    this.depthFrame32[i32 + GreenIndex] = 150;
+                    this.depthFrame32[i32 + BlueIndex] = 100;
+                }
+                else if (realDepth >= 2500 && realDepth < 3000)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 240;
+                    this.depthFrame32[i32 + GreenIndex] = 200;
+                    this.depthFrame32[i32 + BlueIndex] = 150;
+                }
+                else if (realDepth >= 3000 && realDepth < 3500)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 140;
+                    this.depthFrame32[i32 + GreenIndex] = 150;
+                    this.depthFrame32[i32 + BlueIndex] = 150;
+                }
+                else if (realDepth >= 3500 && realDepth < 4000)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 100;
+                    this.depthFrame32[i32 + GreenIndex] = 100;
+                    this.depthFrame32[i32 + BlueIndex] = 200;
+                }
+                else if (realDepth >= 4000 && realDepth < 4500)
+                {
+                    this.depthFrame32[i32 + RedIndex] = 50;
+                    this.depthFrame32[i32 + GreenIndex] = 50;
+                    this.depthFrame32[i32 + BlueIndex] = 200;
+                }
+                else
+                {
+                    this.depthFrame32[i32 + RedIndex] = 50;
+                    this.depthFrame32[i32 + GreenIndex] = 50;
+                    this.depthFrame32[i32 + BlueIndex] = 50;
                 }
             }
 
