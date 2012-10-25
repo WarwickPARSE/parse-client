@@ -21,89 +21,113 @@ namespace PARSE
     public partial class MainWindow : Window
     {
 
-        const float MaxDepth = 4095;
-        const float MinDepth = 400;
-        const float DepthOffset = MaxDepth - MinDepth;
-        KinectSensor newsensor;
+        private short[] pixelData;
+        private byte[] depthFrame32;
+
+        private WriteableBitmap outputBitmap;
+        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+
+        private DepthImageFormat lastImageFormat;
+
+        private const int RedIndex = 2;
+        private const int GreenIndex = 1;
+        private const int BlueIndex = 0;
+
+        KinectSensor kinectSensor;
 
         public MainWindow()
         {
             InitializeComponent();
+        
+            kinectSensor = KinectSensor.KinectSensors[0];
+
+            kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+
+            kinectSensor.Start();
+    
+            kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
+            kinectSensor.ElevationAngle = 0;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
-            newsensor.DepthStream.Enable();
-            newsensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(newSensor_AllFramesReady);
-
-            try
+            using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
             {
-                newsensor.Start();
-            }
-            catch (System.IO.IOException)
+
+            if (imageFrame != null)
             {
-                Console.WriteLine("No device connected or there is an error in the program");
-            }
-        }
+                bool NewFormat = this.lastImageFormat != imageFrame.Format;
 
-        void newSensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
-        {
-            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
-            {
-                if (depthFrame == null)
-                { return; }
- 
-                Byte[] pixels = GenerateDepthBytes(depthFrame);
- 
-                Int32 stride = depthFrame.Width * 4;
+                if (NewFormat)
+                {
+                    this.pixelData = new short[imageFrame.PixelDataLength];
+                    this.depthFrame32 = new byte[imageFrame.Width * imageFrame.Height * Bgr32BytesPerPixel];
 
-                depthimage.Source = BitmapSource.Create(depthFrame.Width, depthFrame.Height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
-            }
-        }
+                    this.outputBitmap = new WriteableBitmap(
+                    imageFrame.Width,
+                    imageFrame.Height,
+                    96, // DpiX
+                    96, // DpiY
+                    PixelFormats.Bgr32,
+                    null);
+                    this.kinectDepthImage.Source = this.outputBitmap;
+                }
 
-        public static Byte CalculateDepthIntensity(Int32 dist)
-        {
-            return (Byte)(255 - (255 * Math.Max(DepthOffset - MinDepth, 0) / (MaxDepth)));
-        }
+                imageFrame.CopyPixelDataTo(this.pixelData);
 
-        private Byte[] GenerateDepthBytes(DepthImageFrame depthFrame)
-        {
-            short[] rawDepthData = new short[depthFrame.PixelDataLength];
-            depthFrame.CopyPixelDataTo(rawDepthData);
+                byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
-            Byte[] pixels = new Byte[depthFrame.Height * depthFrame.Width * 4];
+                this.outputBitmap.WritePixels(
+                new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
+                convertedDepthBits,
+                imageFrame.Width * Bgr32BytesPerPixel,
+                0);
 
-            const Int32 BlueIndex = 0;
-            const Int32 GreenIndex = 1;
-            const Int32 RedIndex = 2;
-
-            for (Int32 depthIndex = 0, colorIndex = 0; depthIndex < rawDepthData.Length && colorIndex < pixels.Length; depthIndex++, colorIndex += 4)
-            {
-                Int32 player = rawDepthData[depthIndex] & DepthImageFrame.PlayerIndexBitmask;
-                Int32 depth = rawDepthData[depthIndex] >> DepthImageFrame.PlayerIndexBitmaskWidth;
-
-                Byte intensity = CalculateDepthIntensity(depth);
-                pixels[colorIndex + BlueIndex] = intensity;
-                pixels[colorIndex + GreenIndex] = intensity;
-                pixels[colorIndex + RedIndex] = intensity;
+                this.lastImageFormat = imageFrame.Format;
             }
 
-            return pixels;
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            StopKinect(newsensor);
-        }
-
-        void StopKinect(KinectSensor sensor)
-        {
-            if (sensor != null)
-            {
-                sensor.Stop();
-                sensor.AudioSource.Stop();
+            else { }
             }
         }
 
+        private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
+        {
+
+            for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
+            {
+
+                int realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+
+                byte Distance = 0;
+                byte distf1 = 0;
+                byte distf2 = 0;
+
+                int MinimumDistance = 800;
+                int MaximumDistance = 4096;
+
+                if (realDepth > MinimumDistance)
+                {
+
+                    distf1 = (byte) (realDepth-MinimumDistance);
+                    distf2 = (byte) (255 / (MaximumDistance-MinimumDistance));
+                    Distance = (byte) (255 - (distf1 * distf2));
+                   //Distance = (byte)(255-((realDepth – MinimumDistance) * 255 / (MaximumDistance – MinimumDistance)));
+
+                    this.depthFrame32[i32 + RedIndex] = (byte)(Distance);
+                    this.depthFrame32[i32 + GreenIndex] = (byte)(Distance);
+                    this.depthFrame32[i32 + BlueIndex] = (byte)(Distance);
+
+                }
+                else
+                {
+                    this.depthFrame32[i32 + RedIndex] = 150;
+                    this.depthFrame32[i32 + GreenIndex] = 0;
+                    this.depthFrame32[i32 + BlueIndex] = 0;
+                }
+            }
+
+            return this.depthFrame32;
+        }
     }
 }
