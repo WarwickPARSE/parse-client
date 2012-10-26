@@ -100,10 +100,10 @@ namespace PARSE
 
                 int realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
-                byte Distance = 0;
+                //byte Distance = 0;
 
-                int MinimumDistance = 800;
-                int MaximumDistance = 4096;
+                //int MinimumDistance = 800;
+                // MaximumDistance = 4096;
  
                 if (realDepth < 800)
                 {
