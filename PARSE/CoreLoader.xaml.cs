@@ -16,9 +16,9 @@ using Microsoft.Kinect;
 namespace PARSE
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for CoreLoader.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class CoreLoader : Window
     {
 
         private short[] pixelData;
@@ -35,7 +35,7 @@ namespace PARSE
 
         KinectSensor kinectSensor;
 
-        public MainWindow()
+        public CoreLoader()
         {
             InitializeComponent();
         
@@ -46,6 +46,8 @@ namespace PARSE
             kinectSensor.Start();
     
             kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
+            kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
 
         }
 
@@ -102,8 +104,7 @@ namespace PARSE
 
                 int MinimumDistance = 800;
                 int MaximumDistance = 4096;
-
-                
+ 
                 if (realDepth < 800)
                 {
                     this.depthFrame32[i32 + RedIndex] = 75;
