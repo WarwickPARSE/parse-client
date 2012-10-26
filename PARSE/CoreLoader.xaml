@@ -4,6 +4,6 @@
         Title="CoreLoader" Height="550" Width="700">
     <Grid>
         <Image Height="203" HorizontalAlignment="Left" Margin="393,12,0,0" Name="kinectDepthImage" Stretch="Fill" VerticalAlignment="Top" Width="273" />
-        <Image Height="203" HorizontalAlignment="Left" Margin="10,10,0,0" Stretch="Fill" VerticalAlignment="Top" Width="273" Name="kinectColorImage" />
+        <Image Height="203" HorizontalAlignment="Left" Margin="10,10,0,0" Stretch="Fill" VerticalAlignment="Top" Width="291" Name="kinectColorImage" />
     </Grid>
 </Window>

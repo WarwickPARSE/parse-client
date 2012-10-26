@@ -21,18 +21,25 @@ namespace PARSE
     public partial class CoreLoader : Window
     {
 
-        private short[] pixelData;
-        private byte[] depthFrame32;
-
-        private WriteableBitmap outputBitmap;
-        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
-
-        private DepthImageFormat lastImageFormat;
-
+        //RGB Constants
         private const int RedIndex = 2;
         private const int GreenIndex = 1;
         private const int BlueIndex = 0;
 
+        //Depth point array and frame definitions
+        private short[] pixelData;
+        private byte[] depthFrame32;
+        private WriteableBitmap outputBitmap;
+        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        private DepthImageFormat lastImageFormat;
+
+        //RGB point array and frame definitions
+        private byte[] colorpixelData;
+        private byte[] colorFrameRGB;
+        private WriteableBitmap outputColorBitmap;
+        private ColorImageFormat rgbImageFormat;
+
+        //Kinect sensor
         KinectSensor kinectSensor;
 
         public CoreLoader()
@@ -42,13 +49,43 @@ namespace PARSE
             kinectSensor = KinectSensor.KinectSensors[0];
 
             kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
             kinectSensor.Start();
     
             kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
             kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
 
+        }
+
+        private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
+        {
+            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            {
+
+                if (colorFrame != null)
+                {
+
+                    bool colorFormat = this.rgbImageFormat != colorFrame.Format;
+
+                    if (colorFormat)
+                    {
+                        this.colorpixelData = new byte[colorFrame.PixelDataLength];
+                        this.colorFrameRGB = new byte[colorFrame.Width * colorFrame.Height * Bgr32BytesPerPixel];
+
+                        this.outputColorBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
+                        this.kinectColorImage.Source = this.outputColorBitmap;
+                    }
+
+                    colorFrame.CopyPixelDataTo(this.colorpixelData);
+
+                    this.outputColorBitmap.WritePixels(new Int32Rect(0,0,colorFrame.Width,colorFrame.Height), colorpixelData, colorFrame.Width*Bgr32BytesPerPixel, 0);
+
+                    this.rgbImageFormat = colorFrame.Format;
+                }
+            }
         }
 
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
