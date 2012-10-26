@@ -7,5 +7,11 @@ namespace PARSE
 {
     class ScannerStateContext
     {
+
+        private ScannerState state;
+
+        public ScannerStateContext(ScannerState state) {
+            this.state = state; 
+        }
     }
 }
