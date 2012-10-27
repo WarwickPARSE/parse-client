@@ -39,29 +39,37 @@ namespace PARSE
         private WriteableBitmap outputColorBitmap;
         private ColorImageFormat rgbImageFormat;
 
+        private bool kinectConnected = false;
+
         //Kinect sensor
         KinectSensor kinectSensor;
 
         public CoreLoader()
         {
             InitializeComponent();
-        
-            //Initialize sensors
-            kinectSensor = KinectSensor.KinectSensors[0];
 
-            //Enable streams
-            kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-            kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            //Only try to use the Kinect sensor if there is one connected
+            if (KinectSensor.KinectSensors.Count != 0)
+            {
+                kinectConnected = true;
 
-            //Start streams
-            kinectSensor.Start();
-    
-            //Check if streams are ready
-            kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                //Initialize sensors
+                kinectSensor = KinectSensor.KinectSensors[0];
 
-            //default to max elevation
-            kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
+                //Enable streams
+                kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+                kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+
+                //Start streams
+                kinectSensor.Start();
+
+                //Check if streams are ready
+                kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+
+                //default to max elevation
+                kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
+            }
 
         }
 
