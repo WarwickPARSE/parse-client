@@ -7,5 +7,6 @@ namespace PARSE
 {
     abstract class ScannerState
     {
+        public abstract void handle();
     }
 }
