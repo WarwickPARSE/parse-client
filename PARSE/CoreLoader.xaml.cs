@@ -67,8 +67,6 @@ namespace PARSE
                 kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
-                //default to max elevation
-                kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
             }
             else {
                 lblStatus.Content = "No Kinect device detected";
@@ -227,6 +225,31 @@ namespace PARSE
             if (kinectConnected) {
                 this.kinectSensor.Stop();
             }
+        }
+
+        //TODO: prevent the following two methods from crashing if called in quick succession
+        private void btnSensorUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (kinectSensor.ElevationAngle != kinectSensor.MaxElevationAngle) {
+                kinectSensor.ElevationAngle+=5;
+            }
+        }
+
+        private void btnSensorDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (kinectSensor.ElevationAngle != kinectSensor.MinElevationAngle) {
+                kinectSensor.ElevationAngle-=5;
+            }
+        }
+
+        private void btnSensorMin_Click(object sender, RoutedEventArgs e)
+        {
+            kinectSensor.ElevationAngle = kinectSensor.MinElevationAngle;
+        }
+
+        private void btnSensorMax_Click(object sender, RoutedEventArgs e)
+        {
+            kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
         }
     }
 }
