@@ -219,5 +219,11 @@ namespace PARSE
 
             return this.depthFrame32;
         }
+
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e) {
+            if (kinectConnected) {
+                this.kinectSensor.Stop();
+            }
+        }
     }
 }
