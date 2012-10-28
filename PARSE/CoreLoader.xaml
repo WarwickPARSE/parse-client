@@ -5,5 +5,9 @@
     <Grid>
         <Image Height="203" HorizontalAlignment="Left" Margin="393,12,0,0" Name="kinectDepthImage" Stretch="Fill" VerticalAlignment="Top" Width="273" />
         <Image Height="203" HorizontalAlignment="Left" Margin="10,10,0,0" Stretch="Fill" VerticalAlignment="Top" Width="291" Name="kinectColorImage" />
+        <Button Content="Front" Height="23" HorizontalAlignment="Left" Margin="10,257,0,0" Name="btnFront" VerticalAlignment="Top" Width="75" />
+        <Button Content="Back" Height="23" HorizontalAlignment="Left" Margin="226,257,0,0" Name="btnBack" VerticalAlignment="Top" Width="75" />
+        <Label Content="Scanning" Height="28" HorizontalAlignment="Left" Margin="12,223,0,0" Name="lblScanning" VerticalAlignment="Top" FontWeight="Bold" />
+        <Label Content="Status" Height="29" HorizontalAlignment="Left" Margin="10,470,0,0" Name="lblStatus" VerticalAlignment="Top" />
     </Grid>
 </Window>
