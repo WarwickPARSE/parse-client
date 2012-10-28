@@ -70,6 +70,9 @@ namespace PARSE
                 //default to max elevation
                 kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
             }
+            else {
+                lblStatus.Content = "No Kinect device detected";
+            }
 
         }
 
