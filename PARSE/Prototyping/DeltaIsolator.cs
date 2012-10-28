@@ -7,5 +7,8 @@ namespace PARSE
 {
     class DeltaIsolator
     {
+        DeltaIsolator() { 
+        
+        }
     }
 }
