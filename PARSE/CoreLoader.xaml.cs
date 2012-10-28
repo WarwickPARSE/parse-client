@@ -69,7 +69,7 @@ namespace PARSE
 
             }
             else {
-                lblStatus.Content = "No Kinect device detected";
+                lblStatus.Content = "Status: No Kinect device detected";
             }
 
         }
