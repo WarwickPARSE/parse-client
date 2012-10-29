@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
@@ -22,27 +23,34 @@ namespace PARSE
     {
 
         //RGB Constants
-        private const int RedIndex = 2;
-        private const int GreenIndex = 1;
-        private const int BlueIndex = 0;
+        private const int                               RedIndex = 2;
+        private const int                               GreenIndex = 1;
+        private const int                               BlueIndex = 0;
 
         //Depth point array and frame definitions
-        private short[] pixelData;
-        private byte[] depthFrame32;
-        private WriteableBitmap outputBitmap;
-        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
-        private DepthImageFormat lastImageFormat;
+        private short[]                                 pixelData;
+        private byte[]                                  depthFrame32;
+        private WriteableBitmap                         outputBitmap;
+        private static readonly int                     Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        private DepthImageFormat                        lastImageFormat;
 
         //RGB point array and frame definitions
-        private byte[] colorpixelData;
-        private byte[] colorFrameRGB;
-        private WriteableBitmap outputColorBitmap;
-        private ColorImageFormat rgbImageFormat;
+        private byte[]                                  colorpixelData;
+        private byte[]                                  colorFrameRGB;
+        private WriteableBitmap                         outputColorBitmap;
+        private ColorImageFormat                        rgbImageFormat;
 
-        private bool kinectConnected = false;
+        //Modelling specific definitions
+        private ScannerModeller                         modeller;
+        private GeometryModel3D                         gm;
+
+        private bool                                    kinectConnected = false;
+        public int                                      realDepth;
+        public int                                      x;
+        public int                                      y;
 
         //Kinect sensor
-        KinectSensor kinectSensor;
+        KinectSensor                                    kinectSensor;
 
         public CoreLoader()
         {
@@ -67,6 +75,7 @@ namespace PARSE
                 kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
+                lblStatus.Content = "Status: Device connected";
             }
             else {
 
@@ -121,6 +130,8 @@ namespace PARSE
             if (imageFrame != null)
             {
                 bool NewFormat = this.lastImageFormat != imageFrame.Format;
+                x = imageFrame.Width/2;
+                y = imageFrame.Height/2;
 
                 if (NewFormat)
                 {
@@ -160,7 +171,7 @@ namespace PARSE
             for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
             {
 
-                int realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
                 //byte Distance = 0;
 
@@ -238,6 +249,16 @@ namespace PARSE
             }
         }
 
+        private void btnFront_Click(object sender, RoutedEventArgs e)
+        {
+
+            MessageBox.Show(realDepth.ToString() + " at (" + x + "," + y + ").");
+            modeller = new ScannerModeller(realDepth,x,y);
+            gm = modeller.run();
+            group.Children.Add(gm);
+
+        }
+
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
@@ -265,5 +286,6 @@ namespace PARSE
         {
             kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
         }
+
     }
 }
