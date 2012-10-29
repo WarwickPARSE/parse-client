@@ -44,6 +44,9 @@ namespace PARSE
         private ScannerModeller                         modeller;
         private GeometryModel3D                         gm;
 
+        //Variables that can actually be reused and are well defined
+
+
         private bool                                    kinectConnected = false;
         public int                                      realDepth;
         public int                                      x;
@@ -61,7 +64,7 @@ namespace PARSE
             {
                 kinectConnected = true;
 
-                //Initialize sensors
+                //Initialize sensor
                 kinectSensor = KinectSensor.KinectSensors[0];
 
                 //Enable streams
@@ -72,6 +75,7 @@ namespace PARSE
                 kinectSensor.Start();
 
                 //Check if streams are ready
+                //TODO: there is no justification for isolating these events, it makes life much harder
                 kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
@@ -147,6 +151,7 @@ namespace PARSE
 
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
+                    //dump the current depth frame to a bitmap image
                     this.outputBitmap.WritePixels(
                     new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
                     convertedDepthBits,
@@ -248,10 +253,6 @@ namespace PARSE
 
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(realDepth.ToString() + " at (" + x + "," + y + ").");
-            modeller = new ScannerModeller(realDepth,x,y);
-            gm = modeller.run();
-            group.Children.Add(gm);
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
@@ -278,6 +279,14 @@ namespace PARSE
         private void btnSensorMax_Click(object sender, RoutedEventArgs e)
         {
             kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
+        }
+
+        private void btnBernardButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(realDepth.ToString() + " at (" + x + "," + y + ").");
+            modeller = new ScannerModeller(realDepth, x, y);
+            gm = modeller.run();
+            group.Children.Add(gm);
         }
 
     }
