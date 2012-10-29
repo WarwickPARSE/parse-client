@@ -78,7 +78,6 @@ namespace PARSE
                 lblStatus.Content = "Status: Device connected";
             }
             else {
-
                 lblStatus.Content = "Status: No Kinect device detected";
 
                 //Disable controls
@@ -89,7 +88,6 @@ namespace PARSE
                 btnSensorMin.IsEnabled = false;
                 btnFront.IsEnabled = false;
                 btnBack.IsEnabled = false;
-
             }
 
         }
@@ -98,10 +96,8 @@ namespace PARSE
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
-
                 if (colorFrame != null)
                 {
-
                     bool colorFormat = this.rgbImageFormat != colorFrame.Format;
 
                     if (colorFormat)
@@ -126,42 +122,43 @@ namespace PARSE
         {
             using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
             {
-
-            if (imageFrame != null)
-            {
-                bool NewFormat = this.lastImageFormat != imageFrame.Format;
-                x = imageFrame.Width/2;
-                y = imageFrame.Height/2;
-
-                if (NewFormat)
+                if (imageFrame != null)
                 {
-                    this.pixelData = new short[imageFrame.PixelDataLength];
-                    this.depthFrame32 = new byte[imageFrame.Width * imageFrame.Height * Bgr32BytesPerPixel];
+                    bool NewFormat = this.lastImageFormat != imageFrame.Format;
+                    x = imageFrame.Width/2;
+                    y = imageFrame.Height/2;
 
-                    this.outputBitmap = new WriteableBitmap(
-                    imageFrame.Width,
-                    imageFrame.Height,
-                    96, // DpiX
-                    96, // DpiY
-                    PixelFormats.Bgr32,
-                    null);
-                    this.kinectDepthImage.Source = this.outputBitmap;
-                }
+                    if (NewFormat)
+                    {
+                        this.pixelData = new short[imageFrame.PixelDataLength];
+                        this.depthFrame32 = new byte[imageFrame.Width * imageFrame.Height * Bgr32BytesPerPixel];
 
-                imageFrame.CopyPixelDataTo(this.pixelData);
+                        this.outputBitmap = new WriteableBitmap(
+                        imageFrame.Width,
+                        imageFrame.Height,
+                        96, // DpiX
+                        96, // DpiY
+                        PixelFormats.Bgr32,
+                        null);
+                        this.kinectDepthImage.Source = this.outputBitmap;
+                    }
 
-                byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
+                    imageFrame.CopyPixelDataTo(this.pixelData);
 
-                this.outputBitmap.WritePixels(
-                new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
-                convertedDepthBits,
-                imageFrame.Width * Bgr32BytesPerPixel,
-                0);
+                    byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
+
+                    this.outputBitmap.WritePixels(
+                    new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
+                    convertedDepthBits,
+                    imageFrame.Width * Bgr32BytesPerPixel,
+                    0);
 
                     this.lastImageFormat = imageFrame.Format;
-            }
-
-            else { }
+                }
+                else 
+                { 
+                    
+                }
             }
         }
 
@@ -251,23 +248,19 @@ namespace PARSE
 
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
-
             MessageBox.Show(realDepth.ToString() + " at (" + x + "," + y + ").");
             modeller = new ScannerModeller(realDepth,x,y);
             gm = modeller.run();
             group.Children.Add(gm);
-
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
-
                 if (kinectSensor.ElevationAngle != kinectSensor.MaxElevationAngle)
                 {
                     kinectSensor.ElevationAngle += 5;
                 }
-
         }
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
