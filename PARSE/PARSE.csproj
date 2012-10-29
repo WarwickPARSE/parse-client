@@ -73,6 +73,7 @@
     </ApplicationDefinition>
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
+    <Compile Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
     <Page Include="CoreLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
