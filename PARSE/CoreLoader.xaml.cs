@@ -69,7 +69,18 @@ namespace PARSE
 
             }
             else {
+
                 lblStatus.Content = "Status: No Kinect device detected";
+
+                //Disable controls
+
+                btnSensorUp.IsEnabled = false;
+                btnSensorDown.IsEnabled = false;
+                btnSensorMax.IsEnabled = false;
+                btnSensorMin.IsEnabled = false;
+                btnFront.IsEnabled = false;
+                btnBack.IsEnabled = false;
+
             }
 
         }
@@ -230,9 +241,12 @@ namespace PARSE
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
-            if (kinectSensor.ElevationAngle != kinectSensor.MaxElevationAngle) {
-                kinectSensor.ElevationAngle+=5;
-            }
+
+                if (kinectSensor.ElevationAngle != kinectSensor.MaxElevationAngle)
+                {
+                    kinectSensor.ElevationAngle += 5;
+                }
+
         }
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
