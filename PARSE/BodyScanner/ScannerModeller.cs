@@ -15,9 +15,9 @@ namespace PARSE
     {
 
         //Prototype specific definitions
-        private int                 z;
-        private int                 x;
-        private int                 y;
+        private Int16[]                 z;
+        private int                     x;
+        private int                     y;
 
         //Modelling definitions
         private MeshGeometry3D      baseModel;
@@ -28,11 +28,11 @@ namespace PARSE
         private byte[]              colorFrame;
 
         //Prototype Constructor
-        public ScannerModeller(int realDepth, int xPoint, int yPoint)
+        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint)
         {
             this.x = xPoint;
             this.y = yPoint;
-            this.z = realDepth;
+            this.z = depthCollection;
             baseModel = new MeshGeometry3D();
             baseModelProperties = new GeometryModel3D();
 
@@ -47,63 +47,24 @@ namespace PARSE
 
         public GeometryModel3D run()
         {
-            //Example geometry to be replaced by modelfactory from actual kinect data.
-            baseModel.Positions.Add(new Point3D(-0.5, -0.5, 1));
-            baseModel.Positions.Add(new Point3D(0.5, -0.5, 1));
-            baseModel.Positions.Add(new Point3D(0.5, 0.5, 1));
-            baseModel.Positions.Add(new Point3D(-0.5, 0.5, 1));
-            // Back face
-            baseModel.Positions.Add(new Point3D(-1, -1, -1));
-            baseModel.Positions.Add(new Point3D(1, -1, -1));
-            baseModel.Positions.Add(new Point3D(1, 1, -1));
-            baseModel.Positions.Add(new Point3D(-1, 1, -1)); 
 
-            //Example meshing to be replaced by modelfactory from actual kinect data.
-            baseModel.TriangleIndices.Add(0);
-            baseModel.TriangleIndices.Add(1);
-            baseModel.TriangleIndices.Add(2);
-            baseModel.TriangleIndices.Add(2);
-            baseModel.TriangleIndices.Add(3);
-            baseModel.TriangleIndices.Add(0);
-   
-            baseModel.TriangleIndices.Add(6);
-            baseModel.TriangleIndices.Add(5);
-            baseModel.TriangleIndices.Add(4);
-            baseModel.TriangleIndices.Add(4);
-            baseModel.TriangleIndices.Add(7);
-            baseModel.TriangleIndices.Add(6);
-   
-            baseModel.TriangleIndices.Add(1);
-            baseModel.TriangleIndices.Add(5);
-            baseModel.TriangleIndices.Add(2);
-            baseModel.TriangleIndices.Add(5);
-            baseModel.TriangleIndices.Add(6);
-            baseModel.TriangleIndices.Add(2);
-   
-            baseModel.TriangleIndices.Add(2);
-            baseModel.TriangleIndices.Add(6);
-            baseModel.TriangleIndices.Add(3);
-            baseModel.TriangleIndices.Add(3);
-            baseModel.TriangleIndices.Add(6);
-            baseModel.TriangleIndices.Add(7);
+            int pointsPlotted = 0;
 
-            baseModel.TriangleIndices.Add(5);
-            baseModel.TriangleIndices.Add(1);
-            baseModel.TriangleIndices.Add(0);
-            baseModel.TriangleIndices.Add(0);
-            baseModel.TriangleIndices.Add(4);
-            baseModel.TriangleIndices.Add(5);
+            for (int i = 0; i < 640; i=i+1)
+            {
+                for (int p = 0; p < 480; p=p+1)
+                {
+                    baseModel.Positions.Add(new Point3D(i, p, this.z[(i*p)]));
+                    pointsPlotted++;
+                }
 
-            baseModel.TriangleIndices.Add(4);
-            baseModel.TriangleIndices.Add(0);
-            baseModel.TriangleIndices.Add(3);
-            baseModel.TriangleIndices.Add(3);
-            baseModel.TriangleIndices.Add(7);
-            baseModel.TriangleIndices.Add(4);
+                pointsPlotted++;
+            }
 
             //create geometry
             baseModelProperties = new GeometryModel3D(baseModel, new DiffuseMaterial(Brushes.Gold));
             baseModelProperties.Transform = new Transform3DGroup();
+            System.Diagnostics.Debug.WriteLine(pointsPlotted);
 
             return baseModelProperties;
         }

@@ -21,9 +21,9 @@
         <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="grid3" Margin="393,240,0,47">
             <Viewport3D x:Name="bodyviewport" Grid.Row="1">
                 <Viewport3D.Camera>
-                    <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="50" 
-                                       NearPlaneDistance="0" LookDirection="0, 0, -10" UpDirection="0,1,0"
-                                       Position="0,0,5" FieldOfView="45" />
+                    <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="8000" 
+                                       NearPlaneDistance="100" LookDirection="0, 0, -10" UpDirection="0,1,0"
+                                       Position="160,120,-1000" FieldOfView="45" />
                 </Viewport3D.Camera>
                 <ModelVisual3D x:Name="coreBodyModel">
                         <ModelVisual3D.Content>
