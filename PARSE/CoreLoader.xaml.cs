@@ -40,12 +40,13 @@ namespace PARSE
         private WriteableBitmap                         outputColorBitmap;
         private ColorImageFormat                        rgbImageFormat;
 
+        //frame sizes
+        private int                                     width;
+        private int                                     height;
+
         //Modelling specific definitions
         private ScannerModeller                         modeller;
         private GeometryModel3D                         gm;
-
-        //Variables that can actually be reused and are well defined
-
 
         private bool                                    kinectConnected = false;
         public int                                      realDepth;
@@ -54,6 +55,9 @@ namespace PARSE
 
         //Kinect sensor
         KinectSensor                                    kinectSensor;
+
+        //These are used for Robin's prototyping (don't delete please)
+        private DeltaIsolator di; 
 
         public CoreLoader()
         {
@@ -128,6 +132,10 @@ namespace PARSE
             {
                 if (imageFrame != null)
                 {
+                    //dirty temporary hack - set global variables 
+                    this.height = imageFrame.Height;
+                    this.width = imageFrame.Width;
+
                     bool NewFormat = this.lastImageFormat != imageFrame.Format;
                     x = imageFrame.Width/2;
                     y = imageFrame.Height/2;
@@ -253,6 +261,23 @@ namespace PARSE
 
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
+            //do nothing if there is no kinect detected
+            //TODO: make sure something has been read in first - this problem is almost certain to never occur 
+            if (kinectConnected)
+            {
+                //set the image to the last one that has been read in by the kinect
+                di.setData(this.depthFrame32);
+
+                WriteableBitmap a = new WriteableBitmap(
+                                    width,
+                                    height,
+                                    96, // DpiX
+                                    96, // DpiY
+                                    PixelFormats.Bgr32,
+                                    null);
+
+                //di.dumpToImage(miniOutput, width, height);
+            }
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession

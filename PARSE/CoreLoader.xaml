@@ -36,5 +36,6 @@
             </Viewport3D> 
         </Grid>
         <Button Content="Bernard Button" Height="23" HorizontalAlignment="Left" Margin="239,459,0,0" Name="btnBernardButton" VerticalAlignment="Top" Width="75" Click="btnBernardButton_Click" />
+        <Image Height="121" HorizontalAlignment="Left" Margin="204,233,0,0" Name="miniOutput" Stretch="Fill" VerticalAlignment="Top" Width="131" />
     </Grid>
 </Window>
