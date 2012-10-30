@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PARSE
 { 
@@ -18,38 +21,56 @@ namespace PARSE
             //do nothing 
         }
 
-        private bool setData() 
+        public bool setData(byte[] dFrame) 
         {
 
             if (!d1Set) {
-                return setFirst();
+                return setFirst(dFrame);
             }
             else if (!d2Set)
             {
-                return setSecond();
+                return setSecond(dFrame);
             }
 
             //default to failure
             return false; 
         }
 
-        private bool setFirst() 
+        private bool setFirst(byte[] dFrame) 
         {
-
+            this.firstDepthFrame = dFrame;
             //counterfeit atomicity
             return d1Set = true; 
         }
 
-        private bool setSecond() 
+        private bool setSecond(byte[] dFrame) 
         {
-
+            this.secondDepthFrame = dFrame;
             //counterfeit atomicity
             return d2Set = true; 
         }
 
         private void process() 
         { 
-            //do nothing
+            //not implemented yet
+        }
+       
+        /*public void dumpToImage(Image im, int width, int height) { 
+            //create a new writable bitmap 
+            WriteableBitmap a = new WriteableBitmap(
+                        width,
+                        height,
+                        96, // DpiX
+                        96, // DpiY
+                        PixelFormats.Bgr32,
+                        null);
+
+
+        }*/
+
+        public byte[] getData() 
+        {
+            return this.firstDepthFrame;
         }
     }
 }
