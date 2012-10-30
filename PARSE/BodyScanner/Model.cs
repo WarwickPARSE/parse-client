@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace PARSE
-{ 
-    class DeltaIsolator
+{
+    class Model
     {
-        DeltaIsolator() { 
-        
-        }
+        //greg was here
     }
 }

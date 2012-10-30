@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
@@ -22,27 +23,42 @@ namespace PARSE
     {
 
         //RGB Constants
-        private const int RedIndex = 2;
-        private const int GreenIndex = 1;
-        private const int BlueIndex = 0;
+        private const int                               RedIndex = 2;
+        private const int                               GreenIndex = 1;
+        private const int                               BlueIndex = 0;
 
         //Depth point array and frame definitions
-        private short[] pixelData;
-        private byte[] depthFrame32;
-        private WriteableBitmap outputBitmap;
-        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
-        private DepthImageFormat lastImageFormat;
+        private short[]                                 pixelData;
+        private byte[]                                  depthFrame32;
+        private WriteableBitmap                         outputBitmap;
+        private static readonly int                     Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        private DepthImageFormat                        lastImageFormat;
 
         //RGB point array and frame definitions
-        private byte[] colorpixelData;
-        private byte[] colorFrameRGB;
-        private WriteableBitmap outputColorBitmap;
-        private ColorImageFormat rgbImageFormat;
+        private byte[]                                  colorpixelData;
+        private byte[]                                  colorFrameRGB;
+        private WriteableBitmap                         outputColorBitmap;
+        private ColorImageFormat                        rgbImageFormat;
 
-        private bool kinectConnected = false;
+        //frame sizes
+        private int                                     width;
+        private int                                     height;
+
+        //Modelling specific definitions
+        private ScannerModeller                         modeller;
+        private GeometryModel3D                         gm;
+
+        private bool                                    kinectConnected = false;
+        public Int16[]                                  realDepthCollection;
+        public int                                      realDepth;
+        public int                                      x;
+        public int                                      y;
 
         //Kinect sensor
-        KinectSensor kinectSensor;
+        KinectSensor                                    kinectSensor;
+
+        //These are used for Robin's prototyping (don't delete please)
+        private DeltaIsolator di; 
 
         public CoreLoader()
         {
@@ -53,7 +69,7 @@ namespace PARSE
             {
                 kinectConnected = true;
 
-                //Initialize sensors
+                //Initialize sensor
                 kinectSensor = KinectSensor.KinectSensors[0];
 
                 //Enable streams
@@ -64,12 +80,13 @@ namespace PARSE
                 kinectSensor.Start();
 
                 //Check if streams are ready
+                //TODO: there is no justification for isolating these events, it makes life much harder
                 kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
+                lblStatus.Content = "Status: Device connected";
             }
             else {
-
                 lblStatus.Content = "Status: No Kinect device detected";
 
                 //Disable controls
@@ -80,7 +97,6 @@ namespace PARSE
                 btnSensorMin.IsEnabled = false;
                 btnFront.IsEnabled = false;
                 btnBack.IsEnabled = false;
-
             }
 
         }
@@ -89,10 +105,8 @@ namespace PARSE
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
-
                 if (colorFrame != null)
                 {
-
                     bool colorFormat = this.rgbImageFormat != colorFrame.Format;
 
                     if (colorFormat)
@@ -117,56 +131,62 @@ namespace PARSE
         {
             using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
             {
-
-            if (imageFrame != null)
-            {
-                bool NewFormat = this.lastImageFormat != imageFrame.Format;
-
-                if (NewFormat)
+                if (imageFrame != null)
                 {
-                    this.pixelData = new short[imageFrame.PixelDataLength];
-                    this.depthFrame32 = new byte[imageFrame.Width * imageFrame.Height * Bgr32BytesPerPixel];
+                    //dirty temporary hack - set global variables 
+                    this.height = imageFrame.Height;
+                    this.width = imageFrame.Width;
 
-                    this.outputBitmap = new WriteableBitmap(
-                    imageFrame.Width,
-                    imageFrame.Height,
-                    96, // DpiX
-                    96, // DpiY
-                    PixelFormats.Bgr32,
-                    null);
-                    this.kinectDepthImage.Source = this.outputBitmap;
-                }
+                    bool NewFormat = this.lastImageFormat != imageFrame.Format;
+                    x = imageFrame.Width/2;
+                    y = imageFrame.Height/2;
 
-                imageFrame.CopyPixelDataTo(this.pixelData);
+                    if (NewFormat)
+                    {
+                        this.pixelData = new short[imageFrame.PixelDataLength];
+                        this.depthFrame32 = new byte[imageFrame.Width * imageFrame.Height * Bgr32BytesPerPixel];
 
-                byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
+                        this.outputBitmap = new WriteableBitmap(
+                        imageFrame.Width,
+                        imageFrame.Height,
+                        96, // DpiX
+                        96, // DpiY
+                        PixelFormats.Bgr32,
+                        null);
+                        this.kinectDepthImage.Source = this.outputBitmap;
+                    }
 
-                this.outputBitmap.WritePixels(
-                new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
-                convertedDepthBits,
-                imageFrame.Width * Bgr32BytesPerPixel,
-                0);
+                    imageFrame.CopyPixelDataTo(this.pixelData);
+
+                    byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
+
+                    //dump the current depth frame to a bitmap image
+                    this.outputBitmap.WritePixels(
+                    new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
+                    convertedDepthBits,
+                    imageFrame.Width * Bgr32BytesPerPixel,
+                    0);
 
                     this.lastImageFormat = imageFrame.Format;
-            }
-
-            else { }
+                }
+                else 
+                { 
+                    
+                }
             }
         }
 
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
 
+            this.realDepthCollection = new Int16[depthFrame.Length];
+
             for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
             {
 
-                int realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                realDepthCollection[i16] = (Int16) realDepth;
 
-                //byte Distance = 0;
-
-                //int MinimumDistance = 800;
-                // MaximumDistance = 4096;
- 
                 if (realDepth < 800)
                 {
                     this.depthFrame32[i32 + RedIndex] = 75;
@@ -238,15 +258,34 @@ namespace PARSE
             }
         }
 
+        private void btnFront_Click(object sender, RoutedEventArgs e)
+        {
+            //do nothing if there is no kinect detected
+            //TODO: make sure something has been read in first - this problem is almost certain to never occur 
+            if (kinectConnected)
+            {
+                //set the image to the last one that has been read in by the kinect
+                di.setData(this.depthFrame32);
+
+                WriteableBitmap a = new WriteableBitmap(
+                                    width,
+                                    height,
+                                    96, // DpiX
+                                    96, // DpiY
+                                    PixelFormats.Bgr32,
+                                    null);
+
+                //di.dumpToImage(miniOutput, width, height);
+            }
+        }
+
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
-
                 if (kinectSensor.ElevationAngle != kinectSensor.MaxElevationAngle)
                 {
                     kinectSensor.ElevationAngle += 5;
                 }
-
         }
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
@@ -265,5 +304,14 @@ namespace PARSE
         {
             kinectSensor.ElevationAngle = kinectSensor.MaxElevationAngle;
         }
+
+        private void btnBernardButton_Click(object sender, RoutedEventArgs e)
+        {
+            modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
+            gm = modeller.run();
+            group.Children.Add(gm);
+
+        }
+
     }
 }

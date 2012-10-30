@@ -71,10 +71,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BodyScanner\Model.cs" />
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
-    <Compile Include="Prototyping\DeltaIsolator.cs" />
+    <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
     <Page Include="CoreLoader.xaml">
