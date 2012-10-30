@@ -51,20 +51,7 @@ namespace PARSE
         { 
             //not implemented yet
         }
-       
-        /*public void dumpToImage(Image im, int width, int height) { 
-            //create a new writable bitmap 
-            WriteableBitmap a = new WriteableBitmap(
-                        width,
-                        height,
-                        96, // DpiX
-                        96, // DpiY
-                        PixelFormats.Bgr32,
-                        null);
-
-
-        }*/
-
+     
         public byte[] getData() 
         {
             return this.firstDepthFrame;
