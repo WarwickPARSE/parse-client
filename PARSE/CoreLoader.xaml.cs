@@ -46,7 +46,7 @@ namespace PARSE
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
-        private GeometryModel3D                         gm;
+        private ModelVisual3D                           gm;
 
         private bool                                    kinectConnected = false;
         public Int16[]                                  realDepthCollection;
@@ -309,7 +309,7 @@ namespace PARSE
         {
             modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
             gm = modeller.run();
-            group.Children.Add(gm);
+            this.bodyviewport.Children.Add(gm);
 
         }
 
