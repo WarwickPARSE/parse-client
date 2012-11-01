@@ -138,11 +138,14 @@ namespace PARSE
 
             //RGB Brush
 
+            /* DONT FUCKING TOUCH ME */
             img.ImageSource = bs;
             System.Diagnostics.Debug.WriteLine(bs.Height);
-            bs = new CroppedBitmap(bs, new Int32Rect(0,0,10,10));
+            BitmapSource bs2 = new CroppedBitmap(bs, new Int32Rect(20, 20, 50, 50));
 
-            Material material = new DiffuseMaterial(new ImageBrush(bs));
+            Material material = new DiffuseMaterial(new ImageBrush(bs2));
+
+            /* IM FUCKING WARNING YOU */
 
             //Map texture coordinates
             PointCollection pcfucker = new PointCollection();
