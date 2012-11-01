@@ -311,12 +311,11 @@ namespace PARSE
 
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
+            //re-initialize modeller instance and clear viewport
             modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
+
             //pass captured stream data to modeller
-            this.outputColorBitmap.Freeze();
-            this.tempBitmap = this.outputColorBitmap.Clone();
             gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
-            this.outputColorBitmap = tempBitmap;
             this.bodyviewport.Children.Add(gm);
 
         }
