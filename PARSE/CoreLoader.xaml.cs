@@ -46,9 +46,10 @@ namespace PARSE
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
-        private GeometryModel3D                         gm;
+        private ModelVisual3D                           gm;
 
         private bool                                    kinectConnected = false;
+        public Int16[]                                  realDepthCollection;
         public int                                      realDepth;
         public int                                      x;
         public int                                      y;
@@ -179,16 +180,14 @@ namespace PARSE
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
 
+            this.realDepthCollection = new Int16[depthFrame.Length];
+
             for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
             {
 
                 realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                realDepthCollection[i16] = (Int16) realDepth;
 
-                //byte Distance = 0;
-
-                //int MinimumDistance = 800;
-                // MaximumDistance = 4096;
- 
                 if (realDepth < 800)
                 {
                     this.depthFrame32[i32 + RedIndex] = 75;
@@ -319,10 +318,10 @@ namespace PARSE
 
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(realDepth.ToString() + " at (" + x + "," + y + ").");
-            modeller = new ScannerModeller(realDepth, x, y);
+            modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
             gm = modeller.run();
-            group.Children.Add(gm);
+            this.bodyviewport.Children.Add(gm);
+
         }
 
     }
