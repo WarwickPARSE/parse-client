@@ -22,14 +22,14 @@
             <Viewport3D x:Name="bodyviewport" Grid.Row="1">
                 <Viewport3D.Camera>
                     <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="100" 
-                                       NearPlaneDistance="1" LookDirection="-11, -10, -9" UpDirection="0,1,0"
-                                       Position="11,10,9" FieldOfView="70" />
+                                       NearPlaneDistance="1" LookDirection="-11, -20, -9" UpDirection="1,0,0"
+                                       Position="11,11,9" FieldOfView="50" />
                 </Viewport3D.Camera>
                 <ModelVisual3D x:Name="coreBodyModel">
                         <ModelVisual3D.Content>
                             <Model3DGroup x:Name="group">
                                 <AmbientLight Color="DarkGray" />
-                                <DirectionalLight Color="White" Direction="-5,-5,-7" />
+                                <DirectionalLight Color="White" Direction="-11,-10,-9" />
                             </Model3DGroup>
                         </ModelVisual3D.Content>
                     </ModelVisual3D>

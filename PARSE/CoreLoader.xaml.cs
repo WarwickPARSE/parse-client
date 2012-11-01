@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,10 +40,12 @@ namespace PARSE
         private byte[]                                  colorFrameRGB;
         private WriteableBitmap                         outputColorBitmap;
         private ColorImageFormat                        rgbImageFormat;
+        private WriteableBitmap                         tempBitmap;
 
         //frame sizes
         private int                                     width;
         private int                                     height;
+        private bool                                    isCaptured;
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
@@ -58,8 +61,7 @@ namespace PARSE
         KinectSensor                                    kinectSensor;
 
         //These are used for Robin's prototyping (don't delete please)
-        private DeltaIsolator di = new DeltaIsolator();
-        private WriteableBitmap deltaBitmap;
+        private DeltaIsolator di; 
 
         public CoreLoader()
         {
@@ -162,6 +164,7 @@ namespace PARSE
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
                     //dump the current depth frame to a bitmap image
+
                     this.outputBitmap.WritePixels(
                     new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
                     convertedDepthBits,
@@ -266,10 +269,9 @@ namespace PARSE
             if (kinectConnected)
             {
                 //set the image to the last one that has been read in by the kinect
-                MessageBox.Show(this.depthFrame32.Length.ToString());
                 di.setData(this.depthFrame32);
 
-                deltaBitmap = new WriteableBitmap(
+                WriteableBitmap a = new WriteableBitmap(
                                     width,
                                     height,
                                     96, // DpiX
@@ -277,15 +279,6 @@ namespace PARSE
                                     PixelFormats.Bgr32,
                                     null);
 
-                byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)this.kinectSensor).DepthStream);
-
-                //dump the current depth frame to a bitmap image
-                this.deltaBitmap.WritePixels(
-                new Int32Rect(0, 0, width, height),
-                convertedDepthBits,
-                width * Bgr32BytesPerPixel,
-                0);
-                this.miniOutput.Source = this.deltaBitmap;
                 //di.dumpToImage(miniOutput, width, height);
             }
         }
@@ -318,8 +311,11 @@ namespace PARSE
 
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
+            //re-initialize modeller instance and clear viewport
             modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
-            gm = modeller.run();
+
+            //pass captured stream data to modeller
+            gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
             this.bodyviewport.Children.Add(gm);
 
         }
