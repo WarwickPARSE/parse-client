@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,10 +40,12 @@ namespace PARSE
         private byte[]                                  colorFrameRGB;
         private WriteableBitmap                         outputColorBitmap;
         private ColorImageFormat                        rgbImageFormat;
+        private WriteableBitmap                         tempBitmap;
 
         //frame sizes
         private int                                     width;
         private int                                     height;
+        private bool                                    isCaptured;
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
@@ -161,6 +164,7 @@ namespace PARSE
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
                     //dump the current depth frame to a bitmap image
+
                     this.outputBitmap.WritePixels(
                     new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
                     convertedDepthBits,
@@ -308,7 +312,11 @@ namespace PARSE
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
             modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
-            gm = modeller.run();
+            //pass captured stream data to modeller
+            this.outputColorBitmap.Freeze();
+            this.tempBitmap = this.outputColorBitmap.Clone();
+            gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
+            this.outputColorBitmap = tempBitmap;
             this.bodyviewport.Children.Add(gm);
 
         }

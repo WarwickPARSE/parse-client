@@ -5,7 +5,9 @@ using System.Text;
 using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Drawing;
 using Microsoft.Kinect;
+using System.Windows;
 
 
 namespace PARSE
@@ -22,6 +24,7 @@ namespace PARSE
         //Modelling definitions
         private MeshGeometry3D      baseModel;
         private GeometryModel3D     baseModelProperties;
+        private BitmapSource        bs;
         private short[]             depthpixeldata;
         private byte[]              depthFrame;
         private byte[]              colorpixeldata;
@@ -64,22 +67,24 @@ namespace PARSE
         /// </summary>
         /// <returns>Base model with associated properties.</returns>
       
-        public ModelVisual3D run()
+        public ModelVisual3D run(BitmapSource rgbImage)
         {
 
-            int pointsPlotted       = 0;
-            Model3DGroup top        = new Model3DGroup();
-            ModelVisual3D mod       = new ModelVisual3D();
+            Model3DGroup top = new Model3DGroup();
+            ModelVisual3D mod = new ModelVisual3D();
 
             ModelVisual3D model = new ModelVisual3D();
 
             Model3DGroup topography = new Model3DGroup();
             Point3D[] points = GetRandomTopographyPoints();
 
+            bs = rgbImage;
+
             for (int z = 0; z <= 80; z = z + 10)
             {
                 for (int x = 0; x < 9; x++)
                 {
+                    //Stitches standard and opposing triangles together.
                     topography.Children.Add(
                         CreateTriangleModel(
                                 points[x + z],
@@ -114,6 +119,7 @@ namespace PARSE
             MeshGeometry3D mesh = new MeshGeometry3D();
             GeometryModel3D model = new GeometryModel3D();
             Model3DGroup gro = new Model3DGroup();
+            ImageBrush img = new ImageBrush();
             //Base normal
             Vector3D normal = CalculateNormal(p0, p1, p2);
 
@@ -130,8 +136,22 @@ namespace PARSE
             mesh.Normals.Add(normal);
             mesh.Normals.Add(normal);
 
-            //Temporary material
-            Material material = new DiffuseMaterial(new SolidColorBrush(Colors.Blue));
+            //RGB Brush
+
+            img.ImageSource = bs;
+            System.Diagnostics.Debug.WriteLine(bs.Height);
+            bs = new CroppedBitmap(bs, new Int32Rect(0,0,10,10));
+
+            Material material = new DiffuseMaterial(new ImageBrush(bs));
+
+            //Map texture coordinates
+            PointCollection pcfucker = new PointCollection();
+            pcfucker.Add(new System.Windows.Point(0, 1));
+            pcfucker.Add(new System.Windows.Point(1, 1));
+            pcfucker.Add(new System.Windows.Point(1, 0));
+            pcfucker.Add(new System.Windows.Point(0, 0));
+
+            mesh.TextureCoordinates = pcfucker;
             model = new GeometryModel3D(mesh, material);
 
             //Add to model group
