@@ -14,7 +14,7 @@ namespace PARSE
         private byte[] firstDepthFrame;
         private byte[] secondDepthFrame;
         
-        DeltaIsolator() { 
+        public DeltaIsolator() { 
             //do nothing 
         }
 
@@ -26,6 +26,7 @@ namespace PARSE
             }
             else if (!d2Set)
             {
+                this.process();
                 return setSecond(dFrame);
             }
 
@@ -47,9 +48,17 @@ namespace PARSE
             return d2Set = true; 
         }
 
-        private void process() 
-        { 
-            //not implemented yet
+        public byte[] process() 
+        {
+            byte[] delta = new byte[firstDepthFrame.Length];
+
+            for (int i = 0; i < firstDepthFrame.Length; i++)
+            {
+                delta[i] = secondDepthFrame[i];
+                delta[i] -= firstDepthFrame[i];
+            }
+
+            return delta; 
         }
      
         public byte[] getData() 
