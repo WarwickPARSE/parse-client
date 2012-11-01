@@ -57,7 +57,8 @@ namespace PARSE
         KinectSensor                                    kinectSensor;
 
         //These are used for Robin's prototyping (don't delete please)
-        private DeltaIsolator di; 
+        private DeltaIsolator di = new DeltaIsolator();
+        private WriteableBitmap deltaBitmap;
 
         public CoreLoader()
         {
@@ -266,9 +267,10 @@ namespace PARSE
             if (kinectConnected)
             {
                 //set the image to the last one that has been read in by the kinect
+                MessageBox.Show(this.depthFrame32.Length.ToString());
                 di.setData(this.depthFrame32);
 
-                WriteableBitmap a = new WriteableBitmap(
+                deltaBitmap = new WriteableBitmap(
                                     width,
                                     height,
                                     96, // DpiX
@@ -276,6 +278,15 @@ namespace PARSE
                                     PixelFormats.Bgr32,
                                     null);
 
+                byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)this.kinectSensor).DepthStream);
+
+                //dump the current depth frame to a bitmap image
+                this.deltaBitmap.WritePixels(
+                new Int32Rect(0, 0, width, height),
+                convertedDepthBits,
+                width * Bgr32BytesPerPixel,
+                0);
+                this.miniOutput.Source = this.deltaBitmap;
                 //di.dumpToImage(miniOutput, width, height);
             }
         }
