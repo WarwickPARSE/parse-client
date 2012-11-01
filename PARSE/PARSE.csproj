@@ -75,6 +75,8 @@
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
+    <Compile Include="ICP\Point.cs" />
+    <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
@@ -148,6 +150,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
