@@ -76,6 +76,14 @@
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
+    <Compile Include="ICP\KdTree\HPoint.cs" />
+    <Compile Include="ICP\KdTree\HRect.cs" />
+    <Compile Include="ICP\KdTree\KDTree.cs" />
+    <Compile Include="ICP\KdTree\KeyDuplicateException.cs" />
+    <Compile Include="ICP\KdTree\KeyMissingException.cs" />
+    <Compile Include="ICP\KdTree\KeySizeException.cs" />
+    <Compile Include="ICP\KdTree\NearestNeighborList.cs" />
+    <Compile Include="ICP\KdTree\PriorityQueue.cs" />
     <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
@@ -151,7 +159,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="ICP\KdTree\LICENSE.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
