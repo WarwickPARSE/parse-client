@@ -29,7 +29,7 @@ This project is in its pre-Alpha stage and, hence cannot be installed at
 this early stage. In fact we offer no guarantees that the code will even 
 compile, especially things that you may find in the prototyping directory. 
 
-Runnnig
+Running
 -------
 This software can only be run from within Visual Studio 2010 at this present 
 time. 
