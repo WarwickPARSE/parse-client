@@ -320,5 +320,15 @@ namespace PARSE
 
         }
 
+        private void kinectColorImage_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
     }
 }
