@@ -317,6 +317,8 @@ namespace PARSE
             // Draw a little yellow triangle
             GL.Color3(System.Drawing.Color.Yellow);
             GL.Begin(BeginMode.Points);
+            GL.Vertex3(100, 30, 0);
+            GL.Vertex3(200, 50, 0);
             GL.End();
 
             glc.SwapBuffers();
