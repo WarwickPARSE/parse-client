@@ -18,8 +18,9 @@ using System.Windows.Forms;
 
 //OpenTK Imports
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using GL = OpenTK.Graphics.OpenGL.GL;
+using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -59,6 +60,8 @@ namespace PARSE
         //Modelling specific definitions
         private ScannerModeller                         modeller;
         private ModelVisual3D                           gm;
+        //Open TK Control.
+        GLControl                                       glc;
 
         private bool                                    kinectConnected = false;
         public Int16[]                                  realDepthCollection;
@@ -293,21 +296,45 @@ namespace PARSE
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
-            //Open TK Control.
-            GLControl glc = new GLControl();
+            glc = new GLControl();
+
+            //Load control and painter
+            glc.Load += new EventHandler(glc_Load);
+            glc.Paint += new System.Windows.Forms.PaintEventHandler(this.glc_Paint);
+
             //Attached to form host.
             host.Child = glc;
 
         }
 
-        void glc_Paint(object sender, System.Windows.Forms.PaintEventHandler e)
+        void glc_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            throw new NotImplementedException();
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+
+            // Draw a little yellow triangle
+            GL.Color3(System.Drawing.Color.Yellow);
+            GL.Begin(BeginMode.Points);
+            GL.End();
+
+            glc.SwapBuffers();
         }
 
         void glc_Load(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            //make background black
+            GL.ClearColor(System.Drawing.Color.Black);
+
+            int w = glc.Width;
+            int h = glc.Height;
+
+            // Set up initial modes
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, w, 0, h, -1, 1);
+            GL.Viewport(0, 0, w, h);
         }
 
         private void btnFront_Click(object sender, RoutedEventArgs e)

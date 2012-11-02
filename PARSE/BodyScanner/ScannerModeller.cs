@@ -42,6 +42,7 @@ namespace PARSE
 
         }
 
+        //WPF 3D Methods
         public void ClearViewport(Viewport3D mainViewport)
         {
             ModelVisual3D m;
