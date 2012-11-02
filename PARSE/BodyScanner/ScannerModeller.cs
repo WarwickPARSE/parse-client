@@ -7,9 +7,20 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Drawing;
-using Microsoft.Kinect;
 using System.Windows;
+using System.Windows.Forms;
 
+//OpenTK Imports
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using GL = OpenTK.Graphics.OpenGL.GL;
+using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
+
+using Microsoft.Kinect;
+
+/*NOTE: Scanner modeller is making use of 2 gl's. This will be refactored to 1.
+        For now, they are incompatible and any additions/deletions
+        should maintain clear seperability between the commented blocks.*/
 
 namespace PARSE
 {
@@ -31,18 +42,44 @@ namespace PARSE
         private byte[]              colorpixeldata;
         private byte[]              colorFrame;
 
+        //OpenTK Definitions
+        private GLControl           glc;
+
         //Prototype Constructor
-        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint)
+        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint, GLControl glc)
         {
             this.x = xPoint;
             this.y = yPoint;
             this.z = depthCollection;
+            this.glc = glc;
             baseModel = new MeshGeometry3D();
             baseModelProperties = new GeometryModel3D();
 
         }
 
-        //WPF 3D Methods
+        //Start of OpenTK 3D Methods
+
+        public void glc_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+
+            // Draw a little yellow triangle
+            GL.Color3(System.Drawing.Color.Yellow);
+            GL.Begin(BeginMode.Points);
+            GL.Vertex3(100, 30, 0);
+            GL.Vertex3(200, 50, 0);
+            GL.End();
+
+            glc.SwapBuffers();
+        }
+
+
+        //End of OpenTK 3D Methods
+
+        //Start of WPF 3D Methods
         public void ClearViewport(Viewport3D mainViewport)
         {
             ModelVisual3D m;

@@ -298,30 +298,6 @@ namespace PARSE
 
             glc = new GLControl();
 
-            //Load control and painter
-            glc.Load += new EventHandler(glc_Load);
-            glc.Paint += new System.Windows.Forms.PaintEventHandler(this.glc_Paint);
-
-            //Attached to form host.
-            host.Child = glc;
-
-        }
-
-        void glc_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
-        {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
-
-            // Draw a little yellow triangle
-            GL.Color3(System.Drawing.Color.Yellow);
-            GL.Begin(BeginMode.Points);
-            GL.Vertex3(100, 30, 0);
-            GL.Vertex3(200, 50, 0);
-            GL.End();
-
-            glc.SwapBuffers();
         }
 
         void glc_Load(object sender, EventArgs e)
@@ -388,12 +364,22 @@ namespace PARSE
 
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
+            
+            //---WPF 3D Methods---
             //re-initialize modeller instance and clear viewport
-            modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
+            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, glc);
 
             //pass captured stream data to modeller
             gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
             this.bodyviewport.Children.Add(gm);
+
+            //---OpenTK Methods---
+            //Load control and painter
+            glc.Load += new EventHandler(glc_Load);
+            glc.Paint += new System.Windows.Forms.PaintEventHandler(modeller.glc_Paint);
+
+            //Attached to form host.
+            host.Child = glc;
 
         }
 

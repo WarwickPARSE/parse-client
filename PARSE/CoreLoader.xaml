@@ -46,9 +46,15 @@
                 </ModelVisual3D.Content>
             </ModelVisual3D>
         </Viewport3D>
-        <WindowsFormsHost Width="273" Name="host" HorizontalAlignment="Right" Margin="0,251,12,62" Grid.Row="1" />
+        <WindowsFormsHost Width="273" Name="host" HorizontalAlignment="Right" Margin="0,250,0,62" Grid.Row="1" Background="Black" />
         <Grid Grid.Row="1" Height="174" HorizontalAlignment="Right" Margin="0,27,576,0" Name="grid4" VerticalAlignment="Top" Width="162">
             <Label Content="Parse Toolkit v0.1" Height="28" HorizontalAlignment="Left" Margin="0,6,0,0" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontStretch="Normal" FontStyle="Italic" />
+        </Grid>
+        <Grid Grid.Row="1" Height="200" Margin="477,251,0,0" Name="grid5" VerticalAlignment="Top" Background="Black">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="98*" />
+            </Grid.RowDefinitions>
         </Grid>
     </Grid>
 </Window>
