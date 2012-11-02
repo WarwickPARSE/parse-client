@@ -300,6 +300,16 @@ namespace PARSE
 
         }
 
+        void glc_Paint(object sender, System.Windows.Forms.PaintEventHandler e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void glc_Load(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
             //do nothing if there is no kinect detected
