@@ -1,6 +1,6 @@
 using System;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// Hyper-Point class supporting KDTree class

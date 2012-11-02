@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// Bjoern Heckel's solution to the KD-Tree n-nearest-neighbor problem

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// This class implements a <code>PriorityQueue</code>. This class

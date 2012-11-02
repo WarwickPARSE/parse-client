@@ -1,6 +1,6 @@
 using System;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// KeySizeException is thrown when a KDTree method is invoked on a

@@ -1,6 +1,6 @@
 using System;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// Key-size mismatch exception supporting KDTree class

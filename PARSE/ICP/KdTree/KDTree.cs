@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// This is an adaptation of the Java KDTree library implemented by Levy 

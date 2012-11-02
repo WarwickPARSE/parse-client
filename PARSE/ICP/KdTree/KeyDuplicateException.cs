@@ -1,6 +1,6 @@
 using System;
 
-namespace KDTreeDLL
+namespace KdTree
 {
     /// <summary>
     /// KeyDuplicateException is thrown when the <TT>KDTree.insert</TT> method
