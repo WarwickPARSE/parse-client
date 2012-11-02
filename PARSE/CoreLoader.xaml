@@ -1,35 +1,39 @@
 ﻿<Window x:Class="PARSE.CoreLoader"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         Title="CoreLoader" Height="586" Width="785" Loaded="Window_Loaded">
     <Grid Height="526" Width="750">
         <Grid.RowDefinitions>
             <RowDefinition Height="12*" />
             <RowDefinition Height="500*" />
         </Grid.RowDefinitions>
-        <Image Height="203" HorizontalAlignment="Left" Margin="177,11,0,0" Name="kinectDepthImage" Stretch="Fill" VerticalAlignment="Top" Width="273" Grid.RowSpan="2" />
-        <Image Height="105" HorizontalAlignment="Left" Margin="10,-1,0,0" Stretch="Fill" VerticalAlignment="Top" Width="146" Name="kinectColorImage" ImageFailed="kinectColorImage_ImageFailed" Grid.Row="1" />
-        <Label Content="Status" Height="29" HorizontalAlignment="Left" Margin="10,484,0,0" Name="lblStatus" VerticalAlignment="Top" Grid.Row="1" />
-        <Grid Height="84" HorizontalAlignment="Left" Margin="12,221,0,0" Name="grid1" VerticalAlignment="Top" Width="177" Grid.Row="1">
+        <Image Height="203" HorizontalAlignment="Left" Margin="465,27,0,0" Name="kinectDepthImage" Stretch="Fill" VerticalAlignment="Top" Width="273" Grid.Row="1" />
+        <Image Height="204" HorizontalAlignment="Left" Margin="187,27,0,0" Stretch="Fill" VerticalAlignment="Top" Width="273" Name="kinectColorImage" ImageFailed="kinectColorImage_ImageFailed" Grid.Row="1" />
+        <Label Content="Status" Height="29" HorizontalAlignment="Left" Margin="10,480,0,0" Name="lblStatus" VerticalAlignment="Top" Grid.Row="1" />
+        <Grid Height="84" HorizontalAlignment="Left" Margin="12,221,0,0" Name="grid1" VerticalAlignment="Top" Width="162" Grid.Row="1">
             <Label Content="Scanning" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="lblScanning" VerticalAlignment="Top" FontWeight="Bold" />
-            <Button Content="Front" Height="23" HorizontalAlignment="Left" Margin="6,40,0,0" Name="btnFront" VerticalAlignment="Top" Width="75" Click="btnFront_Click" />
-            <Button Content="Back" Height="23" HorizontalAlignment="Left" Margin="87,40,0,0" Name="btnBack" VerticalAlignment="Top" Width="75" />
+            <Button Content="Front" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnFront" VerticalAlignment="Top" Width="75" Click="btnFront_Click" />
+            <Button Content="Back" Height="23" HorizontalAlignment="Left" Margin="83,40,0,0" Name="btnBack" VerticalAlignment="Top" Width="75" />
         </Grid>
-        <Grid Height="130" HorizontalAlignment="Left" Margin="12,322,0,0" Name="grid2" VerticalAlignment="Top" Width="177" Grid.Row="1">
+        <Grid Height="130" HorizontalAlignment="Left" Margin="12,322,0,0" Name="grid2" VerticalAlignment="Top" Width="162" Grid.Row="1">
             <Label Content="Sensor Positioning" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="lblSensorPosition" VerticalAlignment="Top" FontWeight="Bold" />
-            <Button Content="Up" Height="23" HorizontalAlignment="Left" Margin="6,40,0,0" Name="btnSensorUp" VerticalAlignment="Top" Width="75" Click="btnSensorUp_Click" />
-            <Button Content="Down" Height="23" HorizontalAlignment="Left" Margin="87,40,0,0" Name="btnSensorDown" VerticalAlignment="Top" Width="75" Click="btnSensorDown_Click" />
-            <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="87,79,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
-            <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="6,79,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
+            <Button Content="Up" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnSensorUp" VerticalAlignment="Top" Width="75" Click="btnSensorUp_Click" />
+            <Button Content="Down" Height="23" HorizontalAlignment="Left" Margin="85,40,0,0" Name="btnSensorDown" VerticalAlignment="Top" Width="75" Click="btnSensorDown_Click" />
+            <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="85,79,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
+            <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="4,79,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
         </Grid>
-        <Grid HorizontalAlignment="Left" Background="Black" Width="286" Name="grid3" Margin="463,11,0,314" Grid.RowSpan="2">
+        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="grid3" Margin="187,251,0,62" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="136*" />
                 <ColumnDefinition Width="137*" />
             </Grid.ColumnDefinitions>
         </Grid>
+        <Grid Name="grid">
+            <Image Width="500" Height="375" Name="image" HorizontalAlignment="Left" />
+        </Grid>
         <Button Content="Bernard Button" Height="23" HorizontalAlignment="Left" Margin="655,478,0,0" Name="btnBernardButton" VerticalAlignment="Top" Width="75" Click="btnBernardButton_Click" Grid.Row="1" />
-        <Viewport3D x:Name="bodyviewport" Margin="467,10,4,315" Grid.RowSpan="2">
+        <Viewport3D x:Name="bodyviewport" Margin="187,251,290,62" Grid.Row="1">
             <Viewport3D.Camera>
                 <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="100" NearPlaneDistance="1" LookDirection="-11, -20, -9" UpDirection="1,0,0" Position="11,11,9" FieldOfView="50" />
             </Viewport3D.Camera>
@@ -42,5 +46,9 @@
                 </ModelVisual3D.Content>
             </ModelVisual3D>
         </Viewport3D>
+        <WindowsFormsHost Width="273" Name="host" HorizontalAlignment="Right" Margin="0,251,12,62" Grid.Row="1" />
+        <Grid Grid.Row="1" Height="174" HorizontalAlignment="Right" Margin="0,27,576,0" Name="grid4" VerticalAlignment="Top" Width="162">
+            <Label Content="Parse Toolkit v0.1" Height="28" HorizontalAlignment="Left" Margin="0,6,0,0" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontStretch="Normal" FontStyle="Italic" />
+        </Grid>
     </Grid>
 </Window>

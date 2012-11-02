@@ -1,4 +1,5 @@
-﻿using System;
+﻿//System imports
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -13,6 +14,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Forms;
+
+//OpenTK Imports
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
+
+//Kinect imports
 using Microsoft.Kinect;
 
 namespace PARSE
@@ -104,6 +113,12 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// Kinect color polling method
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event ready identifier</param>
+
         private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -129,6 +144,12 @@ namespace PARSE
                 }
             }
         }
+
+        /// <summary>
+        /// Kinect Depth Polling Method
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event ready identifier</param>
 
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
@@ -179,6 +200,13 @@ namespace PARSE
                 }
             }
         }
+
+        /// <summary>
+        /// Depth Frame Conversion Method
+        /// </summary>
+        /// <param name="depthFrame">current depth frame</param>
+        /// <param name="depthStream">originating depth stream</param>
+        /// <returns>depth pixel data</returns>
 
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
@@ -256,10 +284,20 @@ namespace PARSE
             return this.depthFrame32;
         }
 
-        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e) {
-            if (kinectConnected) {
-                this.kinectSensor.Stop();
-            }
+        /// <summary>
+        /// WPF Form Methods
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event identifier</param>
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            //Open TK Control.
+            GLControl glc = new GLControl();
+            //Attached to form host.
+            host.Child = glc;
+
         }
 
         private void btnFront_Click(object sender, RoutedEventArgs e)
@@ -320,14 +358,12 @@ namespace PARSE
 
         }
 
-        private void kinectColorImage_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-
+            if (kinectConnected)
+            {
+                this.kinectSensor.Stop();
+            }
         }
 
     }
