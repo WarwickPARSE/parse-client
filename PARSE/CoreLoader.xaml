@@ -23,7 +23,7 @@
             <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="85,79,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
             <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="4,79,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
         </Grid>
-        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="grid3" Margin="187,251,0,62" Grid.Row="1">
+        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="grid3" Margin="187,251,0,62" Grid.Row="1" MouseDown="grid3_MouseDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="136*" />
                 <ColumnDefinition Width="137*" />
@@ -35,14 +35,38 @@
         <Button Content="Bernard Button" Height="23" HorizontalAlignment="Left" Margin="655,478,0,0" Name="btnBernardButton" VerticalAlignment="Top" Width="75" Click="btnBernardButton_Click" Grid.Row="1" />
         <Viewport3D x:Name="bodyviewport" Margin="187,251,290,62" Grid.Row="1">
             <Viewport3D.Camera>
-                <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="100" NearPlaneDistance="1" LookDirection="-11, -20, -9" UpDirection="1,0,0" Position="11,11,9" FieldOfView="50" />
+                <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="4000" NearPlaneDistance="1" LookDirection="0,0,-5" UpDirection="1,0,0" Position="0,0,5" FieldOfView="50" />
             </Viewport3D.Camera>
-            <ModelVisual3D x:Name="coreBodyModel">
+            <!--Plane model -->
+            <!--<ModelVisual3D x:Name="coreBodyModel">
                 <ModelVisual3D.Content>
                     <Model3DGroup x:Name="group">
                         <AmbientLight Color="DarkGray" />
                         <DirectionalLight Color="White" Direction="-11,-10,-9" />
                     </Model3DGroup>
+                </ModelVisual3D.Content>
+            </ModelVisual3D>-->
+            <!--Mesh model -->
+            <ModelVisual3D>
+                <ModelVisual3D.Content>
+                    <Model3DGroup>
+                        <Model3DGroup.Children>
+                            <AmbientLight Color="DarkGray" />
+                            <DirectionalLight Color="White" Direction="0,0,-5" />
+                        </Model3DGroup.Children>
+                    </Model3DGroup>
+                </ModelVisual3D.Content>
+            </ModelVisual3D>
+            <ModelVisual3D>
+                <ModelVisual3D.Content>
+                    <GeometryModel3D>
+                        <GeometryModel3D.Geometry>
+                            <MeshGeometry3D x:Name="pointCloudMesh" />
+                        </GeometryModel3D.Geometry>
+                        <GeometryModel3D.Material><!-- To be replaced with image brush-->
+                            <DiffuseMaterial Brush="Red"/>
+                        </GeometryModel3D.Material>
+                    </GeometryModel3D>
                 </ModelVisual3D.Content>
             </ModelVisual3D>
         </Viewport3D>
@@ -56,5 +80,6 @@
                 <RowDefinition Height="98*" />
             </Grid.RowDefinitions>
         </Grid>
+        <Button Content="+" Grid.Row="1" Height="27" HorizontalAlignment="Left" Click="button1_Click" Margin="187,457,0,0" Name="button1" VerticalAlignment="Top" Width="36" />
     </Grid>
 </Window>

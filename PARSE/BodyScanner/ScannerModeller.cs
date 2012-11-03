@@ -29,29 +29,29 @@ namespace PARSE
     {
 
         //Prototype specific definitions
-        private Int16[]                 z;
+        private short[]                z;
         private int                     x;
         private int                     y;
 
         //Modelling definitions
-        private MeshGeometry3D      baseModel;
-        private GeometryModel3D     baseModelProperties;
-        private BitmapSource        bs;
-        private short[]             depthpixeldata;
-        private byte[]              depthFrame;
-        private byte[]              colorpixeldata;
-        private byte[]              colorFrame;
+        private MeshGeometry3D          baseModel;
+        private GeometryModel3D         baseModelProperties;
+        private BitmapSource            bs;
+        private short[]                 depthpixeldata;
+        private byte[]                  depthFrame;
+        private byte[]                  colorpixeldata;
+        private byte[]                  colorFrame;
 
         //OpenTK Definitions
-        private GLControl           glc;
+        private MeshGeometry3D          pcloud;
 
         //Prototype Constructor
-        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint, GLControl glc)
+        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint, MeshGeometry3D glc)
         {
             this.x = xPoint;
             this.y = yPoint;
             this.z = depthCollection;
-            this.glc = glc;
+            this.pcloud = glc;
             baseModel = new MeshGeometry3D();
             baseModelProperties = new GeometryModel3D();
 
@@ -68,14 +68,8 @@ namespace PARSE
 
             // Draw a little yellow triangle
             GL.Color3(System.Drawing.Color.Yellow);
-            GL.Begin(BeginMode.Points);
-            GL.Vertex3(100, 30, 0);
-            GL.Vertex3(200, 50, 0);
-            GL.End();
-
-            glc.SwapBuffers();
+           
         }
-
 
         //End of OpenTK 3D Methods
 
@@ -90,6 +84,155 @@ namespace PARSE
                     mainViewport.Children.Remove(m);
             }
         }
+
+        //Start of alternative point clouding method
+
+        public void RenderKinectPoints()
+        {
+            Point3DCollection points = ViewportPlotter();
+            CreatePointCloud(points);
+        }
+
+        private void CreatePointCloud(Point3DCollection p3d)
+        {
+
+            for (int i = 0; i < p3d.Count; i++)
+            {
+                RenderMesh(this.pcloud, p3d[i], 0.005);
+            }
+
+            this.pcloud.Freeze();
+        
+        }
+
+        private Point3DCollection ViewportPlotter()
+        {
+
+            Point3DCollection tempPoints = new Point3DCollection();
+            double x = 1;
+            double y = 1;
+            double c1 = 1;
+            double c2 = 1;
+
+            for (int i = 1; i < 640; i = i + 1) {
+
+                for (int p = 1; p < 480; p = p + 1) {
+                    
+                    x = c1 / 640;
+                    y = c2 / 480;
+
+                    if (this.z[i*p]!=1) {
+                        tempPoints.Add(new Point3D(x, y, (double) this.z[i*p]/8000));
+                    }
+                    //System.Diagnostics.Debug.WriteLine(x + " - " + y + " - " + (double) this.z[i*p]/8000);
+
+                    c2++;
+                }
+
+                c1++;
+                c2 = 0;
+            } 
+
+
+           /*
+            double maxTheta = Math.PI * 2;
+            double minY = -1.0;
+            double maxY = 1.0;
+
+            double dt = maxTheta / 70;
+            double dy = (maxY - minY) / 70;
+
+            MeshGeometry3D mesh = new MeshGeometry3D();
+            Point3DCollection points = new Point3DCollection();
+
+            for (int yi = 0; yi <= 70; yi++)
+            {
+                double y = minY + yi * dy;
+
+                for (int ti = 0; ti <= 70; ti++)
+                {
+                    double t = ti * dt;
+                    double r = Math.Sqrt(1 - y * y);
+                    double x = r * Math.Cos(t);
+                    double z = r * Math.Sin(t);
+                    tempPoints.Add(new Point3D(x, y, z));
+
+                    System.Diagnostics.Debug.WriteLine(x + " - " + y + " - " + z);
+                }
+            } */
+
+            return tempPoints;
+        }
+
+        private void RenderMesh(MeshGeometry3D mg, Point3D center, double cdim)
+        {
+
+            int offset = mg.Positions.Count;
+
+            if (mg != null)
+            {
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y + cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y + cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y + cdim, center.Z + cdim));
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y + cdim, center.Z + cdim));
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y - cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y - cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y - cdim, center.Z + cdim));
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y - cdim, center.Z + cdim));
+
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 6);
+
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 6);
+                mg.TriangleIndices.Add(offset + 7);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 1);
+                mg.TriangleIndices.Add(offset + 5);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 5);
+                mg.TriangleIndices.Add(offset + 6);
+
+                mg.TriangleIndices.Add(offset + 1);
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 4);
+
+                mg.TriangleIndices.Add(offset + 1);
+                mg.TriangleIndices.Add(offset + 4);
+                mg.TriangleIndices.Add(offset + 5);
+
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 7);
+
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 7);
+                mg.TriangleIndices.Add(offset + 4);
+
+                mg.TriangleIndices.Add(offset + 7);
+                mg.TriangleIndices.Add(offset + 6);
+                mg.TriangleIndices.Add(offset + 5);
+
+                mg.TriangleIndices.Add(offset + 7);
+                mg.TriangleIndices.Add(offset + 5);
+                mg.TriangleIndices.Add(offset + 4);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 0);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 1);
+            
+            }
+
+        }
+
+        //End of alternative point clouding method
 
         private Point3D[] GetRandomTopographyPoints()
         {
@@ -110,13 +253,13 @@ namespace PARSE
                 }
             }
             return points;
-        }
+        } 
 
         /// <summary>
         /// Plots points into WPF Viewport
         /// </summary>
         /// <returns>Base model with associated properties.</returns>
-      
+
         public ModelVisual3D run(BitmapSource rgbImage)
         {
 

@@ -367,11 +367,12 @@ namespace PARSE
             
             //---WPF 3D Methods---
             //re-initialize modeller instance and clear viewport
-            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, glc);
+            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, pointCloudMesh);
+            modeller.RenderKinectPoints();
 
             //pass captured stream data to modeller
-            gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
-            this.bodyviewport.Children.Add(gm);
+            //gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
+            //this.bodyviewport.Children.Add(gm);
 
             //---OpenTK Methods---
             //Load control and painter
@@ -389,6 +390,21 @@ namespace PARSE
             {
                 this.kinectSensor.Stop();
             }
+        }
+
+        //Viewport manipulation
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+           bodycamera.Position = new Point3D(
+           0.5,
+           0.5,
+           bodycamera.Position.Z - 0.5);
+        }
+
+        private void grid3_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("clicked");
         }
 
     }
