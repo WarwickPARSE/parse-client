@@ -16,12 +16,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
 
-//OpenTK Imports
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using GL = OpenTK.Graphics.OpenGL.GL;
-using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
-
 //Kinect imports
 using Microsoft.Kinect;
 
@@ -50,21 +44,20 @@ namespace PARSE
         private byte[]                                  colorFrameRGB;
         private WriteableBitmap                         outputColorBitmap;
         private ColorImageFormat                        rgbImageFormat;
-        private WriteableBitmap                         tempBitmap;
 
         //frame sizes
         private int                                     width;
         private int                                     height;
-        private bool                                    isCaptured;
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
-        private ModelVisual3D                           gm;
-        //Open TK Control.
-        GLControl                                       glc;
+        private GeometryModel3D                         model;
+        private GeometryModel3D                         pointers;
+        private bool                                    moveDown;
+        private Point                                   moveLastPos;
 
         private bool                                    kinectConnected = false;
-        public Int16[]                                  realDepthCollection;
+        public int[]                                    realDepthCollection;
         public int                                      realDepth;
         public int                                      x;
         public int                                      y;
@@ -185,6 +178,7 @@ namespace PARSE
 
                     imageFrame.CopyPixelDataTo(this.pixelData);
 
+
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
                     //dump the current depth frame to a bitmap image
@@ -214,13 +208,13 @@ namespace PARSE
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
 
-            this.realDepthCollection = new Int16[depthFrame.Length];
+            this.realDepthCollection = new int[depthFrame.Length];
 
             for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
             {
 
                 realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
-                realDepthCollection[i16] = (Int16) realDepth;
+                realDepthCollection[i16] = realDepth;
 
                 if (realDepth < 800)
                 {
@@ -295,25 +289,14 @@ namespace PARSE
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
-            glc = new GLControl();
+            //Initialize camera position
+            bodycamera.Position = new Point3D(
+            0.5,
+            0.5,
+            bodycamera.Position.Z);
 
         }
 
-        void glc_Load(object sender, EventArgs e)
-        {
-            //make background black
-            GL.ClearColor(System.Drawing.Color.Black);
-
-            int w = glc.Width;
-            int h = glc.Height;
-
-            // Set up initial modes
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(0, w, 0, h, -1, 1);
-            GL.Viewport(0, 0, w, h);
-        }
 
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
@@ -365,23 +348,20 @@ namespace PARSE
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
             
-            //---WPF 3D Methods---
             //re-initialize modeller instance and clear viewport
             modeller = new ScannerModeller(realDepthCollection, this.width, this.height, pointCloudMesh);
-            modeller.RenderKinectPoints();
+            model = modeller.RenderKinectPoints();
 
-            //pass captured stream data to modeller
-            //gm = modeller.run(this.outputColorBitmap.CloneCurrentValue());
-            //this.bodyviewport.Children.Add(gm);
+        }
 
-            //---OpenTK Methods---
-            //Load control and painter
-            glc.Load += new EventHandler(glc_Load);
-            glc.Paint += new System.Windows.Forms.PaintEventHandler(modeller.glc_Paint);
+        //Viewport manipulation
 
-            //Attached to form host.
-            host.Child = glc;
-
+        private void ZoomIn_Click(object sender, RoutedEventArgs e)
+        {
+           bodycamera.Position = new Point3D(
+           bodycamera.Position.X,
+           bodycamera.Position.Y,
+           bodycamera.Position.Z - 0.5);
         }
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -390,21 +370,6 @@ namespace PARSE
             {
                 this.kinectSensor.Stop();
             }
-        }
-
-        //Viewport manipulation
-
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-           bodycamera.Position = new Point3D(
-           0.5,
-           0.5,
-           bodycamera.Position.Z - 0.5);
-        }
-
-        private void grid3_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine("clicked");
         }
 
     }

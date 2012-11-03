@@ -10,12 +10,6 @@ using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
 
-//OpenTK Imports
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using GL = OpenTK.Graphics.OpenGL.GL;
-using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
-
 using Microsoft.Kinect;
 
 /*NOTE: Scanner modeller is making use of 2 gl's. This will be refactored to 1.
@@ -29,7 +23,7 @@ namespace PARSE
     {
 
         //Prototype specific definitions
-        private short[]                z;
+        private int[]                   z;
         private int                     x;
         private int                     y;
 
@@ -46,7 +40,7 @@ namespace PARSE
         private MeshGeometry3D          pcloud;
 
         //Prototype Constructor
-        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint, MeshGeometry3D glc)
+        public ScannerModeller(int[] depthCollection, int xPoint, int yPoint, MeshGeometry3D glc)
         {
             this.x = xPoint;
             this.y = yPoint;
@@ -56,22 +50,6 @@ namespace PARSE
             baseModelProperties = new GeometryModel3D();
 
         }
-
-        //Start of OpenTK 3D Methods
-
-        public void glc_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
-        {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
-
-            // Draw a little yellow triangle
-            GL.Color3(System.Drawing.Color.Yellow);
-           
-        }
-
-        //End of OpenTK 3D Methods
 
         //Start of WPF 3D Methods
         public void ClearViewport(Viewport3D mainViewport)
@@ -87,18 +65,26 @@ namespace PARSE
 
         //Start of alternative point clouding method
 
-        public void RenderKinectPoints()
+        public GeometryModel3D RenderKinectPoints()
         {
             Point3DCollection points = ViewportPlotter();
             CreatePointCloud(points);
+
+            return new GeometryModel3D(pcloud, new DiffuseMaterial(System.Windows.Media.Brushes.Red));
         }
 
         private void CreatePointCloud(Point3DCollection p3d)
         {
 
+            GeometryModel3D[] points = new GeometryModel3D[640 * 480];
+            GeometryModel3D sheet = new GeometryModel3D();
+
+            sheet.Geometry = this.pcloud;
+            sheet.Material = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+
             for (int i = 0; i < p3d.Count; i++)
             {
-                RenderMesh(this.pcloud, p3d[i], 0.005);
+                RenderMesh(this.pcloud, p3d[i], 0.05);
             }
 
             this.pcloud.Freeze();
@@ -114,24 +100,23 @@ namespace PARSE
             double c1 = 1;
             double c2 = 1;
 
-            for (int i = 1; i < 640; i = i + 1) {
+            for (int i = 1; i < 640; i = i + 5) {
 
-                for (int p = 1; p < 480; p = p + 1) {
+                for (int p = 1; p < 480; p = p + 5) {
                     
                     x = c1 / 640;
                     y = c2 / 480;
 
-                    if (this.z[i*p]!=1) {
-                        tempPoints.Add(new Point3D(x, y, (double) this.z[i*p]/8000));
+                    if (this.z[p*i] > 1000 && this.z[p*i] < 4000) {
+                        tempPoints.Add(new Point3D(x, y, 0));
                     }
-                    //System.Diagnostics.Debug.WriteLine(x + " - " + y + " - " + (double) this.z[i*p]/8000);
 
-                    c2++;
+                    c2 = c2 + 5;
                 }
 
-                c1++;
+                c1 = c1 + 5;
                 c2 = 0;
-            } 
+            }
 
 
            /*
@@ -151,16 +136,16 @@ namespace PARSE
 
                 for (int ti = 0; ti <= 70; ti++)
                 {
-                    double t = ti * dt;
-                    double r = Math.Sqrt(1 - y * y);
-                    double x = r * Math.Cos(t);
-                    double z = r * Math.Sin(t);
-                    tempPoints.Add(new Point3D(x, y, z));
+                    //double t = ti * dt;
+                    //double r = Math.Sqrt(1 - y * y);
+                    //double x = r * Math.Cos(t);
+                    //double z = r * Math.Sin(t);
+                    tempPoints.Add(new Point3D(0, 0, 0));
 
-                    System.Diagnostics.Debug.WriteLine(x + " - " + y + " - " + z);
+                    //System.Diagnostics.Debug.WriteLine(x + " - " + y + " - " + z);
                 }
-            } */
-
+            }*/
+            System.Diagnostics.Debug.WriteLine(tempPoints.Count());
             return tempPoints;
         }
 

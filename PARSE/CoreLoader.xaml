@@ -23,7 +23,7 @@
             <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="85,79,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
             <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="4,79,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
         </Grid>
-        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="grid3" Margin="187,251,0,62" Grid.Row="1" MouseDown="grid3_MouseDown">
+        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="viewportGrid" Margin="187,251,0,62" Grid.Row="1" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="136*" />
                 <ColumnDefinition Width="137*" />
@@ -33,9 +33,9 @@
             <Image Width="500" Height="375" Name="image" HorizontalAlignment="Left" />
         </Grid>
         <Button Content="Bernard Button" Height="23" HorizontalAlignment="Left" Margin="655,478,0,0" Name="btnBernardButton" VerticalAlignment="Top" Width="75" Click="btnBernardButton_Click" Grid.Row="1" />
-        <Viewport3D x:Name="bodyviewport" Margin="187,251,290,62" Grid.Row="1">
+        <Viewport3D x:Name="bodyviewport" Margin="187,251,290,62" Grid.Row="1" ClipToBounds="True">
             <Viewport3D.Camera>
-                <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="4000" NearPlaneDistance="1" LookDirection="0,0,-5" UpDirection="1,0,0" Position="0,0,5" FieldOfView="50" />
+                <PerspectiveCamera x:Name="bodycamera" FarPlaneDistance="8000" NearPlaneDistance="0" LookDirection="0,0,-5" UpDirection="1,0,0" Position="0,0,5" FieldOfView="50" />
             </Viewport3D.Camera>
             <!--Plane model -->
             <!--<ModelVisual3D x:Name="coreBodyModel">
@@ -51,8 +51,7 @@
                 <ModelVisual3D.Content>
                     <Model3DGroup>
                         <Model3DGroup.Children>
-                            <AmbientLight Color="DarkGray" />
-                            <DirectionalLight Color="White" Direction="0,0,-5" />
+                            <DirectionalLight Color = "White" Direction="0,0,-5"></DirectionalLight>
                         </Model3DGroup.Children>
                     </Model3DGroup>
                 </ModelVisual3D.Content>
@@ -80,6 +79,6 @@
                 <RowDefinition Height="98*" />
             </Grid.RowDefinitions>
         </Grid>
-        <Button Content="+" Grid.Row="1" Height="27" HorizontalAlignment="Left" Click="button1_Click" Margin="187,457,0,0" Name="button1" VerticalAlignment="Top" Width="36" />
+        <Button Content="+" Grid.Row="1" Height="27" HorizontalAlignment="Left" Click="ZoomIn_Click" Margin="187,457,0,0" Name="button1" VerticalAlignment="Top" Width="36" />
     </Grid>
 </Window>
