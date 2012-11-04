@@ -31,15 +31,15 @@ namespace PARSE
         private MeshGeometry3D          baseModel;
         private GeometryModel3D         baseModelProperties;
         private BitmapSource            bs;
-        private short[]                 depthpixeldata;
-        private byte[]                  depthFrame;
-        private byte[]                  colorpixeldata;
-        private byte[]                  colorFrame;
 
         //OpenTK Definitions
         private MeshGeometry3D          pcloud;
 
-        //Prototype Constructor
+        //Constructor 1 definitions
+        private Canvas                  viewportCanvas;
+        private GeometryModel3D[]       pts;
+
+        //Constructor 1
         public ScannerModeller(int[] depthCollection, int xPoint, int yPoint, MeshGeometry3D glc)
         {
             this.x = xPoint;
@@ -50,20 +50,88 @@ namespace PARSE
             baseModelProperties = new GeometryModel3D();
 
         }
-
-        //Start of WPF 3D Methods
-        public void ClearViewport(Viewport3D mainViewport)
+        //Constructor 2
+        public ScannerModeller(Canvas g1, GeometryModel3D[] points)
         {
-            ModelVisual3D m;
-            for (int i = mainViewport.Children.Count - 1; i >= 0; i--)
+            this.viewportCanvas = g1;
+            this.pts = points;
+        }
+        
+        //Start of pc method 1
+
+        public GeometryModel3D[] RenderKinectPointsTriangle()
+        {
+            DirectionalLight DirLight1 = new DirectionalLight();
+            DirLight1.Color = Colors.White;
+            DirLight1.Direction = new Vector3D(1, 1, 1);
+            int s = 4;
+
+
+            PerspectiveCamera Camera1 = new PerspectiveCamera();
+            Camera1.FarPlaneDistance = 8000;
+            Camera1.NearPlaneDistance = 100;
+            Camera1.FieldOfView = 10;
+            Camera1.Position = new Point3D(160, 120, -1000);
+            Camera1.LookDirection = new Vector3D(0, 0, 1);
+            Camera1.UpDirection = new Vector3D(0, -1, 0);
+
+            Model3DGroup modelGroup = new Model3DGroup();
+
+            int i = 0;
+            for (int y = 0; y < 480; y += s)
             {
-                m = (ModelVisual3D)mainViewport.Children[i];
-                if (m.Content is DirectionalLight == false)
-                    mainViewport.Children.Remove(m);
+                for (int x = 0; x < 640; x += s)
+                {
+                    pts[i] = Triangle(x, y, s);
+                    pts[i].Transform = new TranslateTransform3D(0, 0, 0);
+                    modelGroup.Children.Add(pts[i]);
+                    i++;
+                }
             }
+
+            modelGroup.Children.Add(DirLight1);
+            ModelVisual3D modelsVisual = new ModelVisual3D();
+            modelsVisual.Content = modelGroup;
+            Viewport3D myViewport = new Viewport3D();
+            myViewport.IsHitTestVisible = false;
+            myViewport.Camera = Camera1;
+            myViewport.Children.Add(modelsVisual);
+            viewportCanvas.Children.Add(myViewport);
+
+            myViewport.Height = viewportCanvas.Height;
+            myViewport.Width = viewportCanvas.Width;
+            Canvas.SetTop(myViewport, 0);
+            Canvas.SetLeft(myViewport, 0);
+
+            return pts;
         }
 
-        //Start of alternative point clouding method
+        private GeometryModel3D Triangle(double x, double y, double s)
+        {
+            Point3DCollection corners = new Point3DCollection();
+            corners.Add(new Point3D(x, y, 0));
+            corners.Add(new Point3D(x, y + s, 0));
+            corners.Add(new Point3D(x + s, y + s, 0));
+            corners.Add(new Point3D(x + y + s, x + y + s, 0));
+
+            Int32Collection Triangles = new Int32Collection();
+            Triangles.Add(0);
+            Triangles.Add(1);
+            Triangles.Add(2);
+            Triangles.Add(3);
+
+            MeshGeometry3D tmesh = new MeshGeometry3D();
+            tmesh.Positions = corners;
+            tmesh.TriangleIndices = Triangles;
+            tmesh.Normals.Add(new Vector3D(0, 0, -1));
+
+            GeometryModel3D msheet = new GeometryModel3D();
+            msheet.Geometry = tmesh;
+            msheet.Material = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+            return msheet;
+        }
+
+        //Start of pc method 2
 
         public GeometryModel3D RenderKinectPoints()
         {
@@ -118,33 +186,6 @@ namespace PARSE
                 c2 = 0;
             }
 
-
-           /*
-            double maxTheta = Math.PI * 2;
-            double minY = -1.0;
-            double maxY = 1.0;
-
-            double dt = maxTheta / 70;
-            double dy = (maxY - minY) / 70;
-
-            MeshGeometry3D mesh = new MeshGeometry3D();
-            Point3DCollection points = new Point3DCollection();
-
-            for (int yi = 0; yi <= 70; yi++)
-            {
-                double y = minY + yi * dy;
-
-                for (int ti = 0; ti <= 70; ti++)
-                {
-                    //double t = ti * dt;
-                    //double r = Math.Sqrt(1 - y * y);
-                    //double x = r * Math.Cos(t);
-                    //double z = r * Math.Sin(t);
-                    tempPoints.Add(new Point3D(0, 0, 0));
-
-                    //System.Diagnostics.Debug.WriteLine(x + " - " + y + " - " + z);
-                }
-            }*/
             System.Diagnostics.Debug.WriteLine(tempPoints.Count());
             return tempPoints;
         }
@@ -217,7 +258,7 @@ namespace PARSE
 
         }
 
-        //End of alternative point clouding method
+        //Start of pc method 3
 
         private Point3D[] GetRandomTopographyPoints()
         {

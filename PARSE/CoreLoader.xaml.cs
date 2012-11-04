@@ -52,15 +52,15 @@ namespace PARSE
         //Modelling specific definitions
         private ScannerModeller                         modeller;
         private GeometryModel3D                         model;
-        private GeometryModel3D                         pointers;
-        private bool                                    moveDown;
-        private Point                                   moveLastPos;
+        private GeometryModel3D[]                       points;
 
         private bool                                    kinectConnected = false;
         public int[]                                    realDepthCollection;
         public int                                      realDepth;
         public int                                      x;
         public int                                      y;
+        public int                                      s = 4;
+        public bool                                     pc = false;
 
         //Kinect sensor
         KinectSensor                                    kinectSensor;
@@ -156,10 +156,11 @@ namespace PARSE
                     //dirty temporary hack - set global variables 
                     this.height = imageFrame.Height;
                     this.width = imageFrame.Width;
-
                     bool NewFormat = this.lastImageFormat != imageFrame.Format;
-                    x = imageFrame.Width/2;
-                    y = imageFrame.Height/2;
+                    int temp = 0;
+                    int i = 0;
+                    x = imageFrame.Width / 2;
+                    y = imageFrame.Height / 2;
 
                     if (NewFormat)
                     {
@@ -178,8 +179,19 @@ namespace PARSE
 
                     imageFrame.CopyPixelDataTo(this.pixelData);
 
-
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
+
+                    if (pc)
+                    {
+                        for (int a = 0; a < 480; a += s)
+                            for (int b = 0; b < 640; b += s)
+                            {
+                                temp = ((ushort)this.pixelData[b + a * 640]) >> 3;
+                                ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
+                                i++;
+                            }
+                    }
+
 
                     //dump the current depth frame to a bitmap image
 
@@ -192,8 +204,8 @@ namespace PARSE
                     this.lastImageFormat = imageFrame.Format;
                 }
                 else 
-                { 
-                    
+                {
+                    return;
                 }
             }
         }
@@ -347,10 +359,16 @@ namespace PARSE
 
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
-            
-            //re-initialize modeller instance and clear viewport
+            points = new GeometryModel3D[640*480];
+            pc = true;
+
+            //cube mesh viewer
             modeller = new ScannerModeller(realDepthCollection, this.width, this.height, pointCloudMesh);
             model = modeller.RenderKinectPoints();
+
+            //triangle mesh viewer
+            modeller = new ScannerModeller(vpcanvas, points);
+            points = modeller.RenderKinectPointsTriangle();
 
         }
 
