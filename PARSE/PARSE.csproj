@@ -86,6 +86,9 @@
     <Compile Include="ICP\KdTree\PriorityQueue.cs" />
     <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
+    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
@@ -101,6 +104,10 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
