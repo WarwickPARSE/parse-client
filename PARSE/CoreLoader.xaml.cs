@@ -1,6 +1,8 @@
-﻿using System;
+﻿//System imports
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Forms;
+
+//Kinect imports
 using Microsoft.Kinect;
 
 namespace PARSE
@@ -46,13 +51,16 @@ namespace PARSE
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
-        private GeometryModel3D                         gm;
+        private GeometryModel3D                         model;
+        private GeometryModel3D[]                       points;
 
         private bool                                    kinectConnected = false;
-        public Int16[]                                  realDepthCollection;
+        public int[]                                    realDepthCollection;
         public int                                      realDepth;
         public int                                      x;
         public int                                      y;
+        public int                                      s = 4;
+        public bool                                     pc = false;
 
         //Kinect sensor
         KinectSensor                                    kinectSensor;
@@ -101,6 +109,12 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// Kinect color polling method
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event ready identifier</param>
+
         private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -127,6 +141,12 @@ namespace PARSE
             }
         }
 
+        /// <summary>
+        /// Kinect Depth Polling Method
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event ready identifier</param>
+
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
             using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
@@ -136,10 +156,11 @@ namespace PARSE
                     //dirty temporary hack - set global variables 
                     this.height = imageFrame.Height;
                     this.width = imageFrame.Width;
-
                     bool NewFormat = this.lastImageFormat != imageFrame.Format;
-                    x = imageFrame.Width/2;
-                    y = imageFrame.Height/2;
+                    int temp = 0;
+                    int i = 0;
+                    x = imageFrame.Width / 2;
+                    y = imageFrame.Height / 2;
 
                     if (NewFormat)
                     {
@@ -160,7 +181,20 @@ namespace PARSE
 
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
+                    if (pc)
+                    {
+                        for (int a = 0; a < 480; a += s)
+                            for (int b = 0; b < 640; b += s)
+                            {
+                                temp = ((ushort)this.pixelData[b + a * 640]) >> 3;
+                                ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
+                                i++;
+                            }
+                    }
+
+
                     //dump the current depth frame to a bitmap image
+
                     this.outputBitmap.WritePixels(
                     new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
                     convertedDepthBits,
@@ -170,22 +204,29 @@ namespace PARSE
                     this.lastImageFormat = imageFrame.Format;
                 }
                 else 
-                { 
-                    
+                {
+                    return;
                 }
             }
         }
 
+        /// <summary>
+        /// Depth Frame Conversion Method
+        /// </summary>
+        /// <param name="depthFrame">current depth frame</param>
+        /// <param name="depthStream">originating depth stream</param>
+        /// <returns>depth pixel data</returns>
+
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
 
-            this.realDepthCollection = new Int16[depthFrame.Length];
+            this.realDepthCollection = new int[depthFrame.Length];
 
             for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
             {
 
                 realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
-                realDepthCollection[i16] = (Int16) realDepth;
+                realDepthCollection[i16] = realDepth;
 
                 if (realDepth < 800)
                 {
@@ -252,11 +293,22 @@ namespace PARSE
             return this.depthFrame32;
         }
 
-        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e) {
-            if (kinectConnected) {
-                this.kinectSensor.Stop();
-            }
+        /// <summary>
+        /// WPF Form Methods
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event identifier</param>
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //Initialize camera position
+            bodycamera.Position = new Point3D(
+            0.5,
+            0.5,
+            bodycamera.Position.Z);
+
         }
+
 
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
@@ -307,10 +359,35 @@ namespace PARSE
 
         private void btnBernardButton_Click(object sender, RoutedEventArgs e)
         {
-            modeller = new ScannerModeller(realDepthCollection, this.width, this.height);
-            gm = modeller.run();
-            group.Children.Add(gm);
+            points = new GeometryModel3D[640*480];
+            pc = true;
 
+            //cube mesh viewer
+            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, pointCloudMesh);
+            model = modeller.RenderKinectPoints();
+
+            //triangle mesh viewer
+            modeller = new ScannerModeller(vpcanvas, points);
+            points = modeller.RenderKinectPointsTriangle();
+
+        }
+
+        //Viewport manipulation
+
+        private void ZoomIn_Click(object sender, RoutedEventArgs e)
+        {
+           bodycamera.Position = new Point3D(
+           bodycamera.Position.X,
+           bodycamera.Position.Y,
+           bodycamera.Position.Z - 0.5);
+        }
+
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (kinectConnected)
+            {
+                this.kinectSensor.Stop();
+            }
         }
 
     }
