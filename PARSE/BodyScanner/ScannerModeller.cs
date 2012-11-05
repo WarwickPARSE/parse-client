@@ -7,9 +7,14 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Drawing;
-using Microsoft.Kinect;
 using System.Windows;
+using System.Windows.Forms;
 
+using Microsoft.Kinect;
+
+/*NOTE: Scanner modeller is making use of 2 gl's. This will be refactored to 1.
+        For now, they are incompatible and any additions/deletions
+        should maintain clear seperability between the commented blocks.*/
 
 namespace PARSE
 {
@@ -18,40 +23,242 @@ namespace PARSE
     {
 
         //Prototype specific definitions
-        private Int16[]                 z;
+        private int[]                   z;
         private int                     x;
         private int                     y;
 
         //Modelling definitions
-        private MeshGeometry3D      baseModel;
-        private GeometryModel3D     baseModelProperties;
-        private BitmapSource        bs;
-        private short[]             depthpixeldata;
-        private byte[]              depthFrame;
-        private byte[]              colorpixeldata;
-        private byte[]              colorFrame;
+        private MeshGeometry3D          baseModel;
+        private GeometryModel3D         baseModelProperties;
+        private BitmapSource            bs;
 
-        //Prototype Constructor
-        public ScannerModeller(Int16[] depthCollection, int xPoint, int yPoint)
+        //OpenTK Definitions
+        private MeshGeometry3D          pcloud;
+
+        //Constructor 1 definitions
+        private Canvas                  viewportCanvas;
+        private GeometryModel3D[]       pts;
+
+        //Constructor 1
+        public ScannerModeller(int[] depthCollection, int xPoint, int yPoint, MeshGeometry3D glc)
         {
             this.x = xPoint;
             this.y = yPoint;
             this.z = depthCollection;
+            this.pcloud = glc;
             baseModel = new MeshGeometry3D();
             baseModelProperties = new GeometryModel3D();
 
         }
-
-        public void ClearViewport(Viewport3D mainViewport)
+        //Constructor 2
+        public ScannerModeller(Canvas g1, GeometryModel3D[] points)
         {
-            ModelVisual3D m;
-            for (int i = mainViewport.Children.Count - 1; i >= 0; i--)
-            {
-                m = (ModelVisual3D)mainViewport.Children[i];
-                if (m.Content is DirectionalLight == false)
-                    mainViewport.Children.Remove(m);
-            }
+            this.viewportCanvas = g1;
+            this.pts = points;
         }
+        
+        //Start of pc method 1
+
+        public GeometryModel3D[] RenderKinectPointsTriangle()
+        {
+            DirectionalLight DirLight1 = new DirectionalLight();
+            DirLight1.Color = Colors.White;
+            DirLight1.Direction = new Vector3D(1, 1, 1);
+            int s = 4;
+
+
+            PerspectiveCamera Camera1 = new PerspectiveCamera();
+            Camera1.FarPlaneDistance = 8000;
+            Camera1.NearPlaneDistance = 100;
+            Camera1.FieldOfView = 10;
+            Camera1.Position = new Point3D(160, 120, -1000);
+            Camera1.LookDirection = new Vector3D(0, 0, 1);
+            Camera1.UpDirection = new Vector3D(0, -1, 0);
+
+            Model3DGroup modelGroup = new Model3DGroup();
+
+            int i = 0;
+            for (int y = 0; y < 480; y += s)
+            {
+                for (int x = 0; x < 640; x += s)
+                {
+                    pts[i] = Triangle(x, y, s);
+                    pts[i].Transform = new TranslateTransform3D(0, 0, 0);
+                    modelGroup.Children.Add(pts[i]);
+                    i++;
+                }
+            }
+
+            modelGroup.Children.Add(DirLight1);
+            ModelVisual3D modelsVisual = new ModelVisual3D();
+            modelsVisual.Content = modelGroup;
+            Viewport3D myViewport = new Viewport3D();
+            myViewport.IsHitTestVisible = false;
+            myViewport.Camera = Camera1;
+            myViewport.Children.Add(modelsVisual);
+            viewportCanvas.Children.Add(myViewport);
+
+            myViewport.Height = viewportCanvas.Height;
+            myViewport.Width = viewportCanvas.Width;
+            Canvas.SetTop(myViewport, 0);
+            Canvas.SetLeft(myViewport, 0);
+
+            return pts;
+        }
+
+        private GeometryModel3D Triangle(double x, double y, double s)
+        {
+            Point3DCollection corners = new Point3DCollection();
+            corners.Add(new Point3D(x, y, 0));
+            corners.Add(new Point3D(x, y + s, 0));
+            corners.Add(new Point3D(x + s, y + s, 0));
+            corners.Add(new Point3D(x + y + s, x + y + s, 0));
+
+            Int32Collection Triangles = new Int32Collection();
+            Triangles.Add(0);
+            Triangles.Add(1);
+            Triangles.Add(2);
+            Triangles.Add(3);
+
+            MeshGeometry3D tmesh = new MeshGeometry3D();
+            tmesh.Positions = corners;
+            tmesh.TriangleIndices = Triangles;
+            tmesh.Normals.Add(new Vector3D(0, 0, -1));
+
+            GeometryModel3D msheet = new GeometryModel3D();
+            msheet.Geometry = tmesh;
+            msheet.Material = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+            return msheet;
+        }
+
+        //Start of pc method 2
+
+        public GeometryModel3D RenderKinectPoints()
+        {
+            Point3DCollection points = ViewportPlotter();
+            CreatePointCloud(points);
+
+            return new GeometryModel3D(pcloud, new DiffuseMaterial(System.Windows.Media.Brushes.Red));
+        }
+
+        private void CreatePointCloud(Point3DCollection p3d)
+        {
+
+            GeometryModel3D[] points = new GeometryModel3D[640 * 480];
+            GeometryModel3D sheet = new GeometryModel3D();
+
+            sheet.Geometry = this.pcloud;
+            sheet.Material = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+
+            for (int i = 0; i < p3d.Count; i++)
+            {
+                RenderMesh(this.pcloud, p3d[i], 0.05);
+            }
+
+            this.pcloud.Freeze();
+        
+        }
+
+        private Point3DCollection ViewportPlotter()
+        {
+
+            Point3DCollection tempPoints = new Point3DCollection();
+            double x = 1;
+            double y = 1;
+            double c1 = 1;
+            double c2 = 1;
+
+            for (int i = 1; i < 640; i = i + 5) {
+
+                for (int p = 1; p < 480; p = p + 5) {
+                    
+                    x = c1 / 640;
+                    y = c2 / 480;
+
+                    if (this.z[p*i] > 1000 && this.z[p*i] < 4000) {
+                        tempPoints.Add(new Point3D(x, y, 0));
+                    }
+
+                    c2 = c2 + 5;
+                }
+
+                c1 = c1 + 5;
+                c2 = 0;
+            }
+
+            System.Diagnostics.Debug.WriteLine(tempPoints.Count());
+            return tempPoints;
+        }
+
+        private void RenderMesh(MeshGeometry3D mg, Point3D center, double cdim)
+        {
+
+            int offset = mg.Positions.Count;
+
+            if (mg != null)
+            {
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y + cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y + cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y + cdim, center.Z + cdim));
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y + cdim, center.Z + cdim));
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y - cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y - cdim, center.Z - cdim));
+                mg.Positions.Add(new Point3D(center.X + cdim, center.Y - cdim, center.Z + cdim));
+                mg.Positions.Add(new Point3D(center.X - cdim, center.Y - cdim, center.Z + cdim));
+
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 6);
+
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 6);
+                mg.TriangleIndices.Add(offset + 7);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 1);
+                mg.TriangleIndices.Add(offset + 5);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 5);
+                mg.TriangleIndices.Add(offset + 6);
+
+                mg.TriangleIndices.Add(offset + 1);
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 4);
+
+                mg.TriangleIndices.Add(offset + 1);
+                mg.TriangleIndices.Add(offset + 4);
+                mg.TriangleIndices.Add(offset + 5);
+
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 7);
+
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 7);
+                mg.TriangleIndices.Add(offset + 4);
+
+                mg.TriangleIndices.Add(offset + 7);
+                mg.TriangleIndices.Add(offset + 6);
+                mg.TriangleIndices.Add(offset + 5);
+
+                mg.TriangleIndices.Add(offset + 7);
+                mg.TriangleIndices.Add(offset + 5);
+                mg.TriangleIndices.Add(offset + 4);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 3);
+                mg.TriangleIndices.Add(offset + 0);
+
+                mg.TriangleIndices.Add(offset + 2);
+                mg.TriangleIndices.Add(offset + 0);
+                mg.TriangleIndices.Add(offset + 1);
+            
+            }
+
+        }
+
+        //Start of pc method 3
 
         private Point3D[] GetRandomTopographyPoints()
         {
@@ -72,13 +279,13 @@ namespace PARSE
                 }
             }
             return points;
-        }
+        } 
 
         /// <summary>
         /// Plots points into WPF Viewport
         /// </summary>
         /// <returns>Base model with associated properties.</returns>
-      
+
         public ModelVisual3D run(BitmapSource rgbImage)
         {
 
