@@ -115,13 +115,13 @@ namespace PARSE.Prototyping.Nathan
                         this.processedBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
                         this.procImage.Source = this.processedBitmap;
 
-                        this.redBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
+                        this.redBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Gray8, null);
                         this.rgbImage_RED.Source = this.redBitmap;
 
-                        this.greenBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
+                        this.greenBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Gray8, null);
                         this.rgbImage_GREEN.Source = this.greenBitmap;
 
-                        this.blueBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
+                        this.blueBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Gray8, null);
                         this.rgbImage_BLUE.Source = this.blueBitmap;
                     }
 
@@ -149,17 +149,17 @@ namespace PARSE.Prototyping.Nathan
                     this.redBitmap.WritePixels(
                         new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height),
                         redComponent,
-                        colorFrame.Width * Bgr32BytesPerPixel,
+                        colorFrame.Width * 1,
                         0);
                     this.greenBitmap.WritePixels(
                         new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height),
                         greenComponent,
-                        colorFrame.Width * Bgr32BytesPerPixel,
+                        colorFrame.Width * 1,
                         0);
                     this.blueBitmap.WritePixels(
                         new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height),
                         blueComponent,
-                        colorFrame.Width * Bgr32BytesPerPixel,
+                        colorFrame.Width * 1,
                         0);
                  
                     this.rgbImageFormat = colorFrame.Format;
@@ -171,9 +171,9 @@ namespace PARSE.Prototyping.Nathan
         private void frameProcessor(byte[] image)
         {
             processedcolorpixelData = new byte [width * height * 4];
-            redComponent = new byte[width * height * 4];
-            greenComponent = new byte[width * height * 4];
-            blueComponent = new byte[width * height * 4];
+            redComponent = new byte[width * height];
+            greenComponent = new byte[width * height];
+            blueComponent = new byte[width * height];
 
             double range = rgbSlider_range.Value;
             double redMin    = rgbSlider_RED.Value - range;
@@ -185,47 +185,35 @@ namespace PARSE.Prototyping.Nathan
 
             
 
-            for (int i = 0; i < image.Length; i += 4)
+            for (int i = 0; i < (image.Length / 4); i+=1)
             {
                 // See where things are!
                 if (
-                    image[i] > redMin & image[i] < redMax &
-                    image[i + 1] > greenMin & image[i + 1] < greenMax &
-                    image[i + 2] > blueMin & image[i + 2] < blueMax
+                    image[i*4 + 2] > redMin & image[i*4 + 2] < redMax &
+                    image[i*4 + 1] > greenMin & image[i*4 + 1] < greenMax &
+                    image[i*4] > blueMin & image[i*4] < blueMax
                     )
                 {
-                    processedcolorpixelData[i] = 255;
-                    processedcolorpixelData[i + 1] = 255;
-                    processedcolorpixelData[1 + 2] = 255;
-                    processedcolorpixelData[i + 3] = image[i + 3];
+                    processedcolorpixelData[i*4] = 255;
+                    processedcolorpixelData[i*4 + 1] = 255;
+                    processedcolorpixelData[1*4 + 2] = 255;
+                    processedcolorpixelData[i*4 + 3] = image[i*4 + 3];
                 }
 
-                //processedcolorpixelData[i] = 255;
 
                 //RED
-
-                redComponent[i] = 0;//;
-                redComponent[i + 1] = 0;//image[i];
-                redComponent[i + 2] = image[i];
-                redComponent[i + 3] = 0;//image[i];
-
+                redComponent[i] = image[i*4+2];
+                
 
                 //GREEN
-
-                greenComponent[i] = 0;//image[i+1];
-                greenComponent[i + 1] = image[i];
-                greenComponent[i + 2] = 0;//image[i];
-                greenComponent[i + 3] = 0;//image[i];
+                greenComponent[i] = image[i*4 + 1];
+                
                 
                 //BLUE
-
-                blueComponent[i] = image[i+2];
-                blueComponent[i + 1] = 0;//image[i];
-                blueComponent[i + 2] = 0;//image[i];
-                blueComponent[i + 3] = 0;//image[i];
-
-                //ALPHA
+                blueComponent[i] = image[i*4];
                 
+
+                //ALPHA?
                 
             }
         }
