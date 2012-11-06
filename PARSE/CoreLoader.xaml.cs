@@ -54,6 +54,10 @@ namespace PARSE
         private GeometryModel3D                         model;
         private GeometryModel3D[]                       points;
 
+        //point cloud definitions (will change namespace later)
+        private ICP.PointCloud                          pointCloud;
+        private bool                                    generatePC;
+
         private bool                                    kinectConnected = false;
         public int[]                                    realDepthCollection;
         public int                                      realDepth;
@@ -63,16 +67,15 @@ namespace PARSE
         
         public bool                                     pc = false;
 
+        //naughty global variable - added by Robin (to be removed later)
+        public bool                                     generatePC = false; 
+
         //used for view port manip
         //public bool                                     mDown;
         //private Point                                   mLastPos; 
 
-
         //Kinect sensor
         KinectSensor                                    kinectSensor;
-
-        //These are used for Robin's prototyping (don't delete please)
-        private DeltaIsolator di; 
 
         public CoreLoader()
         {
@@ -162,6 +165,7 @@ namespace PARSE
                     //dirty temporary hack - set global variables 
                     this.height = imageFrame.Height;
                     this.width = imageFrame.Width;
+
                     bool NewFormat = this.lastImageFormat != imageFrame.Format;
                     int temp = 0;
                     int i = 0;
@@ -187,6 +191,7 @@ namespace PARSE
 
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
+                    //aaaa
                     if (pc)
                     {
                         for (int a = 0; a < 480; a += s)
@@ -321,7 +326,7 @@ namespace PARSE
         {
             //do nothing if there is no kinect detected
             //TODO: make sure something has been read in first - this problem is almost certain to never occur 
-            if (kinectConnected)
+           /* if (kinectConnected)
             {
                 //set the image to the last one that has been read in by the kinect
                 di.setData(this.depthFrame32);
@@ -335,7 +340,7 @@ namespace PARSE
                                     null);
 
                 //di.dumpToImage(miniOutput, width, height);
-            }
+            }*/
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
@@ -458,6 +463,20 @@ namespace PARSE
             {
                 this.kinectSensor.Stop();
             }
+        }
+
+        private void btnRobinButton_Click(object sender, RoutedEventArgs e)
+        {
+            //enable point cloud generation 
+            this.generatePC = true;
+
+            points = new GeometryModel3D[640 * 480];
+            pc = true;
+            
+            int p = points.Length;
+
+            System.Windows.MessageBox.Show(p.ToString());
+
         }
     }
 }
