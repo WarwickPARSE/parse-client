@@ -60,7 +60,13 @@ namespace PARSE
         public int                                      x;
         public int                                      y;
         public int                                      s = 4;
+        
         public bool                                     pc = false;
+
+        //used for view port manip
+        //public bool                                     mDown;
+        //private Point                                   mLastPos; 
+
 
         //Kinect sensor
         KinectSensor                                    kinectSensor;
@@ -146,7 +152,7 @@ namespace PARSE
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event ready identifier</param>
-
+        /// pc = false added because Bernard Button Slowed it down horribly
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
             using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
@@ -190,6 +196,7 @@ namespace PARSE
                                 ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
                                 i++;
                             }
+                        
                     }
 
 
@@ -374,6 +381,69 @@ namespace PARSE
 
         //Viewport manipulation
 
+        /*private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (!mDown) return;
+            Point pos = Mouse.GetPosition(bodyviewport);
+            Point actualPos = new Point(
+                    pos.X - bodyviewport.ActualWidth / 2,
+                    bodyviewport.ActualHeight / 2 - pos.Y);
+            double dx = actualPos.X - mLastPos.X;
+            double dy = actualPos.Y - mLastPos.Y;
+            double mouseAngle = 0;
+
+            if (dx != 0 && dy != 0)
+            {
+                mouseAngle = Math.Asin(Math.Abs(dy) /
+                    Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2)));
+                if (dx < 0 && dy > 0) mouseAngle += Math.PI / 2;
+                else if (dx < 0 && dy < 0) mouseAngle += Math.PI;
+                else if (dx > 0 && dy < 0) mouseAngle += Math.PI * 1.5;
+            }
+            else if (dx == 0 && dy != 0)
+            {
+                mouseAngle = Math.Sign(dy) > 0 ? Math.PI / 2 : Math.PI * 1.5;
+            }
+            else if (dx != 0 && dy == 0)
+            {
+                mouseAngle = Math.Sign(dx) > 0 ? 0 : Math.PI;
+            }
+
+            double axisAngle = mouseAngle + Math.PI / 2;
+
+            Vector3D axis = new Vector3D(
+                    Math.Cos(axisAngle) * 4,
+                    Math.Sin(axisAngle) * 4, 0);
+
+            double rotation = 0.02 *
+                    Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
+
+            Transform3DGroup group = model.Transform as Transform3DGroup;
+            QuaternionRotation3D r =
+                 new QuaternionRotation3D(
+                 new Quaternion(axis, rotation * 180 / Math.PI));
+            group.Children.Add(new RotateTransform3D(r));
+
+            mLastPos = actualPos;
+
+        }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed) return;
+            mDown = true;
+            Point pos = Mouse.GetPosition(bodyviewport);
+            mLastPos = new Point(
+                    pos.X - bodyviewport.ActualWidth / 2,
+                    bodyviewport.ActualHeight / 2 - pos.Y);
+        }
+
+        private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            mDown = false;
+        }*/
+
+
         private void ZoomIn_Click(object sender, RoutedEventArgs e)
         {
            bodycamera.Position = new Point3D(
@@ -389,6 +459,5 @@ namespace PARSE
                 this.kinectSensor.Stop();
             }
         }
-
     }
 }
