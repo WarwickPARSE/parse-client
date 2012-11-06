@@ -61,6 +61,14 @@ namespace PARSE.ICP
             this.z = z;
         }
 
+        //setter, for the lazy
+        public void setXYZ(int[] x, int[] y, int[] z) 
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
         /// <summary>
         /// Converts the x, y, z info to points and dumps them into a list
         /// </summary>
