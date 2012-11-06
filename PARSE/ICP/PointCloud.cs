@@ -13,8 +13,8 @@ namespace PARSE.ICP
         int[] z;
 
         //dodgy global variables (to be changed)
-        int pixels;
-        int rows;
+        int width;
+        int height;
 
         /// <summary>
         /// Constructor for when just the arrays of x, y and z coordinates are provided.
@@ -27,8 +27,8 @@ namespace PARSE.ICP
             this.x = x;
             this.y = y;
             this.z = y;
-            this.rows = 640;
-            this.pixels = 480;
+            this.width = 640;
+            this.height = 480;
         }
 
         /// <summary>
@@ -40,13 +40,13 @@ namespace PARSE.ICP
         /// <param name="z">array of z depth values</param>
         /// <param name="pixels">the number of pixels (columns)</param>
         /// <param name="rows">the number of rows of pixels</param>
-        public PointCloud(int[] x, int[] y, int[] z, int pixels, int rows)
+        public PointCloud(int[] x, int[] y, int[] z, int width, int height)
         {
-            this.pixels = pixels;
-            this.rows = rows;
             this.x = x;
             this.y = y;
             this.z = y;
+            this.width = width;
+            this.height = height;
         }
         
 
