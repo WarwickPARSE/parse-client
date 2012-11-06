@@ -32,6 +32,8 @@ namespace PARSE.ICP
         public PointCloud() {
             this.width = 640;
             this.height = 480;
+
+            this.points = new List<Point>();
         }
 
         /// <summary>
@@ -44,6 +46,8 @@ namespace PARSE.ICP
         {
             this.width = width;
             this.height = height;
+
+            this.points = new List<Point>();
         }
 
         public void setX(int[] x) 
@@ -77,9 +81,9 @@ namespace PARSE.ICP
             if (y.Length == x.Length && x.Length == z.Length)
             {
                 //only proceed if we have the number of points that we expected
-                if (x.Length == (width * height))
+                if (x.Length == ((width * height) - 1))
                 {
-                    for (int i = 0; i < width * height;  i++)
+                    for (int i = 0; i < (width * height);  i++)
                     {
                         Point p = new Point(x[i], y[i], z[i]);
                         points.Add(p);
