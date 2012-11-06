@@ -52,9 +52,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Kinect, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
-    <Reference Include="OpenTK.Compatibility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
-    <Reference Include="OpenTK.GLControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -91,6 +88,9 @@
     <Compile Include="ICP\KdTree\PriorityQueue.cs" />
     <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
+    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
@@ -106,6 +106,10 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
