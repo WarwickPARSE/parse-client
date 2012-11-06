@@ -19,8 +19,6 @@ using System.Windows.Forms;
 //Kinect imports
 using Microsoft.Kinect;
 
-/*NOTE: pc = false; added to stop bernard button slowing things down horribly*/
-
 namespace PARSE
 {
     /// <summary>
@@ -63,11 +61,11 @@ namespace PARSE
         public int                                      y;
         public int                                      s = 4;
         
-        public bool                                     pc = false;//limits bernie button for testing
+        public bool                                     pc = false;
 
         //used for view port manip
-        public bool                                     mDown;
-        private Point                                   mLastPos; 
+        //public bool                                     mDown;
+        //private Point                                   mLastPos; 
 
 
         //Kinect sensor
@@ -198,7 +196,7 @@ namespace PARSE
                                 ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
                                 i++;
                             }
-                        pc = false;
+                        
                     }
 
 
@@ -383,7 +381,7 @@ namespace PARSE
 
         //Viewport manipulation
 
-        private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        /*private void Grid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             if (!mDown) return;
             Point pos = Mouse.GetPosition(bodyviewport);
@@ -420,13 +418,11 @@ namespace PARSE
             double rotation = 0.02 *
                     Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
 
-            Transform3DGroup group = (Transform3DGroup)model.Transform;
+            Transform3DGroup group = model.Transform as Transform3DGroup;
             QuaternionRotation3D r =
                  new QuaternionRotation3D(
                  new Quaternion(axis, rotation * 180 / Math.PI));
-            model.Transform = new RotateTransform3D(r);
-
-            this.model.Transform = myTransform3DGroup;
+            group.Children.Add(new RotateTransform3D(r));
 
             mLastPos = actualPos;
 
@@ -445,7 +441,7 @@ namespace PARSE
         private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
         {
             mDown = false;
-        }
+        }*/
 
 
         private void ZoomIn_Click(object sender, RoutedEventArgs e)
