@@ -282,54 +282,6 @@ namespace PARSE
         } 
 
         /// <summary>
-        /// Plots points into WPF Viewport
-        /// </summary>
-        /// <returns>Base model with associated properties.</returns>
-
-        public ModelVisual3D run(BitmapSource rgbImage)
-        {
-
-            Model3DGroup top = new Model3DGroup();
-            ModelVisual3D mod = new ModelVisual3D();
-
-            ModelVisual3D model = new ModelVisual3D();
-
-            Model3DGroup topography = new Model3DGroup();
-            Point3D[] points = GetRandomTopographyPoints();
-
-            bs = rgbImage;
-            int f = 0;
-
-            //Columns over mesh
-            for (int z = 0; z <= 80; z = z + 10)
-            {
-
-                f++;
-
-                //Rows over mesh
-                for (int x = 0; x < 9; x++)
-                {
-                    //Stitches standard and opposing triangles together.
-                    topography.Children.Add(
-                        CreateTriangleModel(
-                                points[x + z],
-                                points[x + z + 10],
-                                points[x + z + 1], x*25, f*25)
-                    );
-                    topography.Children.Add(
-                        CreateTriangleModel(
-                                points[x + z + 1],
-                                points[x + z + 10],
-                                points[x + z + 11], x*25, f*25)
-                    );
-                }
-            }
-
-            model.Content = topography;
-            return model;
-        }
-
-        /// <summary>
         /// Triangle constructor for meshes
         /// </summary>
         /// <param name="po">Point 1</param>
