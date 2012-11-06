@@ -228,14 +228,46 @@ namespace PARSE
         {
 
             this.realDepthCollection = new int[depthFrame.Length];
-
-            for (int i16 = 0, i32 = 0; i16 < depthFrame.Length && i32 < this.depthFrame32.Length; i16++, i32 += 4)
+            
+            int colorPixelIndex = 0;
+            for (int i = 0;  i < depthFrame.Length; i++)
             {
 
-                realDepth = depthFrame[i16] >> DepthImageFrame.PlayerIndexBitmaskWidth;
-                realDepthCollection[i16] = realDepth;
+                realDepth = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                realDepthCollection[i] = realDepth;
 
-                if (realDepth < 800)
+                if (realDepth < 1066)
+                {
+                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
+                    this.depthFrame32[colorPixelIndex++] = 0;
+                    this.depthFrame32[colorPixelIndex++] = 0;
+                    ++colorPixelIndex;
+
+                }
+                else if ((1066 <= realDepth) && (realDepth < 2133))
+                {
+                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (2133 - realDepth) / 1066);
+                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 1066) / 1066);
+                    this.depthFrame32[colorPixelIndex++] = 0;
+                    ++colorPixelIndex;
+                }
+                else if ((2133 <= realDepth) && (realDepth < 3199))
+                {
+                    this.depthFrame32[colorPixelIndex++] = 0;
+                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (3198 - realDepth) / 1066);
+                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 2133) / 1066);
+                    ++colorPixelIndex;
+                }
+                else if (3199 <= realDepth)
+                {
+                    this.depthFrame32[colorPixelIndex++] = 0;
+                    this.depthFrame32[colorPixelIndex++] = 0;
+                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (4000 - realDepth) / 801);
+                    ++colorPixelIndex;
+                }
+
+                //Kept incase we wish to revert, bernie to delete if he is happy.
+                /*if (realDepth < 800)
                 {
                     this.depthFrame32[i32 + RedIndex] = 75;
                     this.depthFrame32[i32 + GreenIndex] = 0;
@@ -294,7 +326,7 @@ namespace PARSE
                     this.depthFrame32[i32 + RedIndex] = 50;
                     this.depthFrame32[i32 + GreenIndex] = 50;
                     this.depthFrame32[i32 + BlueIndex] = 50;
-                }
+                }*/
             }
 
             return this.depthFrame32;
