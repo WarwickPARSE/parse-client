@@ -23,7 +23,7 @@
             <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="85,79,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
             <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="4,79,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
         </Grid>
-        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="viewportGrid" Margin="187,251,0,62" Grid.Row="1" >
+        <Grid HorizontalAlignment="Left" Background="Black" Width="273" Name="viewportGrid" Margin="187,251,0,62" Grid.Row="1" MouseDown="Grid_MouseDown" MouseUp="Grid_MouseUp" MouseMove="Grid_MouseMove" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="136*" />
                 <ColumnDefinition Width="137*" />

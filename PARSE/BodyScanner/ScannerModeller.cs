@@ -131,6 +131,10 @@ namespace PARSE
             return msheet;
         }
 
+        ///view port manip for pc method2
+        
+
+
         //Start of pc method 2
 
         public GeometryModel3D RenderKinectPoints()
