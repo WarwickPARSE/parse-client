@@ -251,6 +251,23 @@ namespace PARSE.Prototyping.Nathan
 
         }
 
+        private void frameGrab_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+
+        }
+
+        private void frameGrab_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Console.Write("\n");
+            Console.Write(e.GetPosition(frameGrab));
+
+            int xCoordinate = int(e.GetPosition(frameGrab).X);
+            int yCoordinate = int(e.GetPosition(frameGrab).Y);
+
+        }
+
+        
+
 
     }
 }

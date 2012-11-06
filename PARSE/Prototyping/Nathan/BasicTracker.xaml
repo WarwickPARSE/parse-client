@@ -9,7 +9,7 @@
         </Grid.RowDefinitions>
         <GroupBox Header="Image from RGB feed" Height="222" HorizontalAlignment="Left" Margin="301,293,0,0" Name="groupBox1" VerticalAlignment="Top" Width="277" Grid.Row="1">
             <Grid>
-                <Image Height="187" HorizontalAlignment="Left" Margin="6,6,0,0" Name="frameGrab" Stretch="Fill" VerticalAlignment="Top" Width="253" />
+                <Image Height="187" HorizontalAlignment="Left" Margin="6,6,0,0" Name="frameGrab" Stretch="Fill" VerticalAlignment="Top" Width="253" ImageFailed="frameGrab_ImageFailed" MouseUp="frameGrab_MouseUp" />
             </Grid>
         </GroupBox>
         <StatusBar Height="46" HorizontalAlignment="Left" Margin="0,642,0,0" Name="statusBar1" VerticalAlignment="Top" Width="578" Grid.Row="1">
