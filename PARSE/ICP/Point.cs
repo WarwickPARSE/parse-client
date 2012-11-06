@@ -21,5 +21,10 @@ namespace PARSE.ICP
             //do nothing 
         }
 
+        public Point(int x, int y, int z)
+        {
+            //do nothing 
+        }
+
     }
 }

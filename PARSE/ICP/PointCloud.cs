@@ -16,6 +16,15 @@ namespace PARSE.ICP
         int width;
         int height;
 
+        bool is_dense;                          //to be calculated
+
+        //
+        List<Point> points; // = new List<Point>();
+ 
+        //the following variables may or may not be defined, depending on future need
+        //sensor_orientation
+        //sensor_origin
+
         /// <summary>
         /// Constructor for when just the arrays of x, y and z coordinates are provided.
         /// The resolution will be assumed to be 640 x 480
@@ -48,7 +57,33 @@ namespace PARSE.ICP
             this.width = width;
             this.height = height;
         }
-        
+
+        /// <summary>
+        /// Converts the x, y, z info to points and dumps them into a list
+        /// </summary>
+        public void init() {
+            //only proceed if the coordinates match up
+            if (y.Length == x.Length && x.Length == z.Length)
+            {
+                //only proceed if we have the number of points that we expected
+                if (x.Length == (width * height))
+                {
+                    for (int i = 0; i < width * height;  i++)
+                    {
+                        Point p = new Point(x[i], y[i], z[i]);
+                        points.Add(p);
+                    }
+                }
+                else 
+                {
+                    //throw another kind of exception                 
+                }
+            }
+            else 
+            { 
+                //throw some kint of exception 
+            }
+        }
 
     }
 }
