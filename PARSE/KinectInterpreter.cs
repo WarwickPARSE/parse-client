@@ -5,6 +5,14 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media.Media3D;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Windows.Forms;
 
 //Kinect Imports
 using Microsoft.Kinect;
@@ -35,9 +43,15 @@ namespace PARSE
         public int[]                                    realDepthCollection;
         public int                                      realDepth;
 
+        //Skeleton point array and frame definitions
+        private Skeleton[]                              skeletonData;
+        private Dictionary<int, SkeletonFigure>         skeletons;
+        private Canvas                                  skeletonCanvas;
+
+
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
-        public KinectInterpreter()
+        public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
             rgbReady = false;
@@ -48,6 +62,7 @@ namespace PARSE
             if (KinectSensor.KinectSensors.Count != 0)
             {
                 this.kinectReady = true;
+                this.skeletonCanvas = c;
                 
                 //Initialize sensor
                 this.kinectSensor = KinectSensor.KinectSensors[0];
@@ -76,6 +91,9 @@ namespace PARSE
         //enable skeletonStream
         public void startSkeletonStream()
         {
+            skeletonData = new Skeleton[6];
+            skeletons = new Dictionary<int, SkeletonFigure>();
+
             this.kinectSensor.SkeletonStream.Enable();
             this.kinectSensor.Start();
             this.skeletonReady = true;
@@ -147,7 +165,74 @@ namespace PARSE
                  }
                 return null;
             }
-        }   
+        }
+
+        public void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrame != null)
+                {
+                    skeletonFrame.CopySkeletonDataTo(skeletonData);
+
+                    // Retrieves Skeleton objects with Tracked state
+                    var trackedSkeletons = skeletonData.Where(s => s.TrackingState == SkeletonTrackingState.Tracked);
+
+                    // By default, assume all the drawn skeletons are inactive
+                    foreach (SkeletonFigure skeleton in skeletons.Values)
+                        skeleton.Status = ActivityState.Inactive;
+
+                    foreach (Skeleton trackedSkeleton in trackedSkeletons)
+                    {
+                        SkeletonFigure skeletonFigure;
+                        // Checks if the tracked skeleton is already drawn.
+                        if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
+                        {
+                            // If not, create a new drawing on our canvas
+                            Canvas.SetTop(this.skeletonCanvas, 0);
+                            Canvas.SetLeft(this.skeletonCanvas, 0);
+                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
+                            skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                        }
+
+                        // Update the drawing
+                        Update(trackedSkeleton, skeletonFigure);
+                        skeletonFigure.Status = ActivityState.Active;
+                    }
+
+                    foreach (SkeletonFigure skeleton in skeletons.Values)
+                    {
+                        // Erase all the still inactive drawings. It means they are not tracked anymore.
+                        if (skeleton.Status == ActivityState.Inactive)
+                            skeleton.Erase();
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Updates the specified drawn skeleton with the new positions
+        /// </summary>
+        /// <param name="skeleton">The skeleton source.</param>
+        /// <param name="drawing">The target drawing.</param>
+        private void Update(Skeleton skeleton, SkeletonFigure figure)
+        {
+            foreach (Joint joint in skeleton.Joints)
+            {
+                // Transforms a SkeletonPoint to a ColorImagePoint
+                var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
+                // Scale the ColorImagePoint position to the current window size
+                var point = new Point((int)colorPoint.X / 640.0 * this.skeletonCanvas.ActualWidth, (int)colorPoint.Y / 480.0 * this.skeletonCanvas.ActualHeight);
+                // update the position of that joint
+                figure.Update(joint.JointType, point);
+            }
+        }
+
         /// <summary>
         /// Depth Frame Conversion Method
         /// </summary>

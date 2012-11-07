@@ -61,7 +61,7 @@ namespace PARSE
             InitializeComponent();
 
             //init KinectInterpreter
-            kinectInterp  = new KinectInterpreter();
+            kinectInterp  = new KinectInterpreter(vpcanvas2);
             kinectInterp.startDepthStream();
             kinectInterp.startRGBStream();
             //kinectInterp.startSkeletonStream();
@@ -69,8 +69,7 @@ namespace PARSE
             //Event Handlers
             this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-            //kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonImageReady);
-
+            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
 
             skeletons = new Dictionary<int, SkeletonFigure>();
                
@@ -89,6 +88,11 @@ namespace PARSE
                 btnFront.IsEnabled = false;
                 btnBack.IsEnabled = false;
             }
+        }
+
+        private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            //implement skeleton frame ready into kinectinterp
         }
 
         /// <summary>
@@ -151,75 +155,12 @@ namespace PARSE
                 }
            */
        }
-        /*
-        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
-        {
-            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
-            {
-                if (skeletonFrame != null)
-                {
-                    skeletonFrame.CopySkeletonDataTo(skeletonData);
 
-                    // Retrieves Skeleton objects with Tracked state
-                    var trackedSkeletons = skeletonData.Where(s => s.TrackingState == SkeletonTrackingState.Tracked);
+       private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
+       {
+           kinectInterp.SkeletonFrameReady(sender, e);
+       }
 
-                    // By default, assume all the drawn skeletons are inactive
-                    foreach (SkeletonFigure skeleton in skeletons.Values)
-                        skeleton.Status = ActivityState.Inactive;
-
-                    foreach (Skeleton trackedSkeleton in trackedSkeletons)
-                    {
-                        SkeletonFigure skeletonFigure;
-                        // Checks if the tracked skeleton is already drawn.
-                        if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
-                        {
-                            // If not, create a new drawing on our canvas
-                            Canvas.SetTop(vpcanvas2, 0);
-                            Canvas.SetLeft(vpcanvas2, 0);
-                            skeletonFigure = new SkeletonFigure(vpcanvas2);
-                            skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
-                        }
-
-                        // Update the drawing
-                        Update(trackedSkeleton, skeletonFigure);
-                        skeletonFigure.Status = ActivityState.Active;
-                    }
-
-                    foreach (SkeletonFigure skeleton in skeletons.Values)
-                    {
-                        // Erase all the still inactive drawings. It means they are not tracked anymore.
-                        if (skeleton.Status == ActivityState.Inactive)
-                            skeleton.Erase();
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-        }
-        */
-        /*
-        /// <summary>
-        /// Updates the specified drawn skeleton with the new positions
-        /// </summary>
-        /// <param name="skeleton">The skeleton source.</param>
-        /// <param name="drawing">The target drawing.</param>
-        private void Update(Skeleton skeleton, SkeletonFigure figure)
-        {
-            foreach (Joint joint in skeleton.Joints)
-            {
-                // Transforms a SkeletonPoint to a ColorImagePoint
-                var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
-                // Scale the ColorImagePoint position to the current window size
-                var point = new Point((int)colorPoint.X / 640.0 * this.ActualWidth, (int)colorPoint.Y / 480.0 * this.ActualHeight);
-                // update the position of that joint
-                figure.Update(joint.JointType, point);
-            }
-        }
-        */
-        
         /// <summary>
         /// WPF Form Methods
         /// </summary>
