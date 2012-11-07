@@ -92,6 +92,7 @@
       <DependentUpon>BasicTracker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
+    <Compile Include="Skeletal\SkeletonFigure.cs" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
     <Page Include="CoreLoader.xaml">

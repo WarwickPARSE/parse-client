@@ -68,16 +68,19 @@ namespace PARSE
         //should the kinect be generating point clouds? 
         public bool                                     pc;         
 
-        //used for view port manip
-        //public bool                                     mDown;
-        //private Point                                   mLastPos; 
-
         //Kinect sensor
         KinectSensor                                    kinectSensor;
+
+        //Skeleton definitions (Stef)
+        private Skeleton[] skeletonData = new Skeleton[6];
+        private Dictionary<int, SkeletonFigure> skeletons;
+
 
         public CoreLoader()
         {
             InitializeComponent();
+
+            skeletons = new Dictionary<int, SkeletonFigure>();
                
             //do not generate a point cloud until explicitly told to do so 
             this.pc = false;
@@ -94,6 +97,7 @@ namespace PARSE
                 //Enable streams
                 kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
                 kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                kinectSensor.SkeletonStream.Enable();
 
                 //Start streams
                 kinectSensor.Start();
@@ -102,6 +106,7 @@ namespace PARSE
                 //TODO: there is no justification for isolating these events, it makes life much harder
                 kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonImageReady);
 
                 lblStatus.Content = "Status: Device connected";
             }
@@ -215,16 +220,12 @@ namespace PARSE
                             for (int jj = 0; jj < width; jj += s) 
                             {
                                 temp = ((ushort)this.pixelData[jj + ii * 640]) >> 3;
-                                if(i== 640*480/32)
-                                    Console.Write(temp);
+                                //if(i== 640*480/32)
                                 //((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
                                 i++;
                             }
                         }
                     }
-
-                    Console.Write(i + "::");
-                    //dump the current depth frame to a bitmap image
 
                     this.outputBitmap.WritePixels(
                     new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height),
@@ -238,6 +239,72 @@ namespace PARSE
                 {
                     return;
                 }
+            }
+        }
+
+        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrame != null)
+                {
+                    skeletonFrame.CopySkeletonDataTo(skeletonData);
+
+                    // Retrieves Skeleton objects with Tracked state
+                    var trackedSkeletons = skeletonData.Where(s => s.TrackingState == SkeletonTrackingState.Tracked);
+
+                    // By default, assume all the drawn skeletons are inactive
+                    foreach (SkeletonFigure skeleton in skeletons.Values)
+                        skeleton.Status = ActivityState.Inactive;
+
+                    foreach (Skeleton trackedSkeleton in trackedSkeletons)
+                    {
+                        SkeletonFigure skeletonFigure;
+                        // Checks if the tracked skeleton is already drawn.
+                        if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
+                        {
+                            // If not, create a new drawing on our canvas
+                            Canvas.SetTop(vpcanvas2, 0);
+                            Canvas.SetLeft(vpcanvas2, 0);
+                            skeletonFigure = new SkeletonFigure(vpcanvas2);
+                            skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                        }
+
+                        // Update the drawing
+                        Update(trackedSkeleton, skeletonFigure);
+                        skeletonFigure.Status = ActivityState.Active;
+                    }
+
+                    foreach (SkeletonFigure skeleton in skeletons.Values)
+                    {
+                        // Erase all the still inactive drawings. It means they are not tracked anymore.
+                        if (skeleton.Status == ActivityState.Inactive)
+                            skeleton.Erase();
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Updates the specified drawn skeleton with the new positions
+        /// </summary>
+        /// <param name="skeleton">The skeleton source.</param>
+        /// <param name="drawing">The target drawing.</param>
+        private void Update(Skeleton skeleton, SkeletonFigure figure)
+        {
+            foreach (Joint joint in skeleton.Joints)
+            {
+                // Transforms a SkeletonPoint to a ColorImagePoint
+                var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
+                // Scale the ColorImagePoint position to the current window size
+                var point = new Point((int)colorPoint.X / 640.0 * this.ActualWidth, (int)colorPoint.Y / 480.0 * this.ActualHeight);
+                // update the position of that joint
+                figure.Update(joint.JointType, point);
             }
         }
 
@@ -290,67 +357,6 @@ namespace PARSE
                     ++colorPixelIndex;
                 }
 
-                //Kept incase we wish to revert, bernie to delete if he is happy.
-                /*if (realDepth < 800)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 75;
-                    this.depthFrame32[i32 + GreenIndex] = 0;
-                    this.depthFrame32[i32 + BlueIndex] = 0;
-                }
-                else if (realDepth < 1000)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 150;
-                    this.depthFrame32[i32 + GreenIndex] = 0;
-                    this.depthFrame32[i32 + BlueIndex] = 0;
-                }
-                else if (realDepth >= 1000 && realDepth < 1500)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 240;
-                    this.depthFrame32[i32 + GreenIndex] = 100;
-                    this.depthFrame32[i32 + BlueIndex] = 0;
-                }
-                else if (realDepth >= 1500 && realDepth < 2000)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 240;
-                    this.depthFrame32[i32 + GreenIndex] = 100;
-                    this.depthFrame32[i32 + BlueIndex] = 50;
-                }
-                else if (realDepth >= 2000 && realDepth < 2500)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 240;
-                    this.depthFrame32[i32 + GreenIndex] = 150;
-                    this.depthFrame32[i32 + BlueIndex] = 100;
-                }
-                else if (realDepth >= 2500 && realDepth < 3000)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 240;
-                    this.depthFrame32[i32 + GreenIndex] = 200;
-                    this.depthFrame32[i32 + BlueIndex] = 150;
-                }
-                else if (realDepth >= 3000 && realDepth < 3500)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 140;
-                    this.depthFrame32[i32 + GreenIndex] = 150;
-                    this.depthFrame32[i32 + BlueIndex] = 150;
-                }
-                else if (realDepth >= 3500 && realDepth < 4000)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 100;
-                    this.depthFrame32[i32 + GreenIndex] = 100;
-                    this.depthFrame32[i32 + BlueIndex] = 200;
-                }
-                else if (realDepth >= 4000 && realDepth < 4500)
-                {
-                    this.depthFrame32[i32 + RedIndex] = 50;
-                    this.depthFrame32[i32 + GreenIndex] = 50;
-                    this.depthFrame32[i32 + BlueIndex] = 200;
-                }
-                else
-                {
-                    this.depthFrame32[i32 + RedIndex] = 50;
-                    this.depthFrame32[i32 + GreenIndex] = 50;
-                    this.depthFrame32[i32 + BlueIndex] = 50;
-                }*/
             }
 
             return this.depthFrame32;
