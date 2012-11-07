@@ -402,7 +402,7 @@ namespace PARSE
             pc = true;
 
             //cube mesh viewer
-            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, pointCloudMesh);
+            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, new MeshGeometry3D());
             model = modeller.RenderKinectPoints();
 
             //triangle mesh viewer
