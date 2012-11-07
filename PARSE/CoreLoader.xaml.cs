@@ -65,10 +65,8 @@ namespace PARSE
         public int                                      y;
         public int                                      s = 4;
         
-        public bool                                     pc = false;
-
-        //naughty global variable - added by Robin (to be removed later)
-        public bool                                     generatePC = false; 
+        //should the kinect be generating point clouds? 
+        public bool                                     pc;         
 
         //used for view port manip
         //public bool                                     mDown;
@@ -80,6 +78,10 @@ namespace PARSE
         public CoreLoader()
         {
             InitializeComponent();
+               
+            //do not generate a point cloud until explicitly told to do so 
+            this.pc = false;
+            this.generatePC = false; 
 
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
@@ -107,7 +109,6 @@ namespace PARSE
                 lblStatus.Content = "Status: No Kinect device detected";
 
                 //Disable controls
-
                 btnSensorUp.IsEnabled = false;
                 btnSensorDown.IsEnabled = false;
                 btnSensorMax.IsEnabled = false;
@@ -191,7 +192,7 @@ namespace PARSE
 
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
-                    //aaaa
+                    //something's broken here...
                     if (pc)
                     {
                         for (int a = 0; a < 480; a += s)
@@ -200,11 +201,29 @@ namespace PARSE
                                 temp = ((ushort)this.pixelData[b + a * 640]) >> 3;
                                 ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
                                 i++;
-                            }
-                        
+                            }                        
                     }
 
+                    i = 0;
 
+                    //generate the point cloud using the z data
+                    if (generatePC) 
+                    {
+                        int size = height * width;
+                        for (int ii = 0; ii < height; ii += s) 
+                        {
+                            for (int jj = 0; jj < width; jj += s) 
+                            {
+                                temp = ((ushort)this.pixelData[jj + ii * 640]) >> 3;
+                                if(i== 640*480/32)
+                                    Console.Write(temp);
+                                //((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
+                                i++;
+                            }
+                        }
+                    }
+
+                    Console.Write(i + "::");
                     //dump the current depth frame to a bitmap image
 
                     this.outputBitmap.WritePixels(
@@ -467,15 +486,16 @@ namespace PARSE
 
         private void btnRobinButton_Click(object sender, RoutedEventArgs e)
         {
-            //enable point cloud generation 
-            this.generatePC = true;
+            //enable point cloud generation, istantiate point cloud class  
+            this.generatePC = true; 
+            this.pointCloud = new ICP.PointCloud(this.width, this.height);
 
-            points = new GeometryModel3D[640 * 480];
-            pc = true;
-            
-            int p = points.Length;
-
-            System.Windows.MessageBox.Show(p.ToString());
+            /*
+            pointCloud.setX();
+            pointCloud.setY();
+            pointCloud.setZ();
+            pointCloud.init();
+             */
 
         }
     }

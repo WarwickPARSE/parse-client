@@ -18,9 +18,8 @@ namespace PARSE.ICP
 
         bool is_dense;                          //to be calculated
 
-        //
-        List<Point> points; // = new List<Point>();
- 
+        List<Point> points;
+
         //the following variables may or may not be defined, depending on future need
         //sensor_orientation
         //sensor_origin
@@ -96,8 +95,13 @@ namespace PARSE.ICP
             }
             else 
             { 
-                //throw some kint of exception 
+                //throw some kind of exception 
             }
+        }
+
+        public int countPoints() 
+        {
+            return points.Count; 
         }
 
     }
