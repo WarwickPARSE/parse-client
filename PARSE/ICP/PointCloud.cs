@@ -18,9 +18,8 @@ namespace PARSE.ICP
 
         bool is_dense;                          //to be calculated
 
-        //
-        List<Point> points; // = new List<Point>();
- 
+        List<Point> points;
+
         //the following variables may or may not be defined, depending on future need
         //sensor_orientation
         //sensor_origin
@@ -29,33 +28,48 @@ namespace PARSE.ICP
         /// Constructor for when just the arrays of x, y and z coordinates are provided.
         /// The resolution will be assumed to be 640 x 480
         /// </summary>
-        /// <param name="x">array of x depth values</param>
-        /// <param name="y">array of y depth values</param>
-        /// <param name="z">array of z depth values</param>
-        public PointCloud(int[] x, int[] y, int[] z) {
-            this.x = x;
-            this.y = y;
-            this.z = y;
+        public PointCloud() {
             this.width = 640;
             this.height = 480;
+
+            this.points = new List<Point>();
         }
 
         /// <summary>
         /// Constructor for when just the arrays of x, y and z coordinates are provided.
         /// The resolution will be assumed to be 640 x 480
         /// </summary>
-        /// <param name="x">array of x depth values</param>
-        /// <param name="y">array of y depth values</param>
-        /// <param name="z">array of z depth values</param>
         /// <param name="pixels">the number of pixels (columns)</param>
         /// <param name="rows">the number of rows of pixels</param>
-        public PointCloud(int[] x, int[] y, int[] z, int width, int height)
+        public PointCloud(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+
+            this.points = new List<Point>();
+        }
+
+        public void setX(int[] x) 
+        {
+            this.x = x;
+        }
+
+        public void setY(int[] y) 
+        {
+            this.y = y;
+        }
+
+        public void setZ(int[] z) 
+        {
+            this.z = z;
+        }
+
+        //setter, for the lazy
+        public void setXYZ(int[] x, int[] y, int[] z) 
         {
             this.x = x;
             this.y = y;
-            this.z = y;
-            this.width = width;
-            this.height = height;
+            this.z = z;
         }
 
         /// <summary>
@@ -66,9 +80,9 @@ namespace PARSE.ICP
             if (y.Length == x.Length && x.Length == z.Length)
             {
                 //only proceed if we have the number of points that we expected
-                if (x.Length == (width * height))
+                if (x.Length == ((width * height) - 1))
                 {
-                    for (int i = 0; i < width * height;  i++)
+                    for (int i = 0; i < (width * height);  i++)
                     {
                         Point p = new Point(x[i], y[i], z[i]);
                         points.Add(p);
@@ -81,8 +95,13 @@ namespace PARSE.ICP
             }
             else 
             { 
-                //throw some kint of exception 
+                //throw some kind of exception 
             }
+        }
+
+        public int countPoints() 
+        {
+            return points.Count; 
         }
 
     }

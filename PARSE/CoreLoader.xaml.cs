@@ -54,6 +54,10 @@ namespace PARSE
         private GeometryModel3D                         model;
         private GeometryModel3D[]                       points;
 
+        //point cloud definitions (will change namespace later)
+        private ICP.PointCloud                          pointCloud;
+        private bool                                    generatePC;
+
         private bool                                    kinectConnected = false;
         public int[]                                    realDepthCollection;
         public int                                      realDepth;
@@ -61,22 +65,23 @@ namespace PARSE
         public int                                      y;
         public int                                      s = 4;
         
-        public bool                                     pc = false;
+        //should the kinect be generating point clouds? 
+        public bool                                     pc;         
 
         //used for view port manip
         //public bool                                     mDown;
         //private Point                                   mLastPos; 
 
-
         //Kinect sensor
         KinectSensor                                    kinectSensor;
-
-        //These are used for Robin's prototyping (don't delete please)
-        private DeltaIsolator di; 
 
         public CoreLoader()
         {
             InitializeComponent();
+               
+            //do not generate a point cloud until explicitly told to do so 
+            this.pc = false;
+            this.generatePC = false; 
 
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
@@ -104,7 +109,6 @@ namespace PARSE
                 lblStatus.Content = "Status: No Kinect device detected";
 
                 //Disable controls
-
                 btnSensorUp.IsEnabled = false;
                 btnSensorDown.IsEnabled = false;
                 btnSensorMax.IsEnabled = false;
@@ -162,6 +166,7 @@ namespace PARSE
                     //dirty temporary hack - set global variables 
                     this.height = imageFrame.Height;
                     this.width = imageFrame.Width;
+
                     bool NewFormat = this.lastImageFormat != imageFrame.Format;
                     int temp = 0;
                     int i = 0;
@@ -187,6 +192,7 @@ namespace PARSE
 
                     byte[] convertedDepthBits = this.ConvertDepthFrame(this.pixelData, ((KinectSensor)sender).DepthStream);
 
+                    //something's broken here...
                     if (pc)
                     {
                         for (int a = 0; a < 480; a += s)
@@ -195,11 +201,29 @@ namespace PARSE
                                 temp = ((ushort)this.pixelData[b + a * 640]) >> 3;
                                 ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
                                 i++;
-                            }
-                        
+                            }                        
                     }
 
+                    i = 0;
 
+                    //generate the point cloud using the z data
+                    if (generatePC) 
+                    {
+                        int size = height * width;
+                        for (int ii = 0; ii < height; ii += s) 
+                        {
+                            for (int jj = 0; jj < width; jj += s) 
+                            {
+                                temp = ((ushort)this.pixelData[jj + ii * 640]) >> 3;
+                                if(i== 640*480/32)
+                                    Console.Write(temp);
+                                //((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
+                                i++;
+                            }
+                        }
+                    }
+
+                    Console.Write(i + "::");
                     //dump the current depth frame to a bitmap image
 
                     this.outputBitmap.WritePixels(
@@ -353,7 +377,7 @@ namespace PARSE
         {
             //do nothing if there is no kinect detected
             //TODO: make sure something has been read in first - this problem is almost certain to never occur 
-            if (kinectConnected)
+           /* if (kinectConnected)
             {
                 //set the image to the last one that has been read in by the kinect
                 di.setData(this.depthFrame32);
@@ -367,7 +391,7 @@ namespace PARSE
                                     null);
 
                 //di.dumpToImage(miniOutput, width, height);
-            }
+            }*/
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
@@ -490,6 +514,21 @@ namespace PARSE
             {
                 this.kinectSensor.Stop();
             }
+        }
+
+        private void btnRobinButton_Click(object sender, RoutedEventArgs e)
+        {
+            //enable point cloud generation, istantiate point cloud class  
+            this.generatePC = true; 
+            this.pointCloud = new ICP.PointCloud(this.width, this.height);
+
+            /*
+            pointCloud.setX();
+            pointCloud.setY();
+            pointCloud.setZ();
+            pointCloud.init();
+             */
+
         }
     }
 }
