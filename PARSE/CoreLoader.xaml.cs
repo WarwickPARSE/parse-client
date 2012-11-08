@@ -59,18 +59,18 @@ namespace PARSE
             //init KinectInterpreter
             kinectInterp  = new KinectInterpreter(vpcanvas2);
             kinectInterp.startDepthStream();
-            kinectInterp.startRGBStream();
             kinectInterp.startSkeletonStream();
 
             //Event Handlers
             this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
             this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
                
             //do not generate a point cloud until explicitly told to do so 
             this.pc = false;
             this.generatePC = false; 
 
+
+            //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
             
             if (!kinectInterp.kinectReady)    //Disable controls
@@ -82,6 +82,7 @@ namespace PARSE
                 btnFront.IsEnabled = false;
                 btnBack.IsEnabled = false;
             }
+
         }
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -163,11 +164,6 @@ namespace PARSE
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //Initialize camera position
-            bodycamera.Position = new Point3D(
-            0.5,
-            0.5,
-            bodycamera.Position.Z);
 
         }
 
@@ -298,15 +294,6 @@ namespace PARSE
             mDown = false;
         }*/
 
-
-        private void ZoomIn_Click(object sender, RoutedEventArgs e)
-        {
-          /* bodycamera.Position = new Point3D(
-           bodycamera.Position.X,
-           bodycamera.Position.Y,
-           bodycamera.Position.Z - 0.5);*/
-        }
-
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (this.kinectInterp.kinectReady)
@@ -327,7 +314,25 @@ namespace PARSE
             pointCloud.setZ();
             pointCloud.init();
              */
-
         }
+
+        private void btnVisualise_Click(object sender, RoutedEventArgs e)
+        {
+
+            String feedChoice   = feedcb.Text;
+            String visualChoice = "";
+
+            switch (feedChoice)
+            {
+
+                case "RGB":
+                    kinectInterp.startRGBStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    break;
+
+            }
+        }
+
+
     }
 }
