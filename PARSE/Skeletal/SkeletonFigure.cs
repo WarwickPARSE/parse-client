@@ -49,8 +49,8 @@ namespace PARSE
         public SkeletonFigure(Canvas c)
         {
             this.canvas = c;
-            this.canvas.Height = 200;
-            this.canvas.Width = 200;
+            this.canvas.Height = 426;
+            this.canvas.Width = 543;
 
             InitJoints();
             InitBones();

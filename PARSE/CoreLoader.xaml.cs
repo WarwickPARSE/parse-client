@@ -58,12 +58,6 @@ namespace PARSE
 
             //init KinectInterpreter
             kinectInterp  = new KinectInterpreter(vpcanvas2);
-            kinectInterp.startDepthStream();
-            kinectInterp.startSkeletonStream();
-
-            //Event Handlers
-            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
                
             //do not generate a point cloud until explicitly told to do so 
             this.pc = false;
@@ -97,7 +91,7 @@ namespace PARSE
         /// <param name="e">event ready identifier</param>
        private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
-            this.kinectColorImage.Source = kinectInterp.ColorImageReady(sender, e);
+            this.kinectImager.Source = kinectInterp.ColorImageReady(sender, e);
         }
 
         /// <summary>
@@ -107,7 +101,7 @@ namespace PARSE
         /// <param name="e">event ready identifier</param>
        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
        {
-           this.kinectDepthImage.Source = kinectInterp.DepthImageReady(sender, e);
+           this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
 
            /*Point Cloud Stuff, needs to be intergated
            imageFrame.CopyPixelDataTo(this.pixelData);
@@ -322,12 +316,40 @@ namespace PARSE
             String feedChoice   = feedcb.Text;
             String visualChoice = "";
 
+            //Stop all streams
+            kinectInterp.stopStreams(feedChoice);
+
+            //Assign feed to bitmap source
             switch (feedChoice)
             {
 
                 case "RGB":
                     kinectInterp.startRGBStream();
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    break;
+
+                case "RGB + Skeletal":
+                    kinectInterp.startRGBStream();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                    break;
+
+                case "Depth":
+                    kinectInterp.startDepthStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                    break;
+
+                case "Depth + Skeletal":
+                    kinectInterp.startDepthStream();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                    break;
+
+                case "Skeletal":
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
                     break;
 
             }

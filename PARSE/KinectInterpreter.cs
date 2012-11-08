@@ -100,6 +100,38 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+
+        //Disable all streams on changeover
+        public void stopStreams(String feedChoice)
+        {
+
+            switch (feedChoice) {
+                
+                case "RGB + Skeletal":
+                    this.kinectSensor.DepthStream.Disable();
+                    this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
+                    break;
+
+                case "Depth + Skeletal":
+                    this.kinectSensor.ColorStream.Disable();
+                    this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
+                    break;
+
+                case "Skeletal":
+                    this.kinectSensor.DepthStream.Disable();
+                    this.kinectSensor.ColorStream.Disable();
+                    this.kinectStatus = "Initialized, Skeleton Ready";
+                    break;
+
+                default:
+                    this.kinectSensor.ColorStream.Disable();
+                    this.kinectSensor.DepthStream.Disable();
+                    this.kinectSensor.SkeletonStream.Disable();
+                    this.kinectStatus = "Initialized";
+                    break;
+            }
+        }
+
         public WriteableBitmap ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -193,8 +225,8 @@ namespace PARSE
                             // If not, create a new drawing on our canvas
                             skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
                             skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
-                            Canvas.SetTop(this.skeletonCanvas, 100);
-                            Canvas.SetLeft(this.skeletonCanvas, 100);
+                            Canvas.SetTop(this.skeletonCanvas, 0);
+                            Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
                         // Update the drawing
