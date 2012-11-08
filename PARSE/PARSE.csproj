@@ -89,11 +89,13 @@
     <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
+    <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
+    <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
-    <Compile Include="Skeletal\SkeletonFigure.cs" />
+    <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
     <Page Include="CoreLoader.xaml">
@@ -174,9 +176,7 @@
     <Resource Include="ICP\KdTree\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Library\" />
-    <Folder Include="PointCloud\" />
-    <Folder Include="Visualisation\" />
+    <Folder Include="Library\PointCloud\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
