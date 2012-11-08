@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Drawing.Color;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
 using Microsoft.Kinect;
@@ -26,7 +26,7 @@ namespace PARSE
             this.vc = c;
         }
 
-        public DirectionalLight setupDirectionalLights(Color col)
+        public DirectionalLight setupDirectionalLights(System.Windows.Media.Color col)
         {
 
             d1 = new DirectionalLight();

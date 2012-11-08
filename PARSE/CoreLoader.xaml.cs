@@ -209,21 +209,6 @@ namespace PARSE
             this.kinectInterp.kinectSensor.ElevationAngle = this.kinectInterp.kinectSensor.MaxElevationAngle;
         }
 
-        private void btnBernardButton_Click(object sender, RoutedEventArgs e)
-        {
-     /*       points = new GeometryModel3D[640*480];
-            pc = true;
-
-            //cube mesh viewer
-            modeller = new ScannerModeller(realDepthCollection, this.width, this.height, new MeshGeometry3D());
-            model = modeller.RenderKinectPoints();
-
-            //triangle mesh viewer
-            modeller = new ScannerModeller(vpcanvas, points);
-            points = modeller.RenderKinectPointsTriangle();*/
-
-        }
-
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (this.kinectInterp.kinectReady)
@@ -286,6 +271,14 @@ namespace PARSE
                 case "Skeletal":
                     kinectInterp.startSkeletonStream();
                     this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                    break;
+
+            }
+
+            switch (visualChoice)
+            {
+                default:
+
                     break;
 
             }
