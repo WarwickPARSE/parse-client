@@ -49,10 +49,6 @@ namespace PARSE
         //should the kinect be generating point clouds? 
         public bool                                     pc;         
 
-        //Skeleton definitions (Stef)
-        private Skeleton[] skeletonData = new Skeleton[6];
-        private Dictionary<int, SkeletonFigure> skeletons;
-
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
 
@@ -64,14 +60,12 @@ namespace PARSE
             kinectInterp  = new KinectInterpreter(vpcanvas2);
             kinectInterp.startDepthStream();
             kinectInterp.startRGBStream();
-            //kinectInterp.startSkeletonStream();
+            kinectInterp.startSkeletonStream();
 
             //Event Handlers
             this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
             this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-
-            skeletons = new Dictionary<int, SkeletonFigure>();
                
             //do not generate a point cloud until explicitly told to do so 
             this.pc = false;
@@ -92,7 +86,7 @@ namespace PARSE
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            //implement skeleton frame ready into kinectinterp
+            kinectInterp.SkeletonFrameReady(sender, e);
         }
 
         /// <summary>

@@ -171,8 +171,10 @@ namespace PARSE
         {
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
+
                 if (skeletonFrame != null)
                 {
+
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state
@@ -189,10 +191,10 @@ namespace PARSE
                         if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
                         {
                             // If not, create a new drawing on our canvas
-                            Canvas.SetTop(this.skeletonCanvas, 0);
-                            Canvas.SetLeft(this.skeletonCanvas, 0);
                             skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
                             skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            Canvas.SetTop(this.skeletonCanvas, 100);
+                            Canvas.SetLeft(this.skeletonCanvas, 100);
                         }
 
                         // Update the drawing

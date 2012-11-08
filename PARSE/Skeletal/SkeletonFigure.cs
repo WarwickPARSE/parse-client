@@ -33,9 +33,9 @@ namespace PARSE
 
     class SkeletonFigure
     {
-        private const int JOINT_WIDTH = 20;
-        private const int HEAD_WIDTH = 50;
-        private const int BONES_THICKNESS = 10;
+        private const int JOINT_WIDTH = 4;
+        private const int HEAD_WIDTH = 10;
+        private const int BONES_THICKNESS = 2;
 
         private Canvas canvas;
 
@@ -180,14 +180,14 @@ namespace PARSE
 
         private Ellipse GenerateEllipse(int size = JOINT_WIDTH)
         {
-            var ellipse = new Ellipse() { Width = size, Height = size, Fill = Brushes.Black };
+            var ellipse = new Ellipse() { Width = size, Height = size, Fill = Brushes.LightBlue };
             canvas.Children.Add(ellipse);
             return ellipse;
         }
 
         private Line GenerateLine()
         {
-            var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = Brushes.Black, Stroke = Brushes.Black };
+            var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = Brushes.Blue, Stroke = Brushes.Blue };
             canvas.Children.Add(line);
             return line;
         }
