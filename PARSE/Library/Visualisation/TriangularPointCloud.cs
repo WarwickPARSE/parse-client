@@ -30,14 +30,16 @@ namespace PARSE
             this.pos = 4;
         }
 
-        private GeometryModel3D[] render()
+        public GeometryModel3D[] render()
         {
 
             Model3DGroup modelGroup     = new Model3DGroup();
             Viewport3D visualisation    = new Viewport3D();
+            ModelVisual3D modelsVisual  = new ModelVisual3D();
             int depthPoint              = 0;
 
             //Setup viewport environment
+            init = new ViewportCalibrator(this.cp);
             visualisation = init.setupViewport(init.setupCamera(), this.cp.ActualHeight, this.cp.ActualWidth);
 
             //Create triangle mesh

@@ -48,6 +48,10 @@ namespace PARSE
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
 
+        //Visualisation definitions
+        private GeometryModel3D[]                       pts;
+        private bool                                    visActive;
+
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
@@ -79,6 +83,16 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus+", Depth Ready";
         }
 
+        //Enable depthMeshStream
+        public void startDepthMeshStream(GeometryModel3D[] pts)
+        {
+            this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            this.kinectSensor.Start();
+            this.pts = pts;
+            this.depthReady = true;
+            visActive = true;
+        }
+
         //Enable rgbStream
         public void startRGBStream()
         {
@@ -104,6 +118,9 @@ namespace PARSE
         //Disable all streams on changeover
         public void stopStreams(String feedChoice)
         {
+
+            //visActive set to false to stop duplicate visualisations
+            visActive = false;
 
             switch (feedChoice) {
                 
@@ -173,6 +190,8 @@ namespace PARSE
                     {
                         this.depthPixelData = new short[depthFrame.PixelDataLength];
                         this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
+                        int temp = 0;
+                        int i = 0;
 
                         this.outputBitmap = new WriteableBitmap(
                         depthFrame.Width,
@@ -186,11 +205,27 @@ namespace PARSE
 
                         byte[] convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
-                        this.outputBitmap.WritePixels(
+                        if (visActive)
+                        {
+                            for (int a = 0; a < 480; a += 4)
+                            {
+                                for (int b = 0; b < 640; b += 4)
+                                {
+                                    temp = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
+                                    ((TranslateTransform3D)pts[i].Transform).OffsetZ = temp;
+                                    i++;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            this.outputBitmap.WritePixels(
                             new Int32Rect(0, 0, depthFrame.Width, depthFrame.Height),
                             convertedDepthBits,
                             depthFrame.Width * Bgr32BytesPerPixel,
                             0);
+                        }
 
                         return this.outputBitmap;
                     }

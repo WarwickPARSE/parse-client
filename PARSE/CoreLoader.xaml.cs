@@ -235,7 +235,7 @@ namespace PARSE
         {
 
             String feedChoice   = feedcb.Text;
-            String visualChoice = "";
+            String visualChoice = visualcb.Text;
 
             //Stop all streams
             kinectInterp.stopStreams(feedChoice);
@@ -277,6 +277,19 @@ namespace PARSE
 
             switch (visualChoice)
             {
+
+                case "Triangle Mesh":
+
+                    kinectInterp.stopStreams(null);
+
+                    GeometryModel3D[] gm        = new GeometryModel3D[640*480];
+                    TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
+
+                    kinectInterp.startDepthMeshStream(gm);
+                    tpc.render();
+
+                    break;
+
                 default:
 
                     break;
