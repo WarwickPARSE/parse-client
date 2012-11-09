@@ -52,6 +52,7 @@ namespace PARSE
         private GeometryModel3D[]                       pts;
         private bool                                    visActive;
 
+        private float                                   skelDepth;
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
@@ -121,6 +122,9 @@ namespace PARSE
 
             //visActive set to false to stop duplicate visualisations
             visActive = false;
+
+            //skelDepth needs to reset to 0 for switching between depth and depth+skel
+            //skelDepth = -1;
 
             switch (feedChoice) {
                 
@@ -265,6 +269,7 @@ namespace PARSE
                         }
 
                         // Update the drawing
+                        skelDepth = trackedSkeleton.Position.Z;
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
                     }
@@ -321,38 +326,57 @@ namespace PARSE
                 realDepth = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
                 realDepthCollection[i] = realDepth;
 
-                if (realDepth < 1066)
+                if (skelDepth < 0)
                 {
-                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
-                    this.depthFrame32[colorPixelIndex++] = 0;
-                    this.depthFrame32[colorPixelIndex++] = 0;
-                    ++colorPixelIndex;
+                    if (realDepth < 1066)
+                    {
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        ++colorPixelIndex;
 
+                    }
+                    else if ((1066 <= realDepth) && (realDepth < 2133))
+                    {
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (2133 - realDepth) / 1066);
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 1066) / 1066);
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        ++colorPixelIndex;
+                    }
+                    else if ((2133 <= realDepth) && (realDepth < 3199))
+                    {
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (3198 - realDepth) / 1066);
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 2133) / 1066);
+                        ++colorPixelIndex;
+                    }
+                    else if (3199 <= realDepth)
+                    {
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (4000 - realDepth) / 801);
+                        ++colorPixelIndex;
+                    }
                 }
-                else if ((1066 <= realDepth) && (realDepth < 2133))
+                else
                 {
-                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (2133 - realDepth) / 1066);
-                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 1066) / 1066);
-                    this.depthFrame32[colorPixelIndex++] = 0;
-                    ++colorPixelIndex;
+                    if ((((skelDepth * 1000) - 100) <= realDepth) && (realDepth < ((skelDepth * 1000) + 100)))
+                    {
+                        this.depthFrame32[colorPixelIndex++] = 255;
+                        this.depthFrame32[colorPixelIndex++] = 255;
+                        this.depthFrame32[colorPixelIndex++] = 255;
+                        ++colorPixelIndex;
+                    }
+                    else 
+                    {
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        this.depthFrame32[colorPixelIndex++] = 0;
+                        ++colorPixelIndex;
+                    }
                 }
-                else if ((2133 <= realDepth) && (realDepth < 3199))
-                {
-                    this.depthFrame32[colorPixelIndex++] = 0;
-                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (3198 - realDepth) / 1066);
-                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 2133) / 1066);
-                    ++colorPixelIndex;
-                }
-                else if (3199 <= realDepth)
-                {
-                    this.depthFrame32[colorPixelIndex++] = 0;
-                    this.depthFrame32[colorPixelIndex++] = 0;
-                    this.depthFrame32[colorPixelIndex++] = (byte)(255 * (4000 - realDepth) / 801);
-                    ++colorPixelIndex;
-                }
-
             }
-
+            skelDepth = -1;
             return this.depthFrame32;
         }
         
