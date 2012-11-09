@@ -53,6 +53,8 @@ namespace PARSE
         private bool                                    visActive;
 
         private float                                   skelDepth;
+        private float skelL;
+        private float skelR;
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
