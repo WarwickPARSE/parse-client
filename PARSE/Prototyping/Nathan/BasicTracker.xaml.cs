@@ -13,20 +13,10 @@ namespace PARSE.Prototyping.Nathan
 {
     public partial class BasicTracker : Window
     {
-
-        //RGB Constants
-        private const int RedIndex = 2;
-        private const int GreenIndex = 1;
-        private const int BlueIndex = 0;
-
         //Depth point array and frame definitions
-        private short[] pixelData;
-        private byte[] depthFrame32;
-        private WriteableBitmap outputBitmap;
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
-        private DepthImageFormat lastImageFormat;
 
-        //RGB point array and frame definitions
+        // Composite RGB images - input & output
         private byte[] colorpixelData;
         private byte[] processedcolorpixelData;
         private byte[] colorFrameRGB;
@@ -34,13 +24,18 @@ namespace PARSE.Prototyping.Nathan
         private WriteableBitmap processedBitmap; 
         private ColorImageFormat rgbImageFormat;
 
-        // Component images
+        // RGB Component images
         private byte[] redComponent;
         private byte[] greenComponent;
         private byte[] blueComponent;
         private WriteableBitmap redBitmap;
         private WriteableBitmap greenBitmap;
         private WriteableBitmap blueBitmap;
+
+        //RGB Constants
+        private const int RedIndex = 2;
+        private const int GreenIndex = 1;
+        private const int BlueIndex = 0;
 
         //frame sizes
         private int width;
@@ -57,6 +52,7 @@ namespace PARSE.Prototyping.Nathan
 
         // Frame counter
         public Thread frameProcessorThread;
+        public int frames = 0;
 
         //Kinect sensor
         KinectSensor kinectSensor;
@@ -84,6 +80,9 @@ namespace PARSE.Prototyping.Nathan
                 kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
                 statusbarStatus.Content = "Status: Device connected";
+
+                frameProcessorThread = new Thread(fpsCounter);
+                frameProcessorThread.Start();
             }
             else
             {
@@ -164,6 +163,8 @@ namespace PARSE.Prototyping.Nathan
                  
                     this.rgbImageFormat = colorFrame.Format;
 
+                    frames++;
+
                 }
             }
         }
@@ -233,17 +234,17 @@ namespace PARSE.Prototyping.Nathan
 
         private void RGBSlider_GREEN_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            rgbLabel_Target.Content = Math.Floor(rgbSlider_RED.Value) + " - " + Math.Floor(rgbSlider_GREEN.Value) + " - " + Math.Floor(rgbSlider_BLUE.Value);
         }
 
         private void rgbSlider_RED_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            rgbLabel_Target.Content = Math.Floor(rgbSlider_RED.Value) + " - " + Math.Floor(rgbSlider_GREEN.Value) + " - " + Math.Floor(rgbSlider_BLUE.Value);
         }
 
         private void rgbSlider_BLUE_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            rgbLabel_Target.Content = Math.Floor(rgbSlider_RED.Value) + " - " + Math.Floor(rgbSlider_GREEN.Value) + " - " + Math.Floor(rgbSlider_BLUE.Value);
         }
 
         private void BasicTrackerWindow_Loaded(object sender, RoutedEventArgs e)
@@ -261,10 +262,40 @@ namespace PARSE.Prototyping.Nathan
             Console.Write("\n");
             Console.Write(e.GetPosition(frameGrab));
 
-            int xCoordinate = int(e.GetPosition(frameGrab).X);
-            int yCoordinate = int(e.GetPosition(frameGrab).Y);
+            double xCoordinate = e.GetPosition(frameGrab).X / 253;
+            double yCoordinate = e.GetPosition(frameGrab).Y / 187;
+
+            xCoordinate = xCoordinate * 640;
+            yCoordinate = yCoordinate * 480;
+
+            xCoordinate = Math.Floor(xCoordinate);
+            yCoordinate = Math.Floor(yCoordinate);
+
+            Console.Write("   Relative crds: " + xCoordinate + ", " + yCoordinate);
+
+            int target = Convert.ToInt32((width * (yCoordinate - 1) + xCoordinate) * 4);
+
+            Console.Write("  Value there = R:" + colorpixelData[target+2] + " G:" + colorpixelData[target+1] + " B:" + colorpixelData[target]);
+
+            rgbLabel_GET.Content = colorpixelData[target+2] + " - " + colorpixelData[target+1] + " - " + colorpixelData[target];
 
         }
+
+        private void fpsCounter()
+        {
+            while (true)
+            {
+                Thread.Sleep(1000);
+                int temp = frames;
+                frames = 0;
+                //statusbarFPS.Content = "FPS: " + frames.ToString();
+                Console.WriteLine("FPS: " + frames.ToString());
+
+            }
+        }
+
+
+
 
         
 
