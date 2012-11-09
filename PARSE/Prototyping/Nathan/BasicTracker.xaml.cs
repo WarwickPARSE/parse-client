@@ -275,9 +275,9 @@ namespace PARSE.Prototyping.Nathan
 
             int target = Convert.ToInt32((width * (yCoordinate - 1) + xCoordinate) * 4);
 
-            Console.Write("  Value there = R:" + colorpixelData[target+2] + " G:" + colorpixelData[target+1] + " B:" + colorpixelData[target]);
+            Console.Write(colorpixelData[target+2] + " - " + colorpixelData[target+1] + " - " + colorpixelData[target]);
 
-            rgbLabel_GET.Content = colorpixelData[target+2] + " - " + colorpixelData[target+1] + " - " + colorpixelData[target];
+            rgbLabel_GET.Content = colorpixelData[target+2] + "-" + colorpixelData[target+1] + "-" + colorpixelData[target];
 
         }
 
@@ -291,6 +291,19 @@ namespace PARSE.Prototyping.Nathan
                 //statusbarFPS.Content = "FPS: " + frames.ToString();
                 Console.WriteLine("FPS: " + frames.ToString());
 
+            }
+        }
+
+        private void btn_FindColour_Click(object sender, RoutedEventArgs e)
+        {
+            String labelContent = rgbLabel_GET.Content.ToString();
+            if (labelContent != "Click image to get RGB")
+            {
+                String[] RGB = labelContent.Split('-');
+                rgbSlider_RED.Value = Double.Parse(RGB[0]);
+                rgbSlider_GREEN.Value = Double.Parse(RGB[1]);
+                rgbSlider_BLUE.Value = Double.Parse(RGB[2]);
+                rgbSlider_range.Value = 40;
             }
         }
 
