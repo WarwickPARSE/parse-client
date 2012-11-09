@@ -47,7 +47,7 @@ namespace PARSE
             pc.FarPlaneDistance = 8000;
             pc.NearPlaneDistance = 100;
             pc.FieldOfView = 10;
-            pc.Position = new Point3D(160, 120, -1000);
+            pc.Position = new Point3D(300, 200, -1000);
             pc.LookDirection = new Vector3D(0, 0, 1);
             pc.UpDirection = new Vector3D(0, -1, 0);
 
