@@ -53,8 +53,6 @@ namespace PARSE
         private bool                                    visActive;
 
         private float                                   skelDepth;
-        private float skelL;
-        private float skelR;
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
@@ -270,8 +268,10 @@ namespace PARSE
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        // Update the drawing
+                        //update the depth of the tracked skeleton
                         skelDepth = trackedSkeleton.Position.Z;
+                        
+                        // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
                     }
@@ -364,9 +364,9 @@ namespace PARSE
                 {
                     if ((((skelDepth * 1000) - 100) <= realDepth) && (realDepth < ((skelDepth * 1000) + 100)))
                     {
-                        this.depthFrame32[colorPixelIndex++] = 255;
-                        this.depthFrame32[colorPixelIndex++] = 255;
-                        this.depthFrame32[colorPixelIndex++] = 255;
+                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
+                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
+                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
                         ++colorPixelIndex;
                     }
                     else 
@@ -376,6 +376,8 @@ namespace PARSE
                         this.depthFrame32[colorPixelIndex++] = 0;
                         ++colorPixelIndex;
                     }
+                    
+                    
                 }
             }
             skelDepth = -1;
