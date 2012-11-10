@@ -362,7 +362,7 @@ namespace PARSE
                 }
                 else
                 {
-                    if ((((skelDepth * 1000) - 100) <= realDepth) && (realDepth < ((skelDepth * 1000) + 100)))
+                    if (((((skelDepth * 1000) - 100) <= realDepth) && (realDepth < ((skelDepth * 1000) + 100))) && ((800 <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < 2400)))
                     {
                         this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
                         this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
