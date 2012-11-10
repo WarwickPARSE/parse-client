@@ -53,6 +53,8 @@ namespace PARSE
         private bool                                    visActive;
 
         private float                                   skelDepth;
+        private float skelL;
+        private float skelR;
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
@@ -270,7 +272,15 @@ namespace PARSE
 
                         //update the depth of the tracked skeleton
                         skelDepth = trackedSkeleton.Position.Z;
-                        
+                        skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
+                        skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+
+                        skelDepth = skelDepth * 1000;
+                        skelL = (320 * (1 + skelL)) * 4;
+                        skelR = (320 * (1 + skelR)) * 4;
+
+                        //Console.WriteLine(skelR);
+
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
@@ -362,7 +372,7 @@ namespace PARSE
                 }
                 else
                 {
-                    if (((((skelDepth * 1000) - 100) <= realDepth) && (realDepth < ((skelDepth * 1000) + 100))) && ((800 <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < 2400)))
+                    if ((((skelDepth - 100) <= realDepth) && (realDepth < (skelDepth + 100))) && ((skelL <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < skelR)))
                     {
                         this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
                         this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
