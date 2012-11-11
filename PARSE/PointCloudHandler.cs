@@ -7,5 +7,14 @@ namespace PARSE
 {
     class PointCloudHandler
     {
+        public PointCloudHandler(int frequency) 
+        { 
+        
+        }
+
+        public void run() 
+        {
+            //TODO
+        }
     }
 }

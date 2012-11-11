@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Threading;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,8 +36,6 @@ namespace PARSE
         private GeometryModel3D                         model;
         private GeometryModel3D[]                       points;
 
-        private bool                                    generatePC;
-
         //private bool                                    kinectConnected = false;
         //public int[]                                    realDepthCollection;
         //public int                                      realDepth;
@@ -50,8 +49,17 @@ namespace PARSE
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
 
+        //point cloud handler thread 
+        private PointCloudHandler pcHandler;
+        private Thread pcHandlerThread;
+
         public CoreLoader()
         {
+            //Start a new instance of the point cloud handler (500ms intervals) - not implemented yet d/w
+            pcHandler = new PointCloudHandler(500);
+            pcHandlerThread = new Thread(new ThreadStart(pcHandler.run));
+            //pcHandlerThread.Start();
+
             InitializeComponent();
 
             //init KinectInterpreter
@@ -59,9 +67,7 @@ namespace PARSE
                
             //do not generate a point cloud until explicitly told to do so 
             this.pc = false;
-            this.generatePC = false; 
-
-
+  
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
             
@@ -115,26 +121,6 @@ namespace PARSE
                                 i++;
                             }                        
                     }
-
-                    i = 0;
-
-                    //generate the point cloud using the z data
-                    if (generatePC) 
-                    {
-                        int size = height * width;
-                        for (int ii = 0; ii < height; ii += s) 
-                        {
-                            for (int jj = 0; jj < width; jj += s) 
-                            {
-                                temp = ((ushort)this.pixelData[jj + ii * 640]) >> 3;
-                                //if(i== 640*480/32)
-                                //((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
-                                i++;
-                            }
-                        }
-                    }
-
-
                 }
                 else 
                 {
@@ -159,26 +145,9 @@ namespace PARSE
 
         }
 
-
         private void btnFront_Click(object sender, RoutedEventArgs e)
         {
-            //do nothing if there is no kinect detected
-            //TODO: make sure something has been read in first - this problem is almost certain to never occur 
-            /*if (kinectConnected)
-            {
-                //set the image to the last one that has been read in by the kinect
-                di.setData(this.depthFrame32);
 
-                WriteableBitmap a = new WriteableBitmap(
-                                    width,
-                                    height,
-                                    96, // DpiX
-                                    96, // DpiY
-                                    PixelFormats.Bgr32,
-                                    null);
-
-                //di.dumpToImage(miniOutput, width, height);
-            }*/
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
@@ -213,21 +182,6 @@ namespace PARSE
             {
                 this.kinectInterp.kinectSensor.Stop();
             }
-        }
-
-        private void btnRobinButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO:reevaluate and possibly delete this method
-            //enable point cloud generation, istantiate point cloud class  
-        //    this.generatePC = true; 
-        //    this.pointCloud = new ICP.PointCloud(this.width, this.height);
-
-            /*
-            pointCloud.setX();
-            pointCloud.setY();
-            pointCloud.setZ();
-            pointCloud.init();
-             */
         }
 
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
