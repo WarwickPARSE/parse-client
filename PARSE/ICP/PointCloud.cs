@@ -8,9 +8,9 @@ namespace PARSE.ICP
     class PointCloud
     {
         //temporary array data structures
-        int[] x;
-        int[] y;
-        int[] z;
+        int[] xs;
+        int[] ys;
+        int[] zs;
 
         //dodgy global variables (to be changed)
         int width;
@@ -51,25 +51,25 @@ namespace PARSE.ICP
 
         public void setX(int[] x) 
         {
-            this.x = x;
+            this.xs = x;
         }
 
         public void setY(int[] y) 
         {
-            this.y = y;
+            this.ys = y;
         }
 
         public void setZ(int[] z) 
         {
-            this.z = z;
+            this.zs = z;
         }
 
         //setter, for the lazy
         public void setXYZ(int[] x, int[] y, int[] z) 
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.xs = x;
+            this.ys = y;
+            this.zs = z;
         }
 
         /// <summary>
@@ -77,14 +77,14 @@ namespace PARSE.ICP
         /// </summary>
         public void init() {
             //only proceed if the coordinates match up
-            if (y.Length == x.Length && x.Length == z.Length)
+            if (ys.Length == xs.Length && xs.Length == zs.Length)
             {
                 //only proceed if we have the number of points that we expected
-                if (x.Length == ((width * height) - 1))
+                if (xs.Length == ((width * height) - 1))
                 {
                     for (int i = 0; i < (width * height);  i++)
                     {
-                        Point p = new Point(x[i], y[i], z[i]);
+                        Point p = new Point(xs[i], ys[i], zs[i]);
                         points.Add(p);
                     }
                 }
