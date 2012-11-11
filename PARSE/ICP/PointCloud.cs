@@ -84,7 +84,7 @@ namespace PARSE
                 {
                     for (int i = 0; i < (width * height);  i++)
                     {
-                        PARSE.ICP.Point p = new PARSE.ICP.Point(x[i], y[i], z[i]);
+                        PARSE.ICP.Point p = new PARSE.ICP.Point(xs[i], ys[i], zs[i]);
                         points.Add(p);
                     }
                 }
