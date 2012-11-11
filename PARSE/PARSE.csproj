@@ -93,6 +93,7 @@
     <Compile Include="KinectInterpreter.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
+    <Compile Include="PointCloudHandler.cs" />
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>
     </Compile>
