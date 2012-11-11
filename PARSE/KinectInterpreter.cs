@@ -40,8 +40,8 @@ namespace PARSE
         private byte[]                                  depthFrame32;
         private WriteableBitmap                         outputBitmap;
         private DepthImageFormat                        depthImageFormat;
-        public int[]                                    realDepthCollection;
-        public int                                      realDepth;
+        public int[]                                    realDepthCollection; //probably deprecated
+        public int                                      realDepth;           //probably deprecated
 
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
@@ -50,7 +50,11 @@ namespace PARSE
 
         //Visualisation definitions
         private GeometryModel3D[]                       pts;
+        private PointCloud                              pcl;
         private bool                                    visActive;
+        private int[]                                   x;
+        private int[]                                   y;
+        private int[]                                   z;          
 
         private float                                   skelDepth;
         private float skelL;
@@ -208,7 +212,6 @@ namespace PARSE
                         null);
 
                         depthFrame.CopyPixelDataTo(this.depthPixelData);
-
                         byte[] convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
                         if (visActive)
@@ -218,6 +221,7 @@ namespace PARSE
                                 for (int b = 0; b < 640; b += 4)
                                 {
                                     temp = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
+                                    System.Diagnostics.Debug.WriteLine(temp);
                                     ((TranslateTransform3D)pts[i].Transform).OffsetZ = temp;
                                     i++;
                                 }
@@ -226,6 +230,33 @@ namespace PARSE
                         }
                         else
                         {
+                            /*
+                            //temporary point array for point clouding
+                            pcl = new PointCloud(640, 480);
+                            x = new int[640 * 480];
+                            y = new int[640 * 480];
+                            z = new int[640 * 480];
+
+                            //loop for point cloud array population
+                            int numPoints = 0;
+
+                            for (int a = 0; a < 480; a++)
+                            {
+                                for (int b = 0; b < 640; b++)
+                                {
+                                    x[numPoints] = b + 1;
+                                    y[numPoints] = a + 1;
+                                    z[numPoints] = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
+
+                                    numPoints++;
+                                }
+
+                            }
+
+
+                            pcl.setXYZ(x, y, z);
+                            pcl.init();*/
+
                             this.outputBitmap.WritePixels(
                             new Int32Rect(0, 0, depthFrame.Width, depthFrame.Height),
                             convertedDepthBits,
@@ -330,6 +361,7 @@ namespace PARSE
         {
 
             this.realDepthCollection = new int[depthFrame.Length];
+            Point point = new Point();
             
             int colorPixelIndex = 0;
             for (int i = 0;  i < depthFrame.Length; i++)
