@@ -36,7 +36,6 @@ namespace PARSE
         private GeometryModel3D[]                       points;
 
         //point cloud definitions (will change namespace later)
-        private ICP.PointCloud                          pointCloud;
         private bool                                    generatePC;
 
         //private bool                                    kinectConnected = false;

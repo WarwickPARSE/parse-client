@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace PARSE.ICP
+namespace PARSE
 {
     class PointCloud
     {
@@ -18,7 +18,7 @@ namespace PARSE.ICP
 
         bool is_dense;                          //to be calculated
 
-        List<Point> points;
+        List<PARSE.ICP.Point> points;
 
         //the following variables may or may not be defined, depending on future need
         //sensor_orientation
@@ -32,7 +32,7 @@ namespace PARSE.ICP
             this.width = 640;
             this.height = 480;
 
-            this.points = new List<Point>();
+            this.points = new List<PARSE.ICP.Point>();
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace PARSE.ICP
             this.width = width;
             this.height = height;
 
-            this.points = new List<Point>();
+            this.points = new List<PARSE.ICP.Point>();
         }
 
         public void setX(int[] x) 
@@ -80,11 +80,11 @@ namespace PARSE.ICP
             if (y.Length == x.Length && x.Length == z.Length)
             {
                 //only proceed if we have the number of points that we expected
-                if (x.Length == ((width * height) - 1))
+                if (x.Length == ((width * height)))
                 {
                     for (int i = 0; i < (width * height);  i++)
                     {
-                        Point p = new Point(x[i], y[i], z[i]);
+                        PARSE.ICP.Point p = new PARSE.ICP.Point(x[i], y[i], z[i]);
                         points.Add(p);
                     }
                 }
