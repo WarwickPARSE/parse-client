@@ -78,6 +78,7 @@
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
+    <Compile Include="ICP\PointRGB.cs" />
     <Compile Include="ICP\ICP3D.cs" />
     <Compile Include="ICP\KdTree\HPoint.cs" />
     <Compile Include="ICP\KdTree\HRect.cs" />
