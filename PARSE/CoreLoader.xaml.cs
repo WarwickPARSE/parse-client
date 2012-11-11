@@ -219,6 +219,7 @@ namespace PARSE
 
         private void btnRobinButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO:reevaluate and possibly delete this method
             //enable point cloud generation, istantiate point cloud class  
         //    this.generatePC = true; 
         //    this.pointCloud = new ICP.PointCloud(this.width, this.height);
