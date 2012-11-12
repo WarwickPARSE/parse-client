@@ -77,8 +77,9 @@ namespace PARSE
                 btnSensorDown.IsEnabled = false;
                 btnSensorMax.IsEnabled = false;
                 btnSensorMin.IsEnabled = false;
-                btnFront.IsEnabled = false;
-                btnBack.IsEnabled = false;
+                btnStartScanning.IsEnabled = false;
+                btnStopScanning.IsEnabled = false;
+                btnDumpToFile.IsEnabled = false; 
             }
 
         }
@@ -141,11 +142,6 @@ namespace PARSE
         /// <param name="e">event identifier</param>
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnFront_Click(object sender, RoutedEventArgs e)
         {
 
         }
