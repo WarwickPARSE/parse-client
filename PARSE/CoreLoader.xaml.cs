@@ -107,27 +107,6 @@ namespace PARSE
        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
        {
            this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
-
-           /*Point Cloud Stuff, needs to be intergated
-           imageFrame.CopyPixelDataTo(this.pixelData);
-
-                    //something's broken here...
-                    if (pc)
-                    {
-                        for (int a = 0; a < 480; a += s)
-                            for (int b = 0; b < 640; b += s)
-                            {
-                                temp = ((ushort)this.pixelData[b + a * 640]) >> 3;
-                                ((TranslateTransform3D)points[i].Transform).OffsetZ = temp;
-                                i++;
-                            }                        
-                    }
-                }
-                else 
-                {
-                    return;
-                }
-           */
        }
 
        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
