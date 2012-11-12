@@ -358,12 +358,9 @@ namespace PARSE
         /// <param name="depthFrame">current depth frame</param>
         /// <param name="depthStream">originating depth stream</param>
         /// <returns>depth pixel data</returns>
-
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
-
             this.realDepthCollection = new int[depthFrame.Length];
-            Point point = new Point();
             
             int colorPixelIndex = 0;
             for (int i = 0;  i < depthFrame.Length; i++)
