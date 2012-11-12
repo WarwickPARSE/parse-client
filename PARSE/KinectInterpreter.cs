@@ -255,7 +255,6 @@ namespace PARSE
 
                             }
 
-
                             pcl.setXYZ(x, y, z);
                             pcl.init();*/
 
