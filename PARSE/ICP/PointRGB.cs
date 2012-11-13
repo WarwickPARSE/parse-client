@@ -5,15 +5,20 @@ using System.Text;
 
 namespace PARSE.ICP
 {
-    public struct Point
+    public struct PointRGB
     {
         public int x, y, z;
+        public int r, g, b;
 
-        public Point(int x, int y, int z)
+        public PointRGB(int x, int y, int z, int r, int g, int b)
         {
             this.x = x;
             this.y = y;
-            this.z = z; 
+            this.z = z;
+
+            this.r = r;
+            this.g = g;
+            this.b = b;
         }
     }
 }

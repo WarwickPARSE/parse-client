@@ -19,7 +19,11 @@
         
         <!--Kinect Control Panel -->
         <Label Content="Status" Height="29" HorizontalAlignment="Left" Margin="10,480,0,0" Name="lblStatus" VerticalAlignment="Top" Grid.Row="1" />
+<<<<<<< HEAD
+        <Grid Height="84" HorizontalAlignment="Left" Margin="12,231,0,0" Name="grid1" VerticalAlignment="Top" Width="162" Grid.Row="1">
+=======
         <Grid Height="115" HorizontalAlignment="Left" Margin="12,216,0,0" Name="grid1" VerticalAlignment="Top" Width="162" Grid.Row="1">
+>>>>>>> 237adb0386ba52b2f0c3672138c04cec2a5ced79
             <Label Content="Scanning" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="lblScanning" VerticalAlignment="Top" FontWeight="Bold" />
             <Button Content="Start" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnStartScanning" VerticalAlignment="Top" Width="75" />
             <Button Content="Stop" Height="23" HorizontalAlignment="Left" Margin="83,40,0,0" Name="btnStopScanning" VerticalAlignment="Top" Width="75" />
