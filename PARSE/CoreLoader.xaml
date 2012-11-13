@@ -54,7 +54,7 @@
             <ComboBox Height="23" HorizontalAlignment="Left" Margin="4,104,0,0" Name="visualcb" VerticalAlignment="Top" Width="120">
                 <ComboBoxItem Name="cbv1">---VOLUME---</ComboBoxItem>
                 <ComboBoxItem Name="cbv2">Triangle Mesh</ComboBoxItem>
-                <ComboBoxItem Name="cbv3">Cube Mesh</ComboBoxItem>
+                <ComboBoxItem Name="cbv3">Linear Mesh</ComboBoxItem>
                 <ComboBoxItem Name="cbv4">Wireframe</ComboBoxItem>
                 <ComboBoxItem Name="cbv5">Region</ComboBoxItem>
                 <ComboBoxItem Name="cbv6">---RECOGNITION---</ComboBoxItem>

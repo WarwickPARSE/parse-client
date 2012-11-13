@@ -121,6 +121,7 @@
     <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
+    <Compile Include="Library\Visualisation\LinearPointCloud.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
     <Compile Include="PointCloudHandler.cs" />
