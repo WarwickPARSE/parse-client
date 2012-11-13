@@ -1,7 +1,8 @@
 ﻿<Window x:Class="PARSE.CoreLoader"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"           
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         Title="CoreLoader" Height="586" Width="785" Loaded="Window_Loaded">
     <Grid Height="526" Width="750">
         <Grid.RowDefinitions>
@@ -14,7 +15,7 @@
         <!--Kinect Imager-->
         
         <!--Skeletal Canvas Overlay -->
-        <Canvas Grid.Row="1" Height="426" HorizontalAlignment="Left" Margin="187,26,0,0" Name="vpcanvas2" VerticalAlignment="Top" Width="543" />
+        <Canvas Grid.Row="1" Height="426" HorizontalAlignment="Left" Margin="187,26,0,0" Name="vpcanvas2" VerticalAlignment="Top" Width="543"></Canvas>
         <!--Skeletal Canvas Overlay -->
         
         <!--Kinect Control Panel -->
@@ -53,8 +54,8 @@
             <Button Content="Visualise" Height="26" HorizontalAlignment="Left" Click="btnVisualise_Click" Margin="3,144,0,0" Name="btnVisualise" VerticalAlignment="Top" Width="59" />
             <ComboBox Height="23" HorizontalAlignment="Left" Margin="4,104,0,0" Name="visualcb" VerticalAlignment="Top" Width="120">
                 <ComboBoxItem Name="cbv1">---VOLUME---</ComboBoxItem>
-                <ComboBoxItem Name="cbv2">Triangle Mesh</ComboBoxItem>
-                <ComboBoxItem Name="cbv3">Linear Mesh</ComboBoxItem>
+                <ComboBoxItem Name="cbv2">Real Time Triangle Mesh</ComboBoxItem>
+                <ComboBoxItem Name="cbv3">Static Point Cloud</ComboBoxItem>
                 <ComboBoxItem Name="cbv4">Wireframe</ComboBoxItem>
                 <ComboBoxItem Name="cbv5">Region</ComboBoxItem>
                 <ComboBoxItem Name="cbv6">---RECOGNITION---</ComboBoxItem>
@@ -70,7 +71,15 @@
         
         <!--Additional Controls-->
         <Canvas Grid.Row="1" Height="11" HorizontalAlignment="Left" Margin="156,472,0,0" Name="vpcanvas" VerticalAlignment="Top" Width="18" />
+        <h:HelixViewport3D CameraRotationMode="Trackball" Margin="187,27,20,62" Grid.Row="1" Name="hvpcanvas">
+            <h:HelixViewport3D.Camera>
+                <PerspectiveCamera Position="0,-4,0" LookDirection="0,6,0" UpDirection="0,0,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
+            </h:HelixViewport3D.Camera>
+            <h:SunLight />
+            <ModelVisual3D Content="{Binding Model}" />
+        </h:HelixViewport3D>
         <!--Additional Controls-->
         
+        <!--Helix viewport (WPF3D supporting framework, base layer for all other canvas layers) -->
     </Grid>
 </Window>

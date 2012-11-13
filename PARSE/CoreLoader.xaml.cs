@@ -16,6 +16,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
+using HelixToolkit.Wpf;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -206,21 +207,25 @@ namespace PARSE
             switch (visualChoice)
             {
 
-                case "Triangle Mesh":
+                case "Real Time Triangle Mesh":
 
                     kinectInterp.stopStreams(null);
 
                     GeometryModel3D[] gm        = new GeometryModel3D[640*480];
                     TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
-                    kinectInterp.startDepthMeshStream(gm);
+                    kinectInterp.startDepthMeshStream(gm, 0);
                     tpc.render();
 
                     break;
 
                 case "Linear Mesh":
 
+                    GeometryModel3D model     = new GeometryModel3D();
+                    LinearPointCloud lpc = new LinearPointCloud(model);
 
+                    kinectInterp.startDepthMeshStream(new GeometryModel3D[0], 1);
+                    lpc.render(kinectInterp.realDepthCollection);
 
                     break;
 

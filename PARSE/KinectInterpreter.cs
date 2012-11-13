@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Windows.Forms;
 
 using Emgu.CV;
+using HelixToolkit.Wpf;
 
 //Kinect Imports
 using Microsoft.Kinect;
@@ -43,6 +44,8 @@ namespace PARSE
         private WriteableBitmap                         outputBitmap;
         private DepthImageFormat                        depthImageFormat;
         public int[]                                    realDepthCollection; //probably deprecated
+        public DiffuseMaterial                          imageMesh;
+        public GeometryModel3D                          Model;
         public int                                      realDepth;           //probably deprecated
 
         //Skeleton point array and frame definitions
@@ -96,13 +99,23 @@ namespace PARSE
         }
 
         //Enable depthMeshStream
-        public void startDepthMeshStream(GeometryModel3D[] pts)
+        public void startDepthMeshStream(GeometryModel3D[] pts, int mode)
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
-            this.pts = pts;
-            this.depthReady = true;
-            visActive = true;
+                
+            switch(mode) {
+
+                case 0:
+                    this.pts = pts;
+                    this.depthReady = true;
+                    visActive = true;
+                    break;
+
+                case 1:
+
+                    break;
+            }
         }
 
         //Enable rgbStream
@@ -183,8 +196,9 @@ namespace PARSE
                     colorFrame.CopyPixelDataTo(this.colorpixelData);
 
                     this.outputColorBitmap.WritePixels(new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height), colorpixelData, colorFrame.Width * Bgr32BytesPerPixel, 0);
-                    
-                    //this.rgbImageFormat = colorFrame.Format;
+
+                    imageMesh = new DiffuseMaterial(new ImageBrush(this.outputColorBitmap));
+                    this.Model.Material = this.Model.BackMaterial = imageMesh;
 
                     return this.outputColorBitmap;
                 }
@@ -226,7 +240,6 @@ namespace PARSE
                                 for (int b = 0; b < 640; b += 4)
                                 {
                                     temp = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
-                                    System.Diagnostics.Debug.WriteLine(temp);
                                     ((TranslateTransform3D)pts[i].Transform).OffsetZ = temp;
                                     i++;
                                 }

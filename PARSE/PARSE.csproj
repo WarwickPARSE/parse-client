@@ -54,9 +54,6 @@
     <Reference Include="Emgu.CV">
       <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64 2.4.0.1717\bin\Emgu.CV.dll</HintPath>
     </Reference>
-    <Reference Include="Emgu.CV.DebuggerVisualizers.VS2008">
-      <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64-gpu 2.4.2.1777\bin\Emgu.CV.DebuggerVisualizers.VS2008.dll</HintPath>
-    </Reference>
     <Reference Include="Emgu.CV.DebuggerVisualizers.VS2010">
       <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64 2.4.0.1717\bin\Emgu.CV.DebuggerVisualizers.VS2010.dll</HintPath>
     </Reference>
@@ -80,6 +77,10 @@
     </Reference>
     <Reference Include="Emgu.Util">
       <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64 2.4.0.1717\bin\Emgu.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Wpf, Version=2012.4.14.1, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\HelixToolkit.2012.4.14.1\lib\NET40\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kinect, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -130,6 +131,8 @@
     </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
+    <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Compile Include="Prototyping\PoseIsolater.cs" />
     <Page Include="CoreLoader.xaml">
