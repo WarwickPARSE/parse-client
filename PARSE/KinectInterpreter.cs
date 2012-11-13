@@ -405,9 +405,9 @@ namespace PARSE
                 {
                     if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL-skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR+skelRDelta))))
                     {
-                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
-                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
-                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth - skelDepthDelta) / (2 * skelDepthDelta));
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth - skelDepthDelta) / (2 * skelDepthDelta));
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth - skelDepthDelta) / (2 * skelDepthDelta));
                         ++colorPixelIndex;
                     }
                     else 
