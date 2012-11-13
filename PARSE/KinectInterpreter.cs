@@ -59,8 +59,11 @@ namespace PARSE
         private int[]                                   z;          
 
         private float                                   skelDepth;
-        private float skelL;
-        private float skelR;
+        private float                                   skelDepthDelta = 125;//to be used if we ever implement sliders so we can scan fat people, shouldnt really exceed 255/2
+        private float                                   skelL;
+        private float                                   skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+        private float                                   skelR;
+        private float                                   skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people 
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
@@ -311,8 +314,6 @@ namespace PARSE
                         skelL = (320 * (1 + skelL)) * 4;
                         skelR = (320 * (1 + skelR)) * 4;
 
-                        //Console.WriteLine(skelR);
-
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
@@ -402,7 +403,7 @@ namespace PARSE
                 }
                 else
                 {
-                    if ((((skelDepth - 100) <= realDepth) && (realDepth < (skelDepth + 100))) && ((skelL <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < skelR)))
+                    if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL-skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR+skelRDelta))))
                     {
                         this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
                         this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
