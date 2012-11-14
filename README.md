@@ -34,3 +34,10 @@ Running
 This software can only be run from within Visual Studio 2010 at this present 
 time. 
 
+Current Dependencies
+--------
+We are currently making use of the following 3rd party libraries (subject to change):
+
+- Emgu CV (Image processing)
+- Helix 3D (3D Modelling)
+- Kinect SDK (Kinect)
