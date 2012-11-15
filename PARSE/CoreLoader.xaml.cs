@@ -225,7 +225,7 @@ namespace PARSE
                     LinearPointCloud lpc = new LinearPointCloud(model);
 
                     kinectInterp.startDepthMeshStream(new GeometryModel3D[0], 1);
-                    lpc.render(kinectInterp.realDepthCollection);
+                    lpc.render(kinectInterp.Model);
 
                     break;
 

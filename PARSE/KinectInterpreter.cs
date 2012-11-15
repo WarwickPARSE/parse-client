@@ -41,13 +41,15 @@ namespace PARSE
         //Depth point array and frame definitions
         private short[]                                 depthPixelData;
         private byte[]                                  depthFrame32;
+        public Point3D[]                                depthFramePoints;
+        public Point[]                                  textureCoordinates;
+        public int[]                                    realDepthCollection; 
         private WriteableBitmap                         outputBitmap;
         private DepthImageFormat                        depthImageFormat;
-        public int[]                                    realDepthCollection; //probably deprecated
         public DiffuseMaterial                          imageMesh;
         public GeometryModel3D                          Model;
         public int                                      realDepth;           //probably deprecated
-
+       
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
         private Dictionary<int, SkeletonFigure>         skeletons;
@@ -56,7 +58,7 @@ namespace PARSE
         //Visualisation definitions
         private GeometryModel3D[]                       pts;
         private PointCloud                              pcl;
-        private bool                                    visActive;
+        private int                                     visMode;
         private int[]                                   x;
         private int[]                                   y;
         private int[]                                   z;          
@@ -109,7 +111,7 @@ namespace PARSE
                 case 0:
                     this.pts = pts;
                     this.depthReady = true;
-                    visActive = true;
+                    visMode = 1;
                     break;
 
                 case 1:
@@ -145,7 +147,7 @@ namespace PARSE
         {
 
             //visActive set to false to stop duplicate visualisations
-            visActive = false;
+            visMode = 0;
 
             //skelDepth needs to reset to 0 for switching between depth and depth+skel
             //skelDepth = -1;
@@ -197,6 +199,7 @@ namespace PARSE
 
                     this.outputColorBitmap.WritePixels(new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height), colorpixelData, colorFrame.Width * Bgr32BytesPerPixel, 0);
 
+                    //Updates texture for point cloud visualisation
                     imageMesh = new DiffuseMaterial(new ImageBrush(this.outputColorBitmap));
                     this.Model.Material = this.Model.BackMaterial = imageMesh;
 
@@ -219,6 +222,9 @@ namespace PARSE
                     {
                         this.depthPixelData = new short[depthFrame.PixelDataLength];
                         this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
+                        this.depthFramePoints = new Point3D[depthFrame.PixelDataLength];
+                        this.textureCoordinates = new Point[depthFrame.PixelDataLength];
+
                         int temp = 0;
                         int i = 0;
 
@@ -233,19 +239,31 @@ namespace PARSE
                         depthFrame.CopyPixelDataTo(this.depthPixelData);
                         byte[] convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
-                        if (visActive)
+                        //If visualisation is active - feedback frames
+                        if (visMode==1)
                         {
-                            for (int a = 0; a < 480; a += 4)
+                            for (int a = 0; a < depthFrame.Width; a += 4)
                             {
-                                for (int b = 0; b < 640; b += 4)
+                                for (int b = 0; b < depthFrame.Height; b += 4)
                                 {
-                                    temp = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
+                                    temp = ((ushort)this.depthPixelData[b + a * depthFrame.Height]) >> 3;
                                     ((TranslateTransform3D)pts[i].Transform).OffsetZ = temp;
                                     i++;
                                 }
                             }
-
                         }
+                        else if (visMode==2)
+                        {
+                            for (int a = 0; a < depthFrame.Height; a++)
+                            {
+                                for (int b = 0; b < depthFrame.Width; b++)
+                                {
+                                    this.textureCoordinates[a * depthFrame.Width + b]
+                                        = new Point((double)b / (depthFrame.Width - 1), (double)a 
+                                            / (depthFrame.Height - 1));
+                                }
+                            }
+                        } 
                         else
                         {
                             /*

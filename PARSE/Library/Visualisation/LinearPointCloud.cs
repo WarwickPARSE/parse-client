@@ -29,7 +29,7 @@ namespace PARSE
             this.cloud = mod;
         }
 
-        public GeometryModel3D[] render(int[] realdepth)
+        public MeshGeometry3D render(GeometryModel3D mesh)
         {
 
             return null;
