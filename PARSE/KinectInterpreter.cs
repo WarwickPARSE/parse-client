@@ -13,8 +13,11 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Emgu.CV;
+using HelixToolkit.Wpf;
 
 //Kinect Imports
 using Microsoft.Kinect;
@@ -40,11 +43,16 @@ namespace PARSE
         //Depth point array and frame definitions
         private short[]                                 depthPixelData;
         private byte[]                                  depthFrame32;
+        public Point3D[]                                depthFramePoints;
+        public Point[]                                  textureCoordinates;
+        public int[]                                    realDepthCollection; 
         private WriteableBitmap                         outputBitmap;
         private DepthImageFormat                        depthImageFormat;
-        public int[]                                    realDepthCollection; //probably deprecated
+        public DiffuseMaterial                          imageMesh;
+        public GeometryModel3D                          Model;
         public int                                      realDepth;           //probably deprecated
-
+        public int[]                                    rawDepth;
+       
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
         private Dictionary<int, SkeletonFigure>         skeletons;
@@ -53,14 +61,17 @@ namespace PARSE
         //Visualisation definitions
         private GeometryModel3D[]                       pts;
         private PointCloud                              pcl;
-        private bool                                    visActive;
+        private int                                     visMode;
         private int[]                                   x;
         private int[]                                   y;
         private int[]                                   z;          
 
         private float                                   skelDepth;
-        private float skelL;
-        private float skelR;
+        private float                                   skelDepthDelta = 125;//to be used if we ever implement sliders so we can scan fat people, shouldnt really exceed 255/2
+        private float                                   skelL;
+        private float                                   skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+        private float                                   skelR;
+        private float                                   skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people 
 
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
@@ -97,9 +108,22 @@ namespace PARSE
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
+
             this.pts = pts;
             this.depthReady = true;
-            visActive = true;
+            visMode = 1;
+        }
+
+        public void startDepthLinearStream(GeometryModel3D mod)
+        {
+            this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            this.kinectSensor.Start();
+
+            this.Model = mod;
+            this.depthReady = true;
+            visMode = 2;
+
         }
 
         //Enable rgbStream
@@ -129,7 +153,7 @@ namespace PARSE
         {
 
             //visActive set to false to stop duplicate visualisations
-            visActive = false;
+            visMode = 0;
 
             //skelDepth needs to reset to 0 for switching between depth and depth+skel
             //skelDepth = -1;
@@ -180,8 +204,10 @@ namespace PARSE
                     colorFrame.CopyPixelDataTo(this.colorpixelData);
 
                     this.outputColorBitmap.WritePixels(new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height), colorpixelData, colorFrame.Width * Bgr32BytesPerPixel, 0);
-                    
-                    //this.rgbImageFormat = colorFrame.Format;
+
+                    //Updates texture for point cloud visualisation
+                    imageMesh = new DiffuseMaterial(new ImageBrush(this.outputColorBitmap));
+                    this.Model.Material = this.Model.BackMaterial = imageMesh;
 
                     return this.outputColorBitmap;
                 }
@@ -202,6 +228,10 @@ namespace PARSE
                     {
                         this.depthPixelData = new short[depthFrame.PixelDataLength];
                         this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
+                        this.depthFramePoints = new Point3D[depthFrame.PixelDataLength];
+                        this.textureCoordinates = new Point[depthFrame.PixelDataLength];
+                        this.rawDepth = new int[depthFrame.PixelDataLength];
+
                         int temp = 0;
                         int i = 0;
 
@@ -216,53 +246,50 @@ namespace PARSE
                         depthFrame.CopyPixelDataTo(this.depthPixelData);
                         byte[] convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
-                        if (visActive)
+                        //If visualisation is active - feedback frames
+                        if (visMode==1)
                         {
                             for (int a = 0; a < 480; a += 4)
                             {
                                 for (int b = 0; b < 640; b += 4)
                                 {
                                     temp = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
-                                    System.Diagnostics.Debug.WriteLine(temp);
                                     ((TranslateTransform3D)pts[i].Transform).OffsetZ = temp;
                                     i++;
                                 }
                             }
-
                         }
+                        else if (visMode==2)
+                        {
+
+                            //This method will need to be fixed as there is a distinct offset between depth and colour
+                            //Greg's depth filtering will also need to be intergrated here.
+
+                            for (int a = 0; a < depthFrame.Height; a++)
+                            {
+                                for (int b = 0; b < depthFrame.Width; b++)
+                                {
+                                    this.textureCoordinates[a * depthFrame.Width + b]
+                                        = new Point((double)b / (depthFrame.Width - 1), (double)a 
+                                            / (depthFrame.Height - 1));
+                                }
+                            }
+                        } 
                         else
                         {
-                            /*
-                            //temporary point array for point clouding
-                            pcl = new PointCloud(640, 480);
-                            x = new int[640 * 480];
-                            y = new int[640 * 480];
-                            z = new int[640 * 480];
-
-                            //loop for point cloud array population
-                            int numPoints = 0;
-
-                            for (int a = 0; a < 480; a++)
-                            {
-                                for (int b = 0; b < 640; b++)
-                                {
-                                    x[numPoints] = b + 1;
-                                    y[numPoints] = a + 1;
-                                    z[numPoints] = ((ushort)this.depthPixelData[b + a * 640]) >> 3;
-
-                                    numPoints++;
-                                }
-
-                            }
-
-                            pcl.setXYZ(x, y, z);
-                            pcl.init();*/
 
                             this.outputBitmap.WritePixels(
                             new Int32Rect(0, 0, depthFrame.Width, depthFrame.Height),
                             convertedDepthBits,
                             depthFrame.Width * Bgr32BytesPerPixel,
                             0);
+
+                        }
+
+
+                        if (visMode == 2)
+                        {
+                            this.Model.Geometry = this.CreateMesh(depthFrame.Width, depthFrame.Height);
                         }
 
                         return this.outputBitmap;
@@ -311,8 +338,6 @@ namespace PARSE
                         skelL = (320 * (1 + skelL)) * 4;
                         skelR = (320 * (1 + skelR)) * 4;
 
-                        //Console.WriteLine(skelR);
-
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
@@ -357,70 +382,166 @@ namespace PARSE
         /// <param name="depthFrame">current depth frame</param>
         /// <param name="depthStream">originating depth stream</param>
         /// <returns>depth pixel data</returns>
-        private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
+        /// 
+
+        private MeshGeometry3D CreateMesh(int width, int height, double depthDifferenceTolerance = 200)
         {
-            this.realDepthCollection = new int[depthFrame.Length];
-            
-            int colorPixelIndex = 0;
-            for (int i = 0;  i < depthFrame.Length; i++)
+            var triangleIndices = new List<int>();
+            for (int iy = 0; iy + 1 < height; iy++)
             {
-
-                realDepth = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
-                realDepthCollection[i] = realDepth;
-
-                if (skelDepth < 0)
+                for (int ix = 0; ix + 1 < width; ix++)
                 {
-                    if (realDepth < 1066)
-                    {
-                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        ++colorPixelIndex;
+                    int i0 = (iy * width) + ix;
+                    int i1 = (iy * width) + ix + 1;
+                    int i2 = ((iy + 1) * width) + ix + 1;
+                    int i3 = ((iy + 1) * width) + ix;
 
-                    }
-                    else if ((1066 <= realDepth) && (realDepth < 2133))
+                    var d0 = this.rawDepth[i0];
+                    var d1 = this.rawDepth[i1];
+                    var d2 = this.rawDepth[i2];
+                    var d3 = this.rawDepth[i3];
+
+                    var dmax0 = Math.Max(Math.Max(d0, d1), d2);
+                    var dmin0 = Math.Min(Math.Min(d0, d1), d2);
+                    var dmax1 = Math.Max(d0, Math.Max(d2, d3));
+                    var dmin1 = Math.Min(d0, Math.Min(d2, d3));
+
+                    if (dmax0 - dmin0 < depthDifferenceTolerance && dmin0 != -1)
                     {
-                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (2133 - realDepth) / 1066);
-                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 1066) / 1066);
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        ++colorPixelIndex;
+                        triangleIndices.Add(i0);
+                        triangleIndices.Add(i1);
+                        triangleIndices.Add(i2);
                     }
-                    else if ((2133 <= realDepth) && (realDepth < 3199))
+
+                    if (dmax1 - dmin1 < depthDifferenceTolerance && dmin1 != -1)
                     {
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (3198 - realDepth) / 1066);
-                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 2133) / 1066);
-                        ++colorPixelIndex;
+                        triangleIndices.Add(i0);
+                        triangleIndices.Add(i2);
+                        triangleIndices.Add(i3);
                     }
-                    else if (3199 <= realDepth)
-                    {
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (4000 - realDepth) / 801);
-                        ++colorPixelIndex;
-                    }
-                }
-                else
-                {
-                    if ((((skelDepth - 100) <= realDepth) && (realDepth < (skelDepth + 100))) && ((skelL <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < skelR)))
-                    {
-                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
-                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
-                        this.depthFrame32[colorPixelIndex++] = (byte)(realDepth);
-                        ++colorPixelIndex;
-                    }
-                    else 
-                    {
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        this.depthFrame32[colorPixelIndex++] = 0;
-                        ++colorPixelIndex;
-                    }
-                    
-                    
                 }
             }
-            skelDepth = -1;
+
+            return new MeshGeometry3D()
+            {
+                Positions = new Point3DCollection(this.depthFramePoints),
+                TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
+                TriangleIndices = new Int32Collection(triangleIndices)
+            };
+        }
+
+        private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
+        {
+            int tooNearDepth = depthStream.TooNearDepth;
+            int tooFarDepth = depthStream.TooFarDepth;
+            int unknownDepth = depthStream.UnknownDepth;
+
+            int cx = depthStream.FrameWidth / 2;
+            int cy = depthStream.FrameHeight / 2;
+
+            double fxinv = 1.0 / 476;
+            double fyinv = 1.0 / 476;
+
+            double scale = 0.001;
+
+            this.realDepthCollection = new int[depthFrame.Length];
+
+            if (visMode == 2)
+            {
+
+                Parallel.For(
+                0,
+                480,
+                iy =>
+                {
+                    for (int ix = 0; ix < 640; ix++)
+                    {
+                        int i = (iy * 640) + ix;
+                        this.realDepthCollection[i] = depthFrame[(iy * 640) + ix] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+
+                        if (realDepthCollection[i] == unknownDepth || realDepthCollection[i] < tooNearDepth || realDepthCollection[i] > tooFarDepth)
+                        {
+                            this.realDepthCollection[i] = -1;
+                            this.depthFramePoints[i] = new Point3D();
+                        }
+                        else
+                        {
+                            double zz = this.realDepthCollection[i] * scale;
+                            double x = (cx - ix) * zz * fxinv;
+                            double y = zz;
+                            double z = (cy - iy) * zz * fyinv;
+                            this.depthFramePoints[i] = new Point3D(x, y, z);
+                        }
+                    }
+                });
+
+            }
+
+            else
+            {
+
+                int colorPixelIndex = 0;
+                for (int i = 0; i < depthFrame.Length; i++)
+                {
+
+                    realDepth = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                    realDepthCollection[i] = realDepth;
+
+                    if (skelDepth < 0)
+                    {
+                        if (realDepth < 1066)
+                        {
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            ++colorPixelIndex;
+
+                        }
+                        else if ((1066 <= realDepth) && (realDepth < 2133))
+                        {
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (2133 - realDepth) / 1066);
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 1066) / 1066);
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            ++colorPixelIndex;
+                        }
+                        else if ((2133 <= realDepth) && (realDepth < 3199))
+                        {
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (3198 - realDepth) / 1066);
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 2133) / 1066);
+                            ++colorPixelIndex;
+                        }
+                        else if (3199 <= realDepth)
+                        {
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (4000 - realDepth) / 801);
+                            ++colorPixelIndex;
+                        }
+                    }
+                    else
+                    {
+                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))))
+                        {
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth - skelDepthDelta) / (2 * skelDepthDelta));
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth - skelDepthDelta) / (2 * skelDepthDelta));
+                            this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth - skelDepthDelta) / (2 * skelDepthDelta));
+                            ++colorPixelIndex;
+                        }
+                        else
+                        {
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            ++colorPixelIndex;
+                        }
+
+
+                    }
+                }
+                skelDepth = -1;
+
+            }
             return this.depthFrame32;
         }
         

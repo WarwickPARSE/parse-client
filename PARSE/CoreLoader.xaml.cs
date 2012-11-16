@@ -16,6 +16,8 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
+using System.Threading.Tasks;
+using HelixToolkit.Wpf;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -33,12 +35,8 @@ namespace PARSE
 
         //Modelling specific definitions
         private ScannerModeller                         modeller;
-        private GeometryModel3D                         model;
+        private GeometryModel3D                         Model;
         private GeometryModel3D[]                       points;
-
-        //private bool                                    kinectConnected = false;
-        //public int[]                                    realDepthCollection;
-        //public int                                      realDepth;
         public int                                      x;
         public int                                      y;
         public int                                      s = 4;
@@ -81,6 +79,9 @@ namespace PARSE
                 btnStopScanning.IsEnabled = false;
                 btnDumpToFile.IsEnabled = false; 
             }
+
+            //Miscellaneous modelling definitions
+            Model = new GeometryModel3D();
 
         }
 
@@ -206,7 +207,7 @@ namespace PARSE
             switch (visualChoice)
             {
 
-                case "Triangle Mesh":
+                case "Real Time Triangle Mesh":
 
                     kinectInterp.stopStreams(null);
 
@@ -215,6 +216,23 @@ namespace PARSE
 
                     kinectInterp.startDepthMeshStream(gm);
                     tpc.render();
+
+                    break;
+
+                case "Static Point Cloud":
+
+                    //In the instance that depth feed has not already been instantiated.
+
+                    kinectInterp.startDepthStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
+                    GeometryModel3D model       = new GeometryModel3D();
+                    LinearPointCloud lpc        = new LinearPointCloud(model);
+
+                    kinectInterp.startDepthLinearStream(Model);
+
+                    //Model.Geometry = lpc.render(640, 480, kinectInterp.Model, kinectInterp.depthFramePoints, 
+                    //kinectInterp.textureCoordinates, kinectInterp.realDepthCollection);
 
                     break;
 
