@@ -34,22 +34,14 @@ namespace PARSE
         private int                                     height;
 
         //Modelling specific definitions
-        private ScannerModeller                         modeller;
         private GeometryModel3D                         Model;
-        private GeometryModel3D[]                       points;
-        public int                                      x;
-        public int                                      y;
-        public int                                      s = 4;
-        
-        //should the kinect be generating point clouds? 
-        public bool                                     pc;         
 
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
 
         //point cloud handler thread 
-        private PointCloudHandler pcHandler;
-        private Thread pcHandlerThread;
+        private PointCloudHandler                       pcHandler;
+        private Thread                                  pcHandlerThread;
 
         public CoreLoader()
         {
@@ -62,9 +54,6 @@ namespace PARSE
 
             //init KinectInterpreter
             kinectInterp  = new KinectInterpreter(vpcanvas2);
-               
-            //do not generate a point cloud until explicitly told to do so 
-            this.pc = false;
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
@@ -123,7 +112,7 @@ namespace PARSE
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            //additional interface implementation to follow.
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
@@ -223,16 +212,16 @@ namespace PARSE
 
                     //In the instance that depth feed has not already been instantiated.
 
+                    kinectInterp.stopStreams(null);
+
                     kinectInterp.startDepthStream();
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
 
                     GeometryModel3D model       = new GeometryModel3D();
-                    LinearPointCloud lpc        = new LinearPointCloud(model);
+                    LinearPointCloud lpc        = new LinearPointCloud(Model);
 
                     kinectInterp.startDepthLinearStream(Model);
-
-                    //Model.Geometry = lpc.render(640, 480, kinectInterp.Model, kinectInterp.depthFramePoints, 
-                    //kinectInterp.textureCoordinates, kinectInterp.realDepthCollection);
+                    this.Model = kinectInterp.grabMe();
 
                     break;
 
