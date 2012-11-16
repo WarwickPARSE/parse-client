@@ -80,7 +80,6 @@ namespace PARSE
             rgbReady = false;
             depthReady = false;
             skeletonReady = false;
-            Model = new GeometryModel3D();
             
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
@@ -104,23 +103,26 @@ namespace PARSE
         }
 
         //Enable depthMeshStream
-        public void startDepthMeshStream(GeometryModel3D[] pts, int mode)
+        public void startDepthMeshStream(GeometryModel3D[] pts)
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
-                
-            switch(mode) {
 
-                case 0:
-                    this.pts = pts;
-                    this.depthReady = true;
-                    visMode = 1;
-                    break;
+            this.pts = pts;
+            this.depthReady = true;
+            visMode = 1;
+        }
 
-                case 1:
-                    visMode = 2;
-                    break;
-            }
+        public void startDepthLinearStream(GeometryModel3D mod)
+        {
+            this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            this.kinectSensor.Start();
+
+            this.Model = mod;
+            this.depthReady = true;
+            visMode = 2;
+
         }
 
         //Enable rgbStream

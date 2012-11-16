@@ -214,7 +214,7 @@ namespace PARSE
                     GeometryModel3D[] gm        = new GeometryModel3D[640*480];
                     TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
-                    kinectInterp.startDepthMeshStream(gm, 0);
+                    kinectInterp.startDepthMeshStream(gm);
                     tpc.render();
 
                     break;
@@ -229,10 +229,10 @@ namespace PARSE
                     GeometryModel3D model       = new GeometryModel3D();
                     LinearPointCloud lpc        = new LinearPointCloud(model);
 
-                    kinectInterp.startDepthMeshStream(new GeometryModel3D[0], 1);
+                    kinectInterp.startDepthLinearStream(Model);
 
-                    kinectInterp.Model.Geometry = lpc.render(640, 480, kinectInterp.Model, kinectInterp.depthFramePoints, 
-                    kinectInterp.textureCoordinates, kinectInterp.realDepthCollection);
+                    //Model.Geometry = lpc.render(640, 480, kinectInterp.Model, kinectInterp.depthFramePoints, 
+                    //kinectInterp.textureCoordinates, kinectInterp.realDepthCollection);
 
                     break;
 
