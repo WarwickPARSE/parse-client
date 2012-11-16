@@ -51,6 +51,7 @@ namespace PARSE
         public DiffuseMaterial                          imageMesh;
         public GeometryModel3D                          Model;
         public int                                      realDepth;           //probably deprecated
+        public int[]                                    rawDepth;
        
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
@@ -229,6 +230,7 @@ namespace PARSE
                         this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
                         this.depthFramePoints = new Point3D[depthFrame.PixelDataLength];
                         this.textureCoordinates = new Point[depthFrame.PixelDataLength];
+                        this.rawDepth = new int[depthFrame.PixelDataLength];
 
                         int temp = 0;
                         int i = 0;
@@ -282,6 +284,12 @@ namespace PARSE
                             depthFrame.Width * Bgr32BytesPerPixel,
                             0);
 
+                        }
+
+
+                        if (visMode == 2)
+                        {
+                            this.Model.Geometry = this.CreateMesh(depthFrame.Width, depthFrame.Height);
                         }
 
                         return this.outputBitmap;
@@ -374,6 +382,54 @@ namespace PARSE
         /// <param name="depthFrame">current depth frame</param>
         /// <param name="depthStream">originating depth stream</param>
         /// <returns>depth pixel data</returns>
+        /// 
+
+        private MeshGeometry3D CreateMesh(int width, int height, double depthDifferenceTolerance = 200)
+        {
+            var triangleIndices = new List<int>();
+            for (int iy = 0; iy + 1 < height; iy++)
+            {
+                for (int ix = 0; ix + 1 < width; ix++)
+                {
+                    int i0 = (iy * width) + ix;
+                    int i1 = (iy * width) + ix + 1;
+                    int i2 = ((iy + 1) * width) + ix + 1;
+                    int i3 = ((iy + 1) * width) + ix;
+
+                    var d0 = this.rawDepth[i0];
+                    var d1 = this.rawDepth[i1];
+                    var d2 = this.rawDepth[i2];
+                    var d3 = this.rawDepth[i3];
+
+                    var dmax0 = Math.Max(Math.Max(d0, d1), d2);
+                    var dmin0 = Math.Min(Math.Min(d0, d1), d2);
+                    var dmax1 = Math.Max(d0, Math.Max(d2, d3));
+                    var dmin1 = Math.Min(d0, Math.Min(d2, d3));
+
+                    if (dmax0 - dmin0 < depthDifferenceTolerance && dmin0 != -1)
+                    {
+                        triangleIndices.Add(i0);
+                        triangleIndices.Add(i1);
+                        triangleIndices.Add(i2);
+                    }
+
+                    if (dmax1 - dmin1 < depthDifferenceTolerance && dmin1 != -1)
+                    {
+                        triangleIndices.Add(i0);
+                        triangleIndices.Add(i2);
+                        triangleIndices.Add(i3);
+                    }
+                }
+            }
+
+            return new MeshGeometry3D()
+            {
+                Positions = new Point3DCollection(this.depthFramePoints),
+                TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
+                TriangleIndices = new Int32Collection(triangleIndices)
+            };
+        }
+
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
             int tooNearDepth = depthStream.TooNearDepth;
