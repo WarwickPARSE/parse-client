@@ -30,6 +30,8 @@ namespace PARSE
         public string                                   kinectStatus { get; private set; }
 
         public bool                                     kinectReady { get; private set; }//true if kinect ready
+        public bool                                     IsColorStreamUpdating { get; set; }
+        public bool                                     IsDepthStreamUpdating { get; set; }
         private bool                                    rgbReady;//ditto
         private bool                                    depthReady;//ditto
         private bool                                    skeletonReady;//ditto
@@ -49,6 +51,8 @@ namespace PARSE
         public GeometryModel3D                          Model;
         public GeometryModel3D[]                        pts;
         public int[]                                    rawDepth;
+        private bool                                    updateColorData;
+        private bool                                    updateDepthData;
        
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
@@ -76,6 +80,7 @@ namespace PARSE
             skeletonReady = false;
 
             Model = new GeometryModel3D();
+            CompositionTarget.Rendering += this.CompositionTarget_Rendering;
 
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
@@ -88,6 +93,14 @@ namespace PARSE
                 this.kinectStatus = "Initialized";
             }
         }
+
+        //updates the 3d composition target
+        void CompositionTarget_Rendering(object sender, EventArgs e)
+        {
+            this.updateColorData = true;
+            this.updateDepthData = true;
+        }
+
 
         //Enable depthStream
         public void startDepthStream()
@@ -181,6 +194,7 @@ namespace PARSE
 
         public WriteableBitmap ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
+
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 if (colorFrame != null)
@@ -211,6 +225,7 @@ namespace PARSE
 
         public WriteableBitmap DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
+
             using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
             {
                 if (depthFrame != null)
@@ -270,7 +285,7 @@ namespace PARSE
                             if (!this.Model.IsFrozen)
                             {
                                 this.Model.Geometry = this.CreateMesh(depthFrame.Width, depthFrame.Height);
-                                this.Model.Freeze();
+                                //this.Model.Freeze();
                             }
 
                         }
@@ -528,13 +543,6 @@ namespace PARSE
 
             }
             return this.depthFrame32;
-        }
-
-        public GeometryModel3D grabMe()
-        {
-
-            return this.Model;
-
         }
 
     }

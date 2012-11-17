@@ -42,6 +42,7 @@ namespace PARSE
         //point cloud handler thread 
         private PointCloudHandler                       pcHandler;
         private Thread                                  pcHandlerThread;
+        private StaticViewer                            display;
 
         public CoreLoader()
         {
@@ -210,18 +211,7 @@ namespace PARSE
 
                 case "Static Point Cloud":
 
-                    //In the instance that depth feed has not already been instantiated.
-
-                    kinectInterp.stopStreams(null);
-
-                    kinectInterp.startDepthStream();
-                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-
-                    GeometryModel3D model       = new GeometryModel3D();
-                    LinearPointCloud lpc        = new LinearPointCloud(Model);
-
-                    kinectInterp.startDepthLinearStream(Model);
-                    this.Model = kinectInterp.grabMe();
+                    display = new StaticViewer(kinectInterp.Model);
 
                     break;
 
@@ -230,6 +220,13 @@ namespace PARSE
                     break;
 
             }
+        }
+
+        private void btnStartScanning_Click(object sender, RoutedEventArgs e)
+        {
+            display.Height = 240;
+            display.Width = 320;
+            display.Show();
         }
 
 
