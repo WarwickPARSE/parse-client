@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ using System.Windows.Shapes;
 using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Drawing;
 
 //EMGU Image processing import
 using Emgu.CV;
@@ -48,7 +50,6 @@ namespace PARSE
         private short[]                                 depthPixelData;
         private Byte[]                                  depthFrame32;
         public Point3D[]                                depthFramePoints;
-        public Point[]                                  textureCoordinates;
         private WriteableBitmap                         outputBitmap;
         private DepthImageFormat                        depthImageFormat;
         public GeometryModel3D                          Model;
@@ -224,7 +225,6 @@ namespace PARSE
                         this.depthPixelData = new short[depthFrame.PixelDataLength];
                         this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
                         this.depthFramePoints = new Point3D[depthFrame.PixelDataLength];
-                        this.textureCoordinates = new Point[depthFrame.PixelDataLength];
                         this.rawDepth = new int[depthFrame.PixelDataLength];
 
                         this.outputBitmap = new WriteableBitmap(
@@ -340,7 +340,7 @@ namespace PARSE
                 // Transforms a SkeletonPoint to a ColorImagePoint
                 var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
                 // Scale the ColorImagePoint position to the current window size
-                var point = new Point((int)colorPoint.X / 640.0 * this.skeletonCanvas.ActualWidth, (int)colorPoint.Y / 480.0 * this.skeletonCanvas.ActualHeight);
+                var point = new System.Windows.Point((int)colorPoint.X / 640.0 * this.skeletonCanvas.ActualWidth, (int)colorPoint.Y / 480.0 * this.skeletonCanvas.ActualHeight);
                 // update the position of that joint
                 figure.Update(joint.JointType, point);
             }
@@ -427,20 +427,24 @@ namespace PARSE
             return rawDepthClone;
         }
 
-        public Object[] grabPointCloudParams()
+        public BitmapSource grabPointCloudParams()
         {
             //Variables for point cloud generation
 
-            Object[] parameters = new Object[2];
+            BitmapSource colorbitmap = outputColorBitmap.Clone();
+            Bitmap b1;
 
-            WriteableBitmap colorbitmap = outputColorBitmap.Clone();
-            
-            parameters[0] = colorbitmap;
-            parameters[1] = rawDepthClone;
+            using (var fileStream = new FileStream("C:\\Users\\Bernie\\Documents\\test.bmp", FileMode.Create))
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+
+                enc.Frames.Add(BitmapFrame.Create(colorbitmap));
+                enc.Save(fileStream);
+            }
 
             kinectSensor.Stop();
 
-            return parameters;
+            return colorbitmap;
 
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,8 +22,23 @@ namespace PARSE
 
         //migrate helix viewport stuff later into viewportcalibrator
 
-        public StaticPointCloud(Object[] parameters)
+        public StaticPointCloud(BitmapSource parameters)
         {
+
+            BitmapSource bitmapSource = parameters;
+
+            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+            MemoryStream memoryStream = new MemoryStream();
+            BitmapImage bImg = new BitmapImage();
+
+            encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+            encoder.Save(memoryStream);
+
+            bImg.BeginInit();
+            bImg.StreamSource = new MemoryStream(memoryStream.ToArray());
+            bImg.EndInit();
+
+            memoryStream.Close();
 
             // Create a model group
             var modelGroup = new Model3DGroup();
@@ -37,12 +53,13 @@ namespace PARSE
 
             // Create some materials
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
+            var imageMaterial = MaterialHelper.CreateImageMaterial(bImg, 1);
             var redMaterial = MaterialHelper.CreateMaterial(Colors.Red);
             var blueMaterial = MaterialHelper.CreateMaterial(Colors.Blue);
             var insideMaterial = MaterialHelper.CreateMaterial(Colors.Yellow);
 
             // Add 3 models to the group (using the same mesh, that's why we had to freeze it)
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Material = greenMaterial, BackMaterial = insideMaterial });
+            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Material = imageMaterial, BackMaterial = imageMaterial });
             modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(-2, 0, 0), Material = redMaterial, BackMaterial = insideMaterial });
             modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(2, 0, 0), Material = blueMaterial, BackMaterial = insideMaterial });
             //modelGroup.Children.Add(gm);
