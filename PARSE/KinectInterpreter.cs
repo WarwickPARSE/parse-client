@@ -54,6 +54,8 @@ namespace PARSE
         public GeometryModel3D                          Model;
         public GeometryModel3D[]                        pts;
         public int[]                                    rawDepth;
+        public int[]                                    rawDepthClone;
+        public byte[]                                   convertedDepthBits;
        
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
@@ -68,7 +70,6 @@ namespace PARSE
 
         //Visualisation definitions
         private int                                     visMode;
-        private DiffuseMaterial                         imageMesh;
 
         //Constants
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
@@ -153,9 +154,6 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
-            //skelDepth needs to reset to 0 for switching between depth and depth+skel
-            //skelDepth = -1;
-
             switch (feedChoice) {
                 
                 case "RGB + Skeletal":
@@ -238,10 +236,10 @@ namespace PARSE
                         null);
 
                         depthFrame.CopyPixelDataTo(this.depthPixelData);
-                        byte[] convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
+                        convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
                         //VIS MODE 1: Feedback to visualisation with Z offset.
-                        if (visMode==1)
+                        if (visMode == 1)
                         {
 
                             for (int a = 0; a < 480; a += 4)
@@ -253,27 +251,6 @@ namespace PARSE
                                     i++;
                                 }
                             }
-                        }
-
-                        //VIS MODE 2: Feedback to visualisation with colour map.
-                        else if (visMode == 2)
-                        {
-
-                            //BUG: offset between colour and depth feed is out by 50px - fix.
-
-                            System.Diagnostics.Debug.WriteLine("debug");
-
-                            for (int a = 0; a < depthFrame.Height; a++)
-                            {
-                                for (int b = 0; b < depthFrame.Width; b++)
-                                {
-                                    this.textureCoordinates[a * depthFrame.Width + b]
-                                        = new Point((double)b / (depthFrame.Width - 1), (double)a
-                                            / (depthFrame.Height - 1));
-                                }
-                            }
-
-                            //this.Model.Geometry = this.CreateMesh(depthFrame.Width, depthFrame.Height);
                         }
                         else
                         {
@@ -379,55 +356,11 @@ namespace PARSE
 
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
-            int tooNearDepth = depthStream.TooNearDepth;
-            int tooFarDepth = depthStream.TooFarDepth;
-            int unknownDepth = depthStream.UnknownDepth;
 
-            int cx = depthStream.FrameWidth / 2;
-            int cy = depthStream.FrameHeight / 2;
-
-            double fxinv = 1.0 / 476;
-            double fyinv = 1.0 / 476;
-
-            double scale = 0.001;
-
-            this.rawDepth = new int[depthFrame.Length];
-
-            if (visMode == 2)
-            {
-
-                for(int iy = 0; iy < 480; iy++)
+            int colorPixelIndex = 0;
+            
+            for (int i = 0; i < depthFrame.Length; i++)
                 {
-                    for (int ix = 0; ix < 640; ix++)
-                    {
-                        int i = (iy * 640) + ix;
-                        this.rawDepth[i] = depthFrame[(iy * 640) + ix] >> DepthImageFrame.PlayerIndexBitmaskWidth;
-
-                        if (rawDepth[i] == unknownDepth || rawDepth[i] < tooNearDepth || rawDepth[i] > tooFarDepth)
-                        {
-                            this.rawDepth[i] = -1;
-                            this.depthFramePoints[i] = new Point3D();
-                        }
-                        else
-                        {
-                            double zz = this.rawDepth[i] * scale;
-                            double x = (cx - ix) * zz * fxinv;
-                            double y = zz;
-                            double z = (cy - iy) * zz * fyinv;
-                            this.depthFramePoints[i] = new Point3D(x, y, z);
-                        }
-                    }
-                }
-
-            }
-
-            else
-            {
-
-                int colorPixelIndex = 0;
-                for (int i = 0; i < depthFrame.Length; i++)
-                {
-
                     this.rawDepth[i] = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
                     if (skelDepth < 0)
@@ -479,21 +412,35 @@ namespace PARSE
                             ++colorPixelIndex;
                         }
 
-
-                    }
                 }
                 
                 skelDepth = -1;
+                rawDepthClone = rawDepth;
 
             }
             return this.depthFrame32;
         }
 
-
-        public GeometryModel3D grabPointCloudParams()
+        public int[] getDepthArray()
         {
+            //this is a clone of the rawdepth to capture current depth frame.
+            return rawDepthClone;
+        }
 
-            return this.Model;
+        public Object[] grabPointCloudParams()
+        {
+            //Variables for point cloud generation
+
+            Object[] parameters = new Object[2];
+
+            WriteableBitmap colorbitmap = outputColorBitmap.Clone();
+            
+            parameters[0] = colorbitmap;
+            parameters[1] = rawDepthClone;
+
+            kinectSensor.Stop();
+
+            return parameters;
 
         }
 

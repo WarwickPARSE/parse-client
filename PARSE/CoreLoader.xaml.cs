@@ -42,7 +42,6 @@ namespace PARSE
         //point cloud handler thread 
         private PointCloudHandler                       pcHandler;
         private Thread                                  pcHandlerThread;
-        private StaticViewer                            display;
 
         public CoreLoader()
         {
@@ -206,17 +205,17 @@ namespace PARSE
 
                     kinectInterp.startDepthMeshStream(gm);
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-
                     tpc.render();
 
                     break;
 
                 case "Static Point Cloud":
 
-                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
                     kinectInterp.startDepthLinearStream(new GeometryModel3D());
 
-                    this.DataContext = new LinearPointCloud(this.kinectInterp.grabPointCloudParams());
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    this.DataContext = new StaticPointCloud(this.kinectInterp.grabPointCloudParams());
 
                     break;
 
@@ -229,7 +228,7 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-
+            System.Diagnostics.Debug.WriteLine(kinectInterp.getDepthArray().Length);
         }
 
     }

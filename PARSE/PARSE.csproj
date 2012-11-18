@@ -122,12 +122,9 @@
     <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
-    <Compile Include="Library\Visualisation\LinearPointCloud.cs" />
+    <Compile Include="Library\Visualisation\StaticPointCloud.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
-    <Compile Include="Library\Visualisation\StaticViewer.xaml.cs">
-      <DependentUpon>StaticViewer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PointCloudHandler.cs" />
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>
@@ -150,10 +147,6 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Library\Visualisation\StaticViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Prototyping\Nathan\BasicTracker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
