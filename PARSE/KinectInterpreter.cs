@@ -16,7 +16,10 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
 
+//EMGU Image processing import
 using Emgu.CV;
+
+//HelixToolkit Import
 using HelixToolkit.Wpf;
 
 //Kinect Imports
@@ -51,8 +54,6 @@ namespace PARSE
         public GeometryModel3D                          Model;
         public GeometryModel3D[]                        pts;
         public int[]                                    rawDepth;
-        private bool                                    updateColorData;
-        private bool                                    updateDepthData;
        
         //Skeleton point array and frame definitions
         private Skeleton[]                              skeletonData;
@@ -80,7 +81,7 @@ namespace PARSE
             skeletonReady = false;
 
             Model = new GeometryModel3D();
-            CompositionTarget.Rendering += this.CompositionTarget_Rendering;
+            /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
 
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
@@ -94,14 +95,6 @@ namespace PARSE
             }
         }
 
-        //updates the 3d composition target
-        void CompositionTarget_Rendering(object sender, EventArgs e)
-        {
-            this.updateColorData = true;
-            this.updateDepthData = true;
-        }
-
-
         //Enable depthStream
         public void startDepthStream()
         {
@@ -114,22 +107,20 @@ namespace PARSE
         //Enable depthMeshStream
         public void startDepthMeshStream(GeometryModel3D[] pts)
         {
+            visMode = 1;
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.pts = pts;
             this.kinectSensor.Start();
             this.depthReady = true;
-            visMode = 1;
         }
 
         public void startDepthLinearStream(GeometryModel3D mod)
         {
+            visMode = 2;
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
-
-            this.Model = mod;
             this.depthReady = true;
-            visMode = 2;
 
         }
 
@@ -211,11 +202,8 @@ namespace PARSE
 
                     this.outputColorBitmap.WritePixels(new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height), colorpixelData, colorFrame.Width * Bgr32BytesPerPixel, 0);
 
-                    //Updates texture for point cloud visualisation
-                    imageMesh = new DiffuseMaterial(new ImageBrush(this.outputColorBitmap));
-                    this.Model.Material = this.Model.BackMaterial = imageMesh;
-
                     return this.outputColorBitmap;
+
                 }
                 
                 return null;
@@ -255,6 +243,7 @@ namespace PARSE
                         //VIS MODE 1: Feedback to visualisation with Z offset.
                         if (visMode==1)
                         {
+
                             for (int a = 0; a < 480; a += 4)
                             {
                                 for (int b = 0; b < 640; b += 4)
@@ -272,6 +261,8 @@ namespace PARSE
 
                             //BUG: offset between colour and depth feed is out by 50px - fix.
 
+                            System.Diagnostics.Debug.WriteLine("debug");
+
                             for (int a = 0; a < depthFrame.Height; a++)
                             {
                                 for (int b = 0; b < depthFrame.Width; b++)
@@ -282,21 +273,19 @@ namespace PARSE
                                 }
                             }
 
-                            if (!this.Model.IsFrozen)
-                            {
-                                this.Model.Geometry = this.CreateMesh(depthFrame.Width, depthFrame.Height);
-                                //this.Model.Freeze();
-                            }
-
+                            //this.Model.Geometry = this.CreateMesh(depthFrame.Width, depthFrame.Height);
                         }
+                        else
+                        {
 
-                       this.outputBitmap.WritePixels(
-                            new Int32Rect(0, 0, depthFrame.Width, depthFrame.Height),
-                            convertedDepthBits,
-                            depthFrame.Width * Bgr32BytesPerPixel,
-                            0);
+                            this.outputBitmap.WritePixels(
+                                new Int32Rect(0, 0, depthFrame.Width, depthFrame.Height),
+                                convertedDepthBits,
+                                depthFrame.Width * Bgr32BytesPerPixel,
+                                0);
 
-                        return this.outputBitmap;
+                            return this.outputBitmap;
+                        }
                     }
                  }
                 return null;
@@ -387,52 +376,6 @@ namespace PARSE
         /// <param name="depthStream">originating depth stream</param>
         /// <returns>depth pixel data</returns>
         /// 
-
-        private MeshGeometry3D CreateMesh(int width, int height, double depthDifferenceTolerance = 200)
-        {
-            var triangleIndices = new List<int>();
-            for (int iy = 0; iy + 1 < height; iy++)
-            {
-                for (int ix = 0; ix + 1 < width; ix++)
-                {
-                    int i0 = (iy * width) + ix;
-                    int i1 = (iy * width) + ix + 1;
-                    int i2 = ((iy + 1) * width) + ix + 1;
-                    int i3 = ((iy + 1) * width) + ix;
-
-                    var d0 = this.rawDepth[i0];
-                    var d1 = this.rawDepth[i1];
-                    var d2 = this.rawDepth[i2];
-                    var d3 = this.rawDepth[i3];
-
-                    var dmax0 = Math.Max(Math.Max(d0, d1), d2);
-                    var dmin0 = Math.Min(Math.Min(d0, d1), d2);
-                    var dmax1 = Math.Max(d0, Math.Max(d2, d3));
-                    var dmin1 = Math.Min(d0, Math.Min(d2, d3));
-
-                    if (dmax0 - dmin0 < depthDifferenceTolerance && dmin0 != -1)
-                    {
-                        triangleIndices.Add(i0);
-                        triangleIndices.Add(i1);
-                        triangleIndices.Add(i2);
-                    }
-
-                    if (dmax1 - dmin1 < depthDifferenceTolerance && dmin1 != -1)
-                    {
-                        triangleIndices.Add(i0);
-                        triangleIndices.Add(i2);
-                        triangleIndices.Add(i3);
-                    }
-                }
-            }
-
-            return new MeshGeometry3D()
-            {
-                Positions = new Point3DCollection(this.depthFramePoints),
-                TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
-                TriangleIndices = new Int32Collection(triangleIndices)
-            };
-        }
 
         private byte[] ConvertDepthFrame(short[] depthFrame, DepthImageStream depthStream)
         {
@@ -539,10 +482,19 @@ namespace PARSE
 
                     }
                 }
+                
                 skelDepth = -1;
 
             }
             return this.depthFrame32;
+        }
+
+
+        public GeometryModel3D grabPointCloudParams()
+        {
+
+            return this.Model;
+
         }
 
     }

@@ -71,13 +71,14 @@
         
         <!--Additional Controls-->
         <Canvas Grid.Row="1" Height="11" HorizontalAlignment="Left" Margin="156,472,0,0" Name="vpcanvas" VerticalAlignment="Top" Width="18" />
-        <!--<h:HelixViewport3D CameraRotationMode="Trackball" Margin="187,27,20,62" Grid.Row="1" Name="hvpcanvas">
+        <h:HelixViewport3D CameraRotationMode="Trackball" Margin="187,27,20,62" Grid.Row="1" Name="hvpcanvas">
             <h:HelixViewport3D.Camera>
                 <PerspectiveCamera Position="0,-4,0" LookDirection="0,6,0" UpDirection="0,0,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
             </h:HelixViewport3D.Camera>
             <h:SunLight />
             <ModelVisual3D Content="{Binding Model}" />
-        </h:HelixViewport3D>-->
+            <h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
+        </h:HelixViewport3D>
         <!--Additional Controls-->
         
         <!--Helix viewport (WPF3D supporting framework, base layer for all other canvas layers) -->

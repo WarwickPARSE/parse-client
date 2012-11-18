@@ -38,45 +38,20 @@ namespace PARSE
 
 
     /// <summary>
-    /// Interaction logic for StaticViewer.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class StaticViewer : Window
     {
-        public StaticViewer(GeometryModel3D gm)
+        public StaticViewer()
         {
-            this.Model = gm;
             this.Loaded += this.WindowLoaded;
             this.Closed += this.WindowClosed;
-            this.KeyDown += this.StaticViewer_KeyDown;
+            this.KeyDown += this.Window_KeyDown;
             this.DataContext = this;
             this.Model = new GeometryModel3D();
             this.IsColorStreamUpdating = true;
             this.IsDepthStreamUpdating = true;
             CompositionTarget.Rendering += this.CompositionTarget_Rendering;
-        }
-
-        void StaticViewer_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Space)
-            {
-                this.IsColorStreamUpdating = !this.IsColorStreamUpdating;
-                this.IsDepthStreamUpdating = !this.IsDepthStreamUpdating;
-            }
-
-            if (e.Key == Key.C)
-            {
-                this.IsColorStreamUpdating = !this.IsColorStreamUpdating;
-            }
-
-            if (e.Key == Key.D)
-            {
-                this.IsDepthStreamUpdating = !this.IsDepthStreamUpdating;
-            }
-
-            if (e.Key == Key.E)
-            {
-                this.ExportModel();
-            }
         }
 
         private void ExportModel(string fileName = "model.obj")
@@ -132,7 +107,7 @@ namespace PARSE
 
         private void WindowLoaded(object sender, EventArgs e)
         {
-
+            this.KinectStart();
         }
 
         private void WindowClosed(object sender, EventArgs e)
@@ -419,5 +394,33 @@ namespace PARSE
                 });
         }
 
+        private void MenuItem_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        public void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                this.IsColorStreamUpdating = !this.IsColorStreamUpdating;
+                this.IsDepthStreamUpdating = !this.IsDepthStreamUpdating;
+            }
+
+            if (e.Key == Key.C)
+            {
+                this.IsColorStreamUpdating = !this.IsColorStreamUpdating;
+            }
+
+            if (e.Key == Key.D)
+            {
+                this.IsDepthStreamUpdating = !this.IsDepthStreamUpdating;
+            }
+
+            if (e.Key == Key.E)
+            {
+                this.ExportModel();
+            }
+        }
     }
 }

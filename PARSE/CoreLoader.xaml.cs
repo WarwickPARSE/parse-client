@@ -205,13 +205,18 @@ namespace PARSE
                     TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
                     kinectInterp.startDepthMeshStream(gm);
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
                     tpc.render();
 
                     break;
 
                 case "Static Point Cloud":
 
-                    display = new StaticViewer(kinectInterp.Model);
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    kinectInterp.startDepthLinearStream(new GeometryModel3D());
+
+                    this.DataContext = new LinearPointCloud(this.kinectInterp.grabPointCloudParams());
 
                     break;
 
@@ -224,11 +229,8 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-            display.Height = 240;
-            display.Width = 320;
-            display.Show();
-        }
 
+        }
 
     }
 }
