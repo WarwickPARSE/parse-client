@@ -72,9 +72,6 @@
     <Reference Include="Emgu.CV.UI">
       <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64 2.4.0.1717\bin\Emgu.CV.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Emgu.CV.VideoStab">
-      <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64-gpu 2.4.2.1777\bin\Emgu.CV.VideoStab.dll</HintPath>
-    </Reference>
     <Reference Include="Emgu.Util">
       <HintPath>..\..\..\..\..\..\..\Emgu\emgucv-windows-x64 2.4.0.1717\bin\Emgu.Util.dll</HintPath>
     </Reference>
