@@ -34,22 +34,14 @@ namespace PARSE
         private int                                     height;
 
         //Modelling specific definitions
-        private ScannerModeller                         modeller;
         private GeometryModel3D                         Model;
-        private GeometryModel3D[]                       points;
-        public int                                      x;
-        public int                                      y;
-        public int                                      s = 4;
-        
-        //should the kinect be generating point clouds? 
-        public bool                                     pc;         
 
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
 
         //point cloud handler thread 
-        private PointCloudHandler pcHandler;
-        private Thread pcHandlerThread;
+        private PointCloudHandler                       pcHandler;
+        private Thread                                  pcHandlerThread;
 
         public CoreLoader()
         {
@@ -62,9 +54,6 @@ namespace PARSE
 
             //init KinectInterpreter
             kinectInterp  = new KinectInterpreter(vpcanvas2);
-               
-            //do not generate a point cloud until explicitly told to do so 
-            this.pc = false;
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
@@ -123,7 +112,7 @@ namespace PARSE
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            //additional interface implementation to follow.
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
@@ -215,24 +204,18 @@ namespace PARSE
                     TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
                     kinectInterp.startDepthMeshStream(gm);
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                     tpc.render();
 
                     break;
 
                 case "Static Point Cloud":
 
-                    //In the instance that depth feed has not already been instantiated.
+                    kinectInterp.startDepthLinearStream(new GeometryModel3D());
 
-                    kinectInterp.startDepthStream();
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-
-                    GeometryModel3D model       = new GeometryModel3D();
-                    LinearPointCloud lpc        = new LinearPointCloud(model);
-
-                    kinectInterp.startDepthLinearStream(Model);
-
-                    //Model.Geometry = lpc.render(640, 480, kinectInterp.Model, kinectInterp.depthFramePoints, 
-                    //kinectInterp.textureCoordinates, kinectInterp.realDepthCollection);
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    this.DataContext = new StaticPointCloud(this.kinectInterp.grabPointCloudParams());
 
                     break;
 
@@ -243,6 +226,10 @@ namespace PARSE
             }
         }
 
+        private void btnStartScanning_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(kinectInterp.getDepthArray().Length);
+        }
 
     }
 }

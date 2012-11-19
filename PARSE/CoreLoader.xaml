@@ -22,7 +22,7 @@
         <Label Content="Status" Height="29" HorizontalAlignment="Left" Margin="10,480,0,0" Name="lblStatus" VerticalAlignment="Top" Grid.Row="1" />
         <Grid Height="115" HorizontalAlignment="Left" Margin="12,216,0,0" Name="grid1" VerticalAlignment="Top" Width="162" Grid.Row="1">
             <Label Content="Scanning" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="lblScanning" VerticalAlignment="Top" FontWeight="Bold" />
-            <Button Content="Start" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnStartScanning" VerticalAlignment="Top" Width="75" />
+            <Button Content="Start" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnStartScanning" VerticalAlignment="Top" Width="75" Click="btnStartScanning_Click" />
             <Button Content="Stop" Height="23" HorizontalAlignment="Left" Margin="83,40,0,0" Name="btnStopScanning" VerticalAlignment="Top" Width="75" />
             <Button Content="DTF" Height="23" HorizontalAlignment="Left" Margin="4,77,0,0" Name="btnDumpToFile" VerticalAlignment="Top" Width="75" />
         </Grid>
@@ -77,6 +77,7 @@
             </h:HelixViewport3D.Camera>
             <h:SunLight />
             <ModelVisual3D Content="{Binding Model}" />
+            <h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
         </h:HelixViewport3D>
         <!--Additional Controls-->
         
