@@ -416,10 +416,11 @@ namespace PARSE
                 
                 skelDepth = -1;
                 rawDepthClone = rawDepth;
-
             }
             return this.depthFrame32;
         }
+
+        //Kinect Interpreter Get Methods
 
         public int[] getDepthArray()
         {
@@ -427,21 +428,11 @@ namespace PARSE
             return rawDepthClone;
         }
 
-        public BitmapSource grabPointCloudParams()
+        public BitmapSource getRGBTexture()
         {
             //Variables for point cloud generation
 
             BitmapSource colorbitmap = outputColorBitmap.Clone();
-            Bitmap b1;
-
-            using (var fileStream = new FileStream("C:\\Users\\Bernie\\Documents\\test.bmp", FileMode.Create))
-            {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-
-                enc.Frames.Add(BitmapFrame.Create(colorbitmap));
-                enc.Save(fileStream);
-            }
-
             kinectSensor.Stop();
 
             return colorbitmap;

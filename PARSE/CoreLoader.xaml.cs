@@ -215,7 +215,7 @@ namespace PARSE
 
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                    this.DataContext = new StaticPointCloud(this.kinectInterp.grabPointCloudParams());
+                    this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
 
                     break;
 
