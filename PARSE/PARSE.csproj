@@ -123,7 +123,7 @@
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
     <Compile Include="PointCloudHandler.cs" />
-    <Compile Include="Prototyping\Nathan\BasicClassifierTester.cs" />
+    <Compile Include="Recognition\BasicClassifierTester.cs" />
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>
     </Compile>
@@ -212,7 +212,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Library\PointCloud\" />
-    <Folder Include="Recognition\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Recognition\Classifiers\cascade.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

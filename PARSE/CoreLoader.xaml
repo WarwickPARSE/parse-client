@@ -61,7 +61,7 @@
                 <ComboBoxItem Name="cbv6">---RECOGNITION---</ComboBoxItem>
                 <ComboBoxItem Name="cbv7">SURF</ComboBoxItem>
                 <ComboBoxItem Name="cbv8">SIFT</ComboBoxItem>
-                <ComboBoxItem Name="cbv9">Tbc</ComboBoxItem>
+                <ComboBoxItem Name="cbv9">Classifier</ComboBoxItem>
                 <ComboBoxItem Name="cbv10">Tbc</ComboBoxItem>
             </ComboBox>
             <Label Content="Visualisation" Height="28" HorizontalAlignment="Left" Margin="0,81,0,0" Name="label3" VerticalAlignment="Top" />

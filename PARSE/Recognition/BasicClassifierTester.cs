@@ -7,12 +7,14 @@ using System.Runtime.InteropServices;
 using System.IO;
 
 
-namespace PARSE.Prototyping.Nathan
+namespace PARSE
 {
-    class BasicClassifierTester
+    public class BasicClassifierTester
     {
-        String classifierURI = "C:\\PARSE\\Training\\1\\results\\cascade.xml";
-        String resultsURI = "C:\\PARSE\\Training\\1\\results/";
+        // C:\\PARSE\\Training\\1\\results
+        String classifierURI = "\\cascade.xml";
+        // C:\\PARSE\\Training\\1
+        String resultsURI = "\\results/";
         
         IntPtr classifier;
         IntPtr memory;
@@ -20,23 +22,21 @@ namespace PARSE.Prototyping.Nathan
 
         int stride = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
-        BasicClassifierTester()
+        public BasicClassifierTester()
         {
             memory = CvInvoke.cvCreateMemStorage(0);
             classifier = CvInvoke.cvLoad(classifierURI, memory, "", new IntPtr());
         }
 
-        void classify(byte[] frame, int frameWidth)
+        public void classify(BitmapSource frame)
         {
-            int frameHeight = frame.Length / frameWidth;
-
             //byte[] classifiedImage = frame;
             //WriteableBitmap frameImage = new WriteableBitmap(frameWidth, frameHeight, 96, 96, PixelFormats.Bgr32, null);
 
-            BitmapSource frameImage = BitmapSource.Create(frameWidth, frameHeight, 96, 96, PixelFormats.Bgr32, null, frame, stride);
+            //BitmapSource frameImage = BitmapSource.Create(frameWidth, frameHeight, 96, 96, PixelFormats.Bgr32, null, frame, stride);
 
             IntPtr results = CvInvoke.cvHaarDetectObjects(
-                Marshal.GetIUnknownForObject(frameImage),
+                Marshal.GetIUnknownForObject(frame),
                 classifier,
                 resultsPtr,
                 1.1,
