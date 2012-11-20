@@ -1,5 +1,8 @@
 ﻿using System;
 using Emgu.CV;
+using Emgu.CV.Structure;
+using Emgu.Util;
+using Emgu.CV.Util;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,9 +15,7 @@ namespace PARSE
     public class BasicClassifierTester
     {
         // C:\\PARSE\\Training\\1\\results
-        String classifierURI = "\\cascade.xml";
-        // C:\\PARSE\\Training\\1
-        String resultsURI = "\\results/";
+        String classifierURI = "\\Recognition\\Classifiers\\cascade.xml";
         
         IntPtr classifier;
         IntPtr memory;
@@ -24,8 +25,17 @@ namespace PARSE
 
         public BasicClassifierTester()
         {
-            memory = CvInvoke.cvCreateMemStorage(0);
+            try
+            {
+                memory = CvInvoke.cvCreateMemStorage(0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Inner Exception! - - - " + ex.InnerException);
+            }
+            Console.WriteLine("Memory allocated");
             classifier = CvInvoke.cvLoad(classifierURI, memory, "", new IntPtr());
+            Console.WriteLine("Classifier loaded");
         }
 
         public void classify(BitmapSource frame)
@@ -35,7 +45,7 @@ namespace PARSE
 
             //BitmapSource frameImage = BitmapSource.Create(frameWidth, frameHeight, 96, 96, PixelFormats.Bgr32, null, frame, stride);
 
-            IntPtr results = CvInvoke.cvHaarDetectObjects(
+            resultsPtr = CvInvoke.cvHaarDetectObjects(
                 Marshal.GetIUnknownForObject(frame),
                 classifier,
                 resultsPtr,
@@ -46,8 +56,8 @@ namespace PARSE
                 new System.Drawing.Size(0,0)
             );
 
-            Console.WriteLine("Results?!? Pointer below: ");
-            Console.WriteLine(results.ToString());
+            Console.WriteLine("Classified?!? Pointer below: ");
+            Console.WriteLine(resultsPtr.ToString());
 
             //return classifiedImage;
         }

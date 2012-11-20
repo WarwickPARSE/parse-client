@@ -436,12 +436,17 @@ namespace PARSE
         public BitmapSource getRGBTexture()
         {
             //Variables for point cloud generation
-
-            BitmapSource colorbitmap = null; //outputColorBitmap.Clone();
-            kinectSensor.Stop();
-
-            return colorbitmap;
-
+            if (outputColorBitmap != null)
+            {
+                BitmapSource colorbitmap = outputColorBitmap.Clone(); // null;
+                kinectSensor.Stop();
+                return colorbitmap;
+            }
+            else
+            {
+                Console.WriteLine("No bitmap ready yet...");
+                return null;
+            }
         }
 
     }
