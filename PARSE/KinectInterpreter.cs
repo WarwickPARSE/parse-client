@@ -432,7 +432,7 @@ namespace PARSE
         {
             //Variables for point cloud generation
 
-            BitmapSource colorbitmap = outputColorBitmap.Clone();
+            BitmapSource colorbitmap = null; //outputColorBitmap.Clone();
             kinectSensor.Stop();
 
             return colorbitmap;

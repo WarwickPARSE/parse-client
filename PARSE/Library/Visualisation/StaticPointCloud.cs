@@ -22,6 +22,8 @@ namespace PARSE
         //Constants
         private int     depthFrameWidth = 640;
         private int     depthFrameHeight = 480;
+        private int     cx = 640 / 2;
+        private int     cy = 480 / 2;
         private int     tooCloseDepth = 0;
         private int     tooFarDepth = 4095;
         private int     unknownDepth = -1;
@@ -46,6 +48,7 @@ namespace PARSE
             this.bs = bs;
             this.rawDepth = rawDepth;
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
+            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
             //sanity check for helix responsiveness
             runDemoModel();
@@ -53,8 +56,12 @@ namespace PARSE
             //create texture coordinates
             createTexture();
 
+            //create depth coordinates
+            createDepthCoords();
+
             //create mesh
-            createMesh();
+            this.Model.Geometry = createMesh();
+            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.AliceBlue));
         }
 
         public void createTexture()
@@ -70,6 +77,32 @@ namespace PARSE
             }
 
             System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);
+        }
+
+        public void createDepthCoords()
+        {
+
+            for (int iy = 0; iy < 480; iy++)
+            {
+                for (int ix = 0; ix < 640; ix++)
+                {
+                    int i = (iy * 640) + ix;
+
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
+                    {
+                        this.rawDepth[i] = -1;
+                        this.depthFramePoints[i] = new Point3D();
+                    }
+                    else
+                    {
+                        double zz = this.rawDepth[i] * scale;
+                        double x = (cx - ix) * zz * fxinv;
+                        double y = zz;
+                        double z = (cy - iy) * zz * fyinv;
+                        this.depthFramePoints[i] = new Point3D(x, y, z);
+                    }
+                }
+            }
         }
 
         public MeshGeometry3D createMesh()
@@ -228,8 +261,6 @@ namespace PARSE
 
         public void runDemoModel()
         {
-            // Create a model group
-            var modelGroup = new Model3DGroup();
 
             // Create a mesh builder and add a box to it
             var meshBuilder = new MeshBuilder(false, false);
@@ -242,17 +273,16 @@ namespace PARSE
             // Create some materials
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
 
-            modelGroup.Children.Add(new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial });
-
-            this.Model = modelGroup;
+            this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
 
         }
 
         /// <summary>
-        /// Gets or sets the model.
+        /// Gets or sets the sanity model.
         /// </summary>
         /// <value>The model.</value>
-        public Model3D Model { get; set; }
+
+        public GeometryModel3D Model { get; set; }
        
     }
 }

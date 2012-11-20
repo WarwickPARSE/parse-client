@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
        
         <!--Kinect Imager-->
-        <Image Height="425" HorizontalAlignment="Left" Margin="187,27,0,0" Stretch="Fill" VerticalAlignment="Top" Width="543" Name="kinectImager" Grid.Row="1" />
+        <Image Height="425" HorizontalAlignment="Left" Margin="187,27,0,0" Stretch="Fill" VerticalAlignment="Top" Width="543" Name="kinectImager" Grid.Row="1"  />
         <!--Kinect Imager-->
         
         <!--Skeletal Canvas Overlay -->
