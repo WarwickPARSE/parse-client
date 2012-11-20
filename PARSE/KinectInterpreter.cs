@@ -118,9 +118,13 @@ namespace PARSE
 
         public void startDepthLinearStream(GeometryModel3D mod)
         {
+            skeletonData = new Skeleton[6];
+            skeletons = new Dictionary<int, SkeletonFigure>();
+
             visMode = 2;
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            this.kinectSensor.SkeletonStream.Enable();
             this.kinectSensor.Start();
             this.depthReady = true;
 
@@ -409,7 +413,7 @@ namespace PARSE
                             this.depthFrame32[colorPixelIndex++] = 0;
                             this.depthFrame32[colorPixelIndex++] = 0;
                             this.depthFrame32[colorPixelIndex++] = 0;
-                            rawDepth[i] = 0;
+                            rawDepth[i] = -1;
                             ++colorPixelIndex;
                         }
 
