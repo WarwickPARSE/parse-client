@@ -409,6 +409,7 @@ namespace PARSE
                             this.depthFrame32[colorPixelIndex++] = 0;
                             this.depthFrame32[colorPixelIndex++] = 0;
                             this.depthFrame32[colorPixelIndex++] = 0;
+                            rawDepth[i] = 0;
                             ++colorPixelIndex;
                         }
 
