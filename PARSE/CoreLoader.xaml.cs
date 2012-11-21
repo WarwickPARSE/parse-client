@@ -57,6 +57,7 @@ namespace PARSE
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
+            btnStartScanning.IsEnabled = false;
             
             if (!kinectInterp.kinectReady)    //Disable controls
             {
@@ -156,7 +157,7 @@ namespace PARSE
             String visualChoice = visualcb.Text;
 
             //Stop all streams
-            kinectInterp.stopStreams(feedChoice);
+            //kinectInterp.stopStreams(feedChoice);
 
             //Assign feed to bitmap source
             switch (feedChoice)
@@ -211,14 +212,21 @@ namespace PARSE
 
                 case "Static Point Cloud":
 
-                    kinectInterp.startDepthLinearStream(new GeometryModel3D());
+                    //kinectInterp.startDepthLinearStream(new GeometryModel3D());
 
-                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                    kinectInterp.startRGBStream();
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-                    kinectImager.Width = 0;
-                    this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
 
+                    kinectInterp.startDepthStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+
+                    btnStartScanning.IsEnabled = true;
+
+                    //initialize kinect event
+                    kinectImager.Width = 0;
                     break;
 
                 default:
@@ -230,7 +238,9 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(kinectInterp.getDepthArray().Length);
+
+            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+
         }
 
     }

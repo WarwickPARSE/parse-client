@@ -191,6 +191,7 @@ namespace PARSE
 
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
+
                 if (colorFrame != null)
                 {
                     bool colorFormat = this.rgbImageFormat != colorFrame.Format;
@@ -219,6 +220,7 @@ namespace PARSE
 
             using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
             {
+
                 if (depthFrame != null)
                 {
                     bool NewFormat = this.depthImageFormat != depthFrame.Format;
@@ -240,6 +242,7 @@ namespace PARSE
                         null);
 
                         depthFrame.CopyPixelDataTo(this.depthPixelData);
+
                         convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
                         //VIS MODE 1: Feedback to visualisation with Z offset.
@@ -255,6 +258,13 @@ namespace PARSE
                                     i++;
                                 }
                             }
+                        }
+
+                        else if (visMode == 2)
+                        {
+
+                            //figure something out
+                            System.Diagnostics.Debug.WriteLine("i am in vismode 2");
                         }
                         else
                         {
@@ -275,6 +285,7 @@ namespace PARSE
 
         public void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
 
@@ -430,14 +441,14 @@ namespace PARSE
         public int[] getDepthArray()
         {
             //this is a clone of the rawdepth to capture current depth frame.
+            Thread.Sleep(2000);
             return rawDepthClone;
         }
 
         public BitmapSource getRGBTexture()
         {
             //Variables for point cloud generation
-
-            BitmapSource colorbitmap = null; //outputColorBitmap.Clone();
+            BitmapSource colorbitmap = outputColorBitmap.Clone();
             kinectSensor.Stop();
 
             return colorbitmap;
