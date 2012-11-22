@@ -101,33 +101,7 @@ namespace PARSE
             
         }
 
-        /// <summary>
-        /// Converts the x, y, z info to points and dumps them into a list
-        /// </summary>
-        /*public void init() {
-            //only proceed if the coordinates match up
-            if (ys.Length == xs.Length && xs.Length == zs.Length)
-            {
-                //only proceed if we have the number of points that we expected
-                if (xs.Length == ((width * height) - 1))
-                {
-                    for (int i = 0; i < (width * height);  i++)
-                    {
-                        PARSE.ICP.Point p = new PARSE.ICP.Point(xs[i], ys[i], zs[i]);
-                        //points.Add(p);
-                    }
-                }
-                else 
-                {
-                    //throw another kind of exception                 
-                }
-            }
-            else 
-            { 
-                //throw some kind of exception 
-            }
-        }*/
-
+        //do we really need this? 
         /*public int countPoints() 
         {
             return points.Count; 
