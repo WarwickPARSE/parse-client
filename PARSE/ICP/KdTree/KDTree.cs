@@ -262,7 +262,10 @@ namespace KdTree
             return m_root.toString(0);
         }
 
-
+        public int numberOfNodes() 
+        {
+            return m_count;
+        }
 
         /// <summary>
         /// K-D Tree node class
