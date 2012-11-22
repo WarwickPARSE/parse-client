@@ -72,6 +72,8 @@ namespace PARSE
             {
                 for (int b = 0; b < depthFrameWidth; b++)
                 {
+
+                    //alignment issues - to be fixed.
                     this.textureCoordinates[a * depthFrameWidth + b] 
                         = new Point((double)b / (depthFrameWidth - 1), (double)a / (depthFrameHeight - 1));
                 }

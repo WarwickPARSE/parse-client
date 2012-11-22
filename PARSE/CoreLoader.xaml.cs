@@ -214,14 +214,14 @@ namespace PARSE
 
                     //kinectInterp.startDepthLinearStream(new GeometryModel3D());
 
-                    kinectInterp.startRGBStream();
-                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-
                     kinectInterp.startDepthStream();
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
 
                     kinectInterp.startSkeletonStream();
                     this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+
+                    kinectInterp.startRGBStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
                     btnStartScanning.IsEnabled = true;
 
