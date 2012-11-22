@@ -35,6 +35,7 @@ namespace PARSE
 
         //Modelling specific definitions
         private GeometryModel3D                         Model;
+        private GeometryModel3D                         BaseModel;
 
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
@@ -72,6 +73,7 @@ namespace PARSE
 
             //Miscellaneous modelling definitions
             Model = new GeometryModel3D();
+            BaseModel = new GeometryModel3D();
 
         }
 
@@ -227,6 +229,9 @@ namespace PARSE
 
                     //initialize kinect event
                     kinectImager.Width = 0;
+                    vpcanvas.Width = 0;
+                    vpcanvas2.Width = 0;
+
                     break;
 
                 default:
@@ -238,7 +243,8 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-
+            
+            kinectInterp.stopStreams(null);
             this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
 
         }
