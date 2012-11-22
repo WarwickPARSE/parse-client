@@ -40,6 +40,7 @@ namespace PARSE
         private KinectInterpreter                       kinectInterp;
 
         //point cloud handler thread 
+        private System.Windows.Forms.Timer              pcTimer; 
         private PointCloudHandler                       pcHandler;
         private Thread                                  pcHandlerThread;
 
@@ -57,7 +58,7 @@ namespace PARSE
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
-            btnStartScanning.IsEnabled = false;
+            //btnStartScanning.IsEnabled = false;
             
             if (!kinectInterp.kinectReady)    //Disable controls
             {
@@ -238,10 +239,16 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-
-            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-
+            //this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+            pcTimer = new System.Windows.Forms.Timer();
+            pcTimer.Tick += new EventHandler(pcTimer_tick);
+            pcTimer.Interval = 500;
+            pcTimer.Start(); 
         }
 
+        private void pcTimer_tick(Object sender, EventArgs e) 
+        {
+            //grab depth info then send it to the point cloud handler 
+        }
     }
 }
