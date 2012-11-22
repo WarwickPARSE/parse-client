@@ -70,11 +70,14 @@ namespace PARSE
         {
             //opacity % 
             int transparency = 0;
+
+
             for (int i = 0; i < rawDepth.Length; i++) { 
                 //generate null colours with unlimited transparency 
             }
         }
 
+        //this is not fully implemented as I don't know how colours are represented!
         public void setPoints(int[] rawDepth, int[] rawColor) 
         {
             for (int iy = 0; iy < 480; iy++)
@@ -100,12 +103,5 @@ namespace PARSE
             }
             
         }
-
-        //do we really need this? 
-        /*public int countPoints() 
-        {
-            return points.Count; 
-        }*/
-
     }
 }
