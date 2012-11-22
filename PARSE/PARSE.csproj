@@ -123,6 +123,7 @@
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
     <Compile Include="Library\ImageResizer.cs" />
+    <Compile Include="Library\RGBColor.cs" />
     <Compile Include="Library\Visualisation\StaticPointCloud.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
