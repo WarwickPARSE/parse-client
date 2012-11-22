@@ -239,11 +239,11 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-            //this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-            pcTimer = new System.Windows.Forms.Timer();
+            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+            /*pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);
             pcTimer.Interval = 500;
-            pcTimer.Start(); 
+            pcTimer.Start(); */
         }
 
         private void pcTimer_tick(Object sender, EventArgs e) 

@@ -22,9 +22,10 @@ namespace PARSE
             while (scanning) 
             {
                 //do some point cloud icp jiggery pokery here 
+                Console.WriteLine("Starting the icp algorithm");
 
-                //done, sleep and wait for the next scan
-                Thread.Sleep(frequency);
+                //
+                Console.WriteLine("the icp algorithm would have been finished if implemented");
             }
         }
     }
