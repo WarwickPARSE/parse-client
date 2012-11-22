@@ -59,10 +59,16 @@ namespace PARSE
             //create depth coordinates
             createDepthCoords();
 
-            //create mesh
+            //create mesh default 
             this.Model.Geometry = createMesh();
             this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new ImageBrush(this.bs));
-            this.Model.Transform = new TranslateTransform3D(0, -2, 1);
+            this.Model.Transform = new TranslateTransform3D(1, -2, 1);
+
+            //create mesh raw
+            this.BaseModel.Geometry = this.Model.Geometry;
+            this.BaseModel.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+            this.BaseModel.Transform = new TranslateTransform3D(-1, -2, 1);
+
         }
 
         public void createTexture()
@@ -91,7 +97,7 @@ namespace PARSE
                 {
                     int i = (iy * 640) + ix;
 
-                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth || rawDepth[i] > 2500)
                     {
                         this.rawDepth[i] = -1;
                         this.depthFramePoints[i] = new Point3D();
@@ -178,6 +184,8 @@ namespace PARSE
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
 
             this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+
 
         }
 
@@ -187,6 +195,7 @@ namespace PARSE
         /// <value>The model.</value>
 
         public GeometryModel3D Model { get; set; }
+        public GeometryModel3D BaseModel { get; set; }
        
     }
 }
