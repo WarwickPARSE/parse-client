@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing; 
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows;
+using System.Windows.Media.Media3D;
+using System.Windows.Media;
+
+using HelixToolkit.Wpf;
 
 namespace PARSE
 {
@@ -25,6 +30,10 @@ namespace PARSE
         private const int unknownDepth = -1;
         private const double scale = 0.001;             //for rendering 
 
+        //dimension constants 
+        private int depthFrameWidth = 640;
+        private int depthFrameHeight = 480;
+
         //centre points (these will need changing at some point)
         private const int cx = 640 / 2;
         private const int cy = 480 / 2;
@@ -32,6 +41,12 @@ namespace PARSE
         //fiddle values (they make it work but I don't know why!)
         private const double fxinv = 1.0 / 476;
         private const double fyinv = 1.0 / 476;
+        private double ddt = 200;
+
+        //geometry
+        int[] rawDepth;
+        Point3D[] depthFramePoints;
+        System.Windows.Point[] textureCoordinates;
 
         //percentage of opacity that we want the colour to be 
         private const int opacity = 100;
@@ -93,7 +108,7 @@ namespace PARSE
         public void setPoints(int[] rawDepth, Bitmap image)
         {
             Rectangle rec = new Rectangle(0, 0, image.Width, image.Height);
-            BitmapData imageData = image.LockBits(rec, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            BitmapData imageData = image.LockBits(rec, ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             //get address of the first scanline 
             IntPtr ptr = imageData.Scan0;
@@ -155,7 +170,7 @@ namespace PARSE
                         //this.depthFramePoints[i] = new Point3D(x, y, z);
 
                         //create a new colour using the info given
-                        Color c = Color.FromArgb(opacity, r[i], g[i], b[i]);
+                        System.Drawing.Color c = System.Drawing.Color.FromArgb(opacity, r[i], g[i], b[i]);
 
                         //create a new point key
                         double[] pointKey = new double[3];
@@ -166,5 +181,129 @@ namespace PARSE
             }
             
         }
+
+        /*                             
+         *                             
+         * DO NOT USE ANY OF THIS CODE YET
+         *                             
+         */                            
+        public void createTexture()
+        {
+
+            for (int a = 0; a < depthFrameHeight; a++)
+            {
+                for (int b = 0; b < depthFrameWidth; b++)
+                {
+
+                    //alignment issues - to be fixed.
+                    this.textureCoordinates[a * depthFrameWidth + b]
+                        = new System.Windows.Point((double)b / (depthFrameWidth - 1), (double)a / (depthFrameHeight - 1));
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);
+        }
+
+        public void createDepthCoords()
+        {
+
+            for (int iy = 0; iy < 480; iy++)
+            {
+                for (int ix = 0; ix < 640; ix++)
+                {
+                    int i = (iy * 640) + ix;
+
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth || rawDepth[i] > 2500)
+                    {
+                        this.rawDepth[i] = -1;
+                        this.depthFramePoints[i] = new Point3D();
+                    }
+                    else
+                    {
+                        double zz = this.rawDepth[i] * scale;
+                        double x = (cx - ix) * zz * fxinv;
+                        double y = zz;
+                        double z = (cy - iy) * zz * fyinv;
+                        this.depthFramePoints[i] = new Point3D(x, y, z);
+                    }
+                }
+            }
+        }
+
+        public MeshGeometry3D createMesh()
+        {
+            var triangleIndices = new List<int>();
+            for (int iy = 0; iy + 1 < depthFrameHeight; iy++)
+            {
+                for (int ix = 0; ix + 1 < depthFrameWidth; ix++)
+                {
+                    int i0 = (iy * depthFrameWidth) + ix;
+                    int i1 = (iy * depthFrameWidth) + ix + 1;
+                    int i2 = ((iy + 1) * depthFrameWidth) + ix + 1;
+                    int i3 = ((iy + 1) * depthFrameWidth) + ix;
+
+                    var d0 = this.rawDepth[i0];
+                    var d1 = this.rawDepth[i1];
+                    var d2 = this.rawDepth[i2];
+                    var d3 = this.rawDepth[i3];
+
+                    var dmax0 = Math.Max(Math.Max(d0, d1), d2);
+                    var dmin0 = Math.Min(Math.Min(d0, d1), d2);
+                    var dmax1 = Math.Max(d0, Math.Max(d2, d3));
+                    var dmin1 = Math.Min(d0, Math.Min(d2, d3));
+
+                    if (dmax0 - dmin0 < ddt && dmin0 != -1)
+                    {
+                        triangleIndices.Add(i0);
+                        triangleIndices.Add(i1);
+                        triangleIndices.Add(i2);
+                    }
+
+                    if (dmax1 - dmin1 < ddt && dmin1 != -1)
+                    {
+                        triangleIndices.Add(i0);
+                        triangleIndices.Add(i2);
+                        triangleIndices.Add(i3);
+                    }
+                }
+            }
+
+            return new MeshGeometry3D()
+            {
+                Positions = new Point3DCollection(this.depthFramePoints),
+                TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
+                TriangleIndices = new Int32Collection(triangleIndices)
+            };
+        }
+
+        public void runDemoModel()
+        {
+
+            // Create a mesh builder and add a box to it
+            var meshBuilder = new MeshBuilder(false, false);
+            meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
+            meshBuilder.AddBox(new Rect3D(0, 0, 1.2, 0.5, 1, 0.4));
+
+            // Create a mesh from the builder (and freeze it)
+            var mesh = meshBuilder.ToMesh(true);
+
+            // Create some materials
+            var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
+
+            this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+
+
+        }
+
+        /// <summary>
+        /// Gets or sets the sanity model.
+        /// </summary>
+        /// <value>The model.</value>
+
+        public GeometryModel3D Model { get; set; }
+        public GeometryModel3D BaseModel { get; set; }
+
+        //
     }
 }
