@@ -72,13 +72,20 @@ namespace PARSE
         /// <param name="rawDepth"></param>
         public void setPoints(int[] rawDepth) 
         {
-            //opacity % 
-            int transparency = 0;
+            int[] r= new int [rawDepth.Length];
+            int[] g = new int[rawDepth.Length];
+            int[] b = new int[rawDepth.Length];
 
-
-            for (int i = 0; i < rawDepth.Length; i++) { 
-                //generate null colours with unlimited transparency 
+            //fill each colour element with an empty color
+            for (int i=0; i<rawDepth.Length; i++) 
+            {
+                r[i] = 0;
+                g[i] = 0;
+                b[i] = 0;
             }
+            
+            //call this overloaded method
+            setPoints(rawDepth, r, g, b);
         }
 
         //not fully impemented yet
