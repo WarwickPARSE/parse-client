@@ -119,7 +119,6 @@
     <Compile Include="ICP\KdTree\KeySizeException.cs" />
     <Compile Include="ICP\KdTree\NearestNeighborList.cs" />
     <Compile Include="ICP\KdTree\PriorityQueue.cs" />
-    <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
     <Compile Include="Library\ImageResizer.cs" />
