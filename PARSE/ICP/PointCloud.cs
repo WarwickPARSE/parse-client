@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Color; 
 using System.Linq;
 using System.Text;
@@ -30,6 +31,9 @@ namespace PARSE
         //fiddle values (they make it work but I don't know why!)
         private const double fxinv = 1.0 / 476;
         private const double fyinv = 1.0 / 476;
+
+        //percentage of opacity that we want the colour to be 
+        private const int opacity = 100;
 
         //the following variables may or may not be defined, depending on future need
         //sensor_orientation
@@ -77,8 +81,15 @@ namespace PARSE
             }
         }
 
+        //not fully impemented yet
+        public void setPoints(int[] rawDepth, Bitmap image)
+        { 
+            //rip image into its constituent pixels   
+        }
+
         //this is not fully implemented as I don't know how colours are represented!
-        public void setPoints(int[] rawDepth, int[] rawColor) 
+        //TODO: throw an exception if the rawdepth is not the same length as rgb
+        public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) 
         {
             for (int iy = 0; iy < 480; iy++)
             {
@@ -89,6 +100,8 @@ namespace PARSE
                     if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
                     {
                         rawDepth[i] = -1;
+
+                        //at the moment we seem to be deleting points that are too far away, this will need changing at some point
                         //this.depthFramePoints[i] = new Point3D();
                     }
                     else
@@ -98,6 +111,14 @@ namespace PARSE
                         double y = zz;
                         double z = (cy - iy) * zz * fyinv;
                         //this.depthFramePoints[i] = new Point3D(x, y, z);
+
+                        //create a new colour using the info given
+                        Color c = Color.FromArgb(opacity, r[i], g[i], b[i]);
+
+                        //create a new point key
+                        double[] pointKey = new double[3];
+
+                        this.points.insert(pointKey, c);
                     }
                 }
             }
