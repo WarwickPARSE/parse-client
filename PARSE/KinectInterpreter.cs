@@ -29,7 +29,7 @@ using Microsoft.Kinect;
 
 namespace PARSE
 {
-    class KinectInterpreter
+    class KinectInterpreter : Window
     {
         public KinectSensor                             kinectSensor { get; private set; }
         public string                                   kinectStatus { get; private set; }
@@ -67,7 +67,9 @@ namespace PARSE
         private float skelL;
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
         private float skelR;
-        private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people 
+        private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+
+        public String instruction = "Waiting for patient...";
 
         //Visualisation definitions
         private int                                     visMode;
@@ -349,7 +351,7 @@ namespace PARSE
         /// <param name="drawing">The target drawing.</param>
         private void Update(Skeleton skeleton, SkeletonFigure figure)
         {
-            /*foreach (Joint joint in skeleton.Joints)
+            foreach (Joint joint in skeleton.Joints)
             {
                 // Transforms a SkeletonPoint to a ColorImagePoint
                 var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
@@ -357,7 +359,8 @@ namespace PARSE
                 var point = new System.Windows.Point((int)colorPoint.X / 640.0 * this.skeletonCanvas.ActualWidth, (int)colorPoint.Y / 480.0 * this.skeletonCanvas.ActualHeight);
                 // update the position of that joint
                 figure.Update(joint.JointType, point);
-             } */
+                instruction = figure.instruction;
+             }
         }
 
         /// <summary>
