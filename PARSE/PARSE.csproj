@@ -137,9 +137,9 @@
     <Compile Include="ICP\KdTree\KeySizeException.cs" />
     <Compile Include="ICP\KdTree\NearestNeighborList.cs" />
     <Compile Include="ICP\KdTree\PriorityQueue.cs" />
-    <Compile Include="ICP\Point.cs" />
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
+    <Compile Include="Library\ImageResizer.cs" />
     <Compile Include="Library\Visualisation\StaticPointCloud.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
@@ -153,7 +153,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
-    <Compile Include="Prototyping\PoseIsolater.cs" />
     <Page Include="CoreLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

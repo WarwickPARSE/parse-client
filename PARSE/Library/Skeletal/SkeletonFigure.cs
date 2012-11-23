@@ -33,6 +33,8 @@ namespace PARSE
 
     class SkeletonFigure
     {
+        public String instruction = "hello";
+
         private const int JOINT_WIDTH = 4;
         private const int HEAD_WIDTH = 10;
         private const int BONES_THICKNESS = 2;
@@ -41,6 +43,8 @@ namespace PARSE
 
         private IDictionary<JointType, Ellipse> Joints;
         private IDictionary<SkeletonBones, Line> Bones;
+
+        private double shoulder = 0;
 
         public int TrackingId { get; set; }
 
@@ -75,6 +79,8 @@ namespace PARSE
 
         public void Update(JointType jointType, Point point, float distance = 2.0f)
         {
+            instruction = "Move your arms into a horizontal position";
+
             if (Status == ActivityState.Erased)
             {
                 InitJoints();
@@ -92,6 +98,8 @@ namespace PARSE
             Canvas.SetTop(Joints[jointType], (point.Y - Joints[jointType].Height / 2));
             Canvas.SetLeft(Joints[jointType], (point.X - Joints[jointType].Width / 2));
 
+            //double shoulder = 0;
+
             foreach (SkeletonBones bones in Bones.Keys.Where(b => b.joint1 == jointType || b.joint2 == jointType))
             {
                 var line = Bones[bones];
@@ -99,6 +107,22 @@ namespace PARSE
                 {
                     line.X1 = point.X;
                     line.Y1 = point.Y;
+
+                    if (bones.joint1 == JointType.WristLeft || bones.joint1 == JointType.WristRight)
+                    {
+                        if ((point.Y <= shoulder+5) && (point.Y >= shoulder-5) && (shoulder!=0))
+                        {
+                            Console.WriteLine("stay there mate" + point.Y);
+                            instruction = "Hold this pose!";
+                            
+                        }
+                        //x`ZConsole.WriteLine(point.X + " " + point.Y);
+                    }
+                    if (bones.joint1 == JointType.ShoulderLeft || bones.joint1 == JointType.ShoulderRight)
+                    {
+                        shoulder = point.Y;
+                        //Console.WriteLine("shoulder " + point.X + " " + point.Y);
+                    }
                 }
                 else
                 {

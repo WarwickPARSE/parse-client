@@ -35,11 +35,13 @@ namespace PARSE
 
         //Modelling specific definitions
         private GeometryModel3D                         Model;
+        private GeometryModel3D                         BaseModel;
 
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
 
         //point cloud handler thread 
+        private System.Windows.Forms.Timer              pcTimer; 
         private PointCloudHandler                       pcHandler;
         private Thread                                  pcHandlerThread;
 
@@ -54,9 +56,12 @@ namespace PARSE
 
             //init KinectInterpreter
             kinectInterp  = new KinectInterpreter(vpcanvas2);
+            this.label4.Visibility = System.Windows.Visibility.Hidden;
+            this.label4.Content = kinectInterp.instruction;
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
+            //btnStartScanning.IsEnabled = false;
             
             if (!kinectInterp.kinectReady)    //Disable controls
             {
@@ -71,12 +76,15 @@ namespace PARSE
 
             //Miscellaneous modelling definitions
             Model = new GeometryModel3D();
+            BaseModel = new GeometryModel3D();
 
         }
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             kinectInterp.SkeletonFrameReady(sender, e);
+            this.label4.Content = kinectInterp.instruction;
+            this.label4.Visibility = System.Windows.Visibility.Visible;
         }
 
         /// <summary>
@@ -156,7 +164,7 @@ namespace PARSE
             String visualChoice = visualcb.Text;
 
             //Stop all streams
-            kinectInterp.stopStreams(feedChoice);
+            //kinectInterp.stopStreams(feedChoice);
 
             //Assign feed to bitmap source
             switch (feedChoice)
@@ -211,13 +219,27 @@ namespace PARSE
 
                 case "Static Point Cloud":
 
-                    kinectInterp.startDepthLinearStream(new GeometryModel3D());
+                    //kinectInterp.startDepthLinearStream(new GeometryModel3D());
 
+                    kinectInterp.startDepthStream();
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
+                   /* kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);*/
+
+                    kinectInterp.startRGBStream();
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+
+                    btnStartScanning.IsEnabled = true;
+
+                    //initialize kinect event
                     kinectImager.Width = 0;
-                    this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                    vpcanvas.Width = 0;
+                    vpcanvas2.Width = 0;
+
+                    //make label visible
+                    this.label4.Content = "Click start to generate point cloud";
+                    this.label4.Visibility = System.Windows.Visibility.Visible;
 
                     break;
 
@@ -245,9 +267,20 @@ namespace PARSE
         }
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine(kinectInterp.getDepthArray().Length);
+        { 
+            kinectInterp.stopStreams(null);
+            this.label4.Content = "Rendering...";
+            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+            this.label4.Content = "Rendered!";
+            /*pcTimer = new System.Windows.Forms.Timer();
+            pcTimer.Tick += new EventHandler(pcTimer_tick);
+            pcTimer.Interval = 500;
+            pcTimer.Start(); */
         }
 
+        private void pcTimer_tick(Object sender, EventArgs e) 
+        {
+            //grab depth info then send it to the point cloud handler 
+        }
     }
 }
