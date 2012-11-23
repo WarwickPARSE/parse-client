@@ -33,6 +33,8 @@ namespace PARSE
 
     class SkeletonFigure
     {
+        public String instruction = "hello";
+
         private const int JOINT_WIDTH = 4;
         private const int HEAD_WIDTH = 10;
         private const int BONES_THICKNESS = 2;
@@ -77,6 +79,8 @@ namespace PARSE
 
         public void Update(JointType jointType, Point point, float distance = 2.0f)
         {
+            instruction = "Move your arms into a horizontal position";
+
             if (Status == ActivityState.Erased)
             {
                 InitJoints();
@@ -109,6 +113,8 @@ namespace PARSE
                         if ((point.Y <= shoulder+5) && (point.Y >= shoulder-5) && (shoulder!=0))
                         {
                             Console.WriteLine("stay there mate" + point.Y);
+                            instruction = "Hold this pose!";
+                            
                         }
                         //x`ZConsole.WriteLine(point.X + " " + point.Y);
                     }
