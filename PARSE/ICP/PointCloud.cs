@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Drawing.Color; 
 using System.Linq;
 using System.Text;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace PARSE
 {
@@ -88,10 +90,44 @@ namespace PARSE
             setPoints(rawDepth, r, g, b);
         }
 
-        //not fully impemented yet
+        //this may cause runtime errors - due to the implicit typecasting from byte to int, will need to test this further
         public void setPoints(int[] rawDepth, Bitmap image)
-        { 
-            //rip image into its constituent pixels   
+        {
+            Rectangle rec = new Rectangle(0, 0, image.Width, image.Height);
+            BitmapData imageData = image.LockBits(rec, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            //get address of the first scanline 
+            IntPtr ptr = imageData.Scan0;
+
+            //basically width*height
+            int bytes = imageData.Stride * image.Height;
+
+            //create an array of bytes to hold the bmp
+            byte[] rgbData = new byte[bytes];
+            int[] r = new int[bytes / 3];
+            int[] g = new int[bytes / 3];
+            int[] b = new int[bytes / 3];
+
+            //copy the rgb values into the array
+            Marshal.Copy(ptr, rgbData, 0, bytes);
+
+            int i = 0;
+            int stride = imageData.Stride;
+
+            //shove the image data into its place 
+            for (int col = 0; col < imageData.Height; col++)
+            {
+                for (int row = 0; row < imageData.Width; row++) 
+                {
+                    b[i] = (rgbData[(col * stride) + (row * 3)]); 
+                    g[i] = (rgbData[(col * stride) + (row * 3) + 1]);
+                    r[i] = (rgbData[(col * stride) + (row * 3) + 2]);
+                    i++; //this may cause an array out of bounds, must look at this 
+                }
+            }
+
+            //now call the overloaded method 
+            setPoints(rawDepth, r, g, b);
         }
 
         //this is not fully implemented as I don't know how colours are represented!
