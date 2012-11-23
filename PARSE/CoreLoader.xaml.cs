@@ -225,8 +225,15 @@ namespace PARSE
 
                     kinectInterp.startRGBStream();
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                   
+                    
                     BasicClassifierTester classifierTester = new BasicClassifierTester();
-                    classifierTester.classify(kinectInterp.getRGBTexture());
+                    BitmapSource rgbimage = null;
+                    while (rgbimage == null)
+                    {
+                        rgbimage = kinectInterp.getRGBTexture();
+                    }
+                    classifierTester.classify(rgbimage);
 
                     break;
 
