@@ -204,6 +204,15 @@ namespace PARSE
                         this.outputColorBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
                     }
 
+                    /*
+                    int offset = 100;
+                    for (int i = this.colorpixelData.Length-1; offset < i; i--)
+                    {
+                        //Console.WriteLine("I'm in your loop");
+                        this.colorpixelData[i] = 5;// this.colorpixelData[i - offset];
+                    }
+                    */
+
                     colorFrame.CopyPixelDataTo(this.colorpixelData);
 
                     this.outputColorBitmap.WritePixels(new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height), colorpixelData, colorFrame.Width * Bgr32BytesPerPixel, 0);

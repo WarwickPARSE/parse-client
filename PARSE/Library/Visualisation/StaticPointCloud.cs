@@ -65,9 +65,9 @@ namespace PARSE
             this.Model.Transform = new TranslateTransform3D(1, -2, 1);
 
             //create mesh raw
-            this.BaseModel.Geometry = this.Model.Geometry;
-            this.BaseModel.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
-            this.BaseModel.Transform = new TranslateTransform3D(-1, -2, 1);
+            //this.BaseModel.Geometry = this.Model.Geometry;
+            //this.BaseModel.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+            //this.BaseModel.Transform = new TranslateTransform3D(-1, -2, 1);
 
         }
 
@@ -81,7 +81,7 @@ namespace PARSE
 
                     //alignment issues - to be fixed.
                     this.textureCoordinates[a * depthFrameWidth + b] 
-                        = new Point((double)b / (depthFrameWidth - 1), (double)a / (depthFrameHeight - 1));
+                        = new Point(((double)b / (depthFrameWidth - 1)), (double)a / (depthFrameHeight - 1));
                 }
             }
 
@@ -97,7 +97,7 @@ namespace PARSE
                 {
                     int i = (iy * 640) + ix;
 
-                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth || rawDepth[i] > 2500)
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
                     {
                         this.rawDepth[i] = -1;
                         this.depthFramePoints[i] = new Point3D();
@@ -184,7 +184,7 @@ namespace PARSE
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
 
             this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
-            this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            //this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
 
 
         }

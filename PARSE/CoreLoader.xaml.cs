@@ -49,7 +49,7 @@ namespace PARSE
         {
             //Start a new instance of the point cloud handler (500ms intervals) - not implemented yet d/w
             pcHandler = new PointCloudHandler(500);
-            pcHandlerThread = new Thread(new ThreadStart(pcHandler.run));
+            //pcHandlerThread = new Thread(new ThreadStart(pcHandler.run));
             //pcHandlerThread.Start();
 
             InitializeComponent();
