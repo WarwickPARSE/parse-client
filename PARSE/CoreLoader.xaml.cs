@@ -16,6 +16,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
+using System.Speech.Synthesis;
 using System.Windows.Interop;
 using System.Threading.Tasks;
 using HelixToolkit.Wpf;
@@ -57,6 +58,9 @@ namespace PARSE
         private PointCloudHandler                       pcHandler;
         private Thread                                  pcHandlerThread;
 
+        //Generic coreloader instances
+        private SpeechSynthesizer                       ss;
+
         public CoreLoader()
         {
             //Start a new instance of the point cloud handler (500ms intervals) - not implemented yet d/w
@@ -73,6 +77,7 @@ namespace PARSE
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
+            ss = new SpeechSynthesizer();
             //btnStartScanning.IsEnabled = false;
             
             if (!kinectInterp.kinectReady)    //Disable controls
@@ -251,6 +256,9 @@ namespace PARSE
 
                     //make label visible
                     this.label4.Content = "Click start to generate point cloud";
+                    ss.Rate = 1;
+                    ss.Volume = 100;
+                    ss.Speak("Click start to generate point cloud");
                     this.label4.Visibility = System.Windows.Visibility.Visible;
 
                     break;
@@ -294,22 +302,22 @@ namespace PARSE
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
             this.label4.Content = "Rendering...";
-            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+            //this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
             this.label4.Content = "Rendered!";
 
-            kinectInterp.stopStreams(null);
+            //kinectInterp.stopStreams(null);
             //vpcanvas2.Width = 0;
             
-
-            /*pcTimer = new System.Windows.Forms.Timer();
+            pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);
-            pcTimer.Interval = 500;
-            pcTimer.Start(); */
+            System.Diagnostics.Debug.WriteLine("Generating new cloud...");
+            pcTimer.Interval = 10000;
+            pcTimer.Start();
         }
 
         private void pcTimer_tick(Object sender, EventArgs e) 
         {
-            //grab depth info then send it to the point cloud handler 
+            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray()); 
         }
 
         private void surfTimer_tick(Object sender, EventArgs e)

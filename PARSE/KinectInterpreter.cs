@@ -476,7 +476,7 @@ namespace PARSE
             if (outputColorBitmap != null)
             {
                 BitmapSource colorbitmap = outputColorBitmap.Clone(); // null;
-                kinectSensor.Stop();
+                //kinectSensor.Stop();
                 return colorbitmap;
             }
             else
