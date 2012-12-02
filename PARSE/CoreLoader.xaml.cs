@@ -224,8 +224,8 @@ namespace PARSE
                     kinectInterp.startDepthStream();
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
 
-                   /* kinectInterp.startSkeletonStream();
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);*/
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
 
                     kinectInterp.startRGBStream();
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
@@ -235,7 +235,7 @@ namespace PARSE
                     //initialize kinect event
                     kinectImager.Width = 0;
                     vpcanvas.Width = 0;
-                    vpcanvas2.Width = 0;
+                    //vpcanvas2.Width = 0;
 
                     //make label visible
                     this.label4.Content = "Click start to generate point cloud";
@@ -267,11 +267,15 @@ namespace PARSE
         }
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
-        { 
-            kinectInterp.stopStreams(null);
+        {
             this.label4.Content = "Rendering...";
             this.DataContext = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
             this.label4.Content = "Rendered!";
+
+            kinectInterp.stopStreams(null);
+            //vpcanvas2.Width = 0;
+            
+
             /*pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);
             pcTimer.Interval = 500;

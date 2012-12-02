@@ -112,7 +112,7 @@ namespace PARSE
                     {
                         if ((point.Y <= shoulder+5) && (point.Y >= shoulder-5) && (shoulder!=0))
                         {
-                            Console.WriteLine("stay there mate" + point.Y);
+                            //Console.WriteLine("stay there mate" + point.Y);
                             instruction = "Hold this pose!";
                             
                         }
