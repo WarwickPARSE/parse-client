@@ -268,10 +268,6 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("Sleeping Beauty");
-            System.Threading.Thread.Sleep(5000);
-            Console.WriteLine("Prince Charming");
-
             this.label4.Content = "Rendering...";
             this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
             this.label4.Content = "Rendered!";
