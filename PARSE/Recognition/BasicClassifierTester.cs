@@ -17,6 +17,7 @@ namespace PARSE
     public class BasicClassifierTester
     {
         // C:\\PARSE\\Training\\1\\results
+        String relativeURI = Environment.CurrentDirectory;
         String classifierURI = "C:\\PARSE\\Training\\1\\results\\cascade.xml";
 
         IntPtr classifier;
@@ -62,7 +63,7 @@ namespace PARSE
 
         public void classify(BitmapSource frame)
         {
-            Console.WriteLine(" - - - Classifying!");
+            Console.WriteLine(relativeURI);
 
             //byte[] classifiedImage = frame;
             //WriteableBitmap frameImage = new WriteableBitmap(frameWidth, frameHeight, 96, 96, PixelFormats.Bgr32, null);
@@ -126,6 +127,12 @@ namespace PARSE
             }
             else
             {
+
+                using (HOGDescriptor des = new HOGDescriptor())
+                {
+                    //des.SetSVMDetector
+                }
+
                 Console.WriteLine(" - - - No CUDA  :( ");
                 Console.WriteLine(" - - - Devices available: " + GpuInvoke.GetCudaEnabledDeviceCount());
             }

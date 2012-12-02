@@ -16,8 +16,11 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using System.Threading.Tasks;
 using HelixToolkit.Wpf;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -39,6 +42,15 @@ namespace PARSE
 
         //New KinectInterpreter Class
         private KinectInterpreter                       kinectInterp;
+
+        //Image recognition specific definitions
+        private System.Windows.Forms.Timer              surfTimer;
+        private bool                                    capturedModel;
+        private BitmapSource                            modelimage;
+        private bool                                    capturedObject;
+        private BitmapSource                            objectimage;
+        private int                                     countdown;
+        private long                                    matchtime;
 
         //point cloud handler thread 
         private System.Windows.Forms.Timer              pcTimer; 
@@ -248,7 +260,6 @@ namespace PARSE
                     kinectInterp.startRGBStream();
                     this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
                    
-                    
                     BasicClassifierTester classifierTester = new BasicClassifierTester();
                     BitmapSource rgbimage = null;
                     while (rgbimage == null)
@@ -257,6 +268,20 @@ namespace PARSE
                     }
                     classifierTester.classify(rgbimage);
 
+                    break;
+
+                case "SURF":
+
+                    kinectInterp.startRGBStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    this.label4.Visibility = System.Windows.Visibility.Visible;
+
+                    surfTimer = new System.Windows.Forms.Timer();
+                    surfTimer.Tick += new EventHandler(surfTimer_tick);
+                    surfTimer.Interval = 1000;
+                    countdown = 5;
+                    surfTimer.Start();
+                    
                     break;
 
                 default:
@@ -281,6 +306,63 @@ namespace PARSE
         private void pcTimer_tick(Object sender, EventArgs e) 
         {
             //grab depth info then send it to the point cloud handler 
+        }
+
+        private void surfTimer_tick(Object sender, EventArgs e)
+        {
+
+            if ((countdown > 0) && (!capturedModel)) {
+                countdown--;
+                label4.Content = "Present scanner to camera...." + countdown.ToString() + "...";
+            } else if ((countdown == 0) && (!capturedModel)) {
+                capturedModel = true;
+                modelimage = kinectInterp.getRGBTexture();
+                kinectInterp.startRGBStream();
+                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                countdown = 10;
+            } else if ((countdown > 0) && (capturedModel)) {
+                countdown--;
+                label4.Content = "Place scanner on patient..." + countdown.ToString() + "...";
+            } else if ((countdown == 0) && (capturedModel)) {
+                capturedObject = true;
+                objectimage = kinectInterp.getRGBTexture();
+                label4.Content = "Looking for scanner..";
+                startSurfing();
+            } else if ((capturedModel) && (capturedObject)) {
+                surfTimer.Stop();
+            }
+
+        }
+
+        private void startSurfing()
+        {
+            //Convert bitmap source to image
+            MemoryStream outStream = new MemoryStream();
+            BitmapEncoder enc = new BmpBitmapEncoder();
+            System.Drawing.Bitmap resultBitmap;
+            Image<Bgr, Byte> result;
+
+            //Convert model image
+            enc.Frames.Add(BitmapFrame.Create(modelimage));
+            enc.Save(outStream);
+            System.Drawing.Bitmap modbm = new System.Drawing.Bitmap(outStream);
+
+            Image<Gray, Byte> modelImg = new Image<Gray, Byte>(modbm);
+
+            //Convert object image
+            enc = new BmpBitmapEncoder();
+            enc.Frames.Add(BitmapFrame.Create(objectimage));
+            enc.Save(outStream);
+            System.Drawing.Bitmap objbm = new System.Drawing.Bitmap(outStream);
+
+            Image<Gray, Byte> objectImg = new Image<Gray, Byte>(objbm);
+
+            SurfDetector sd = new SurfDetector();
+            result = sd.Draw(modelImg, objectImg, out matchtime);
+            resultBitmap = result.ToBitmap();
+            BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+            this.kinectImager.Source = bs;
+            surfTimer.Stop();
         }
     }
 }

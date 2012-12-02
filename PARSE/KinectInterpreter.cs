@@ -54,6 +54,7 @@ namespace PARSE
         private DepthImageFormat                        depthImageFormat;
         public GeometryModel3D                          Model;
         public GeometryModel3D[]                        pts;
+        private ColorImagePoint[]                       mappedDepthLocations;
         public int[]                                    rawDepth;
         public int[]                                    rawDepthClone;
         public byte[]                                   convertedDepthBits;
@@ -231,6 +232,7 @@ namespace PARSE
                         int i = 0;
                         int temp = 0;
                         this.depthPixelData = new short[depthFrame.PixelDataLength];
+                        this.mappedDepthLocations = new ColorImagePoint[depthFrame.PixelDataLength];
                         this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
                         this.depthFramePoints = new Point3D[depthFrame.PixelDataLength];
 
@@ -245,6 +247,11 @@ namespace PARSE
                         depthFrame.CopyPixelDataTo(this.depthPixelData);
 
                         convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
+
+                        CoordinateMapper cm = new CoordinateMapper(kinectSensor);
+                        DepthImagePixel[] dp = new DepthImagePixel[depthFrame.PixelDataLength];
+                        
+                        //cm.MapDepthFrameToColorFrame(DepthImageFormat.Resolution640x480Fps30, this.depthPixelData, ColorImageFormat.RgbResolution640x480Fps30, mappedDepthLocations);
 
                         //VIS MODE 1: Feedback to visualisation with Z offset.
                         if (visMode == 1)

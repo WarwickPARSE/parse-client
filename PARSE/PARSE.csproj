@@ -150,6 +150,7 @@
     </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
+    <Compile Include="Recognition\SurfDetector.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />

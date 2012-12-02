@@ -28,8 +28,8 @@ namespace PARSE
         private int     tooFarDepth = 4095;
         private int     unknownDepth = -1;
         private double  scale = 0.001;
-        private double  fxinv = 1.0 / 476;
-        private double  fyinv = 1.0 / 476;
+        private double  fxinv = 1.0 / 480;
+        private double  fyinv = 1.0 / 480;
         private double  ddt = 200;
 
         //Geometry
@@ -40,6 +40,8 @@ namespace PARSE
         //Texture
         BitmapSource        bs;
         DiffuseMaterial     imageMesh;
+
+        KinectSensor        kinectSensor;
 
 
         public StaticPointCloud(BitmapSource bs, int[] rawDepth)
@@ -62,6 +64,7 @@ namespace PARSE
             //create mesh default 
             this.Model.Geometry = createMesh();
             this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new ImageBrush(this.bs));
+
             this.Model.Transform = new TranslateTransform3D(1, -2, 1);
 
             //create mesh raw
@@ -73,15 +76,33 @@ namespace PARSE
 
         public void createTexture()
         {
-            
+           /* for (int a = 0; a < depthFrameHeight; a++)
+            {
+                for (int b = 0; b < depthFrameWidth; b++)
+                {
+
+                    //alignment issues with color image- to be fixed
+                    //this.textureCoordinates[(a * depthFrameWidth) + b] = new Point((double)b / (depthFrameWidth), (double)a / (depthFrameHeight));
+
+                    //this.textureCoordinates[(a * depthFrameWidth) + b] = new Point((double) b+30, (double)a+30);
+                    this.textureCoordinates[(a * depthFrameWidth) + b] = (double)kinectSensor.CoordinateMapper.MapDepthPointToColorPoint(DepthImageFormat.Resolution320x240Fps30, (DepthImagePoint) this.rawDepth[1], ColorImageFormat.RgbResolution640x480Fps30);
+
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);*/
+
             for (int a = 0; a < depthFrameHeight; a++)
             {
                 for (int b = 0; b < depthFrameWidth; b++)
                 {
 
-                    //alignment issues - to be fixed.
-                    this.textureCoordinates[a * depthFrameWidth + b] 
-                        = new Point((double)b / (depthFrameWidth - 1), (double)a / (depthFrameHeight - 1));
+                    //alignment issues with color image- to be fixed
+                    this.textureCoordinates[(a * depthFrameWidth) + b] 
+                        = new Point((double)b / (depthFrameWidth), (double)a / (depthFrameHeight));
+
+                    this.textureCoordinates[(a * depthFrameWidth) + b] = new Point((double) b+30, (double)a+30);
+
                 }
             }
 
