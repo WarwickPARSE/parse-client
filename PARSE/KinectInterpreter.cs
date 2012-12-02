@@ -205,6 +205,15 @@ namespace PARSE
                         this.outputColorBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
                     }
 
+                    /*
+                    int offset = 100;
+                    for (int i = this.colorpixelData.Length-1; offset < i; i--)
+                    {
+                        //Console.WriteLine("I'm in your loop");
+                        this.colorpixelData[i] = 5;// this.colorpixelData[i - offset];
+                    }
+                    */
+
                     colorFrame.CopyPixelDataTo(this.colorpixelData);
 
                     this.outputColorBitmap.WritePixels(new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height), colorpixelData, colorFrame.Width * Bgr32BytesPerPixel, 0);
@@ -360,8 +369,7 @@ namespace PARSE
         {
             foreach (Joint joint in skeleton.Joints)
             {
-                // Transforms a SkeletonPoint to a ColorImagePoint
-                var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
+                var colorPoint = kinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, kinectSensor.ColorStream.Format);
                 // Scale the ColorImagePoint position to the current window size
                 var point = new System.Windows.Point((int)colorPoint.X / 640.0 * this.skeletonCanvas.ActualWidth, (int)colorPoint.Y / 480.0 * this.skeletonCanvas.ActualHeight);
                 // update the position of that joint
