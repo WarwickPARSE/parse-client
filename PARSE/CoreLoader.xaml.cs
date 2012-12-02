@@ -273,6 +273,7 @@ namespace PARSE
             this.label4.Content = "Rendered!";
 
             kinectInterp.stopStreams(null);
+            //vpcanvas2.Width = 0;
             
 
             /*pcTimer = new System.Windows.Forms.Timer();
