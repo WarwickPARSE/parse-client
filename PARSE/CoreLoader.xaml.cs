@@ -270,7 +270,7 @@ namespace PARSE
         { 
             kinectInterp.stopStreams(null);
             this.label4.Content = "Rendering...";
-            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+            this.DataContext = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
             this.label4.Content = "Rendered!";
             /*pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);

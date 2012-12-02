@@ -1,13 +1,17 @@
 ﻿using System;
+//using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Media3D;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows;
+using System.Windows.Forms;
 
 using HelixToolkit.Wpf;
 
@@ -42,6 +46,9 @@ namespace PARSE
         private const double fxinv = 1.0 / 476;
         private const double fyinv = 1.0 / 476;
         private double ddt = 200;
+
+        //bitmap source, to be deprecated soon
+        BitmapSource bs; 
 
         //geometry
         int[] rawDepth;
@@ -79,6 +86,26 @@ namespace PARSE
             this.height = height;
 
             //create a new 3d point cloud 
+            this.points = new KdTree.KDTree(3);
+        }
+
+
+        public PointCloud(BitmapSource bs, int[] rawDepth) 
+        {
+            this.bs = bs;
+            this.rawDepth = rawDepth;
+
+            textureCoordinates = new System.Windows.Point[depthFrameHeight * depthFrameWidth];
+            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
+
+            this.legacy();
+
+            //create mesh default 
+            this.Model.Geometry = createMesh();
+            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new ImageBrush(this.bs));
+            this.Model.Transform = new TranslateTransform3D(1, -2, 1);
+
+            //this is pointless if you are instantiating in this manner, but meh 
             this.points = new KdTree.KDTree(3);
         }
 
@@ -182,12 +209,25 @@ namespace PARSE
             
         }
 
-        /*                             
-         *                             
-         * DO NOT USE ANY OF THIS CODE YET
-         *                             
-         */                            
-        public void createTexture()
+        /***
+         * Aids in the transition from Bernie's point cloud to this one 
+         */
+        public void legacy()
+        {
+            //sanity check for helix responsiveness 
+            this.runDemoModel();
+
+            //create the texture coords
+            this.createTexture();
+
+            //create the depth coords
+            this.createDepthCoords();
+        }
+        
+        /***
+         * Creates tecture coordinates  
+         */
+        private void createTexture()
         {
 
             for (int a = 0; a < depthFrameHeight; a++)
@@ -204,7 +244,10 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);
         }
 
-        public void createDepthCoords()
+        /***
+         * Creates depth coordinates, was private scope previously  
+         */
+        private void createDepthCoords()
         {
 
             for (int iy = 0; iy < 480; iy++)
@@ -276,9 +319,11 @@ namespace PARSE
             };
         }
 
-        public void runDemoModel()
+        /***
+         * Some sanity check 
+         */
+        private void runDemoModel()
         {
-
             // Create a mesh builder and add a box to it
             var meshBuilder = new MeshBuilder(false, false);
             meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
@@ -291,9 +336,7 @@ namespace PARSE
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
 
             this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
-            this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
-
-
+           // this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
         }
 
         /// <summary>
