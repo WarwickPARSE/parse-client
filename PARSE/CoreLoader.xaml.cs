@@ -269,7 +269,7 @@ namespace PARSE
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
             this.label4.Content = "Rendering...";
-            this.DataContext = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
             this.label4.Content = "Rendered!";
 
             kinectInterp.stopStreams(null);
