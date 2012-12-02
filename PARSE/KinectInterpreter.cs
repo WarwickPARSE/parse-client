@@ -362,8 +362,7 @@ namespace PARSE
         {
             foreach (Joint joint in skeleton.Joints)
             {
-                // Transforms a SkeletonPoint to a ColorImagePoint
-                var colorPoint = kinectSensor.MapSkeletonPointToColor(joint.Position, kinectSensor.ColorStream.Format);
+                var colorPoint = kinectSensor.CoordinateMapper.MapSkeletonPointToColorPoint(joint.Position, kinectSensor.ColorStream.Format);
                 // Scale the ColorImagePoint position to the current window size
                 var point = new System.Windows.Point((int)colorPoint.X / 640.0 * this.skeletonCanvas.ActualWidth, (int)colorPoint.Y / 480.0 * this.skeletonCanvas.ActualHeight);
                 // update the position of that joint

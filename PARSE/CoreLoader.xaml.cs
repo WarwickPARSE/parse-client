@@ -235,7 +235,7 @@ namespace PARSE
                     //initialize kinect event
                     kinectImager.Width = 0;
                     vpcanvas.Width = 0;
-                    vpcanvas2.Width = 0;
+                    //vpcanvas2.Width = 0;
 
                     //make label visible
                     this.label4.Content = "Click start to generate point cloud";
@@ -267,11 +267,18 @@ namespace PARSE
         }
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
-        { 
-            kinectInterp.stopStreams(null);
+        {
+            Console.WriteLine("Sleeping Beauty");
+            System.Threading.Thread.Sleep(5000);
+            Console.WriteLine("Prince Charming");
+
             this.label4.Content = "Rendering...";
             this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
             this.label4.Content = "Rendered!";
+
+            kinectInterp.stopStreams(null);
+            
+
             /*pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);
             pcTimer.Interval = 500;

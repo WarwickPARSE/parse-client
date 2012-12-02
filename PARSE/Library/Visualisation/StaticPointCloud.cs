@@ -42,11 +42,11 @@ namespace PARSE
         DiffuseMaterial     imageMesh;
 
 
-        public StaticPointCloud(BitmapSource bs, int[] rawDepth)
+        public StaticPointCloud(BitmapSource bs, int[] rDepth)
         {
 
             this.bs = bs;
-            this.rawDepth = rawDepth;
+            this.rawDepth = rDepth;
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
