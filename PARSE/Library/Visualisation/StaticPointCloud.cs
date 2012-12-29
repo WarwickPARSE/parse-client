@@ -33,6 +33,7 @@ namespace PARSE
         private double  ddt = 200;
 
         //Geometry
+        List<int[]>         depthClouds;
         int[]               rawDepth;
         Point3D[]           depthFramePoints;
         Point[]             textureCoordinates;
@@ -44,33 +45,61 @@ namespace PARSE
         KinectSensor        kinectSensor;
 
 
-        public StaticPointCloud(BitmapSource bs, int[] rDepth)
+        public StaticPointCloud(List<int[]> dp)
         {
 
             this.bs = bs;
-            this.rawDepth = rDepth;
+            this.depthClouds = dp;
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
             //sanity check for helix responsiveness
-            runDemoModel();
-
             //create texture coordinates
-            createTexture();
-
-            //create depth coordinates
-            createDepthCoords();
-
-            //create mesh default 
-            this.Model.Geometry = createMesh();
-            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new ImageBrush(this.bs));
-
-            this.Model.Transform = new TranslateTransform3D(1, -2, 1);
+            //createTexture();
+            render();
 
             //create mesh raw
             //this.BaseModel.Geometry = this.Model.Geometry;
             //this.BaseModel.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
             //this.BaseModel.Transform = new TranslateTransform3D(-1, -2, 1);
+
+        }
+
+        public void render()
+        {
+            //create depth coordinates
+
+            for (int i = 0; i < this.depthClouds.Count; i++)
+            {
+                this.rawDepth = this.depthClouds[i];
+                runDemoModel(i);
+                createDepthCoords();
+
+                switch (i)
+                {
+                    case 0:
+                        this.Model.Geometry = createMesh();
+                        this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+                        break;
+                    case 1:
+                        this.Model2.Geometry = createMesh();
+                        this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        this.Model2.Transform = new TranslateTransform3D(0, -2, 1);
+                        break;
+                    case 2:
+                        this.Model3.Geometry = createMesh();
+                        this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        this.Model3.Transform = new TranslateTransform3D(1, -2, 1);
+                        break;
+                    case 3:
+                        this.Model4.Geometry = createMesh();
+                        this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        this.Model4.Transform = new TranslateTransform3D(2, -2, 1);
+                        break;
+                } 
+
+            }
 
         }
 
@@ -190,7 +219,7 @@ namespace PARSE
         /// Sanity check.
         /// </summary>
 
-        public void runDemoModel()
+        public void runDemoModel(int pos)
         {
 
             // Create a mesh builder and add a box to it
@@ -204,9 +233,13 @@ namespace PARSE
             // Create some materials
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
 
-            this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
-            //this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            switch(pos) {
 
+                case 0: this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; break;
+                case 1: this.Model2 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; break;
+                case 2: this.Model3 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; break;
+                case 3: this.Model4 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; break;
+            }
 
         }
 
@@ -217,6 +250,8 @@ namespace PARSE
 
         public GeometryModel3D Model { get; set; }
         public GeometryModel3D BaseModel { get; set; }
-       
+        public GeometryModel3D Model2 { get; set; }
+        public GeometryModel3D Model3 { get; set; }
+        public GeometryModel3D Model4 { get; set; }
     }
 }

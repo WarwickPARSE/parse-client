@@ -57,6 +57,7 @@ namespace PARSE
         private System.Windows.Forms.Timer              pcTimer; 
         private PointCloudHandler                       pcHandler;
         private Thread                                  pcHandlerThread;
+        private List<int[]>                             dps;
 
         //Generic coreloader instances
         private SpeechSynthesizer                       ss;
@@ -256,9 +257,6 @@ namespace PARSE
 
                     //make label visible
                     this.label4.Content = "Click start to generate point cloud";
-                    ss.Rate = 1;
-                    ss.Volume = 100;
-                    ss.Speak("Click start to generate point cloud");
                     this.label4.Visibility = System.Windows.Visibility.Visible;
 
                     break;
@@ -301,23 +299,50 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-            this.label4.Content = "Rendering...";
-            //this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-            this.label4.Content = "Rendered!";
-
-            //kinectInterp.stopStreams(null);
-            //vpcanvas2.Width = 0;
             
+            //create list structure
+            dps = new List<int[]>();
+
+            //start new scanning timer.
             pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);
+
             System.Diagnostics.Debug.WriteLine("Generating new cloud...");
+
+            ss.Rate = 1;
+            ss.Volume = 100;
+            ss.Speak("Please face the camera");
+
             pcTimer.Interval = 10000;
+            countdown = 3;
             pcTimer.Start();
         }
 
         private void pcTimer_tick(Object sender, EventArgs e) 
         {
-            this.DataContext = new StaticPointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray()); 
+            if (countdown == 3)
+            {
+                dps.Add(this.kinectInterp.getDepthArray());
+                ss.Speak("Please turn left away from camera");
+                countdown--;
+            }
+            else if (countdown == 2)
+            {
+                dps.Add(this.kinectInterp.getDepthArray());
+                ss.Speak("Please turn left with your back to the camera");
+                countdown--;
+            }
+            else if (countdown == 1)
+            {
+                dps.Add(this.kinectInterp.getDepthArray());
+                ss.Speak("Turn left once more with your side to the camera");
+                countdown--;
+            }
+            else if (countdown == 0) {
+                dps.Add(this.kinectInterp.getDepthArray());
+                this.DataContext = new StaticPointCloud(dps);
+                pcTimer.Stop();
+            }
         }
 
         private void surfTimer_tick(Object sender, EventArgs e)
