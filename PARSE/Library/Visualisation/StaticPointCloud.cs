@@ -38,30 +38,13 @@ namespace PARSE
         Point3D[]           depthFramePoints;
         Point[]             textureCoordinates;
 
-        //Texture
-        BitmapSource        bs;
-        DiffuseMaterial     imageMesh;
-
-        KinectSensor        kinectSensor;
-
-
         public StaticPointCloud(List<int[]> dp)
         {
-
-            this.bs = bs;
             this.depthClouds = dp;
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
-            //sanity check for helix responsiveness
-            //create texture coordinates
-            //createTexture();
             render();
-
-            //create mesh raw
-            //this.BaseModel.Geometry = this.Model.Geometry;
-            //this.BaseModel.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
-            //this.BaseModel.Transform = new TranslateTransform3D(-1, -2, 1);
 
         }
 
@@ -101,41 +84,6 @@ namespace PARSE
 
             }
 
-        }
-
-        public void createTexture()
-        {
-           /* for (int a = 0; a < depthFrameHeight; a++)
-            {
-                for (int b = 0; b < depthFrameWidth; b++)
-                {
-
-                    //alignment issues with color image- to be fixed
-                    //this.textureCoordinates[(a * depthFrameWidth) + b] = new Point((double)b / (depthFrameWidth), (double)a / (depthFrameHeight));
-
-                    //this.textureCoordinates[(a * depthFrameWidth) + b] = new Point((double) b+30, (double)a+30);
-                    this.textureCoordinates[(a * depthFrameWidth) + b] = (double)kinectSensor.CoordinateMapper.MapDepthPointToColorPoint(DepthImageFormat.Resolution320x240Fps30, (DepthImagePoint) this.rawDepth[1], ColorImageFormat.RgbResolution640x480Fps30);
-
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);*/
-
-            for (int a = 0; a < depthFrameHeight; a++)
-            {
-                for (int b = 0; b < depthFrameWidth; b++)
-                {
-
-                    //alignment issues with color image- to be fixed
-                    this.textureCoordinates[(a * depthFrameWidth) + b] 
-                        = new Point(((double)b / (depthFrameWidth - 1)), (double)a / (depthFrameHeight - 1));
-
-                    this.textureCoordinates[(a * depthFrameWidth) + b] = new Point((double) b+30, (double)a+30);
-
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);
         }
 
         public void createDepthCoords()
@@ -209,11 +157,6 @@ namespace PARSE
                 TriangleIndices = new Int32Collection(triangleIndices)
             };
         }
-
-        //required components
-
-        //imageMesh = new DiffuseMaterial(new ImageBrush(this.outputColorBitmap));
-        //this.Model.Material = this.Model.BackMaterial = imageMesh;
 
         /// <summary>
         /// Sanity check.
