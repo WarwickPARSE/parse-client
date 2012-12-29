@@ -33,10 +33,6 @@ namespace PARSE
     /// </summary>
     public partial class CoreLoader : Window
     {
-        //frame sizes
-        private int                                     width;
-        private int                                     height;
-
         //Modelling specific definitions
         private GeometryModel3D                         Model;
         private GeometryModel3D                         BaseModel;
@@ -56,30 +52,22 @@ namespace PARSE
         //point cloud handler thread 
         private System.Windows.Forms.Timer              pcTimer; 
         private PointCloudHandler                       pcHandler;
-        private Thread                                  pcHandlerThread;
         private List<int[]>                             dps;
 
-        //Generic coreloader instances
+        //speech synthesizer instances
         private SpeechSynthesizer                       ss;
 
         public CoreLoader()
         {
-            //Start a new instance of the point cloud handler (500ms intervals) - not implemented yet d/w
-            pcHandler = new PointCloudHandler(500);
-            //pcHandlerThread = new Thread(new ThreadStart(pcHandler.run));
-            //pcHandlerThread.Start();
-
+            //Initialize Component
             InitializeComponent();
 
-            //init KinectInterpreter
-            kinectInterp  = new KinectInterpreter(vpcanvas2);
-            this.label4.Visibility = System.Windows.Visibility.Hidden;
-            this.label4.Content = kinectInterp.instruction;
+            //Initialize KinectInterpreter
+            kinectInterp = new KinectInterpreter(vpcanvas2);
   
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
             ss = new SpeechSynthesizer();
-            //btnStartScanning.IsEnabled = false;
             
             if (!kinectInterp.kinectReady)    //Disable controls
             {
@@ -97,6 +85,12 @@ namespace PARSE
             BaseModel = new GeometryModel3D();
 
         }
+
+        /// <summary>
+        /// Kinect skeleton polling method
+        /// </summary>
+        /// <param name="sender">originator of event</param>
+        /// <param name="e">event ready identifier</param>
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
@@ -182,7 +176,7 @@ namespace PARSE
             String visualChoice = visualcb.Text;
 
             //Stop all streams
-            //kinectInterp.stopStreams(feedChoice);
+            kinectInterp.stopStreams(feedChoice);
 
             //Assign feed to bitmap source
             switch (feedChoice)
@@ -253,26 +247,10 @@ namespace PARSE
                     //initialize kinect event
                     kinectImager.Width = 0;
                     vpcanvas.Width = 0;
-                    //vpcanvas2.Width = 0;
 
                     //make label visible
                     this.label4.Content = "Click start to generate point cloud";
                     this.label4.Visibility = System.Windows.Visibility.Visible;
-
-                    break;
-
-                case "Classifier":
-
-                    kinectInterp.startRGBStream();
-                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                   
-                    BasicClassifierTester classifierTester = new BasicClassifierTester();
-                    BitmapSource rgbimage = null;
-                    while (rgbimage == null)
-                    {
-                        rgbimage = kinectInterp.getRGBTexture();
-                    }
-                    classifierTester.classify(rgbimage);
 
                     break;
 
@@ -307,12 +285,12 @@ namespace PARSE
             pcTimer = new System.Windows.Forms.Timer();
             pcTimer.Tick += new EventHandler(pcTimer_tick);
 
-            System.Diagnostics.Debug.WriteLine("Generating new cloud...");
-
+            //initalize speech sythesizer
             ss.Rate = 1;
             ss.Volume = 100;
             ss.Speak("Please face the camera");
 
+            //Initialize and start timerr
             pcTimer.Interval = 10000;
             countdown = 3;
             pcTimer.Start();
