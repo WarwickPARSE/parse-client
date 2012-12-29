@@ -37,9 +37,6 @@ namespace PARSE
         public bool                                     kinectReady { get; private set; }//true if kinect ready
         public bool                                     IsColorStreamUpdating { get; set; }
         public bool                                     IsDepthStreamUpdating { get; set; }
-        private bool                                    rgbReady;//ditto
-        private bool                                    depthReady;//ditto
-        private bool                                    skeletonReady;//ditto
 
         //RGB point array and frame definitions
         private byte[]                                  colorpixelData;
@@ -81,9 +78,6 @@ namespace PARSE
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
-            rgbReady = false;
-            depthReady = false;
-            skeletonReady = false;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -105,7 +99,6 @@ namespace PARSE
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
-            this.depthReady = true;
             this.kinectStatus = this.kinectStatus+", Depth Ready";
         }
 
@@ -116,7 +109,6 @@ namespace PARSE
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.pts = pts;
             this.kinectSensor.Start();
-            this.depthReady = true;
         }
 
         public void startDepthLinearStream(GeometryModel3D mod)
@@ -129,8 +121,6 @@ namespace PARSE
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.SkeletonStream.Enable();
             this.kinectSensor.Start();
-            this.depthReady = true;
-
         }
 
         //Enable rgbStream
@@ -138,7 +128,6 @@ namespace PARSE
         {
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             this.kinectSensor.Start();
-            this.rgbReady = true;
             this.kinectStatus = this.kinectStatus + ", RGB Ready";
         }
 
@@ -150,7 +139,6 @@ namespace PARSE
 
             this.kinectSensor.SkeletonStream.Enable();
             this.kinectSensor.Start();
-            this.skeletonReady = true;
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
@@ -248,11 +236,6 @@ namespace PARSE
 
                         convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
 
-                       /* CoordinateMapper cm = new CoordinateMapper(kinectSensor);
-                        DepthImagePixel[] dp = new DepthImagePixel[depthFrame.PixelDataLength];
-                        */
-                        //cm.MapDepthFrameToColorFrame(DepthImageFormat.Resolution640x480Fps30, this.depthPixelData, ColorImageFormat.RgbResolution640x480Fps30, mappedDepthLocations);
-
                         //VIS MODE 1: Feedback to visualisation with Z offset.
                         if (visMode == 1)
                         {
@@ -266,13 +249,6 @@ namespace PARSE
                                     i++;
                                 }
                             }
-                        }
-
-                        else if (visMode == 2)
-                        {
-
-                            //figure something out
-                            System.Diagnostics.Debug.WriteLine("i am in vismode 2");
                         }
                         else
                         {
@@ -467,7 +443,6 @@ namespace PARSE
             if (outputColorBitmap != null)
             {
                 BitmapSource colorbitmap = outputColorBitmap.Clone(); // null;
-                //kinectSensor.Stop();
                 return colorbitmap;
             }
             else
