@@ -130,7 +130,7 @@ namespace PARSE
                     line.Y2 = point.Y;
                 }
             }
-
+            
         }
 
         #region Private methods
