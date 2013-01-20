@@ -390,11 +390,18 @@ namespace PARSE
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - 2133) / 1066);
                             ++colorPixelIndex;
                         }
-                        else if (3199 <= realDepth)
+                        else if ((3199 <= realDepth) && (realDepth < 4000))
                         {
                             this.depthFrame32[colorPixelIndex++] = 0;
                             this.depthFrame32[colorPixelIndex++] = 0;
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (4000 - realDepth) / 801);
+                            ++colorPixelIndex;
+                        }
+                        else
+                        {
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = 0;
+                            this.depthFrame32[colorPixelIndex++] = 0;
                             ++colorPixelIndex;
                         }
                     }
