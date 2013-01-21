@@ -92,11 +92,16 @@ namespace PARSE
         /// <param name="sender">originator of event</param>
         /// <param name="e">event ready identifier</param>
 
+        int count = 0;
+        
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            kinectInterp.SkeletonFrameReady(sender, e);
-            this.label4.Content = kinectInterp.instruction;
-            this.label4.Visibility = System.Windows.Visibility.Visible;
+            if (count == 0)
+            {
+                kinectInterp.SkeletonFrameReady(sender, e);
+                this.label4.Content = kinectInterp.instruction;
+                this.label4.Visibility = System.Windows.Visibility.Visible;
+            }
         }
 
         /// <summary>
@@ -116,7 +121,15 @@ namespace PARSE
         /// <param name="e">event ready identifier</param>
        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
        {
-           this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+           if (count == 0)
+           {
+               this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+           }
+           count++;
+           if (count > 4)
+           {
+               count = 0;
+           }
        }
 
        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -288,7 +301,7 @@ namespace PARSE
             //initalize speech sythesizer
             ss.Rate = 1;
             ss.Volume = 100;
-            ss.Speak("Please face the camera");
+            ss.Speak("Please face the camera Bitch");
 
             //Initialize and start timerr
             pcTimer.Interval = 10000;
@@ -300,20 +313,25 @@ namespace PARSE
         {
             if (countdown == 3)
             {
+                //enable update of skelL, skelR, skelDepth
+                this.kinectInterp.enableUpdateSkelVars();
                 dps.Add(this.kinectInterp.getDepthArray());
-                ss.Speak("Please turn left away from camera");
+                
+                //freeze skelL skelDepth and skelR
+                this.kinectInterp.disableUpdateSkelVars();
+                ss.Speak("Turn left bitch");
                 countdown--;
             }
             else if (countdown == 2)
             {
                 dps.Add(this.kinectInterp.getDepthArray());
-                ss.Speak("Please turn left with your back to the camera");
+                ss.Speak("Turn left bitch show me your ass");
                 countdown--;
             }
             else if (countdown == 1)
             {
                 dps.Add(this.kinectInterp.getDepthArray());
-                ss.Speak("Turn left once more with your side to the camera");
+                ss.Speak("Turn left bitch");
                 countdown--;
             }
             else if (countdown == 0) {

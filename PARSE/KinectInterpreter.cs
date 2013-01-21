@@ -60,9 +60,10 @@ namespace PARSE
         private Skeleton[]                              skeletonData;
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
-        private float skelDepth;
-        private float skelDepthDelta = 125;//to be used if we ever implement sliders so we can scan fat people, shouldnt really exceed 255/2
-        private float skelL;
+        private Boolean                                 updateSkelVars;
+        private float skelDepth = -1; //for testing only make private
+        private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
+        private float skelL; 
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
         private float skelR;
         private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people
@@ -78,6 +79,7 @@ namespace PARSE
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
+            updateSkelVars = true;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -92,6 +94,16 @@ namespace PARSE
                 this.kinectSensor = KinectSensor.KinectSensors[0];
                 this.kinectStatus = "Initialized";
             }
+        }
+
+        public void enableUpdateSkelVars()
+        {
+            this.updateSkelVars = true;
+        }
+
+        public void disableUpdateSkelVars()
+        {
+            this.updateSkelVars = false;
         }
 
         //Enable depthStream
@@ -298,15 +310,17 @@ namespace PARSE
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        //update the depth of the tracked skeleton
-                        skelDepth = trackedSkeleton.Position.Z;
-                        skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
-                        skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+                        if (updateSkelVars)
+                        {
+                            //update the depth of the tracked skeleton
+                            skelDepth = trackedSkeleton.Position.Z;
+                            skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
+                            skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
 
-                        skelDepth = skelDepth * 1000;
-                        skelL = (320 * (1 + skelL)) * 4;
-                        skelR = (320 * (1 + skelR)) * 4;
-
+                            skelDepth = skelDepth * 1000;
+                            skelL = (320 * (1 + skelL)) * 4;
+                            skelR = (320 * (1 + skelR)) * 4;
+                        }
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
@@ -431,7 +445,7 @@ namespace PARSE
             
             }
 
-            skelDepth = -1;
+            //skelDepth = -1;
             return this.depthFrame32;
         }
 
