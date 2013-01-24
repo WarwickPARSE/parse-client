@@ -61,7 +61,7 @@ namespace PARSE
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
         private Boolean                                 updateSkelVars;
-        private float skelDepth = -1; //for testing only make private
+        private float skelDepth = -1; 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
         private float skelL; 
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
