@@ -255,6 +255,15 @@ namespace PARSE
             
         }
 
+        /// <summary>
+        /// returns kd-tree representation of point cloud
+        /// </summary>
+        /// <param name="points"></param>
+        private KdTree.KDTree getKDTree()
+        {
+            return this.points;
+        }
+
         /***
          * Aids in the transition from Bernie's point cloud to this one 
          */
