@@ -189,7 +189,7 @@ namespace PARSE
             String visualChoice = visualcb.Text;
 
             //Stop all streams
-            kinectInterp.stopStreams(feedChoice);
+            kinectInterp.stopStreams();
 
             //Assign feed to bitmap source
             switch (feedChoice)
@@ -228,11 +228,7 @@ namespace PARSE
 
             switch (visualChoice)
             {
-
-                case "Real Time Triangle Mesh":
-
-                    kinectInterp.stopStreams(null);
-
+               case "Real Time Triangle Mesh":
                     GeometryModel3D[] gm        = new GeometryModel3D[640*480];
                     TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
