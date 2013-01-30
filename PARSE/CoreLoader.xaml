@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        xmlns:local="clr-namespace:PARSE"
         Title="CoreLoader" Height="586" Width="785" Loaded="Window_Loaded">
     <Grid Height="526" Width="750">
         <Grid.RowDefinitions>
