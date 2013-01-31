@@ -176,10 +176,12 @@ namespace PARSE
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
             if (this.kinectInterp.kinectReady)
             {
                 this.kinectInterp.kinectSensor.Stop();
             }
+
         }
 
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
@@ -392,6 +394,12 @@ namespace PARSE
             BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = bs;
             surfTimer.Stop();
+        }
+
+        private void VolumeOption_Click(object sender, RoutedEventArgs e)
+        {
+            //Static call to volume calculation method, pass point cloud yielded from visualisation result.
+            System.Windows.Forms.MessageBox.Show("You are too fat");
         }
     }
 }
