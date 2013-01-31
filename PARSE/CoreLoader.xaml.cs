@@ -176,10 +176,12 @@ namespace PARSE
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
             if (this.kinectInterp.kinectReady)
             {
                 this.kinectInterp.kinectSensor.Stop();
             }
+
         }
 
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
@@ -189,7 +191,7 @@ namespace PARSE
             String visualChoice = visualcb.Text;
 
             //Stop all streams
-            kinectInterp.stopStreams(feedChoice);
+            kinectInterp.stopStreams();
 
             //Assign feed to bitmap source
             switch (feedChoice)
@@ -228,11 +230,7 @@ namespace PARSE
 
             switch (visualChoice)
             {
-
-                case "Real Time Triangle Mesh":
-
-                    kinectInterp.stopStreams(null);
-
+               case "Real Time Triangle Mesh":
                     GeometryModel3D[] gm        = new GeometryModel3D[640*480];
                     TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
@@ -396,6 +394,12 @@ namespace PARSE
             BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = bs;
             surfTimer.Stop();
+        }
+
+        private void VolumeOption_Click(object sender, RoutedEventArgs e)
+        {
+            //Static call to volume calculation method, pass point cloud yielded from visualisation result.
+            System.Windows.Forms.MessageBox.Show("You are too fat");
         }
     }
 }

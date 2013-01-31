@@ -37,6 +37,7 @@ namespace PARSE
         public bool                                     kinectReady { get; private set; }//true if kinect ready
         public bool                                     IsColorStreamUpdating { get; set; }
         public bool                                     IsDepthStreamUpdating { get; set; }
+        public bool                                     IsSkelStreamUpdating { get; set; }
 
         //RGB point array and frame definitions
         private byte[]                                  colorpixelData;
@@ -110,6 +111,7 @@ namespace PARSE
         public void startDepthStream()
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            this.IsDepthStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus+", Depth Ready";
         }
@@ -139,6 +141,7 @@ namespace PARSE
         public void startRGBStream()
         {
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            this.IsColorStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", RGB Ready";
         }
@@ -150,42 +153,30 @@ namespace PARSE
             skeletons = new Dictionary<int, SkeletonFigure>();
 
             this.kinectSensor.SkeletonStream.Enable();
+            this.IsSkelStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
 
         //Disable all streams on changeover
-        public void stopStreams(String feedChoice)
+        public void stopStreams()
         {
 
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
-            switch (feedChoice) {
-                
-                case "RGB + Skeletal":
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
-                    break;
-
-                case "Depth + Skeletal":
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
-                    break;
-
-                case "Skeletal":
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectStatus = "Initialized, Skeleton Ready";
-                    break;
-
-                default:
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectSensor.SkeletonStream.Disable();
-                    this.kinectStatus = "Initialized";
-                    break;
+            if (this.IsSkelStreamUpdating)
+            {
+                this.kinectSensor.SkeletonStream.Disable();
+            }
+            if (this.IsDepthStreamUpdating)
+            {
+                this.kinectSensor.DepthStream.Disable();
+            }
+            if (this.IsColorStreamUpdating)
+            {
+                this.kinectSensor.ColorStream.Disable();
             }
         }
 
