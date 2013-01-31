@@ -32,8 +32,8 @@
                 </MenuItem>
                 <MenuItem Header="_Details" IsCheckable="true"/>
                 <Separator/>
-                <MenuItem Header="_Import Record" IsCheckable="true"/>
-                <MenuItem Header="_Export Record" IsCheckable="true"/>
+                <MenuItem Header="_Import Scan" IsCheckable="true" Click="ImportScan_Click"/>
+                <MenuItem Header="_Export Scan" IsCheckable="true" Click="ExportScan_Click"/>
             </MenuItem>
             <MenuItem Header="_Help">
 

@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using System.Speech.Synthesis;
 using System.Windows.Interop;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using HelixToolkit.Wpf;
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -50,9 +51,9 @@ namespace PARSE
         private long                                    matchtime;
 
         //point cloud handler thread 
+        private CloudVisualisation                      viscloud;
+        private List<int[]>                             capcloud;    
         private System.Windows.Forms.Timer              pcTimer; 
-        private PointCloudHandler                       pcHandler;
-        private List<int[]>                             dps;
 
         //speech synthesizer instances
         private SpeechSynthesizer                       ss;
@@ -288,9 +289,14 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
+
+            /*This method will eventually make use of the PointCloud structure
+             * rather than using list structures of raw depth arrays */
             
-            //create list structure
-            dps = new List<int[]>();
+            /*List structure to be deprecated and replaced with:
+             * new PointCloud(image source, raw depth); */
+
+            capcloud = new List<int[]>();
 
             //start new scanning timer.
             pcTimer = new System.Windows.Forms.Timer();
@@ -313,7 +319,7 @@ namespace PARSE
             {
                 //enable update of skelL, skelR, skelDepth
                 this.kinectInterp.enableUpdateSkelVars();
-                dps.Add(this.kinectInterp.getDepthArray());
+                capcloud.Add(this.kinectInterp.getDepthArray());
                 
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.disableUpdateSkelVars();
@@ -322,19 +328,19 @@ namespace PARSE
             }
             else if (countdown == 2)
             {
-                dps.Add(this.kinectInterp.getDepthArray());
+                capcloud.Add(this.kinectInterp.getDepthArray());
                 ss.Speak("Turn left bitch show me your ass");
                 countdown--;
             }
             else if (countdown == 1)
             {
-                dps.Add(this.kinectInterp.getDepthArray());
+                capcloud.Add(this.kinectInterp.getDepthArray());
                 ss.Speak("Turn left bitch");
                 countdown--;
             }
             else if (countdown == 0) {
-                dps.Add(this.kinectInterp.getDepthArray());
-                this.DataContext = new StaticPointCloud(dps);
+                capcloud.Add(this.kinectInterp.getDepthArray());
+                this.DataContext = new CloudVisualisation(capcloud);
                 pcTimer.Stop();
             }
         }
@@ -398,8 +404,55 @@ namespace PARSE
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
-            //Static call to volume calculation method, pass point cloud yielded from visualisation result.
+            //Static call to volume calculation method, pass persistent point cloud object
             System.Windows.Forms.MessageBox.Show("You are too fat");
         }
+
+        private void ImportScan_Click(object sender, RoutedEventArgs e)
+        {
+
+            /*Import scan currently imports files based on the assumption that they
+             * have been serialized as a visualisation object. Once the point cloud 
+             * class has been been implemented, it will assume that it is dealing
+             * with point cloud objects which will then be passed to the visualisation
+             * method as appropriate */
+
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".PARSE";
+            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+            if (dlg.ShowDialog() == true)
+            {
+                String filename = dlg.FileName;
+                XmlSerializer deserializer = new XmlSerializer(typeof(CloudVisualisation));
+                TextReader textReader = new StreamReader(filename);
+                CloudVisualisation temp = (CloudVisualisation)(deserializer.Deserialize(textReader));
+                this.DataContext = viscloud;
+            }
+        }
+
+        private void ExportScan_Click(object sender, RoutedEventArgs e)
+        {
+
+            /*ExportScan serializes the visualisation object, once the pointcloud
+             * structure has been implemented, it will serialize the pc object
+             * rather than this visualisation. Current issue, cant serialize list
+             objects that contain arrays apparantely.*/
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".PARSE";
+            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+            if (dlg.ShowDialog() == true)
+            {
+                String filename = dlg.FileName;
+                XmlSerializer serializer = new XmlSerializer(typeof(CloudVisualisation));
+                TextWriter textWriter = new StreamWriter(filename);
+                serializer.Serialize(textWriter, viscloud.depthClouds);
+                textWriter.Close();
+            }
+
+        }
+       
     }
 }

@@ -8,8 +8,6 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
-using System.Windows.Forms;
-using System.Xml.Serialization;
 
 using HelixToolkit.Wpf;
 
@@ -17,10 +15,10 @@ using Microsoft.Kinect;
 
 namespace PARSE
 {
-    class StaticPointCloud
+    public class CloudVisualisation
     {
 
-        //Constants
+        //Constants for visualisation
         private int     depthFrameWidth = 640;
         private int     depthFrameHeight = 480;
         private int     cx = 640 / 2;
@@ -33,13 +31,18 @@ namespace PARSE
         private double  fyinv = 1.0 / 480;
         private double  ddt = 200;
 
-        //Geometry
+        //Geometry for visualisation
         List<int[]>         depthClouds;
         int[]               rawDepth;
         Point3D[]           depthFramePoints;
         Point[]             textureCoordinates;
 
-        public StaticPointCloud(List<int[]> dp)
+        public CloudVisualisation()
+        {
+            //parameterless
+        }
+
+        public CloudVisualisation(List<int[]> dp)
         {
             this.depthClouds = dp;
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
@@ -48,51 +51,6 @@ namespace PARSE
             render();
 
         }
-
-        //serialization stuff
-        /// <summary>
-        /// write to file. takes filename as input. does not need file extension!
-        /// currently save to the Visual Studio 2010\Projects\parse-client\PARSE\bin\Debug directory. can be changed when we agree on a place.
-        /// also currently appends dates to the filename
-        /// to be used like:
-        /// 
-        /// PointCloud pc = new PointCloud();
-        /// //populate point cloud
-        /// pc.serializeTo(Bernard)
-        /// 
-        /// will output a file called Bernard-01-25-2013.PARSE 
-        /// </summary>
-        public void serializeTo(string filename)
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(StaticPointCloud));
-            TextWriter textWriter = new StreamWriter(".\\" + filename + ".PARSE");
-            serializer.Serialize(textWriter, this);
-            textWriter.Close();
-        }
-
-        /// <summary>
-        /// retrieve from file. takes filename as input. does not need file extension!
-        /// currently retrieves from the Visual Studio 2010\Projects\parse-client\PARSE\bin\Debug directory. can be changed when we agree on a place.
-        /// to be used like:
-        /// PointCloud pc = PointCloud.deserializeFrom(Bernard-01-25-2013);
-        /// </summary>
-        public static StaticPointCloud deserializeFrom(String filename)
-        {
-            XmlSerializer deserializer = new XmlSerializer(typeof(StaticPointCloud));
-            TextReader textReader = new StreamReader(".\\" + filename + "-" + todaysDate() + ".PARSE");
-            StaticPointCloud temp = (StaticPointCloud)(deserializer.Deserialize(textReader));
-            textReader.Close();
-            return temp;
-        }
-
-        /// <summary>
-        /// returns todays day as a string formatted as MM-DD-YYYY
-        /// </summary>
-        private static String todaysDate()
-        {
-            return DateTime.Today.Month + "-" + DateTime.Today.Day + "-" + DateTime.Today.Year; ;
-        }
-
         
         public void render()
         {
@@ -242,5 +200,6 @@ namespace PARSE
         public GeometryModel3D Model2 { get; set; }
         public GeometryModel3D Model3 { get; set; }
         public GeometryModel3D Model4 { get; set; }
+
     }
 }
