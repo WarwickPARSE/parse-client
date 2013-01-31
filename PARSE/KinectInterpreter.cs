@@ -178,32 +178,6 @@ namespace PARSE
             {
                 this.kinectSensor.ColorStream.Disable();
             }
-            
-            /*switch (feedChoice) {
-                
-                case "RGB + Skeletal":
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
-                    break;
-
-                case "Depth + Skeletal":
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
-                    break;
-
-                case "Skeletal":
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectStatus = "Initialized, Skeleton Ready";
-                    break;
-
-                default:
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectSensor.SkeletonStream.Disable();
-                    this.kinectStatus = "Initialized";
-                    break;
-            }*/
         }
 
         public WriteableBitmap ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
