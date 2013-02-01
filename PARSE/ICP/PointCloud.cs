@@ -75,6 +75,8 @@ namespace PARSE
 
             //convert bitmap stream into a format that is supported by the kd-tree method
             Bitmap b = convertToBitmap(bs);
+
+            setPoints(rawDepth, b);
         }
      
         /// <summary>
