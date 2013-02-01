@@ -52,7 +52,9 @@ namespace PARSE
 
         //point cloud handler thread 
         private CloudVisualisation                      viscloud;
-        private List<int[]>                             capcloud;    
+        //these lists WILL BE deprecated once the PointCloud class is complete
+        private List<int[]>                             capcloud;
+        private List<BitmapSource>                      rgbcloud;
         private System.Windows.Forms.Timer              pcTimer; 
 
         //speech synthesizer instances
@@ -100,8 +102,6 @@ namespace PARSE
             if (count == 0)
             {
                 kinectInterp.SkeletonFrameReady(sender, e);
-                this.label4.Content = kinectInterp.instruction;
-                this.label4.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
@@ -297,6 +297,7 @@ namespace PARSE
              * new PointCloud(image source, raw depth); */
 
             capcloud = new List<int[]>();
+            rgbcloud = new List<BitmapSource>();
 
             //start new scanning timer.
             pcTimer = new System.Windows.Forms.Timer();
@@ -306,6 +307,7 @@ namespace PARSE
             ss.Rate = 1;
             ss.Volume = 100;
             ss.Speak("Please face the camera Bitch");
+            this.label4.Content = "Please face the camera";
 
             //Initialize and start timerr
             pcTimer.Interval = 10000;
@@ -320,27 +322,34 @@ namespace PARSE
                 //enable update of skelL, skelR, skelDepth
                 this.kinectInterp.enableUpdateSkelVars();
                 capcloud.Add(this.kinectInterp.getDepthArray());
-                
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.disableUpdateSkelVars();
                 ss.Speak("Turn left bitch");
+                this.label4.Content = "Please turn left";
                 countdown--;
             }
             else if (countdown == 2)
             {
                 capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 ss.Speak("Turn left bitch show me your ass");
+                this.label4.Content = "Please turn left with your back to the camera";
                 countdown--;
             }
             else if (countdown == 1)
             {
                 capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 ss.Speak("Turn left bitch");
+                this.label4.Content = "Please turn left once more";
                 countdown--;
             }
             else if (countdown == 0) {
                 capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 this.DataContext = new CloudVisualisation(capcloud);
+                this.label4.Content = "Scanning complete.";
                 pcTimer.Stop();
             }
         }
@@ -424,10 +433,7 @@ namespace PARSE
             if (dlg.ShowDialog() == true)
             {
                 String filename = dlg.FileName;
-                XmlSerializer deserializer = new XmlSerializer(typeof(CloudVisualisation));
-                TextReader textReader = new StreamReader(filename);
-                CloudVisualisation temp = (CloudVisualisation)(deserializer.Deserialize(textReader));
-                this.DataContext = viscloud;
+                this.DataContext = ScanSerializer.deserialize(filename);
             }
         }
 
@@ -446,10 +452,7 @@ namespace PARSE
             if (dlg.ShowDialog() == true)
             {
                 String filename = dlg.FileName;
-                XmlSerializer serializer = new XmlSerializer(typeof(CloudVisualisation));
-                TextWriter textWriter = new StreamWriter(filename);
-                serializer.Serialize(textWriter, viscloud.depthClouds);
-                textWriter.Close();
+                ScanSerializer.serialize(filename, capcloud);
             }
 
         }

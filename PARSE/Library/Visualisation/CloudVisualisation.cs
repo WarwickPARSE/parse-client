@@ -15,6 +15,10 @@ using Microsoft.Kinect;
 
 namespace PARSE
 {
+    /*CloudVisualisation Class
+     * - Displays a cloud visualisation based on the received point cloud structure
+     * - Currently uses int arrays. Will use PointCloud type */
+
     public class CloudVisualisation
     {
 
@@ -32,7 +36,10 @@ namespace PARSE
         private double  ddt = 200;
 
         //Geometry for visualisation
-        List<int[]>         depthClouds;
+        //This is public to be accessed for XML serialization.s
+        public List<int[]>         depthClouds;
+        
+        //Geometry for visualisation computation.
         int[]               rawDepth;
         Point3D[]           depthFramePoints;
         Point[]             textureCoordinates;
@@ -45,6 +52,18 @@ namespace PARSE
         public CloudVisualisation(List<int[]> dp)
         {
             this.depthClouds = dp;
+
+            textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
+            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
+
+            render();
+
+        }
+
+        public CloudVisualisation(List<int[]> dp, List<BitmapSource> bs)
+        {
+            this.depthClouds = dp;
+
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 

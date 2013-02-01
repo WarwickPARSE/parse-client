@@ -10,7 +10,7 @@ namespace PARSE
     {
         private static double calculateVolume(KdTree.KDTree pctree)
         {
-
+            //read in kd tre
             return 0;
         }
 
