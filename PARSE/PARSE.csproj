@@ -32,7 +32,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -151,6 +151,8 @@
     </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
+    <Compile Include="Recognition\SurfResults.cs" />
+    <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Recognition\SurfDetector.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
@@ -239,9 +241,32 @@
     <Resource Include="Recognition\Classifiers\cascade.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="npp64_42_9.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_calib3d240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_contrib240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="opencv_core240.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="opencv_features2d240.dll" />
+    <Content Include="opencv_ffmpeg240_64.dll" />
+    <Content Include="opencv_flann240.dll" />
+    <Content Include="opencv_gpu240.dll" />
+    <Content Include="opencv_highgui240.dll" />
+    <Content Include="opencv_imgproc240.dll" />
+    <Content Include="opencv_legacy240.dll" />
+    <Content Include="opencv_ml240.dll" />
+    <Content Include="opencv_nonfree240.dll" />
+    <Content Include="opencv_objdetect240.dll" />
+    <Content Include="opencv_photo240.dll" />
+    <Content Include="opencv_stitching240.dll" />
+    <Content Include="opencv_video240.dll" />
+    <Content Include="opencv_videostab240.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

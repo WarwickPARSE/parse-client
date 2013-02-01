@@ -34,28 +34,29 @@ namespace PARSE
     public partial class CoreLoader : Window
     {
         //Modelling specific definitions
-        private GeometryModel3D                         Model;
-        private GeometryModel3D                         BaseModel;
+        private GeometryModel3D Model;
+        private GeometryModel3D BaseModel;
 
         //New KinectInterpreter Class
-        private KinectInterpreter                       kinectInterp;
+        private KinectInterpreter kinectInterp;
 
         //Image recognition specific definitions
-        private System.Windows.Forms.Timer              surfTimer;
-        private bool                                    capturedModel;
-        private BitmapSource                            modelimage;
-        private bool                                    capturedObject;
-        private BitmapSource                            objectimage;
-        private int                                     countdown;
-        private long                                    matchtime;
+        private System.Windows.Forms.Timer surfTimer;
+        private bool capturedModel;
+        private BitmapSource modelimage;
+        private bool capturedObject;
+        private BitmapSource objectimage;
+        private int countdown;
+        private long matchtime;
+        private MultiSurf multiSurfController;
 
         //point cloud handler thread 
-        private System.Windows.Forms.Timer              pcTimer; 
-        private PointCloudHandler                       pcHandler;
-        private List<int[]>                             dps;
+        private System.Windows.Forms.Timer pcTimer;
+        private PointCloudHandler pcHandler;
+        private List<int[]> dps;
 
         //speech synthesizer instances
-        private SpeechSynthesizer                       ss;
+        private SpeechSynthesizer ss;
 
         public CoreLoader()
         {
@@ -64,11 +65,11 @@ namespace PARSE
 
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
-  
+
             //ui initialization
             lblStatus.Content = kinectInterp.kinectStatus;
             ss = new SpeechSynthesizer();
-            
+
             if (!kinectInterp.kinectReady)    //Disable controls
             {
                 btnSensorUp.IsEnabled = false;
@@ -77,7 +78,7 @@ namespace PARSE
                 btnSensorMin.IsEnabled = false;
                 btnStartScanning.IsEnabled = false;
                 btnStopScanning.IsEnabled = false;
-                btnDumpToFile.IsEnabled = false; 
+                btnDumpToFile.IsEnabled = false;
             }
 
             //Miscellaneous modelling definitions
@@ -93,7 +94,7 @@ namespace PARSE
         /// <param name="e">event ready identifier</param>
 
         int count = 0;
-        
+
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             if (count == 0)
@@ -109,7 +110,7 @@ namespace PARSE
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event ready identifier</param>
-       private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
+        private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             this.kinectImager.Source = kinectInterp.ColorImageReady(sender, e);
         }
@@ -119,23 +120,23 @@ namespace PARSE
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event ready identifier</param>
-       private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
-       {
-           if (count == 0)
-           {
-               this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
-           }
-           count++;
-           if (count > 4)
-           {
-               count = 0;
-           }
-       }
+        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
+        {
+            if (count == 0)
+            {
+                this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+            }
+            count++;
+            if (count > 4)
+            {
+                count = 0;
+            }
+        }
 
-       private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
-       {
-           kinectInterp.SkeletonFrameReady(sender, e);
-       }
+        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            kinectInterp.SkeletonFrameReady(sender, e);
+        }
 
         /// <summary>
         /// WPF Form Methods
@@ -151,16 +152,17 @@ namespace PARSE
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
-                if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
-                {
-                    this.kinectInterp.kinectSensor.ElevationAngle += 5;
-                }
+            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
+            {
+                this.kinectInterp.kinectSensor.ElevationAngle += 5;
+            }
         }
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MinElevationAngle) {
-                this.kinectInterp.kinectSensor.ElevationAngle-=5;
+            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MinElevationAngle)
+            {
+                this.kinectInterp.kinectSensor.ElevationAngle -= 5;
             }
         }
 
@@ -185,7 +187,7 @@ namespace PARSE
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
         {
 
-            String feedChoice   = feedcb.Text;
+            String feedChoice = feedcb.Text;
             String visualChoice = visualcb.Text;
 
             //Stop all streams
@@ -233,8 +235,8 @@ namespace PARSE
 
                     kinectInterp.stopStreams(null);
 
-                    GeometryModel3D[] gm        = new GeometryModel3D[640*480];
-                    TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
+                    GeometryModel3D[] gm = new GeometryModel3D[640 * 480];
+                    TriangularPointCloud tpc = new TriangularPointCloud(vpcanvas2, gm);
 
                     kinectInterp.startDepthMeshStream(gm);
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
@@ -278,7 +280,13 @@ namespace PARSE
                     surfTimer.Interval = 1000;
                     countdown = 5;
                     surfTimer.Start();
-                    
+
+                    break;
+
+                case "Multi-SURF":
+
+                    multiSurf();
+
                     break;
 
                 default:
@@ -290,7 +298,7 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
-            
+
             //create list structure
             dps = new List<int[]>();
 
@@ -309,14 +317,14 @@ namespace PARSE
             pcTimer.Start();
         }
 
-        private void pcTimer_tick(Object sender, EventArgs e) 
+        private void pcTimer_tick(Object sender, EventArgs e)
         {
             if (countdown == 3)
             {
                 //enable update of skelL, skelR, skelDepth
                 this.kinectInterp.enableUpdateSkelVars();
                 dps.Add(this.kinectInterp.getDepthArray());
-                
+
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.disableUpdateSkelVars();
                 ss.Speak("Turn left bitch");
@@ -334,7 +342,8 @@ namespace PARSE
                 ss.Speak("Turn left bitch");
                 countdown--;
             }
-            else if (countdown == 0) {
+            else if (countdown == 0)
+            {
                 dps.Add(this.kinectInterp.getDepthArray());
                 this.DataContext = new StaticPointCloud(dps);
                 pcTimer.Stop();
@@ -344,24 +353,33 @@ namespace PARSE
         private void surfTimer_tick(Object sender, EventArgs e)
         {
 
-            if ((countdown > 0) && (!capturedModel)) {
+            if ((countdown > 0) && (!capturedModel))
+            {
                 countdown--;
                 label4.Content = "Present scanner to camera...." + countdown.ToString() + "...";
-            } else if ((countdown == 0) && (!capturedModel)) {
+            }
+            else if ((countdown == 0) && (!capturedModel))
+            {
                 capturedModel = true;
                 modelimage = kinectInterp.getRGBTexture();
                 kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
                 countdown = 10;
-            } else if ((countdown > 0) && (capturedModel)) {
+            }
+            else if ((countdown > 0) && (capturedModel))
+            {
                 countdown--;
                 label4.Content = "Place scanner on patient..." + countdown.ToString() + "...";
-            } else if ((countdown == 0) && (capturedModel)) {
+            }
+            else if ((countdown == 0) && (capturedModel))
+            {
                 capturedObject = true;
                 objectimage = kinectInterp.getRGBTexture();
                 label4.Content = "Looking for scanner..";
                 startSurfing();
-            } else if ((capturedModel) && (capturedObject)) {
+            }
+            else if ((capturedModel) && (capturedObject))
+            {
                 surfTimer.Stop();
             }
 
@@ -391,11 +409,40 @@ namespace PARSE
             Image<Gray, Byte> objectImg = new Image<Gray, Byte>(objbm);
 
             SurfDetector sd = new SurfDetector();
-            result = sd.Draw(modelImg, objectImg, out matchtime);
+            result = sd.Draw(modelImg, objectImg, out matchtime).getMappedImage();
             resultBitmap = result.ToBitmap();
             BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = bs;
             surfTimer.Stop();
+        }
+
+        private void multiSurf()
+        {
+            Console.WriteLine("Opening Image1...");
+            Image<Bgr, Byte> inputImageRaw;
+            try
+            {
+                //inputImageRaw = new Image<Bgr, Byte>("C:/PARSE/MultiSurf/Specs/Positives15.jpg");
+                inputImageRaw = new Image<Bgr, Byte>("C:/PARSE/Training/1/img/Positives7.jpg");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Fail.");
+                Console.WriteLine(e.InnerException);
+                throw e;
+            }
+            Console.WriteLine("Converting Image...");
+            Image<Gray, Byte> inputImage = inputImageRaw.Convert<Gray, Byte>();
+            Console.WriteLine("Opened Image1!");
+
+            if (multiSurfController == null)
+                multiSurfController = new MultiSurf();
+
+            Image<Bgr, Byte> result = multiSurfController.Draw(inputImage);
+            System.Drawing.Bitmap resultBitmap = result.ToBitmap();
+            BitmapSource resultBitmapSource = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+            this.kinectImager.Source = resultBitmapSource;
+
         }
     }
 }

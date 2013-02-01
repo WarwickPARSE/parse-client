@@ -181,9 +181,16 @@ namespace PARSE
                     break;
 
                 default:
-                    this.kinectSensor.ColorStream.Disable();
-                    this.kinectSensor.DepthStream.Disable();
-                    this.kinectSensor.SkeletonStream.Disable();
+                    try
+                    {
+                        this.kinectSensor.ColorStream.Disable();
+                        this.kinectSensor.DepthStream.Disable();
+                        this.kinectSensor.SkeletonStream.Disable();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("KinectInterpreter/StopStreams() - closing streams that aren't open causes exceptions. Ignore them for now.");
+                    }
                     this.kinectStatus = "Initialized";
                     break;
             }

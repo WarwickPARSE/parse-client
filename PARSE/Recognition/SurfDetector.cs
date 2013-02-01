@@ -11,6 +11,7 @@ using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.GPU;
+using PARSE.Recognition;
 
 namespace PARSE
 {
@@ -20,7 +21,7 @@ namespace PARSE
         ///Takes a model image and an observed image and outlines the matched features and homography projection
         ///</summary>
 
-        public Image<Bgr, Byte> Draw(Image<Gray, Byte> modelImage, Image<Gray, byte> observedImage, out long matchTime)
+        public SurfResults Draw(Image<Gray, Byte> modelImage, Image<Gray, byte> observedImage, out long matchTime)
         {
             Stopwatch watch;
             HomographyMatrix homography = null;
@@ -135,6 +136,8 @@ namespace PARSE
             Image<Bgr, Byte> result = Features2DToolbox.DrawMatches(modelImage, modelKeyPoints, observedImage, observedKeyPoints,
             indices, new Bgr(255, 255, 255), new Bgr(255, 255, 255), mask, Features2DToolbox.KeypointDrawType.DEFAULT);
 
+            
+
             #region draw the projected region on the image
             if (homography != null)
             {  //draw a rectangle along the projected model
@@ -150,9 +153,18 @@ namespace PARSE
             }
             #endregion
 
+            
+            
+            //return result;
+            Boolean isMatch = (homography != null);
+            int matches = 0;
+            if (isMatch)
+                matches = 5;
+
             matchTime = watch.ElapsedMilliseconds;
-            Console.WriteLine("Surf complete: " + matchTime);
-            return result;
+            Console.WriteLine("Surf completed in " + matchTime + "ms" + " with " + matches + " matches");
+
+            return new SurfResults(isMatch, matches, observedImage, result, matchTime);
         }
     }
 }

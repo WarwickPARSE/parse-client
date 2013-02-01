@@ -64,6 +64,7 @@
                 <ComboBoxItem Name="cbv8">SIFT</ComboBoxItem>
                 <ComboBoxItem Name="cbv9">Classifier</ComboBoxItem>
                 <ComboBoxItem Name="cbv10">Tbc</ComboBoxItem>
+                <ComboBoxItem Name="cbv11">Multi-SURF</ComboBoxItem>
             </ComboBox>
             <Label Content="Visualisation" Height="28" HorizontalAlignment="Left" Margin="0,81,0,0" Name="label3" VerticalAlignment="Top" />
    
