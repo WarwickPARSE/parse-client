@@ -204,55 +204,6 @@ namespace PARSE
         {
             return this.points;
         }
-        
-        /***
-         * Creates texture coordinates  
-         */
-        private void createTexture()
-        {
-
-            for (int a = 0; a < depthFrameHeight; a++)
-            {
-                for (int b = 0; b < depthFrameWidth; b++)
-                {
-
-                    //alignment issues - to be fixed.
-                    this.textureCoordinates[a * depthFrameWidth + b]
-                        = new System.Windows.Point((double)b / (depthFrameWidth - 1), (double)a / (depthFrameHeight - 1));
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);
-        }
-
-        /***
-         * Creates depth coordinates, was private scope previously  
-         */
-        private void createDepthCoords()
-        {
-
-            for (int iy = 0; iy < 480; iy++)
-            {
-                for (int ix = 0; ix < 640; ix++)
-                {
-                    int i = (iy * 640) + ix;
-
-                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth || rawDepth[i] > 2500)
-                    {
-                        this.rawDepth[i] = -1;
-                        this.depthFramePoints[i] = new Point3D();
-                    }
-                    else
-                    {
-                        double zz = this.rawDepth[i] * scale;
-                        double x = (cx - ix) * zz * fxinv;
-                        double y = zz;
-                        double z = (cy - iy) * zz * fyinv;
-                        this.depthFramePoints[i] = new Point3D(x, y, z);
-                    }
-                }
-            }
-        }
-
+    
     }
 }
