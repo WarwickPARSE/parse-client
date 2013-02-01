@@ -418,27 +418,11 @@ namespace PARSE
 
         private void multiSurf()
         {
-            Console.WriteLine("Opening Image1...");
-            Image<Bgr, Byte> inputImageRaw;
-            try
-            {
-                //inputImageRaw = new Image<Bgr, Byte>("C:/PARSE/MultiSurf/Specs/Positives15.jpg");
-                inputImageRaw = new Image<Bgr, Byte>("C:/PARSE/Training/1/img/Positives7.jpg");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Fail.");
-                Console.WriteLine(e.InnerException);
-                throw e;
-            }
-            Console.WriteLine("Converting Image...");
-            Image<Gray, Byte> inputImage = inputImageRaw.Convert<Gray, Byte>();
-            Console.WriteLine("Opened Image1!");
-
             if (multiSurfController == null)
                 multiSurfController = new MultiSurf();
 
-            Image<Bgr, Byte> result = multiSurfController.Draw(inputImage);
+            // TODO Change from .draw to .run or something?
+            Image<Bgr, Byte> result = multiSurfController.run();
             System.Drawing.Bitmap resultBitmap = result.ToBitmap();
             BitmapSource resultBitmapSource = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = resultBitmapSource;

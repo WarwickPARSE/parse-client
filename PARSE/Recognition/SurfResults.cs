@@ -15,24 +15,37 @@ namespace PARSE.Recognition
 {
     class SurfResults
     {
-        private Boolean Match;
+        private Boolean HasMatches;
         private int Matches;
         private Image<Bgr, Byte> MappedImage;
+        private string MappedImageUrl;
         private Image<Gray, Byte> OriginalImage;
+        private string OriginalImageUrl;
         private long MatchTime;
 
         public SurfResults(Boolean match, int matches, Image<Gray, byte> Original, Image<Bgr, byte> Mapped, long Time)
         {
-            Match = match;
+            HasMatches = match;
             Matches = matches;
             OriginalImage = Original;
             MappedImage = Mapped;
             MatchTime = Time;
         }
 
-        public Boolean isMatch()
+        public SurfResults(Boolean match, int matches, string OriginalURI, Image<Gray, byte> Original, string MappedURI, Image<Bgr, byte> Mapped, long Time)
         {
-            return Match;
+            HasMatches = match;
+            Matches = matches;
+            OriginalImage = Original;
+            OriginalImageUrl = OriginalURI;
+            MappedImage = Mapped;
+            MappedImageUrl = MappedURI;
+            MatchTime = Time;
+        }
+
+        public Boolean hasMatches()
+        {
+            return HasMatches;
         }
 
         public int getMatches()
@@ -45,9 +58,19 @@ namespace PARSE.Recognition
             return MappedImage;
         }
 
+        public string getMappedImageUrl()
+        {
+            return MappedImageUrl;
+        }
+
         public Image<Gray, Byte> getOriginalImage()
         {
             return OriginalImage;
+        }
+
+        public string getOriginalImageUrl()
+        {
+            return OriginalImageUrl;
         }
 
         public long getMatchTime()
@@ -55,5 +78,21 @@ namespace PARSE.Recognition
             return MatchTime;
         }
 
+        public void setURLs(string Model_Url, string Target_Url)
+        {
+            MappedImageUrl = Model_Url;
+            OriginalImageUrl = Target_Url;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder output = new StringBuilder();
+            output.AppendLine("Target image: " + OriginalImageUrl);
+            output.AppendLine("Model image: " + MappedImageUrl);
+            output.AppendLine("Match? " + HasMatches);
+            output.AppendLine("Number of matches: " + Matches);
+            output.AppendLine("Time taken: " + MatchTime + "ms");
+            return output.ToString();
+        }
     }
 }

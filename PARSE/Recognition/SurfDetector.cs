@@ -158,6 +158,8 @@ namespace PARSE
             //return result;
             Boolean isMatch = (homography != null);
             int matches = 0;
+
+            // TODO Get an actual number of matches from somewhere
             if (isMatch)
                 matches = 5;
 
