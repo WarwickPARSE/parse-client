@@ -40,6 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -141,7 +142,7 @@
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
     <Compile Include="Library\ImageResizer.cs" />
-    <Compile Include="Library\Visualisation\StaticPointCloud.cs" />
+    <Compile Include="Library\Visualisation\CloudVisualisation.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
     <Compile Include="PointCloudHandler.cs" />
