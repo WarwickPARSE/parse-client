@@ -72,6 +72,9 @@ namespace PARSE
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
             this.points = new KdTree.KDTree(3);
+
+            //convert bitmap stream into a format that is supported by the kd-tree method
+            Bitmap b = convertToBitmap(bs);
         }
 
         //serialization stuff
@@ -108,6 +111,25 @@ namespace PARSE
             PointCloud temp = (PointCloud)(deserializer.Deserialize(textReader));
             textReader.Close();
             return temp;
+        }
+
+        /// <summary>
+        /// Converts a bitmap stream into a bitmap image 
+        /// </summary>
+        /// <param name="bs">A bitmap stream</param>
+        /// <returns></returns>
+        public Bitmap convertToBitmap(BitmapSource bs) {
+            //Convert bitmap source to image
+            MemoryStream outStream = new MemoryStream();
+            BitmapEncoder enc = new BmpBitmapEncoder();
+            //System.Drawing.Bitmap resultBitmap;
+
+            //Convert model image
+            enc.Frames.Add(BitmapFrame.Create(bs));
+            enc.Save(outStream);
+            System.Drawing.Bitmap modbm = new System.Drawing.Bitmap(outStream);
+
+            return modbm; 
         }
 
         /// <summary>
