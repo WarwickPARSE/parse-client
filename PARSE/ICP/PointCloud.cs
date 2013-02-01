@@ -21,13 +21,13 @@ namespace PARSE
     class PointCloud
     {
         //dodgy global variables (to be changed)
-        private int width;
-        private int height;
+        //private int width;
+        //private int height;
 
         //tree of points
         private KdTree.KDTree points;
 
-        private bool is_dense;                  //to be calculated
+        //private bool is_dense;                  //to be calculated
 
         //depth constants
         private const int tooCloseDepth = 0;
@@ -46,7 +46,7 @@ namespace PARSE
         //fiddle values (they make it work but I don't know why!)
         private const double fxinv = 1.0 / 476;
         private const double fyinv = 1.0 / 476;
-        private double ddt = 200;
+        //private double ddt = 200;
 
         //bitmap source, to be deprecated soon
         BitmapSource bs; 
@@ -63,34 +63,6 @@ namespace PARSE
         //sensor_orientation
         //sensor_origin
 
-        /// <summary>
-        /// Constructor for when just the arrays of x, y and z coordinates are provided.
-        /// The resolution will be assumed to be 640 x 480
-        /// </summary>
-        public PointCloud() {
-            this.width = 640;
-            this.height = 480;
-
-            //create a new 3d point cloud
-            this.points = new KdTree.KDTree(3);
-        }
-
-        /// <summary>
-        /// Constructor for when just the arrays of x, y and z coordinates are provided.
-        /// The resolution will be assumed to be 640 x 480
-        /// </summary>
-        /// <param name="pixels">the number of pixels (columns)</param>
-        /// <param name="rows">the number of rows of pixels</param>
-        public PointCloud(int width, int height)
-        {
-            this.width = width;
-            this.height = height;
-
-            //create a new 3d point cloud 
-            this.points = new KdTree.KDTree(3);
-        }
-
-
         public PointCloud(BitmapSource bs, int[] rawDepth) 
         {
             this.bs = bs;
@@ -99,61 +71,32 @@ namespace PARSE
             textureCoordinates = new System.Windows.Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
-            this.legacy();
-
-            //create mesh default 
-            this.Model.Geometry = createMesh();
-            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new ImageBrush(this.bs));
-            this.Model.Transform = new TranslateTransform3D(1, -2, 1);
-
-            //this is pointless if you are instantiating in this manner, but meh 
             this.points = new KdTree.KDTree(3);
-        }
 
-        //serialization stuff
-        /// <summary>
-        /// write to file. takes filename as input. does not need file extension!
-        /// currently save to the Visual Studio 2010\Projects\parse-client\PARSE\bin\Debug directory. can be changed when we agree on a place.
-        /// also currently appends dates to the filename
-        /// to be used like:
-        /// 
-        /// PointCloud pc = new PointCloud();
-        /// //populate point cloud
-        /// pc.serializeTo(Bernard)
-        /// 
-        /// will output a file called Bernard-01-25-2013.PARSE 
-        /// </summary>
-        public void serializeTo(string filename)
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(PointCloud));
-            TextWriter textWriter = new StreamWriter(".\\" + filename + ".PARSE");
-            serializer.Serialize(textWriter, this);
-            textWriter.Close();
-        }
-        
-        /// <summary>
-        /// retrieve from file. takes filename as input. does not need file extension!
-        /// currently retrieves from the Visual Studio 2010\Projects\parse-client\PARSE\bin\Debug directory. can be changed when we agree on a place.
-        /// to be used like:
-        /// PointCloud pc = PointCloud.deserializeFrom(Bernard-01-25-2013);
-        /// </summary>
-        public static PointCloud deserializeFrom(String filename)
-        {
-            XmlSerializer deserializer = new XmlSerializer(typeof(PointCloud));
-            TextReader textReader = new StreamReader(".\\" + filename + "-" + todaysDate() + ".PARSE");
-            PointCloud temp = (PointCloud)(deserializer.Deserialize(textReader));
-            textReader.Close();
-            return temp;
-        }
+            //convert bitmap stream into a format that is supported by the kd-tree method
+            Bitmap b = convertToBitmap(bs);
 
-        /// <summary>
-        /// returns todays day as a string formatted as MM-DD-YYYY
-        /// </summary>
-        private static String todaysDate()
-        {
-            return DateTime.Today.Month + "-" + DateTime.Today.Day + "-" + DateTime.Today.Year; ;
+            setPoints(rawDepth, b);
         }
+     
+        /// <summary>
+        /// Converts a bitmap stream into a bitmap image 
+        /// </summary>
+        /// <param name="bs">A bitmap stream</param>
+        /// <returns></returns>
+        public Bitmap convertToBitmap(BitmapSource bs) {
+            //Convert bitmap source to image
+            MemoryStream outStream = new MemoryStream();
+            BitmapEncoder enc = new BmpBitmapEncoder();
+            //System.Drawing.Bitmap resultBitmap;
 
+            //Convert model image
+            enc.Frames.Add(BitmapFrame.Create(bs));
+            enc.Save(outStream);
+            System.Drawing.Bitmap modbm = new System.Drawing.Bitmap(outStream);
+
+            return modbm; 
+        }
 
         /// <summary>
         /// Generates a point cloud with no colours
@@ -263,145 +206,6 @@ namespace PARSE
         {
             return this.points;
         }
-
-        /***
-         * Aids in the transition from Bernie's point cloud to this one 
-         */
-        public void legacy()
-        {
-            //sanity check for helix responsiveness 
-            this.runDemoModel();
-
-            //create the texture coords
-            this.createTexture();
-
-            //create the depth coords
-            this.createDepthCoords();
-        }
-        
-        /***
-         * Creates tecture coordinates  
-         */
-        private void createTexture()
-        {
-
-            for (int a = 0; a < depthFrameHeight; a++)
-            {
-                for (int b = 0; b < depthFrameWidth; b++)
-                {
-
-                    //alignment issues - to be fixed.
-                    this.textureCoordinates[a * depthFrameWidth + b]
-                        = new System.Windows.Point((double)b / (depthFrameWidth - 1), (double)a / (depthFrameHeight - 1));
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine("Texture created: " + this.textureCoordinates.Length);
-        }
-
-        /***
-         * Creates depth coordinates, was private scope previously  
-         */
-        private void createDepthCoords()
-        {
-
-            for (int iy = 0; iy < 480; iy++)
-            {
-                for (int ix = 0; ix < 640; ix++)
-                {
-                    int i = (iy * 640) + ix;
-
-                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth || rawDepth[i] > 2500)
-                    {
-                        this.rawDepth[i] = -1;
-                        this.depthFramePoints[i] = new Point3D();
-                    }
-                    else
-                    {
-                        double zz = this.rawDepth[i] * scale;
-                        double x = (cx - ix) * zz * fxinv;
-                        double y = zz;
-                        double z = (cy - iy) * zz * fyinv;
-                        this.depthFramePoints[i] = new Point3D(x, y, z);
-                    }
-                }
-            }
-        }
-
-        public MeshGeometry3D createMesh()
-        {
-            var triangleIndices = new List<int>();
-            for (int iy = 0; iy + 1 < depthFrameHeight; iy++)
-            {
-                for (int ix = 0; ix + 1 < depthFrameWidth; ix++)
-                {
-                    int i0 = (iy * depthFrameWidth) + ix;
-                    int i1 = (iy * depthFrameWidth) + ix + 1;
-                    int i2 = ((iy + 1) * depthFrameWidth) + ix + 1;
-                    int i3 = ((iy + 1) * depthFrameWidth) + ix;
-
-                    var d0 = this.rawDepth[i0];
-                    var d1 = this.rawDepth[i1];
-                    var d2 = this.rawDepth[i2];
-                    var d3 = this.rawDepth[i3];
-
-                    var dmax0 = Math.Max(Math.Max(d0, d1), d2);
-                    var dmin0 = Math.Min(Math.Min(d0, d1), d2);
-                    var dmax1 = Math.Max(d0, Math.Max(d2, d3));
-                    var dmin1 = Math.Min(d0, Math.Min(d2, d3));
-
-                    if (dmax0 - dmin0 < ddt && dmin0 != -1)
-                    {
-                        triangleIndices.Add(i0);
-                        triangleIndices.Add(i1);
-                        triangleIndices.Add(i2);
-                    }
-
-                    if (dmax1 - dmin1 < ddt && dmin1 != -1)
-                    {
-                        triangleIndices.Add(i0);
-                        triangleIndices.Add(i2);
-                        triangleIndices.Add(i3);
-                    }
-                }
-            }
-
-            return new MeshGeometry3D()
-            {
-                Positions = new Point3DCollection(this.depthFramePoints),
-                TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
-                TriangleIndices = new Int32Collection(triangleIndices)
-            };
-        }
-
-        /***
-         * Some sanity check 
-         */
-        private void runDemoModel()
-        {
-            // Create a mesh builder and add a box to it
-            var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
-            meshBuilder.AddBox(new Rect3D(0, 0, 1.2, 0.5, 1, 0.4));
-
-            // Create a mesh from the builder (and freeze it)
-            var mesh = meshBuilder.ToMesh(true);
-
-            // Create some materials
-            var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
-
-            this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
-           // this.BaseModel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
-        }
-
-        /// <summary>
-        /// Gets or sets the sanity model.
-        /// </summary>
-        /// <value>The model.</value>
-
-        public GeometryModel3D Model { get; set; }
-        public GeometryModel3D BaseModel { get; set; }
-
-        //
+    
     }
 }
