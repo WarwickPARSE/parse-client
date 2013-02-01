@@ -76,43 +76,7 @@ namespace PARSE
             //convert bitmap stream into a format that is supported by the kd-tree method
             Bitmap b = convertToBitmap(bs);
         }
-
-        //serialization stuff
-        /// <summary>
-        /// write to file. takes filename as input. does not need file extension!
-        /// currently save to the Visual Studio 2010\Projects\parse-client\PARSE\bin\Debug directory. can be changed when we agree on a place.
-        /// also currently appends dates to the filename
-        /// to be used like:
-        /// 
-        /// PointCloud pc = new PointCloud();
-        /// //populate point cloud
-        /// pc.serializeTo(Bernard)
-        /// 
-        /// will output a file called Bernard-01-25-2013.PARSE 
-        /// </summary>
-        public void serializeTo(string filename)
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(PointCloud));
-            TextWriter textWriter = new StreamWriter(".\\" + filename + ".PARSE");
-            serializer.Serialize(textWriter, this);
-            textWriter.Close();
-        }
-        
-        /// <summary>
-        /// retrieve from file. takes filename as input. does not need file extension!
-        /// currently retrieves from the Visual Studio 2010\Projects\parse-client\PARSE\bin\Debug directory. can be changed when we agree on a place.
-        /// to be used like:
-        /// PointCloud pc = PointCloud.deserializeFrom(Bernard-01-25-2013);
-        /// </summary>
-        public static PointCloud deserializeFrom(String filename)
-        {
-            XmlSerializer deserializer = new XmlSerializer(typeof(PointCloud));
-            TextReader textReader = new StreamReader(".\\" + filename + "-" + todaysDate() + ".PARSE");
-            PointCloud temp = (PointCloud)(deserializer.Deserialize(textReader));
-            textReader.Close();
-            return temp;
-        }
-
+     
         /// <summary>
         /// Converts a bitmap stream into a bitmap image 
         /// </summary>
@@ -131,15 +95,6 @@ namespace PARSE
 
             return modbm; 
         }
-
-        /// <summary>
-        /// returns todays day as a string formatted as MM-DD-YYYY
-        /// </summary>
-        private static String todaysDate()
-        {
-            return DateTime.Today.Month + "-" + DateTime.Today.Day + "-" + DateTime.Today.Year; ;
-        }
-
 
         /// <summary>
         /// Generates a point cloud with no colours
