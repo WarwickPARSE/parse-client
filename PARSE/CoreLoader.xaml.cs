@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using System.Speech.Synthesis;
 using System.Windows.Interop;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using HelixToolkit.Wpf;
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -36,9 +37,11 @@ namespace PARSE
         //Modelling specific definitions
         private GeometryModel3D Model;
         private GeometryModel3D BaseModel;
+        private GeometryModel3D                         Model;
+        private GeometryModel3D                         BaseModel;
 
         //New KinectInterpreter Class
-        private KinectInterpreter kinectInterp;
+        private KinectInterpreter                       kinectInterp;
 
         //Image recognition specific definitions
         private System.Windows.Forms.Timer surfTimer;
@@ -51,12 +54,14 @@ namespace PARSE
         private MultiSurf multiSurfController;
 
         //point cloud handler thread 
+        private CloudVisualisation                      viscloud;
+        //these lists WILL BE deprecated once the PointCloud class is complete
+        private List<int[]>                             capcloud;
+        private List<BitmapSource>                      rgbcloud;
         private System.Windows.Forms.Timer pcTimer;
-        private PointCloudHandler pcHandler;
-        private List<int[]> dps;
 
         //speech synthesizer instances
-        private SpeechSynthesizer ss;
+        private SpeechSynthesizer                       ss;
 
         public CoreLoader()
         {
@@ -100,8 +105,6 @@ namespace PARSE
             if (count == 0)
             {
                 kinectInterp.SkeletonFrameReady(sender, e);
-                this.label4.Content = kinectInterp.instruction;
-                this.label4.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
@@ -178,20 +181,22 @@ namespace PARSE
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
             if (this.kinectInterp.kinectReady)
             {
                 this.kinectInterp.kinectSensor.Stop();
             }
+
         }
 
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
         {
 
-            String feedChoice = feedcb.Text;
+            String feedChoice   = feedcb.Text;
             String visualChoice = visualcb.Text;
 
             //Stop all streams
-            kinectInterp.stopStreams(feedChoice);
+            kinectInterp.stopStreams();
 
             //Assign feed to bitmap source
             switch (feedChoice)
@@ -230,13 +235,9 @@ namespace PARSE
 
             switch (visualChoice)
             {
-
-                case "Real Time Triangle Mesh":
-
-                    kinectInterp.stopStreams(null);
-
-                    GeometryModel3D[] gm = new GeometryModel3D[640 * 480];
-                    TriangularPointCloud tpc = new TriangularPointCloud(vpcanvas2, gm);
+               case "Real Time Triangle Mesh":
+                    GeometryModel3D[] gm        = new GeometryModel3D[640*480];
+                    TriangularPointCloud tpc    = new TriangularPointCloud(vpcanvas2, gm);
 
                     kinectInterp.startDepthMeshStream(gm);
                     this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
@@ -299,8 +300,14 @@ namespace PARSE
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
 
-            //create list structure
-            dps = new List<int[]>();
+            /*This method will eventually make use of the PointCloud structure
+             * rather than using list structures of raw depth arrays */
+            
+            /*List structure to be deprecated and replaced with:
+             * new PointCloud(image source, raw depth); */
+
+            capcloud = new List<int[]>();
+            rgbcloud = new List<BitmapSource>();
 
             //start new scanning timer.
             pcTimer = new System.Windows.Forms.Timer();
@@ -310,6 +317,7 @@ namespace PARSE
             ss.Rate = 1;
             ss.Volume = 100;
             ss.Speak("Please face the camera Bitch");
+            this.label4.Content = "Please face the camera";
 
             //Initialize and start timerr
             pcTimer.Interval = 10000;
@@ -317,35 +325,41 @@ namespace PARSE
             pcTimer.Start();
         }
 
-        private void pcTimer_tick(Object sender, EventArgs e)
+        private void pcTimer_tick(Object sender, EventArgs e) 
         {
             if (countdown == 3)
             {
                 //enable update of skelL, skelR, skelDepth
                 this.kinectInterp.enableUpdateSkelVars();
-                dps.Add(this.kinectInterp.getDepthArray());
-
+                capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.disableUpdateSkelVars();
                 ss.Speak("Turn left bitch");
+                this.label4.Content = "Please turn left";
                 countdown--;
             }
             else if (countdown == 2)
             {
-                dps.Add(this.kinectInterp.getDepthArray());
+                capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 ss.Speak("Turn left bitch show me your ass");
+                this.label4.Content = "Please turn left with your back to the camera";
                 countdown--;
             }
             else if (countdown == 1)
             {
-                dps.Add(this.kinectInterp.getDepthArray());
+                capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
                 ss.Speak("Turn left bitch");
+                this.label4.Content = "Please turn left once more";
                 countdown--;
             }
-            else if (countdown == 0)
-            {
-                dps.Add(this.kinectInterp.getDepthArray());
-                this.DataContext = new StaticPointCloud(dps);
+            else if (countdown == 0) {
+                capcloud.Add(this.kinectInterp.getDepthArray());
+                rgbcloud.Add(this.kinectInterp.getRGBTexture());
+                this.DataContext = new CloudVisualisation(capcloud);
+                this.label4.Content = "Scanning complete.";
                 pcTimer.Stop();
             }
         }
@@ -428,5 +442,52 @@ namespace PARSE
             this.kinectImager.Source = resultBitmapSource;
 
         }
+
+        private void VolumeOption_Click(object sender, RoutedEventArgs e)
+        {
+            //Static call to volume calculation method, pass persistent point cloud object
+            System.Windows.Forms.MessageBox.Show("You are too fat");
+        }
+
+        private void ImportScan_Click(object sender, RoutedEventArgs e)
+        {
+
+            /*Import scan currently imports files based on the assumption that they
+             * have been serialized as a visualisation object. Once the point cloud 
+             * class has been been implemented, it will assume that it is dealing
+             * with point cloud objects which will then be passed to the visualisation
+             * method as appropriate */
+
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".PARSE";
+            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+            if (dlg.ShowDialog() == true)
+            {
+                String filename = dlg.FileName;
+                this.DataContext = ScanSerializer.deserialize(filename);
+            }
+        }
+
+        private void ExportScan_Click(object sender, RoutedEventArgs e)
+        {
+
+            /*ExportScan serializes the visualisation object, once the pointcloud
+             * structure has been implemented, it will serialize the pc object
+             * rather than this visualisation. Current issue, cant serialize list
+             objects that contain arrays apparantely.*/
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".PARSE";
+            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+            if (dlg.ShowDialog() == true)
+            {
+                String filename = dlg.FileName;
+                ScanSerializer.serialize(filename, capcloud);
+            }
+
+        }
+       
     }
 }

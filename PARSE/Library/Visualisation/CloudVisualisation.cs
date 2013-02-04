@@ -8,7 +8,6 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
-using System.Windows.Forms;
 
 using HelixToolkit.Wpf;
 
@@ -16,10 +15,14 @@ using Microsoft.Kinect;
 
 namespace PARSE
 {
-    class StaticPointCloud
+    /*CloudVisualisation Class
+     * - Displays a cloud visualisation based on the received point cloud structure
+     * - Currently uses int arrays. Will use PointCloud type */
+
+    public class CloudVisualisation
     {
 
-        //Constants
+        //Constants for visualisation
         private int     depthFrameWidth = 640;
         private int     depthFrameHeight = 480;
         private int     cx = 640 / 2;
@@ -32,15 +35,24 @@ namespace PARSE
         private double  fyinv = 1.0 / 480;
         private double  ddt = 200;
 
-        //Geometry
-        List<int[]>         depthClouds;
+        //Geometry for visualisation
+        //This is public to be accessed for XML serialization.s
+        public List<int[]>         depthClouds;
+        
+        //Geometry for visualisation computation.
         int[]               rawDepth;
         Point3D[]           depthFramePoints;
         Point[]             textureCoordinates;
 
-        public StaticPointCloud(List<int[]> dp)
+        public CloudVisualisation()
+        {
+            //parameterless
+        }
+
+        public CloudVisualisation(List<int[]> dp)
         {
             this.depthClouds = dp;
+
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
@@ -48,6 +60,17 @@ namespace PARSE
 
         }
 
+        public CloudVisualisation(List<int[]> dp, List<BitmapSource> bs)
+        {
+            this.depthClouds = dp;
+
+            textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
+            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
+
+            render();
+
+        }
+        
         public void render()
         {
             //create depth coordinates
@@ -196,5 +219,6 @@ namespace PARSE
         public GeometryModel3D Model2 { get; set; }
         public GeometryModel3D Model3 { get; set; }
         public GeometryModel3D Model4 { get; set; }
+
     }
 }

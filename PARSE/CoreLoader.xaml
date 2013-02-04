@@ -3,13 +3,44 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        xmlns:local="clr-namespace:PARSE"
-        Title="CoreLoader" Height="586" Width="785" Loaded="Window_Loaded">
-    <Grid Height="526" Width="750">
+        Title="Body Measurement and Scanning Environment by PARSE" Height="586" Width="785" Loaded="Window_Loaded" Closing="WindowClosing">
+    <Grid Height="526" Width="750" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="12*" />
+            <RowDefinition Height="25*" />
             <RowDefinition Height="500*" />
         </Grid.RowDefinitions>
+        
+        <!--Menu definition-->
+        <Menu Name="functionMenu" Height="25" Width="785">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Patient" IsCheckable="true"/>
+                <MenuItem Header="_Open Patient" IsCheckable="true"/>
+                <MenuItem Header="_Save Patient" IsCheckable="true"/>
+                <Separator/>
+                <MenuItem Header="Exit" IsCheckable="true"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+
+            </MenuItem>
+            <MenuItem Header="_View">
+
+            </MenuItem>
+            <MenuItem Header="Patient">
+                <MenuItem Header="Capture">
+                    <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
+                    <MenuItem Header="Limb Circumference" IsCheckable="true"/>
+                </MenuItem>
+                <MenuItem Header="_Details" IsCheckable="true"/>
+                <Separator/>
+                <MenuItem Header="_Import Scan" IsCheckable="true" Click="ImportScan_Click"/>
+                <MenuItem Header="_Export Scan" IsCheckable="true" Click="ExportScan_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+
+            </MenuItem>
+        </Menu>
+        
+        <!--Menu definition-->
        
         <!--Kinect Imager-->
         <Image Height="425" HorizontalAlignment="Left" Margin="187,27,0,0" Stretch="Fill" VerticalAlignment="Top" Width="543" Name="kinectImager" Grid.Row="1"  />

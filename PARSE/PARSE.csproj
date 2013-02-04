@@ -40,6 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -124,10 +125,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BodyScanner\Model.cs" />
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
+    <Compile Include="Measurement\VolumeCalculator.cs" />
     <Compile Include="ICP\PointRGB.cs" />
     <Compile Include="ICP\ICP3D.cs" />
     <Compile Include="ICP\KdTree\HPoint.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="ICP\PointCloud.cs" />
     <Compile Include="KinectInterpreter.cs" />
     <Compile Include="Library\ImageResizer.cs" />
-    <Compile Include="Library\Visualisation\StaticPointCloud.cs" />
+    <Compile Include="Library\Visualisation\CloudVisualisation.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
     <Compile Include="PointCloudHandler.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Recognition\SurfResults.cs" />
     <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Recognition\SurfDetector.cs" />
+    <Compile Include="Library\ScanSerializer.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
