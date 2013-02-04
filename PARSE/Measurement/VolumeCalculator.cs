@@ -45,7 +45,7 @@ namespace PARSE
 
             for (double i = zmin; i <= zmax; i = i + increment)
             {
-                List<Point3D> plane = testList//pctree.getAllPointsAt(i);
+                List<Point3D> plane = testList;//pctree.getAllPointsAt(i);
                 plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
                 double innerVolume = 0;
@@ -65,9 +65,9 @@ namespace PARSE
             return volume;
         }
 
-        private static double calculateVolume(KdTree.KDTree pctree)
+        private static double calculateVolume(PointCloud pc)//KdTree.KDTree pctree)
         {
-            return volume0thApprox(pctree);
+            return volume0thApprox(pc);
         }
     }
 }
