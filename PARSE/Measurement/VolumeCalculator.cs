@@ -38,14 +38,20 @@ namespace PARSE
         {
             double zmin = 1;//pctree.getZMin();
             double zmax = 1;//pctree.getZMax();
-            double increment 1;//= pctree.getIncrement();
+            double increment = 1;//= pctree.getIncrement();
             double volume = 0;
 
             for (double i = zmin; i <= zmax; i = i + increment)
             {
-                List<Point3D> plane = testList; //pctree.getAllPointsAt(i);
-                
-                //volume = volume + ?;
+                Point3D[] plane = testList.ToArray(); //pctree.getAllPointsAt(i);
+                double innerVolume = 0;
+                for (int j = 0; j < plane.Length-1; j++)
+                {
+                    innerVolume = innerVolume + ((plane[j].X*plane[j+1].Y) - (plane[j+1].X*plane[j].Y));
+                }
+                innerVolume = innerVolume + ((plane[plane.Length-1].X*plane[0].Y) - (plane[0].X*plane[plane.Length-1].Y));
+                innerVolume = innerVolume/2;
+                volume = volume + innerVolume;
             }
 
             //volume = volume * ?;
