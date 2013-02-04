@@ -9,14 +9,6 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        public static Point3D p1 = new Point3D(0, 0, 0);
-        public static Point3D p2 = new Point3D(0, 7, 0);
-        public static Point3D p3 = new Point3D(1, 6, 0);
-        public static Point3D p4 = new Point3D(2, 4, 0);
-        public static Point3D p5 = new Point3D(3, 0, 0);
-        public static Point3D[] p = { p1, p2, p3, p4, p5 };
-        public static List<Point3D> testList = new List<Point3D>(p);
-        
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
@@ -24,22 +16,23 @@ namespace PARSE
 
         private static double volume0thApprox(KdTree.KDTree pctree)
         {
-            double xmin = pctree.getXMin();
-            double xmax = pctree.getXMax();
-            double ymin = pctree.getYMin();
-            double ymax = pctree.getYMax();
-            double zmin = pctree.getZMin();
-            double zmax = pctree.getZMax();
+            double xmin = pctree.getxMin();
+            double xmax = pctree.getxMax();
+            double ymin = pctree.getyMin();
+            double ymax = pctree.getyMax();
+            double zmin = pctree.getzMin();
+            double zmax = pctree.getzMax();
             double volume = getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
             //volume = volume * ?;
             return volume;
         }
 
+        //only works on an amorphus blob
         public static double volume1stApprox(KdTree.KDTree pctree)
         {
-            double zmin = pctree.getZMin();
-            double zmax = pctree.getZMax();
-            double increment = pctree.getIncrement();
+            double zmin = pctree.getzMin();
+            double zmax = pctree.getzMax();
+            double increment = 0.01;//pctree.getIncrement();
             double volume = 0;
 
             for (double i = zmin; i <= zmax; i = i + increment)

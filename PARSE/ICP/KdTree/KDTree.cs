@@ -268,55 +268,6 @@ namespace KdTree
             return m_count;
         }
 
-        public double getXMin()
-        {
-            //for robin to overwrite
-            return 0.1;
-        }
-
-        public double getXMax()
-        {
-            //for robin to overwrite
-            return 1;
-        }
-
-        public double getYMin()
-        {
-            //for robin to overwrite
-            return 0.2;
-        }
-
-        public double getYMax()
-        {
-            //for robin to overwrite
-            return 2;
-        }
-
-        public double getZMin()
-        {
-            //for robin to overwrite
-            return 0.3;
-        }
-
-        public double getZMax()
-        {
-            //for robin to overwrite
-            return 3;
-        }        /// <summary>
-
-        public double getIncrement()
-        {
-            //returns the differnece between two z slices
-            return 0.1;
-        }
-
-        
-        public List<Point3D> getAllPointsAt(double z)
-        {
-            return null;
-        }
-        
-        
         /// K-D Tree node class
         /// </summary>
         class KDNode
