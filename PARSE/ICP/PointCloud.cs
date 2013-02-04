@@ -191,6 +191,11 @@ namespace PARSE
                         //create a new point key
                         double[] pointKey = new double[3];
 
+                        //set key
+                        pointKey[0] = x;
+                        pointKey[1] = y;
+                        pointKey[2] = z;
+
                         this.points.insert(pointKey, c);
                     }
                 }
