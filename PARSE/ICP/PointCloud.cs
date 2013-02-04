@@ -18,7 +18,7 @@ using HelixToolkit.Wpf;
 
 namespace PARSE
 {
-    class PointCloud
+    public class PointCloud
     {
         //dodgy global variables (to be changed)
         //private int width;
