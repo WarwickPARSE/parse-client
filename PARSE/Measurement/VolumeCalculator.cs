@@ -13,7 +13,7 @@ namespace PARSE
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
         }
 
-        private static double volume0thDegree(KdTree.KDTree pctree)
+        private static double volume0thApprox(KdTree.KDTree pctree)
         {
             double xmin = pctree.getXMin();
             double xmax = pctree.getXMax();
@@ -21,13 +21,33 @@ namespace PARSE
             double ymax = pctree.getYMax();
             double zmin = pctree.getZMin();
             double zmax = pctree.getZMax();
-            return getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
+            double volume = getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
+            //volume = volume * ?;
+            return volume;
         }
-        
+
+        private static double volume1stApprox(KdTree.KDTree pctree)
+        {
+            double zmin = pctree.getZMin();
+            double zmax = pctree.getZMax();
+            double increment = pctree.getIncrement();
+            double volume = 0;
+
+            for (double i = zmin; i <= zmax; i = i + increment)
+            {
+                List<> = pctree.getAllPointsAt(i);
+                
+                //volume = volume + ?;
+            }
+
+            //volume = volume * ?;
+            return volume;
+        }
+
         private static double calculateVolume(KdTree.KDTree pctree)
         {
             //read in kd tre
-            return 0;
+            return volume0thApprox(pctree);
         }
 
         private static double partitionKDTree(KdTree.KDTree pctree)

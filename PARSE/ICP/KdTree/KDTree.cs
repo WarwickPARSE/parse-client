@@ -302,6 +302,21 @@ namespace KdTree
             //for robin to overwrite
             return 3;
         }        /// <summary>
+
+        public double getIncrement()
+        {
+            //returns the differnece between two z slices
+            return 0.1;
+        }
+
+        /*
+        for robin
+        public List<?> getAllPointsAt(double z)
+        {
+            return ?
+        }*/
+        
+        
         /// K-D Tree node class
         /// </summary>
         class KDNode
