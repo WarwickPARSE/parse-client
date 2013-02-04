@@ -36,21 +36,28 @@ namespace PARSE
 
         private static double volume1stApprox(KdTree.KDTree pctree)
         {
-            double zmin = 1;//pctree.getZMin();
-            double zmax = 1;//pctree.getZMax();
-            double increment = 1;//= pctree.getIncrement();
+            double zmin = pctree.getZMin();
+            double zmax = pctree.getZMax();
+            double increment = pctree.getIncrement();
             double volume = 0;
+
+
 
             for (double i = zmin; i <= zmax; i = i + increment)
             {
-                Point3D[] plane = testList.ToArray(); //pctree.getAllPointsAt(i);
+                Point3D[] plane = pctree.getAllPointsAt(i).ToArray();
+                
+
+
                 double innerVolume = 0;
-                for (int j = 0; j < plane.Length-1; j++)
+                for (int j = 0; j < plane.Length - 1; j++)
                 {
-                    innerVolume = innerVolume + ((plane[j].X*plane[j+1].Y) - (plane[j+1].X*plane[j].Y));
+                    innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Y) - (plane[j + 1].X * plane[j].Y));
                 }
-                innerVolume = innerVolume + ((plane[plane.Length-1].X*plane[0].Y) - (plane[0].X*plane[plane.Length-1].Y));
-                innerVolume = innerVolume/2;
+
+                innerVolume = innerVolume + ((plane[plane.Length - 1].X * plane[0].Y) - (plane[0].X * plane[plane.Length - 1].Y));
+                innerVolume = Math.Abs(innerVolume / 2);
+
                 volume = volume + innerVolume;
             }
 

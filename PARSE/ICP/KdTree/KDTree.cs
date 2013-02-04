@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace KdTree
 {
@@ -310,11 +311,10 @@ namespace KdTree
         }
 
         
-        /*public List<Point3D> getAllPointsAt(double z)
+        public List<Point3D> getAllPointsAt(double z)
         {
-            //for robin
-            return null
-        }*/
+            return null;
+        }
         
         
         /// K-D Tree node class
