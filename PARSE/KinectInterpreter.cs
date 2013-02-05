@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 
 //EMGU Image processing import
-using Emgu.CV;
+//using Emgu.CV;
 
 //HelixToolkit Import
 using HelixToolkit.Wpf;

@@ -415,7 +415,7 @@ namespace PARSE
             resultBitmap = result.ToBitmap();
             BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = bs;
-            surfTimer.Stop();
+            surfTimer.Stop(); 
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)

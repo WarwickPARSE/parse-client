@@ -49,6 +49,7 @@ namespace PARSE
         //private double ddt = 200;
 
         //max and min values for the data stored within the point cloud 
+        public BitmapSource bs;
         double maxx = 0;
         double maxy = 0;
         double maxz = 0;
