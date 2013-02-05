@@ -18,7 +18,7 @@ using HelixToolkit.Wpf;
 
 namespace PARSE
 {
-    class PointCloud
+    public class PointCloud
     {
         //dodgy global variables (to be changed)
         //private int width;
@@ -48,7 +48,14 @@ namespace PARSE
         private const double fyinv = 1.0 / 476;
         //private double ddt = 200;
 
-        //bitmap source, to be deprecated soon
+        //max and min values for the data stored within the point cloud 
+        double maxx = 0;
+        double maxy = 0;
+        double maxz = 0;
+        double minx = 1;
+        double miny = 1;
+        double minz = 1;
+
         BitmapSource bs; 
 
         //geometry
@@ -185,11 +192,26 @@ namespace PARSE
                         double z = (cy - iy) * zz * fyinv;
                         //this.depthFramePoints[i] = new Point3D(x, y, z);
 
+                        //check min values
+                        if (x < minx) { minx = x; }
+                        if (y < miny) { miny = y; }
+                        if (z < minz) { minz = z; }
+
+                        //check max values
+                        if (x > maxx) { maxx = x; }
+                        if (y > maxy) { maxy = y; }
+                        if (z > maxz) { maxz = z; }
+
                         //create a new colour using the info given
                         System.Drawing.Color c = System.Drawing.Color.FromArgb(opacity, r[i], g[i], b[i]);
 
                         //create a new point key
                         double[] pointKey = new double[3];
+
+                        //set key
+                        pointKey[0] = x;
+                        pointKey[1] = y;
+                        pointKey[2] = z;
 
                         this.points.insert(pointKey, c);
                     }
@@ -206,6 +228,13 @@ namespace PARSE
         {
             return this.points;
         }
+
+        public double getxMax() { return maxx; }
+        public double getyMax() { return maxy; }
+        public double getzMax() { return maxz; }
+        public double getxMin() { return minx; }
+        public double getyMin() { return miny; }
+        public double getzMin() { return minz; }
     
     }
 }
