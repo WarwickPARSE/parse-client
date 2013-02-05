@@ -10,10 +10,10 @@ namespace PARSE
     class ScanSerializer
     {
 
-        public static void serialize(String filename, List<int[]> capcloud)
+        public static void serialize(String filename, List<PointCloud> capcloud)
         {
             /*Serializes captured point cloud*/
-            XmlSerializer serializer = new XmlSerializer(typeof(List<int[]>));
+            XmlSerializer serializer = new XmlSerializer(typeof(List<PointCloud>));
             TextWriter textWriter = new StreamWriter(filename);
             serializer.Serialize(textWriter, capcloud);
             textWriter.Close();
@@ -21,10 +21,10 @@ namespace PARSE
 
         public static CloudVisualisation deserialize(String filename) {
 
-            XmlSerializer deserializer = new XmlSerializer(typeof(List<int[]>));
+            XmlSerializer deserializer = new XmlSerializer(typeof(List<PointCloud>));
             TextReader textReader = new StreamReader(filename);
-            List<int[]> temp = (List<int[]>)(deserializer.Deserialize(textReader));
-            CloudVisualisation cloud = new CloudVisualisation(temp);
+            List<PointCloud> temp = (List<PointCloud>)(deserializer.Deserialize(textReader));
+            CloudVisualisation cloud = new CloudVisualisation(temp, false);
             return cloud;
         }
         

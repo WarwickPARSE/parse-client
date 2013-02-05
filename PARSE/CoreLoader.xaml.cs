@@ -50,11 +50,8 @@ namespace PARSE
         private int                                     countdown;
         private long                                    matchtime;
 
-        //point cloud handler thread 
-        private CloudVisualisation                      viscloud;
-        //these lists WILL BE deprecated once the PointCloud class is complete
-        private List<int[]>                             capcloud;
-        private List<BitmapSource>                      rgbcloud;
+        //point cloud lists for visualisation
+        private List<PointCloud>                        fincloud;
         private System.Windows.Forms.Timer              pcTimer; 
 
         //speech synthesizer instances
@@ -80,7 +77,6 @@ namespace PARSE
                 btnSensorMin.IsEnabled = false;
                 btnStartScanning.IsEnabled = false;
                 btnStopScanning.IsEnabled = false;
-                btnDumpToFile.IsEnabled = false; 
             }
 
             //Miscellaneous modelling definitions
@@ -290,14 +286,7 @@ namespace PARSE
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
 
-            /*This method will eventually make use of the PointCloud structure
-             * rather than using list structures of raw depth arrays */
-            
-            /*List structure to be deprecated and replaced with:
-             * new PointCloud(image source, raw depth); */
-
-            capcloud = new List<int[]>();
-            rgbcloud = new List<BitmapSource>();
+            fincloud = new List<PointCloud>();
 
             //start new scanning timer.
             pcTimer = new System.Windows.Forms.Timer();
@@ -321,8 +310,11 @@ namespace PARSE
             {
                 //enable update of skelL, skelR, skelDepth
                 this.kinectInterp.enableUpdateSkelVars();
-                capcloud.Add(this.kinectInterp.getDepthArray());
-                rgbcloud.Add(this.kinectInterp.getRGBTexture());
+
+                //PointCloud structure methods
+                PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                fincloud.Add(frontCloud);
+
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.disableUpdateSkelVars();
                 ss.Speak("Turn left bitch");
@@ -331,24 +323,37 @@ namespace PARSE
             }
             else if (countdown == 2)
             {
-                capcloud.Add(this.kinectInterp.getDepthArray());
-                rgbcloud.Add(this.kinectInterp.getRGBTexture());
+
+                //PointCloud structure methods
+                PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                fincloud.Add(rightCloud);
+
                 ss.Speak("Turn left bitch show me your ass");
                 this.label4.Content = "Please turn left with your back to the camera";
                 countdown--;
             }
             else if (countdown == 1)
             {
-                capcloud.Add(this.kinectInterp.getDepthArray());
-                rgbcloud.Add(this.kinectInterp.getRGBTexture());
+
+                //PointCloud structure methods
+                PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                fincloud.Add(backCloud);
+
                 ss.Speak("Turn left bitch");
                 this.label4.Content = "Please turn left once more";
                 countdown--;
             }
             else if (countdown == 0) {
-                capcloud.Add(this.kinectInterp.getDepthArray());
-                rgbcloud.Add(this.kinectInterp.getRGBTexture());
-                this.DataContext = new CloudVisualisation(capcloud);
+
+                //PointCloud structure methods
+                PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                fincloud.Add(leftCloud);
+
+                //Visualisation instantiation based on int array clouds
+                this.DataContext = new CloudVisualisation(fincloud,radioButton1.IsChecked);
+
+                //Visualisation instantiation based on KDTree array clouds
+
                 this.label4.Content = "Scanning complete.";
                 pcTimer.Stop();
             }
@@ -393,7 +398,9 @@ namespace PARSE
             enc.Save(outStream);
             System.Drawing.Bitmap modbm = new System.Drawing.Bitmap(outStream);
 
+            System.Diagnostics.Debug.WriteLine("Model Image about to be initialised");
             Image<Gray, Byte> modelImg = new Image<Gray, Byte>(modbm);
+            System.Diagnostics.Debug.WriteLine("Model Image initialised");
 
             //Convert object image
             enc = new BmpBitmapEncoder();
@@ -408,7 +415,7 @@ namespace PARSE
             resultBitmap = result.ToBitmap();
             BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = bs;
-            surfTimer.Stop();
+            surfTimer.Stop(); 
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
@@ -452,7 +459,7 @@ namespace PARSE
             if (dlg.ShowDialog() == true)
             {
                 String filename = dlg.FileName;
-                ScanSerializer.serialize(filename, capcloud);
+                ScanSerializer.serialize(filename, fincloud);
             }
 
         }
