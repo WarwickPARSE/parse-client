@@ -24,13 +24,13 @@ namespace PARSE
         ///</summary>
 
         // Model images
-        string[] Model_Urls = new string[] {"Patterns/Checkerboard+trishapes/Checkerboard_four_trishapes.png"};
+        string[] Model_Urls = new string[] {"Model1.bmp"};
         Image<Gray, byte>[] Models;
 
         Image<Bgr, byte> MatchFailImage;
 
         // Target image
-        string Target_Url = "C:/PARSE/MultiSurf/Patterns/Checkerboard+trishapes/Canyon.bmp";
+        string Target_Url = "C:/PARSE/MultiSurf/Image2.bmp";
         Image<Gray, byte> Target;
 
         // SURF Detectors
@@ -55,8 +55,8 @@ namespace PARSE
                 detectors[i] = new SurfDetector();
             
             // Get the current detector
-            //currentDetector = detectors[currentDetectorIndex];
-            
+            //currentDetector = detectors[currentDetectorIndex];           
+
             Console.WriteLine("MultiSurf Controller ready");
         }
 
@@ -181,13 +181,14 @@ namespace PARSE
             // String timestamp = System.DateTime.Now.ToUniversalTime().ToString();
             String timestamp = string.Format("{0:yyyy-MM-dd_hh-mm-ss}", DateTime.Now);
             String finalDirectory = homeFolder + timestamp;
-            Console.WriteLine("Date is: " + timestamp);
             System.IO.Directory.CreateDirectory(finalDirectory);
 
             // Log the details
             System.IO.StreamWriter logFileWriter = new System.IO.StreamWriter(finalDirectory + "/log.txt");
             logFileWriter.WriteLine("Log file for test run at: " + timestamp);
             logFileWriter.WriteLine("Target image: " + Target_Url);
+            logFileWriter.WriteLine("Match found: " + (bestMatch > 0));
+            logFileWriter.WriteLine("Match index: " + bestMatch);
             logFileWriter.WriteLine("");
             logFileWriter.WriteLine(" * * * * * * * * * * ");
 

@@ -41,6 +41,8 @@ namespace PARSE
             int k = 2;
             double uniquenessThreshold = 0.7;
 
+            int matches = 0;
+
             //CUDA Instantiation
 
             if (GpuInvoke.HasCuda)
@@ -85,6 +87,8 @@ namespace PARSE
                         gpuMask.Download(mask);
                         gpuMatchIndices.Download(indices);
 
+                        matches = GpuInvoke.CountNonZero(gpuMask);
+
                         if (GpuInvoke.CountNonZero(gpuMask) >= 4)
                         {
                             int nonZeroCount = Features2DToolbox.VoteForSizeAndOrientation(modelKeyPoints, observedKeyPoints, indices, mask, 1.5, 20);
@@ -122,6 +126,7 @@ namespace PARSE
                 }
 
                 int nonZeroCount = CvInvoke.cvCountNonZero(mask);
+                matches = nonZeroCount;
                 if (nonZeroCount >= 4)
                 {
                     nonZeroCount = Features2DToolbox.VoteForSizeAndOrientation(modelKeyPoints, observedKeyPoints, indices, mask, 1.5, 20);
@@ -135,8 +140,6 @@ namespace PARSE
             //Draw matched keypoints in observed image.
             Image<Bgr, Byte> result = Features2DToolbox.DrawMatches(modelImage, modelKeyPoints, observedImage, observedKeyPoints,
             indices, new Bgr(255, 255, 255), new Bgr(255, 255, 255), mask, Features2DToolbox.KeypointDrawType.DEFAULT);
-
-            
 
             #region draw the projected region on the image
             if (homography != null)
@@ -157,11 +160,12 @@ namespace PARSE
             
             //return result;
             Boolean isMatch = (homography != null);
-            int matches = 0;
 
             // TODO Get an actual number of matches from somewhere
             if (isMatch)
-                matches = 5;
+            {
+                Console.WriteLine("nonzerocount = " + matches);
+            }
 
             matchTime = watch.ElapsedMilliseconds;
             Console.WriteLine("Surf completed in " + matchTime + "ms" + " with " + matches + " matches");

@@ -37,11 +37,9 @@ namespace PARSE
         //Modelling specific definitions
         private GeometryModel3D Model;
         private GeometryModel3D BaseModel;
-        private GeometryModel3D                         Model;
-        private GeometryModel3D                         BaseModel;
 
         //New KinectInterpreter Class
-        private KinectInterpreter                       kinectInterp;
+        private KinectInterpreter kinectInterp;
 
         //Image recognition specific definitions
         private System.Windows.Forms.Timer surfTimer;
