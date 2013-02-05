@@ -7,10 +7,14 @@ namespace PARSE.ICP
 {
     public struct PointRGB
     {
-        public int x, y, z;
-        public int r, g, b;
+        public double x { get; set; }
+        public double y { get; set; }
+        public double z { get; set; }
+        public double r { get; set; }
+        public double g { get; set; }
+        public double b { get; set; }
 
-        public PointRGB(int x, int y, int z, int r, int g, int b)
+        public PointRGB(double x, double y, double z, double r, double g, double b)
         {
             this.x = x;
             this.y = y;
