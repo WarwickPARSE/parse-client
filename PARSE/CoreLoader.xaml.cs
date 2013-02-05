@@ -62,6 +62,8 @@ namespace PARSE
             //Initialize Component
             InitializeComponent();
 
+            this.WindowState = WindowState.Maximized;
+
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
   
