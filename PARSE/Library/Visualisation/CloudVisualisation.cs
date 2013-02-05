@@ -37,7 +37,8 @@ namespace PARSE
 
         //Geometry for visualisation
         //This is public to be accessed for XML serialization.s
-        public List<int[]>         depthClouds;
+        List<PointCloud>    clouds;
+        bool?               texture;
         
         //Geometry for visualisation computation.
         int[]               rawDepth;
@@ -49,20 +50,10 @@ namespace PARSE
             //parameterless
         }
 
-        public CloudVisualisation(List<int[]> dp)
+        public CloudVisualisation(List<PointCloud> pc, bool? texture)
         {
-            this.depthClouds = dp;
-
-            textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
-            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
-
-            render();
-
-        }
-
-        public CloudVisualisation(List<int[]> dp, List<BitmapSource> bs)
-        {
-            this.depthClouds = dp;
+            this.clouds = pc;
+            this.texture = texture;
 
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
@@ -75,9 +66,9 @@ namespace PARSE
         {
             //create depth coordinates
 
-            for (int i = 0; i < this.depthClouds.Count; i++)
+            for (int i = 0; i < this.clouds.Count; i++)
             {
-                this.rawDepth = this.depthClouds[i];
+                this.rawDepth = this.clouds[i].rawDepth;
                 runDemoModel(i);
                 createDepthCoords();
 
@@ -85,22 +76,58 @@ namespace PARSE
                 {
                     case 0:
                         this.Model.Geometry = createMesh();
-                        this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+
+                        if (texture == false)
+                        {
+                            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        }
+                        else
+                        {
+                            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
+                        }
+                        
                         this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
                         break;
                     case 1:
                         this.Model2.Geometry = createMesh();
-                        this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+
+                        if (texture == true)
+                        {
+                            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        }
+                        else
+                        {
+                            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
+                        }
+
                         this.Model2.Transform = new TranslateTransform3D(0, -2, 1);
                         break;
                     case 2:
                         this.Model3.Geometry = createMesh();
-                        this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+
+                        if (texture == true)
+                        {
+                            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        }
+                        else
+                        {
+                            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
+                        }
+                            
                         this.Model3.Transform = new TranslateTransform3D(1, -2, 1);
                         break;
                     case 3:
                         this.Model4.Geometry = createMesh();
-                        this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+
+                        if (texture == true)
+                        {
+                            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                        }
+                        else
+                        {
+                            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
+                        }
+                        
                         this.Model4.Transform = new TranslateTransform3D(2, -2, 1);
                         break;
                 } 
