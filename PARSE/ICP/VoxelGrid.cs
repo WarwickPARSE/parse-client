@@ -12,17 +12,34 @@ namespace PARSE.ICP
     {
         PointCloud pcd;
 
+        //division values
+        int xSep;
+        int ySep;
+        int zSep; 
+
+        //maximum values from the point cloud (for easy+efficient access)
+        int xMax;
+        int yMax;
+        int zMax;
+
         /// <summary>
         /// Nothing flashy here. Just saves the point cloud into memory
         /// </summary>
         /// <param name="pcd">A point cloud</param>
-        /// <param name="x">Number of x separations</param>
-        /// <param name="y">Number of y separations</param>
-        /// <param name="z">Number of z separations</param>
-        VoxelGrid(PointCloud pcd, int x, int y, int z) {
-            this.pcd = pcd; 
+        /// <param name="xSep">Number of x separations</param>
+        /// <param name="ySep">Number of y separations</param>
+        /// <param name="zSep">Number of z separations</param>
+        VoxelGrid(PointCloud pcd, int xSep, int ySep, int zSep) {
+            this.pcd = pcd;
+
+            this.xSep = xSep;
+            this.ySep = ySep;
+            this.zSep = zSep;
         }
 
-
+        public void getVoxel(int indexx, int indexy, int indexz) { 
+        
+        }
+        
     }
 }
