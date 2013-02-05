@@ -6,21 +6,42 @@ using System.Windows.Media.Media3D;
 
 namespace PARSE.ICP
 {
-    public struct PointRGB
+    struct PointRGB
     {
-        public Point3D point { get; set; }
-
-        public double r { get; set; }
-        public double g { get; set; }
-        public double b { get; set; }
-
-        public PointRGB(double x, double y, double z, double r, double g, double b)
+        
+        public PointRGB(Point3D point, double x, double y, double z) 
         {
-            this.point = new Point3D(x, y, z);
+            _x = x;
+            _y = y;
+            _z = z;
+            _point = point; 
+        }
 
-            this.r = r;
-            this.g = g;
-            this.b = b;
+        private double _x, _y, _z;
+        private Point3D _point; 
+
+        //todo: make the properties immutable 
+        public double x {
+            get { return _x; }
+            set { _x = value; }
+        }
+
+        public double y
+        {
+            get { return _y; }
+            set { _y = value; }
+        }
+
+        public double z
+        {
+            get { return _z; }
+            set { _z = value; }
+        }
+
+        public Point3D point
+        {
+            get { return _point; }
+            set { _point = value; }
         }
     }
 }

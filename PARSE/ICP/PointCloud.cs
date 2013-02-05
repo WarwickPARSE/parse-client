@@ -203,7 +203,7 @@ namespace PARSE
                         if (z > maxz) { maxz = z; }
 
                         //create a new colour using the info given
-                        System.Drawing.Color c = System.Drawing.Color.FromArgb(opacity, r[i], g[i], b[i]);
+                        //System.Drawing.Color c = System.Drawing.Color.FromArgb(opacity, r[i], g[i], b[i]);
 
                         //create a new point key
                         double[] pointKey = new double[3];
@@ -213,7 +213,10 @@ namespace PARSE
                         pointKey[1] = y;
                         pointKey[2] = z;
 
-                        this.points.insert(pointKey, c);
+                        Point3D poLoc = new Point3D(z, y, z);
+                        PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r[i], g[i], b[i]);
+
+                        this.points.insert(pointKey, po);
                     }
                 }
             }
