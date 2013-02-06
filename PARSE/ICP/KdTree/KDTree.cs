@@ -230,6 +230,12 @@ namespace KdTree
          *
          * @throws KeySizeException on mismatch among lowk.length, uppk.length, or K
          */
+        public List<Point3D> getAllPointsAt(double i, double r)
+        {
+            //i - r i + r
+            return null;
+        }
+        
         public Object[] range(double[] lowk, double[] uppk)
         {
 
