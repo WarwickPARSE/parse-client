@@ -20,6 +20,12 @@ namespace PARSE
         
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
+            Console.WriteLine(xmin);
+            Console.WriteLine(xmax);
+            Console.WriteLine(ymin);
+            Console.WriteLine(ymax);
+            Console.WriteLine(zmin);
+            Console.WriteLine(zmax);
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
         }
 
@@ -75,14 +81,15 @@ namespace PARSE
         
         public static double calculateVolume(PointCloud pc)
         {
-            Console.WriteLine("Upper Bound on Patient Volume: "+volume0thApprox(pc));
+            Console.WriteLine("Upper Bound on Patient Volume: " + volume0thApprox(pc));
+            Console.WriteLine("Better Volume Patient Volume: " + volume1stApprox(pc));
             return 0;//volume1stApprox(pc);
         }
 
         private static int compareTwoPoints(Point3D a, Point3D b)
         {
             double aTanA, aTanB;
-
+            Console.WriteLine(a);
             //  Fetch the atans
 
             aTanA = Math.Atan2(a.Y, a.X);
