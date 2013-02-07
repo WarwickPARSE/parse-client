@@ -44,6 +44,7 @@ namespace PARSE
         int[]               rawDepth;
         Point3D[]           depthFramePoints;
         Point[]             textureCoordinates;
+        Vector3DCollection  normals = new Vector3DCollection();
 
         public CloudVisualisation()
         {
@@ -81,7 +82,7 @@ namespace PARSE
 
                         if (texture == false)
                         {
-                            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
                         }
                         else
                         {
@@ -95,46 +96,88 @@ namespace PARSE
 
                         if (texture == false)
                         {
-                            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
                         }
                         else
                         {
                             this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
                         }
 
-                        this.Model2.Transform = new TranslateTransform3D(0, -2, 1);
+                        //translate then rotate
+                        Transform3DGroup transGroup = new Transform3DGroup();
+
+                        TranslateTransform3D transTrans = new TranslateTransform3D(-0.50, -3.40, 1);
+                        transGroup.Children.Add(transTrans);
+
+                        RotateTransform3D transRotate = new RotateTransform3D();
+                        AxisAngleRotation3D transRotateAxis = new AxisAngleRotation3D();
+
+                        transRotateAxis.Axis = new Vector3D(0, 0, 1);
+                        transRotateAxis.Angle = -90;
+                        transRotate.Rotation = transRotateAxis;
+
+                        transGroup.Children.Add(transRotate);
+
+                        this.Model2.Transform = transGroup;
+
                         break;
                     case 2:
                         this.Model3.Geometry = createMesh();
 
                         if (texture == false)
                         {
-                            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
                         }
                         else
                         {
                             this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
                         }
-
                         //translate then rotate
-                        Transform3DCollection tc = new Transform3DCollection(2);
-           
-                        this.Model3.Transform = new TranslateTransform3D(-1, -1, 1);
-                        //this.Model3.Transform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 0, 0), 0), 0, -2, 0);
+                        Transform3DGroup transGroup2 = new Transform3DGroup();
+
+                        TranslateTransform3D transTrans2 = new TranslateTransform3D(0.85, -2.95, 1);
+                        transGroup2.Children.Add(transTrans2);
+
+                        RotateTransform3D transRotate2 = new RotateTransform3D();
+                        AxisAngleRotation3D transRotateAxis2 = new AxisAngleRotation3D();
+
+                        transRotateAxis2.Axis = new Vector3D(0, 0, 1);
+                        transRotateAxis2.Angle = 180;
+                        transRotate2.Rotation = transRotateAxis2;
+
+                        transGroup2.Children.Add(transRotate2);
+
+                        this.Model3.Transform = transGroup2;
                         break;
                     case 3:
                         this.Model4.Geometry = createMesh();
 
                         if (texture == false)
                         {
-                            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
+                            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
                         }
                         else
                         {
                             this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
                         }
-                        
-                        this.Model4.Transform = new TranslateTransform3D(2, -2, 1);
+
+                        //translate then rotate
+                        Transform3DGroup transGroup3 = new Transform3DGroup();
+
+                        TranslateTransform3D transTrans3 = new TranslateTransform3D(0.30, -1.50, 1);
+                        transGroup3.Children.Add(transTrans3);
+
+                        RotateTransform3D transRotate3 = new RotateTransform3D();
+                        AxisAngleRotation3D transRotateAxis3 = new AxisAngleRotation3D();
+
+                        transRotateAxis3.Axis = new Vector3D(0, 0, 1);
+                        transRotateAxis3.Angle = 90;
+                        transRotate3.Rotation = transRotateAxis3;
+
+                        transGroup3.Children.Add(transRotate3);
+
+                        this.Model4.Transform = transGroup3;
+
                         break;
                 } 
 
@@ -144,6 +187,9 @@ namespace PARSE
 
         public void createDepthCoords()
         {
+
+            int vertexCounter = 0;
+            List<Point3D> vertexMaintainer = new List<Point3D>();
 
             for (int iy = 0; iy < 480; iy++)
             {
@@ -163,14 +209,42 @@ namespace PARSE
                         double y = zz;
                         double z = (cy - iy) * zz * fyinv;
                         this.depthFramePoints[i] = new Point3D(x, y, z);
+
+                        if (vertexCounter != 2)
+                        {
+                            vertexMaintainer.Add(new Point3D(x, y, z));
+                            vertexCounter++;
+                        }
+                        else
+                        {
+                            vertexMaintainer.Add(new Point3D(x, y, z));
+                            this.normals.Add(CalculateNormal(vertexMaintainer[0], vertexMaintainer[1], vertexMaintainer[2]));
+                            vertexMaintainer.Clear();
+                            vertexCounter = 0;
+                        }
+                       
                     }
                 }
             }
         }
 
+        private Vector3D CalculateNormal(Point3D p0, Point3D p1, Point3D p2)
+        {
+            var v0 = new Vector3D(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);
+            var v1 = new Vector3D(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+            return Vector3D.CrossProduct(v0, v1);
+        }
+
+
         public MeshGeometry3D createMesh()
         {
             var triangleIndices = new List<int>();
+
+            Vector3DCollection myNormalCollection = new Vector3DCollection();
+            myNormalCollection.Add(new Vector3D(0, 0, 1));
+            myNormalCollection.Add(new Vector3D(0, 1, 1));
+            myNormalCollection.Add(new Vector3D(1, 1, 1));
+
             for (int iy = 0; iy + 1 < depthFrameHeight; iy++)
             {
                 for (int ix = 0; ix + 1 < depthFrameWidth; ix++)
@@ -202,7 +276,9 @@ namespace PARSE
                         triangleIndices.Add(i0);
                         triangleIndices.Add(i2);
                         triangleIndices.Add(i3);
+
                     }
+
                 }
             }
 
@@ -210,7 +286,9 @@ namespace PARSE
             {
                 Positions = new Point3DCollection(this.depthFramePoints),
                 TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
-                TriangleIndices = new Int32Collection(triangleIndices)
+                TriangleIndices = new Int32Collection(triangleIndices),
+                Normals = this.normals
+
             };
         }
 

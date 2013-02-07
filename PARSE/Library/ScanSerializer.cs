@@ -11,6 +11,7 @@ namespace PARSE
 {
     class ScanSerializer
     {
+        public static List<PointCloud> depthPc = new List<PointCloud>();
 
         public static void serialize(String filename, List<PointCloud> capcloud)
         {
@@ -45,8 +46,6 @@ namespace PARSE
                 XmlSerializer deserializer = new XmlSerializer(typeof(List<int[]>));
                 TextReader textReader = new StreamReader(filename);
                 List<int[]> temp = (List<int[]>)(deserializer.Deserialize(textReader));
-
-                List<PointCloud> depthPc = new List<PointCloud>();
 
                 /*Deserializes*/
                 for (int i = 0; i < temp.Count; i++)
