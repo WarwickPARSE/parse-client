@@ -445,6 +445,7 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 this.DataContext = ScanSerializer.deserialize(filename);
+                fincloud = ScanSerializer.depthPc;
             }
         }
 
