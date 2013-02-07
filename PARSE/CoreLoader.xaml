@@ -28,7 +28,7 @@
             <MenuItem Header="Patient">
                 <MenuItem Header="Capture">
                     <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                    <MenuItem Header="Limb Circumference" IsCheckable="true"/>
+                    <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Details" IsCheckable="true"/>
                 <Separator/>
