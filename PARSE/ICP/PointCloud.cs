@@ -259,8 +259,6 @@ namespace PARSE
                 //jam the data into the existing kd-tree
                 this.points.insert(key, value);
             }
-
-            //iterate over every element of the kd tree and jam it into this one
         }
 
         /// <summary>
