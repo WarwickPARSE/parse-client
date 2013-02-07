@@ -81,9 +81,16 @@ namespace PARSE
             this.points = new KdTree.KDTree(3);
 
             //convert bitmap stream into a format that is supported by the kd-tree method
-            Bitmap b = convertToBitmap(bs);
+            if (bs != null)
+            {
+                Bitmap b = convertToBitmap(bs);
+                setPoints(rawDepth, b);
+            }
+        }
 
-            setPoints(rawDepth, b);
+        public PointCloud()
+        {
+            //parameterless constructor needed for serialization
         }
      
         /// <summary>

@@ -72,6 +72,8 @@ namespace PARSE
                 runDemoModel(i);
                 createDepthCoords();
 
+                System.Diagnostics.Debug.WriteLine(this.clouds[i].rawDepth.Length);
+
                 switch (i)
                 {
                     case 0:
@@ -91,7 +93,7 @@ namespace PARSE
                     case 1:
                         this.Model2.Geometry = createMesh();
 
-                        if (texture == true)
+                        if (texture == false)
                         {
                             this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
                         }
@@ -105,7 +107,7 @@ namespace PARSE
                     case 2:
                         this.Model3.Geometry = createMesh();
 
-                        if (texture == true)
+                        if (texture == false)
                         {
                             this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
                         }
@@ -113,13 +115,17 @@ namespace PARSE
                         {
                             this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new ImageBrush(this.clouds[i].bs));
                         }
-                            
-                        this.Model3.Transform = new TranslateTransform3D(1, -2, 1);
+
+                        //translate then rotate
+                        Transform3DCollection tc = new Transform3DCollection(2);
+           
+                        this.Model3.Transform = new TranslateTransform3D(-1, -1, 1);
+                        //this.Model3.Transform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0, 0, 0), 0), 0, -2, 0);
                         break;
                     case 3:
                         this.Model4.Geometry = createMesh();
 
-                        if (texture == true)
+                        if (texture == false)
                         {
                             this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightGray));
                         }
