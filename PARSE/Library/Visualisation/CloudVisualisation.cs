@@ -53,6 +53,7 @@ namespace PARSE
 
         public CloudVisualisation(List<PointCloud> pc, bool? texture)
         {
+            //this will be a singleton soon
             this.clouds = pc;
             this.texture = texture;
 
