@@ -262,13 +262,58 @@ namespace PARSE
         }
 
         /// <summary>
+        /// Returns all points from the kd tree
+        /// </summary>
+        /// <returns>The points from the kd tree</returns>
+        public PARSE.ICP.PointRGB[] getAllPoints() {
+            //max and min values 
+            double[] minVal = new double[3]{ double.MinValue, double.MinValue, double.MinValue };
+            double[] maxVal = new double[3]{ double.MaxValue, double.MaxValue, double.MaxValue };
+
+            //pull objects from kd tree
+            Object[] objects = points.range(minVal, maxVal);
+
+            //create somewhere to jam all the points 
+            PARSE.ICP.PointRGB[] retPoints = new PARSE.ICP.PointRGB[objects.Length];
+
+            //filthy: typecast everything in turn
+            int i = 0;
+            foreach(Object pt in objects) {
+                retPoints[i] = (PARSE.ICP.PointRGB)pt;
+                i++;
+            }
+
+            return retPoints;
+        }
+
+        /// <summary>
         /// Translate the point cloud by a given value
         /// </summary>
         /// <param name="tx">Up to three co-ords</param>
         public void translate(double[] tx) 
         {
-            if (!(tx.Length > 3)) {
+            if (!(tx.Length != 3)) {
+                //turn the transformation vector into and object
+                TranslateTransform3D translation = new TranslateTransform3D(tx[0], tx[1], tx[2]);
 
+                //pull out the entire tree
+                PARSE.ICP.PointRGB[] pts = this.getAllPoints();
+
+                //create a new kd tree 
+                KdTree.KDTree newPoints = new KdTree.KDTree(3);  
+              
+                //iterate over every point and translate + jam in new tree
+                foreach(PARSE.ICP.PointRGB point in pts) {
+                    //perform the translation
+                    point.point.Offset(tx[0], tx[1], tx[2]);
+
+                    //jam into the tree 
+                    double[] key = new double[3]{point.point.X, point.point.Y, point.point.Z};
+                    newPoints.insert(key, point);
+                }
+
+                //replace the old kd tree with the new one
+                this.points = newPoints;
             }
             else { 
                 //probably want to throw an exception here
@@ -282,8 +327,34 @@ namespace PARSE
         /// <param name="angle">The angle to which te point cloud is to be rotated</param>
         public void rotate(double[] axis, double angle) 
         {
-            if (!(axis.Length > 3)) {
+            if (!(axis.Length != 3)) {
+                //centre of rotation 
+                Point3D centre = new Point3D(axis[0], axis[1], axis[2]);
 
+                //pull out the entire tree
+                PARSE.ICP.PointRGB[] pts = this.getAllPoints();
+
+                //create a new kd tree 
+                KdTree.KDTree newPoints = new KdTree.KDTree(3);  
+
+                //iterate over every point and translate + jam in new tree
+                foreach (PARSE.ICP.PointRGB point in pts)
+                {
+                    //create rot matrix
+                    Matrix3D mtx = new Matrix3D();
+                    Quaternion q = new Quaternion(new Vector3D(0, 1, 0), angle);
+                    mtx.RotateAt(q, centre);
+
+                    //complete rotation
+                    Point3D newPoint = mtx.Transform(point.point);
+
+                    //jam into the tree 
+                    double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
+                    newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
+                }
+
+                //replace the old kd tree with the new one
+                this.points = newPoints;
             }
             else{
                 //throw an exception and annoy Bernie in the process ;)
