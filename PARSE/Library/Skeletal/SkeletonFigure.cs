@@ -170,8 +170,8 @@ namespace PARSE
                 { new SkeletonBones(JointType.AnkleLeft,JointType.FootLeft), GenerateLine()},
             };
 
-            foreach (Line line in Bones.Values)
-                canvas.Children.Add(line);
+            //foreach (Line line in Bones.Values)
+            //canvas.Children.Add(line);
         }
 
         private void InitJoints()
@@ -200,8 +200,8 @@ namespace PARSE
                   { JointType.WristRight,       GenerateEllipse()},
             };
 
-            foreach (Ellipse ellipse in Joints.Values)
-                canvas.Children.Add(ellipse);
+            //foreach (Ellipse ellipse in Joints.Values)
+            //    canvas.Children.Add(ellipse);
         }
 
         private Ellipse GenerateEllipse(int size = JOINT_WIDTH)

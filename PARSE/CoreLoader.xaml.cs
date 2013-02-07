@@ -52,7 +52,8 @@ namespace PARSE
 
         //point cloud lists for visualisation
         private List<PointCloud>                        fincloud;
-        private System.Windows.Forms.Timer              pcTimer; 
+        private System.Windows.Forms.Timer              pcTimer;
+        private bool                                    rgbActive;
 
         //speech synthesizer instances
         private SpeechSynthesizer                       ss;
@@ -136,6 +137,15 @@ namespace PARSE
            kinectInterp.SkeletonFrameReady(sender, e);
        }
 
+       private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+       {
+           WriteableBitmap[] results = new WriteableBitmap[1];
+           results = kinectInterp.SensorAllFramesReady(sender, e);
+           
+           this.kinectImager.Source = results[1];
+           this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
+       }
+
         /// <summary>
         /// WPF Form Methods
         /// </summary>
@@ -203,9 +213,9 @@ namespace PARSE
 
                 case "RGB + Skeletal":
                     kinectInterp.startRGBStream();
+                    kinectInterp.startDepthStream();
                     kinectInterp.startSkeletonStream();
-                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                    this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
                     break;
 
                 case "Depth":
