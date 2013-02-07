@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        Title="Body Measurement and Scanning Environment by PARSE" Height="{Binding SystemParameters.PrimaryScreenHeight}" Width="{Binding SystemParameters.PrimaryScreenWidth}" Loaded="Window_Loaded" Closing="WindowClosing">
+        Title="Body Measurement and Scanning Environment by PARSE" Loaded="Window_Loaded" Closing="WindowClosing">
     <Grid Height="526" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="40*" />
