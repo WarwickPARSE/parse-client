@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 //using Emgu.CV.CvEnum;
 using System.Windows.Media.Media3D;
+using PARSE.ICP;
 
 namespace PARSE
 {
@@ -38,6 +39,12 @@ namespace PARSE
         //only works on an amorphus blob
         public static double volume1stApprox(PointCloud pc)
         {
+            double xmin = pc.getxMin();
+            double xmax = pc.getxMax();
+            double ymin = pc.getyMin();
+            double ymax = pc.getyMax();
+            double[] limits = { xmin, ymin, xmax, ymax };
+
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
             double increment = 0.01;
@@ -45,7 +52,7 @@ namespace PARSE
 
             for (double i = zmin + (increment / 2); i <= zmax - (increment / 2); i = i + increment)
             {
-                List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2);
+                List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 plane = rotSort(plane);
                 plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
@@ -69,7 +76,7 @@ namespace PARSE
         private static double calculateVolume(PointCloud pc)
         {
             Console.WriteLine("Upper Bound on Patient Volume: "+volume0thApprox(pc));
-            return volume1stApprox(pc);
+            return 0;//volume1stApprox(pc);
         }
 
         private static int compareTwoPoints(Point3D a, Point3D b)
@@ -78,8 +85,8 @@ namespace PARSE
 
             //  Fetch the atans
 
-            aTanA = Math.Atan2(a.Y, a.X);
-            aTanB = Math.Atan2(b.Y, b.X);
+            aTanA = Math.Atan2(a.y, a.x);
+            aTanB = Math.Atan2(b.y, b.x);
 
             //  Determine next point in Clockwise rotation
             if (aTanA < aTanB) return -1;
@@ -95,21 +102,21 @@ namespace PARSE
             double ymin = double.MaxValue;
             for (int i = 0; i < input.Count; i++)
             {
-                if (input[i].X > xmax)
+                if (input[i].x > xmax)
                 {
-                    xmax = input[i].X;
+                    xmax = input[i].x;
                 }
-                else if (input[i].X < xmin)
+                else if (input[i].x < xmin)
                 {
-                    xmin = input[i].X;
+                    xmin = input[i].x;
                 }
-                if (input[i].Y > ymax)
+                if (input[i].y > ymax)
                 {
-                    ymax = input[i].Y;
+                    ymax = input[i].y;
                 }
-                else if (input[i].Y < ymin)
+                else if (input[i].y < ymin)
                 {
-                    ymin = input[i].Y;
+                    ymin = input[i].y;
                 }
             }
 

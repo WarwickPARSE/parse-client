@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Media.Media3D;
+using PARSE.ICP;
 
 namespace KdTree
 {
@@ -230,10 +231,18 @@ namespace KdTree
          *
          * @throws KeySizeException on mismatch among lowk.length, uppk.length, or K
          */
-        public List<Point3D> getAllPointsAt(double i, double r)
+        public List<PointRGB> getAllPointsAt(double i, double r, double[] limits)
         {
-            //i - r i + r
-            return null;
+            double[] point1 = {limits[0], limits[1], i - r};
+            double[] point2 = {limits[2], limits[3], i + r};
+
+            Object[] temp = range(point1,point2);
+            List<PointRGB> output = new List<PointRGB>();
+            for (int i = 0; i < temp.Length; i++)
+            {
+                output.Add((PointRGB)temp[i]);
+            }
+            return output;
         }
         
         public Object[] range(double[] lowk, double[] uppk)
