@@ -9,33 +9,33 @@ namespace PARSE.ICP
     struct PointRGB
     {
         
-        public PointRGB(Point3D point, double x, double y, double z) 
+        public PointRGB(Point3D point, double r, double g, double b) 
         {
-            _x = x;
-            _y = y;
-            _z = z;
+            _r = r;
+            _g = g;
+            _b = b;
             _point = point; 
         }
 
-        private double _x, _y, _z;
+        private double _r, _g, _b;
         private Point3D _point; 
 
         //todo: make the properties immutable 
-        public double x {
-            get { return _x; }
-            set { _x = value; }
+        public double r {
+            get { return _r; }
+            set { _r = value; }
         }
 
-        public double y
+        public double g
         {
-            get { return _y; }
-            set { _y = value; }
+            get { return _g; }
+            set { _g = value; }
         }
 
-        public double z
+        public double b
         {
-            get { return _z; }
-            set { _z = value; }
+            get { return _b; }
+            set { _b = value; }
         }
 
         public Point3D point
