@@ -86,6 +86,10 @@ namespace PARSE
                 Bitmap b = convertToBitmap(bs);
                 setPoints(rawDepth, b);
             }
+            else
+            {
+                setPoints(rawDepth);
+            }
         }
 
         public PointCloud()

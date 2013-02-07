@@ -56,6 +56,12 @@ namespace PARSE
             this.clouds = pc;
             this.texture = texture;
 
+            System.Diagnostics.Debug.WriteLine(pc[0].getxMax());
+            System.Diagnostics.Debug.WriteLine(pc[0].getyMax());
+            System.Diagnostics.Debug.WriteLine(pc[0].getxMin());
+            System.Diagnostics.Debug.WriteLine(pc[0].getyMin());
+            System.Diagnostics.Debug.WriteLine(pc[0].getKDTree().numberOfNodes());
+
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
