@@ -73,7 +73,7 @@ namespace PARSE
             return volume;
         }
         
-        private static double calculateVolume(PointCloud pc)
+        public static double calculateVolume(PointCloud pc)
         {
             Console.WriteLine("Upper Bound on Patient Volume: "+volume0thApprox(pc));
             return 0;//volume1stApprox(pc);
@@ -85,8 +85,8 @@ namespace PARSE
 
             //  Fetch the atans
 
-            aTanA = Math.Atan2(a.y, a.x);
-            aTanB = Math.Atan2(b.y, b.x);
+            aTanA = Math.Atan2(a.Y, a.X);
+            aTanB = Math.Atan2(b.Y, b.X);
 
             //  Determine next point in Clockwise rotation
             if (aTanA < aTanB) return -1;
@@ -102,21 +102,21 @@ namespace PARSE
             double ymin = double.MaxValue;
             for (int i = 0; i < input.Count; i++)
             {
-                if (input[i].x > xmax)
+                if (input[i].X > xmax)
                 {
-                    xmax = input[i].x;
+                    xmax = input[i].X;
                 }
-                else if (input[i].x < xmin)
+                else if (input[i].X < xmin)
                 {
-                    xmin = input[i].x;
+                    xmin = input[i].X;
                 }
-                if (input[i].y > ymax)
+                if (input[i].Y > ymax)
                 {
-                    ymax = input[i].y;
+                    ymax = input[i].Y;
                 }
-                else if (input[i].y < ymin)
+                else if (input[i].Y < ymin)
                 {
-                    ymin = input[i].y;
+                    ymin = input[i].Y;
                 }
             }
 

@@ -231,16 +231,16 @@ namespace KdTree
          *
          * @throws KeySizeException on mismatch among lowk.length, uppk.length, or K
          */
-        public List<PointRGB> getAllPointsAt(double i, double r, double[] limits)
+        public List<Point3D> getAllPointsAt(double i, double r, double[] limits)
         {
             double[] point1 = {limits[0], limits[1], i - r};
             double[] point2 = {limits[2], limits[3], i + r};
 
             Object[] temp = range(point1,point2);
-            List<PointRGB> output = new List<PointRGB>();
-            for (int i = 0; i < temp.Length; i++)
+            List<Point3D> output = new List<Point3D>();
+            for (int j = 0; j < temp.Length; j++)
             {
-                output.Add((PointRGB)temp[i]);
+                output.Add(((PointRGB)temp[j]).point);
             }
             return output;
         }
