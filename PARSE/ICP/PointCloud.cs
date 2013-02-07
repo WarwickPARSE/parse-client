@@ -235,6 +235,35 @@ namespace PARSE
         }
 
         /// <summary>
+        /// Adds an existing point cloud into this point cloud 
+        /// </summary>
+        /// <param name="pc">The point cloud to add</param>
+        public void addPointCLoud(PointCloud pc) { 
+            //retrieve the kd tree
+            KdTree.KDTree kd = pc.getKDTree();
+
+            //define a max and min point 
+            //TODO: set these to proper max+min vals from the point cloud object 
+            double[] minPoint = new double[3] { -100, -100, -100 };
+            double[] maxPoint = new double[3] { 100, 100, 100 };
+
+            //retrieve a list of all item in the tree
+            Object[] points2 = kd.range(minPoint, maxPoint);
+
+            //iterate over every point and jam it in this point cloud
+            foreach (Object element in points2) {
+                //create k,v pair from data extracted
+                PARSE.ICP.PointRGB value = (PARSE.ICP.PointRGB)element;
+                double[] key = new double[3] {value.point.X, value.point.Y, value.point.Z};
+
+                //jam the data into the existing kd-tree
+                this.points.insert(key, value);
+            }
+
+            //iterate over every element of the kd tree and jam it into this one
+        }
+
+        /// <summary>
         /// returns kd-tree representation of point cloud
         /// </summary>
         /// <param name="points"></param>
