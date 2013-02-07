@@ -117,6 +117,7 @@
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
     <Compile Include="ICP\Downsampler.cs" />
+    <Compile Include="ICP\KdTree\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
