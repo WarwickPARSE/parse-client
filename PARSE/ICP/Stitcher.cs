@@ -14,7 +14,7 @@ namespace PARSE.ICP
         public bool processComplete = false; 
 
         //add a point cloud into the stitcher
-        public abstract void add();
+        public abstract void add(PointCloud pc);
 
         //this is where the stitching process takes place. This can be replalced by a dummy for on-the-fly stitching
         public abstract void stitch();

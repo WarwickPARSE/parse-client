@@ -27,14 +27,14 @@ namespace PARSE.ICP.KdTree
         /// Add a point cloud into the list of point clouds
         /// </summary>
         /// <param name="pc">Input point cloud</param>
-        public void add(PointCloud pc) {
+        public override void add(PointCloud pc) {
             this.pointClouds.Add(pc);
         }
 
         /// <summary>
         /// Stitch the point clouds together 
         /// </summary>
-        public void stitch() {
+        public override void stitch() {
 
             //change the state to complete
             processComplete = true; 
@@ -88,7 +88,7 @@ namespace PARSE.ICP.KdTree
         /// Return the result of the stitching
         /// </summary>
         /// <returns>The result of the stitching</returns>
-        public PointCloud getResult() {
+        public override PointCloud getResult() {
             return null; 
         }
     }
