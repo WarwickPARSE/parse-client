@@ -428,6 +428,11 @@ namespace PARSE
             System.Windows.Forms.MessageBox.Show("You are too fat");
         }
 
+        private void LimbOption_Click(object sender, RoutedEventArgs e)
+        {
+            SkeletonFigure sf = new SkeletonFigure(vpcanvas2);
+        }
+
         private void ImportScan_Click(object sender, RoutedEventArgs e)
         {
 
