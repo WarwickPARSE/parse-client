@@ -6,7 +6,7 @@ using System.Windows.Media.Media3D;
 
 namespace PARSE.ICP
 {
-    struct PointRGB
+    public struct PointRGB
     {
         
         public PointRGB(Point3D point, double r, double g, double b) 

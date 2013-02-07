@@ -18,7 +18,7 @@ namespace PARSE
         public static Point3D[] p = { p1, p2, p3, p4, p5 };
         public static List<Point3D> testList = new List<Point3D>(p);*/
 
-        private const double pctorwtransform = 1/19.74234925;//to be determined experimentally
+        private const double pctorwtransform = 0.123195634;//to be determined experimentally
         
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
@@ -34,7 +34,8 @@ namespace PARSE
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
             double volume = getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
-            //volume = volume * pctorwtransform;
+            Console.WriteLine("Volume Pre Multi: " + volume);
+            volume = volume * pctorwtransform;
             return volume;
         }
 
@@ -75,8 +76,8 @@ namespace PARSE
                     volume = volume + innerVolume;
                 }
             }
-
-            //volume = volume * pctorwtransform;
+            Console.WriteLine("Volume Pre Multi: " + volume);
+            volume = volume * pctorwtransform;
             return volume;
         }
         
