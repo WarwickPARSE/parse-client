@@ -4,21 +4,28 @@ using System.Linq;
 using System.Text;
 //using Emgu.CV.CvEnum;
 using System.Windows.Media.Media3D;
+using PARSE.ICP;
 
 namespace PARSE
 {
     public static class VolumeCalculator
     {
-        public static Point3D p2 = new Point3D(0, 0, 0);
+        /*public static Point3D p2 = new Point3D(0, 0, 0);
         public static Point3D p1 = new Point3D(0, 7, 0);
         public static Point3D p4 = new Point3D(1, 6, 0);
         public static Point3D p5 = new Point3D(2, 4, 0);
         public static Point3D p3 = new Point3D(3, 0, 0);
         public static Point3D[] p = { p1, p2, p3, p4, p5 };
-        public static List<Point3D> testList = new List<Point3D>(p);
+        public static List<Point3D> testList = new List<Point3D>(p);*/
         
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
+            Console.WriteLine(xmin);
+            Console.WriteLine(xmax);
+            Console.WriteLine(ymin);
+            Console.WriteLine(ymax);
+            Console.WriteLine(zmin);
+            Console.WriteLine(zmax);
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
         }
 
@@ -38,14 +45,20 @@ namespace PARSE
         //only works on an amorphus blob
         public static double volume1stApprox(PointCloud pc)
         {
+            double xmin = pc.getxMin();
+            double xmax = pc.getxMax();
+            double ymin = pc.getyMin();
+            double ymax = pc.getyMax();
+            double[] limits = { xmin, ymin, xmax, ymax };
+
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
             double increment = 0.01;
             double volume = 0;
 
-            for (double i = zmin; i <= zmax; i = i + increment)
+            for (double i = zmin + (increment / 2); i <= zmax - (increment / 2); i = i + increment)
             {
-                List<Point3D> plane = testList;//pc.getAllPointsAt(i);
+                List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 plane = rotSort(plane);
                 plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
@@ -57,7 +70,7 @@ namespace PARSE
                 }
 
                 innerVolume = Math.Abs(innerVolume / 2);
-                //innerVolume = innerVolume * ?;
+                innerVolume = innerVolume * increment;
 
                 volume = volume + innerVolume;
             }
@@ -66,16 +79,17 @@ namespace PARSE
             return volume;
         }
         
-        private static double calculateVolume(PointCloud pc)
+        public static double calculateVolume(PointCloud pc)
         {
-            Console.WriteLine("Upper Bound on Patient Volume: "+volume0thApprox(pc));
-            return volume1stApprox(pc);
+            Console.WriteLine("Upper Bound on Patient Volume: " + volume0thApprox(pc));
+            Console.WriteLine("Better Volume Patient Volume: " + volume1stApprox(pc));
+            return 0;//volume1stApprox(pc);
         }
 
         private static int compareTwoPoints(Point3D a, Point3D b)
         {
             double aTanA, aTanB;
-
+            Console.WriteLine(a);
             //  Fetch the atans
 
             aTanA = Math.Atan2(a.Y, a.X);
