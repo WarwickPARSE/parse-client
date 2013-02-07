@@ -262,6 +262,35 @@ namespace PARSE
         }
 
         /// <summary>
+        /// Translate the point cloud by a given value
+        /// </summary>
+        /// <param name="tx">Up to three co-ords</param>
+        public void translate(double[] tx) 
+        {
+            if (!(tx.Length > 3)) {
+
+            }
+            else { 
+                //probably want to throw an exception here
+            }
+        }
+
+        /// <summary>
+        /// Rotates the point cloud by a given angle
+        /// </summary>
+        /// <param name="axis">The axis of rotation</param>
+        /// <param name="angle">The angle to which te point cloud is to be rotated</param>
+        public void rotate(double[] axis, double angle) 
+        {
+            if (!(axis.Length > 3)) {
+
+            }
+            else{
+                //throw an exception and annoy Bernie in the process ;)
+            }
+        }
+
+        /// <summary>
         /// returns kd-tree representation of point cloud
         /// </summary>
         /// <param name="points"></param>
