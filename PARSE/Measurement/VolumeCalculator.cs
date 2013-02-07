@@ -64,7 +64,7 @@ namespace PARSE
                 }
 
                 innerVolume = Math.Abs(innerVolume / 2);
-                //innerVolume = innerVolume * ?;
+                innerVolume = innerVolume * increment;
 
                 volume = volume + innerVolume;
             }
