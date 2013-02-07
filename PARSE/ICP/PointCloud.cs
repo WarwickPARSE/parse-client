@@ -50,12 +50,12 @@ namespace PARSE
 
         //max and min values for the data stored within the point cloud 
         public BitmapSource bs;
-        double maxx = 0;
-        double maxy = 0;
-        double maxz = 0;
-        double minx = 1;
-        double miny = 1;
-        double minz = 1;
+        double maxx = double.MinValue;
+        double maxy = double.MinValue;
+        double maxz = double.MinValue;
+        double minx = double.MaxValue;
+        double miny = double.MaxValue;
+        double minz = double.MaxValue;
 
 
         //geometry, accessible for visualisation.
