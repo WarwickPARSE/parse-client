@@ -116,6 +116,7 @@
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
+    <Compile Include="Database\Class1.cs" />
     <Compile Include="Measurement\VolumeCalculator.cs" />
     <Compile Include="ICP\PointRGB.cs" />
     <Compile Include="ICP\ICP3D.cs" />
