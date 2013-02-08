@@ -236,46 +236,7 @@ namespace PARSE
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
         {
 
-            String feedChoice   = feedcb.Text;
             String visualChoice = visualcb.Text;
-
-            //Stop all streams
-            kinectInterp.stopStreams();
-
-            //Assign feed to bitmap source
-            switch (feedChoice)
-            {
-
-                case "RGB":
-                    kinectInterp.startRGBStream();
-                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                    break;
-
-                case "RGB + Skeletal":
-                    kinectInterp.startRGBStream();
-                    kinectInterp.startDepthStream();
-                    kinectInterp.startSkeletonStream();
-                    this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
-                    break;
-
-                case "Depth":
-                    kinectInterp.startDepthStream();
-                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-                    break;
-
-                case "Depth + Skeletal":
-                    kinectInterp.startDepthStream();
-                    kinectInterp.startSkeletonStream();
-                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-                    break;
-
-                case "Skeletal":
-                    kinectInterp.startSkeletonStream();
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-                    break;
-
-            }
 
             switch (visualChoice)
             {
