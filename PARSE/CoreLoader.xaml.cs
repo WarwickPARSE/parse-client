@@ -488,9 +488,9 @@ namespace PARSE
 
         private void multiSurf()
         {
-            MultiSurf multiSurfController = new MultiSurf();
+            /*MultiSurf multiSurfController = new MultiSurf();
 
-            /*
+            
             BitmapSource observedImg = kinectInterp.getRGBTexture();
            
             //Convert bitmap source to image
@@ -508,18 +508,18 @@ namespace PARSE
 
             // Run with image from Kinect
             //Image<Bgr, Byte> result = multiSurfController.run(obsImg);
-            */
+            
             // Run with image from file
             Image<Bgr, Byte> result = multiSurfController.run();
 
             System.Drawing.Bitmap resultBitmap = result.ToBitmap();
             BitmapSource resultBitmapSource = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-            this.kinectImager.Source = resultBitmapSource;
+            this.kinectImager.Source = resultBitmapSource;*/
         }
 
         private void blockSurf()
         {
-            String Target_Url = "c:/parse/multisurf/camera/1.jpg";
+           /* String Target_Url = "c:/parse/multisurf/camera/1.jpg";
 
             Console.WriteLine("Opening target image...");
             Image<Bgr, Byte> inputImageRaw;
@@ -563,7 +563,7 @@ namespace PARSE
 
                 }
             }
-
+            */
             
         }
 
