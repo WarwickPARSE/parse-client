@@ -58,6 +58,8 @@ namespace PARSE
 
             InitJoints();
             InitBones();
+
+            System.Diagnostics.Debug.WriteLine("Created the skeleton");
         }
 
         public void Erase()
@@ -169,7 +171,7 @@ namespace PARSE
             };
 
             //foreach (Line line in Bones.Values)
-            //    canvas.Children.Add(line);
+            //canvas.Children.Add(line);
         }
 
         private void InitJoints()

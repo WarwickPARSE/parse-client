@@ -10,7 +10,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
-using Emgu.CV.GPU;
+//using Emgu.CV.GPU;
 using PARSE.Recognition;
 
 namespace PARSE
@@ -47,7 +47,7 @@ namespace PARSE
 
             //CUDA Instantiation
 
-            if (GpuInvoke.HasCuda)
+           /* if (GpuInvoke.HasCuda)
             {
                 GpuSURFDetector surfGPU = new GpuSURFDetector(surfCPU.SURFParams, 0.01f);
                 using (GpuImage<Gray, Byte> gpuModelImage = new GpuImage<Gray, byte>(modelImage))
@@ -107,7 +107,7 @@ namespace PARSE
             }
             else
             {
-                //Non CUDA Instantiation
+              */  //Non CUDA Instantiation
                 //extract features from the object image
                 modelKeyPoints = surfCPU.DetectKeyPointsRaw(modelImage, null);
                 Matrix<float> modelDescriptors = surfCPU.ComputeDescriptorsRaw(modelImage, null, modelKeyPoints);
@@ -139,7 +139,7 @@ namespace PARSE
                 }
 
                 watch.Stop();
-            }
+           // }
 
             //Draw matched keypoints in observed image.
             Image<Bgr, Byte> result = Features2DToolbox.DrawMatches(modelImage.Clone(), modelKeyPoints, observedImage.Clone(), observedKeyPoints,
@@ -175,6 +175,6 @@ namespace PARSE
             Console.WriteLine("Surf completed in " + matchTime + "ms" + " with " + matches + " matches");
 
             return new SurfResults(isMatch, matches, observedImage, result, modelImage.ROI, matchTime);
-        }
+        } 
     }
 }

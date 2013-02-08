@@ -3,15 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        Title="Body Measurement and Scanning Environment by PARSE" Height="586" Width="785" Loaded="Window_Loaded" Closing="WindowClosing">
-    <Grid Height="526" Width="750" HorizontalAlignment="Left" VerticalAlignment="Top">
+        Title="Body Measurement and Scanning Environment by PARSE" Loaded="Window_Loaded" Closing="WindowClosing">
+    <Grid Height="526" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25*" />
-            <RowDefinition Height="500*" />
+            <RowDefinition Height="40*" />
+            <RowDefinition Height="900*" />
         </Grid.RowDefinitions>
         
         <!--Menu definition-->
-        <Menu Name="functionMenu" Height="25" Width="785">
+        <Menu Name="functionMenu">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Patient" IsCheckable="true"/>
                 <MenuItem Header="_Open Patient" IsCheckable="true"/>
@@ -28,7 +28,7 @@
             <MenuItem Header="Patient">
                 <MenuItem Header="Capture">
                     <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                    <MenuItem Header="Limb Circumference" IsCheckable="true"/>
+                    <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Details" IsCheckable="true"/>
                 <Separator/>
@@ -52,29 +52,35 @@
         
         <!--Kinect Control Panel -->
         <Label Content="Status" Height="29" HorizontalAlignment="Left" Margin="10,480,0,0" Name="lblStatus" VerticalAlignment="Top" Grid.Row="1" />
-        <Grid Height="115" HorizontalAlignment="Left" Margin="12,216,0,0" Name="grid1" VerticalAlignment="Top" Width="162" Grid.Row="1">
+        <Grid Height="126" HorizontalAlignment="Left" Margin="12,216,0,0" Name="grid1" VerticalAlignment="Top" Width="160" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="91*" />
+                <RowDefinition Height="35*" />
+            </Grid.RowDefinitions>
             <Label Content="Scanning" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="lblScanning" VerticalAlignment="Top" FontWeight="Bold" />
             <Button Content="Start" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnStartScanning" VerticalAlignment="Top" Width="75" Click="btnStartScanning_Click" />
             <Button Content="Stop" Height="23" HorizontalAlignment="Left" Margin="83,40,0,0" Name="btnStopScanning" VerticalAlignment="Top" Width="75" />
-            <Button Content="DTF" Height="23" HorizontalAlignment="Left" Margin="4,77,0,0" Name="btnDumpToFile" VerticalAlignment="Top" Width="75" />
+            <Label Content="Texture" FontWeight="Bold" Height="28" HorizontalAlignment="Left" Margin="6,69,0,0" Name="label5" VerticalAlignment="Top" Grid.RowSpan="2" />
+            <RadioButton Content="On" Height="16" HorizontalAlignment="Left" Margin="13,7,0,0" Name="radioButton1" VerticalAlignment="Top" Grid.Row="1" GroupName="texop" />
+            <RadioButton Content="Off" Height="16" HorizontalAlignment="Right" Margin="0,7,55,0" Name="radioButton2" VerticalAlignment="Top" Grid.Row="1" GroupName="texop" />
         </Grid>
-        <Grid Height="110" HorizontalAlignment="Left" Margin="12,342,0,0" Name="grid2" VerticalAlignment="Top" Width="162" Grid.Row="1">
-            <Label Content="Sensor Positioning" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="lblSensorPosition" VerticalAlignment="Top" FontWeight="Bold" />
-            <Button Content="Up" Height="23" HorizontalAlignment="Left" Margin="4,40,0,0" Name="btnSensorUp" VerticalAlignment="Top" Width="75" Click="btnSensorUp_Click" />
-            <Button Content="Down" Height="23" HorizontalAlignment="Left" Margin="85,40,0,0" Name="btnSensorDown" VerticalAlignment="Top" Width="75" Click="btnSensorDown_Click" />
-            <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="85,79,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
-            <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="4,79,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
+        <Grid Height="115" HorizontalAlignment="Left" Margin="12,348,0,0" Name="grid2" VerticalAlignment="Top" Width="162" Grid.Row="1">
+            <Label Content="Sensor Positioning" Height="28" HorizontalAlignment="Left" Margin="3,0,0,0" Name="lblSensorPosition" VerticalAlignment="Top" FontWeight="Bold" />
+            <Button Content="Up" Height="23" HorizontalAlignment="Left" Margin="4,26,0,0" Name="btnSensorUp" VerticalAlignment="Top" Width="75" Click="btnSensorUp_Click" />
+            <Button Content="Down" Height="23" HorizontalAlignment="Left" Margin="85,26,0,0" Name="btnSensorDown" VerticalAlignment="Top" Width="75" Click="btnSensorDown_Click" />
+            <Button Content="Min" Height="23" HorizontalAlignment="Left" Margin="85,65,0,0" Name="btnSensorMin" VerticalAlignment="Top" Width="75" Click="btnSensorMin_Click" />
+            <Button Content="Max" Height="23" HorizontalAlignment="Left" Margin="4,65,0,0" Name="btnSensorMax" VerticalAlignment="Top" Width="75" Click="btnSensorMax_Click" />
         </Grid>
         
         <!--Main grid-->
-        <Grid Name="grid">
-            <Image Width="500" Height="375" Name="image" HorizontalAlignment="Left" />
+        <Grid Name="grid" Margin="0,0,0,501" Grid.RowSpan="2">
+            <Image Width="750" Name="image" HorizontalAlignment="Left" Margin="-1,22,0,-398" />
         </Grid>
         <!--Main grid-->
         
         <!--Visualisation Grid-->
         <Grid Grid.Row="1" Height="194" HorizontalAlignment="Right" Margin="0,27,576,0" Name="grid4" VerticalAlignment="Top" Width="162">
-            <Label Content="Parse Toolkit v0.1" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontStretch="Normal" FontStyle="Italic" Margin="0,-4,0,0" />
+            <Label Content="Parse Toolkit" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontStretch="Normal" FontStyle="Italic" Margin="0,-4,0,0" />
             <ComboBox Height="23" HorizontalAlignment="Left" Margin="4,43,0,0" Name="feedcb" VerticalAlignment="Top" Width="120">
                 <ComboBoxItem Name="cbi1">RGB</ComboBoxItem>
                 <ComboBoxItem Name="cbi2">RGB + Skeletal</ComboBoxItem>
