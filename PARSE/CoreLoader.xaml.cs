@@ -52,7 +52,8 @@ namespace PARSE
 
         //point cloud lists for visualisation
         private List<PointCloud>                        fincloud;
-        private System.Windows.Forms.Timer              pcTimer; 
+        private System.Windows.Forms.Timer              pcTimer;
+        private bool                                    rgbActive;
 
         //speech synthesizer instances
         private SpeechSynthesizer                       ss;
@@ -61,6 +62,8 @@ namespace PARSE
         {
             //Initialize Component
             InitializeComponent();
+
+            this.WindowState = WindowState.Maximized;
 
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
@@ -134,6 +137,15 @@ namespace PARSE
            kinectInterp.SkeletonFrameReady(sender, e);
        }
 
+       private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+       {
+           WriteableBitmap[] results = new WriteableBitmap[1];
+           results = kinectInterp.SensorAllFramesReady(sender, e);
+           
+           this.kinectImager.Source = results[1];
+           this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
+       }
+
         /// <summary>
         /// WPF Form Methods
         /// </summary>
@@ -201,9 +213,9 @@ namespace PARSE
 
                 case "RGB + Skeletal":
                     kinectInterp.startRGBStream();
+                    kinectInterp.startDepthStream();
                     kinectInterp.startSkeletonStream();
-                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                    this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
                     break;
 
                 case "Depth":
@@ -421,7 +433,14 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
+            VolumeCalculator.calculateVolume(fincloud[0]);
+            ss.Speak("You are a fat bastard");
             System.Windows.Forms.MessageBox.Show("You are too fat");
+        }
+
+        private void LimbOption_Click(object sender, RoutedEventArgs e)
+        {
+            SkeletonFigure sf = new SkeletonFigure(vpcanvas2);
         }
 
         private void ImportScan_Click(object sender, RoutedEventArgs e)
@@ -441,6 +460,7 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 this.DataContext = ScanSerializer.deserialize(filename);
+                fincloud = ScanSerializer.depthPc;
             }
         }
 

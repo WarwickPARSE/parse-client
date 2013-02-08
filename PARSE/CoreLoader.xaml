@@ -3,15 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        Title="Body Measurement and Scanning Environment by PARSE" Height="586" Width="785" Loaded="Window_Loaded" Closing="WindowClosing">
-    <Grid Height="526" Width="750" HorizontalAlignment="Left" VerticalAlignment="Top">
+        Title="Body Measurement and Scanning Environment by PARSE" Loaded="Window_Loaded" Closing="WindowClosing">
+    <Grid Height="526" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25*" />
-            <RowDefinition Height="500*" />
+            <RowDefinition Height="40*" />
+            <RowDefinition Height="900*" />
         </Grid.RowDefinitions>
         
         <!--Menu definition-->
-        <Menu Name="functionMenu" Height="25" Width="785">
+        <Menu Name="functionMenu">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Patient" IsCheckable="true"/>
                 <MenuItem Header="_Open Patient" IsCheckable="true"/>
@@ -28,7 +28,7 @@
             <MenuItem Header="Patient">
                 <MenuItem Header="Capture">
                     <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                    <MenuItem Header="Limb Circumference" IsCheckable="true"/>
+                    <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Details" IsCheckable="true"/>
                 <Separator/>
@@ -73,14 +73,14 @@
         </Grid>
         
         <!--Main grid-->
-        <Grid Name="grid">
-            <Image Width="500" Height="375" Name="image" HorizontalAlignment="Left" />
+        <Grid Name="grid" Margin="0,0,0,501" Grid.RowSpan="2">
+            <Image Width="750" Name="image" HorizontalAlignment="Left" Margin="-1,22,0,-398" />
         </Grid>
         <!--Main grid-->
         
         <!--Visualisation Grid-->
         <Grid Grid.Row="1" Height="194" HorizontalAlignment="Right" Margin="0,27,576,0" Name="grid4" VerticalAlignment="Top" Width="162">
-            <Label Content="Parse Toolkit v0.1" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontStretch="Normal" FontStyle="Italic" Margin="0,-4,0,0" />
+            <Label Content="Parse Toolkit" Height="28" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" FontWeight="Bold" FontStretch="Normal" FontStyle="Italic" Margin="0,-4,0,0" />
             <ComboBox Height="23" HorizontalAlignment="Left" Margin="4,43,0,0" Name="feedcb" VerticalAlignment="Top" Width="120">
                 <ComboBoxItem Name="cbi1">RGB</ComboBoxItem>
                 <ComboBoxItem Name="cbi2">RGB + Skeletal</ComboBoxItem>

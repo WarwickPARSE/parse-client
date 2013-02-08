@@ -116,7 +116,12 @@
     <Compile Include="BodyScanner\ScannerModeller.cs" />
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
-    <Compile Include="Database\Class1.cs" />
+    <Compile Include="ICP\Downsampler.cs" />
+    <Compile Include="ICP\KdTree\SimpleStitcher.cs" />
+    <Compile Include="ICP\PCR.cs" />
+    <Compile Include="ICP\Stitcher.cs" />
+    <Compile Include="ICP\VoxelGrid.cs" />
+    <Compile Include="Measurement\LimbCalculator.cs" />
     <Compile Include="Measurement\VolumeCalculator.cs" />
     <Compile Include="ICP\PointRGB.cs" />
     <Compile Include="ICP\ICP3D.cs" />
