@@ -27,6 +27,8 @@ namespace PARSE
             HomographyMatrix homography = null;
 
             //new surfdetector with hessian threshold of 500
+            // WAS 500 - NOW 300!
+
             //(hessian threshold is based on blob detection (points with contrasting brightness/intensity
             //compared to surroundings) threshold determines how agressively surfdetector performs on features.
 
@@ -39,7 +41,7 @@ namespace PARSE
 
             Matrix<byte> mask;
             int k = 2;
-            double uniquenessThreshold = 0.7;
+            double uniquenessThreshold = 0.8;
 
             int matches = 0;
 
@@ -88,10 +90,12 @@ namespace PARSE
                         gpuMatchIndices.Download(indices);
 
                         matches = GpuInvoke.CountNonZero(gpuMask);
-
                         if (GpuInvoke.CountNonZero(gpuMask) >= 4)
                         {
-                            int nonZeroCount = Features2DToolbox.VoteForSizeAndOrientation(modelKeyPoints, observedKeyPoints, indices, mask, 1.5, 20);
+                            int nonZeroCount = 0;
+                            if (observedKeyPoints.Size > 0)
+                                nonZeroCount = Features2DToolbox.VoteForSizeAndOrientation(modelKeyPoints, observedKeyPoints, indices, mask, 1.5, 20);
+
                             if (nonZeroCount >= 4)
                                 homography = Features2DToolbox.GetHomographyMatrixFromMatchedFeatures(modelKeyPoints, observedKeyPoints, indices, mask, 2);
                         }
@@ -138,7 +142,7 @@ namespace PARSE
             }
 
             //Draw matched keypoints in observed image.
-            Image<Bgr, Byte> result = Features2DToolbox.DrawMatches(modelImage, modelKeyPoints, observedImage, observedKeyPoints,
+            Image<Bgr, Byte> result = Features2DToolbox.DrawMatches(modelImage.Clone(), modelKeyPoints, observedImage.Clone(), observedKeyPoints,
             indices, new Bgr(255, 255, 255), new Bgr(255, 255, 255), mask, Features2DToolbox.KeypointDrawType.DEFAULT);
 
             #region draw the projected region on the image
@@ -170,7 +174,7 @@ namespace PARSE
             matchTime = watch.ElapsedMilliseconds;
             Console.WriteLine("Surf completed in " + matchTime + "ms" + " with " + matches + " matches");
 
-            return new SurfResults(isMatch, matches, observedImage, result, matchTime);
+            return new SurfResults(isMatch, matches, observedImage, result, modelImage.ROI, matchTime);
         }
     }
 }

@@ -156,6 +156,7 @@
     <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Recognition\SurfDetector.cs" />
     <Compile Include="Library\ScanSerializer.cs" />
+    <Compile Include="Tracking\SensorTracker.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
@@ -255,20 +256,48 @@
     <Content Include="opencv_core240.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="opencv_features2d240.dll" />
-    <Content Include="opencv_ffmpeg240_64.dll" />
-    <Content Include="opencv_flann240.dll" />
-    <Content Include="opencv_gpu240.dll" />
-    <Content Include="opencv_highgui240.dll" />
-    <Content Include="opencv_imgproc240.dll" />
-    <Content Include="opencv_legacy240.dll" />
-    <Content Include="opencv_ml240.dll" />
-    <Content Include="opencv_nonfree240.dll" />
-    <Content Include="opencv_objdetect240.dll" />
-    <Content Include="opencv_photo240.dll" />
-    <Content Include="opencv_stitching240.dll" />
-    <Content Include="opencv_video240.dll" />
-    <Content Include="opencv_videostab240.dll" />
+    <Content Include="opencv_features2d240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_ffmpeg240_64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_flann240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_gpu240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_highgui240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_imgproc240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_legacy240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_ml240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_nonfree240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_objdetect240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_photo240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_stitching240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_video240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="opencv_videostab240.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

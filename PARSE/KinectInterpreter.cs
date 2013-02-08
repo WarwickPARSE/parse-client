@@ -459,9 +459,9 @@ namespace PARSE
         public BitmapSource getRGBTexture()
         {
             //Variables for point cloud generation
-            if (outputColorBitmap != null)
+            if (this.outputColorBitmap != null)
             {
-                BitmapSource colorbitmap = outputColorBitmap.Clone(); // null;
+                BitmapSource colorbitmap = this.outputColorBitmap.Clone(); // null;
                 return colorbitmap;
             }
             else

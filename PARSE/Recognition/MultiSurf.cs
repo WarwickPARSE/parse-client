@@ -23,14 +23,14 @@ namespace PARSE
         ///Takes an observed image and searches for matches with multiple reference images, using multiple SURF detectors
         ///</summary>
 
-        // Model images
-        string[] Model_Urls = new string[] {"Model1.bmp"};
+        // Model images}
+        string[] Model_Urls = new string[] { "camera/oj/1.jpg", "camera/oj/2.jpg", "camera/oj/3.jpg", "camera/oj/4.jpg" };
         Image<Gray, byte>[] Models;
 
         Image<Bgr, byte> MatchFailImage;
 
         // Target image
-        string Target_Url = "C:/PARSE/MultiSurf/Image2.bmp";
+        string Target_Url = "C:/PARSE/MultiSurf/Camera/oj/Nath_oj_400.png";
         Image<Gray, byte> Target;
 
         // SURF Detectors
@@ -73,6 +73,10 @@ namespace PARSE
             catch (Exception e)
             {
                 Console.WriteLine("Failed to load target image.");
+                
+                if (!System.IO.File.Exists(Target_Url))
+                    Console.WriteLine("Target image does not exist!");
+
                 Console.WriteLine(e.InnerException);
                 throw e;
             }
@@ -95,7 +99,9 @@ namespace PARSE
             {
                 try
                 {
-                    Models[index] = new Image<Bgr, Byte>("C://PARSE//MultiSurf//" + Model_Urls[index]).Convert<Gray, Byte>();
+                    Image<Gray, byte> temp = new Image<Bgr, Byte>("C://PARSE//MultiSurf//" + Model_Urls[index]).Convert<Gray, Byte>();
+                    Models[index] = temp.Clone();
+                    temp.Dispose();
                 }
                 
                 catch (Exception e)
@@ -137,7 +143,7 @@ namespace PARSE
             {
                 //detector_threads[detector] = new Thread(new ThreadStart(runDetector(detector, observedImage)));
                 long matchTime;
-                MultiSurfResults[detector] = detectors[detector].Draw(Models[detector], observedImage, out matchTime);
+                MultiSurfResults[detector] = detectors[detector].Draw(Models[detector].Clone(), observedImage.Clone(), out matchTime);
             }
 
             //foreach (Thread thread in detector_threads)
@@ -146,7 +152,10 @@ namespace PARSE
             int match = analyseResults(MultiSurfResults);
             resultsToDisk(MultiSurfResults, match);
 
-            return MultiSurfResults[match].getMappedImage();
+            if (match > -1)
+                return MultiSurfResults[match].getMappedImage();
+            else
+                return MatchFailImage;
         }
 
         private Image<Bgr, Byte> DrawFromFile(Image<Gray, byte> observedImage)
@@ -157,7 +166,7 @@ namespace PARSE
             {
                 //detector_threads[detector] = new Thread(new ThreadStart(runDetector(detector, observedImage)));
                 long matchTime;
-                MultiSurfResults[detector] = detectors[detector].Draw(Models[detector], observedImage, out matchTime);
+                MultiSurfResults[detector] = detectors[detector].Draw(Models[detector], observedImage.Clone(), out matchTime);
                 MultiSurfResults[detector].setURLs(Model_Urls[detector], Target_Url);
             }
 
@@ -177,7 +186,7 @@ namespace PARSE
         private void resultsToDisk(SurfResults[] results, int bestMatch)
         {
             // Create a folder
-            String homeFolder = "C:/PARSE/MultiSurf/Testing/Results/";
+            String homeFolder = "C:/PARSE/MultiSurf/Testing/Results2/";
             // String timestamp = System.DateTime.Now.ToUniversalTime().ToString();
             String timestamp = string.Format("{0:yyyy-MM-dd_hh-mm-ss}", DateTime.Now);
             String finalDirectory = homeFolder + timestamp;
@@ -204,7 +213,9 @@ namespace PARSE
                 logFileWriter.WriteLine(" * * * * * * * * * * ");
 
                 // Save the image to disk
-                result.getMappedImage().Save(finalDirectory + "/image-" + index.ToString() + ".bmp");
+                if (result.getMappedImage() != null)
+                    result.getMappedImage().Save(finalDirectory + "/image-" + index.ToString() + ".jpg");
+                
             }
 
             logFileWriter.Close();

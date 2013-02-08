@@ -22,13 +22,15 @@ namespace PARSE.Recognition
         private Image<Gray, Byte> OriginalImage;
         private string OriginalImageUrl;
         private long MatchTime;
+        private Rectangle Region;
 
-        public SurfResults(Boolean match, int matches, Image<Gray, byte> Original, Image<Bgr, byte> Mapped, long Time)
+        public SurfResults(Boolean match, int matches, Image<Gray, byte> Original, Image<Bgr, byte> Mapped, Rectangle ROI, long Time)
         {
             HasMatches = match;
             Matches = matches;
             OriginalImage = Original;
             MappedImage = Mapped;
+            Region = ROI;
             MatchTime = Time;
         }
 
@@ -92,6 +94,8 @@ namespace PARSE.Recognition
             output.AppendLine("Match? " + HasMatches);
             output.AppendLine("Number of matches: " + Matches);
             output.AppendLine("Time taken: " + MatchTime + "ms");
+            output.AppendLine("ROI: " + Region.ToString());
+
             return output.ToString();
         }
     }

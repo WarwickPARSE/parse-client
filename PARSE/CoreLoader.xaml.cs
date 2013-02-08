@@ -26,6 +26,7 @@ using Emgu.CV.Structure;
 
 //Kinect imports
 using Microsoft.Kinect;
+using PARSE.Recognition;
 
 namespace PARSE
 {
@@ -49,7 +50,6 @@ namespace PARSE
         private BitmapSource objectimage;
         private int countdown;
         private long matchtime;
-        private MultiSurf multiSurfController;
 
         //point cloud handler thread 
         private CloudVisualisation                      viscloud;
@@ -283,8 +283,11 @@ namespace PARSE
                     break;
 
                 case "Multi-SURF":
+                    kinectInterp.startRGBStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
                     multiSurf();
+                    //blockSurf();
 
                     break;
 
@@ -374,8 +377,6 @@ namespace PARSE
             {
                 capturedModel = true;
                 modelimage = kinectInterp.getRGBTexture();
-                kinectInterp.startRGBStream();
-                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
                 countdown = 10;
             }
             else if ((countdown > 0) && (capturedModel))
@@ -430,15 +431,83 @@ namespace PARSE
 
         private void multiSurf()
         {
-            if (multiSurfController == null)
-                multiSurfController = new MultiSurf();
+            MultiSurf multiSurfController = new MultiSurf();
+
+            /*
+            BitmapSource observedImg = kinectInterp.getRGBTexture();
+           
+            //Convert bitmap source to image
+            MemoryStream outStream = new MemoryStream();
+            BitmapEncoder enc = new BmpBitmapEncoder();
+
+            //Convert image
+            enc.Frames.Add(BitmapFrame.Create(observedImg));
+            enc.Save(outStream);
+            System.Drawing.Bitmap observedBitmap = new System.Drawing.Bitmap(outStream);
+
+            Image<Gray, Byte> obsImg = new Image<Gray, Byte>(observedBitmap);
 
             // TODO Change from .draw to .run or something?
+
+            // Run with image from Kinect
+            //Image<Bgr, Byte> result = multiSurfController.run(obsImg);
+            */
+            // Run with image from file
             Image<Bgr, Byte> result = multiSurfController.run();
+
             System.Drawing.Bitmap resultBitmap = result.ToBitmap();
             BitmapSource resultBitmapSource = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = resultBitmapSource;
+        }
 
+        private void blockSurf()
+        {
+            String Target_Url = "c:/parse/multisurf/camera/1.jpg";
+
+            Console.WriteLine("Opening target image...");
+            Image<Bgr, Byte> inputImageRaw;
+            try
+            {
+                //inputImageRaw = new Image<Bgr, Byte>("C:/PARSE/MultiSurf/Specs/Positives15.jpg");
+                //inputImageRaw = new Image<Bgr, Byte>("C:/PARSE/Training/1/img/Positives7.jpg");
+                inputImageRaw = new Image<Bgr, Byte>(Target_Url);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to load target image.");
+
+                if (!System.IO.File.Exists(Target_Url))
+                    Console.WriteLine("Target image does not exist!");
+
+                Console.WriteLine(e.InnerException);
+                throw e;
+            }
+            Image<Gray, Byte> Target = inputImageRaw.Convert<Gray, Byte>();
+            Console.WriteLine("Opened target image.");
+
+
+            MultiSurf[] multiSurfController = new MultiSurf[12];
+            Image<Bgr, byte>[] multiSurfResults = new Image<Bgr, byte>[12];
+
+            for (int blockX = 0; blockX < 4; blockX++)
+            {
+                for (int blockY = 0; blockY < 3; blockY++)
+                {
+                    //Thread.Sleep(2000);
+
+                    int blockNumber = 3 * blockX + blockY;
+                    Console.WriteLine("Running on block " + blockNumber + " (" + blockX + ", " + blockY + ")" );
+
+                    Image<Gray, byte> blockData = Target.GetSubRect(new System.Drawing.Rectangle(blockX * 320, blockY * 320, 320, 320));
+                    Console.WriteLine("Coords! x1 = " + (blockX * 320) + " x2 = " + (blockX * 320 + 320) + " y1 = " + (blockY * 320) + " y2 = " + (blockY*320 + 320) );
+
+                    multiSurfController[blockNumber] = new MultiSurf();
+                    multiSurfResults[blockNumber] = multiSurfController[blockNumber].run(blockData);
+
+                }
+            }
+
+            
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
