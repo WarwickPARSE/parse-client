@@ -195,6 +195,13 @@ namespace PARSE
             if (this.IsColorStreamUpdating)
             {
                 this.kinectSensor.ColorStream.Disable();
+                    try
+                    {
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("KinectInterpreter/StopStreams() - closing streams that aren't open causes exceptions. Ignore them for now.");
+                    }
             }
         }
 
@@ -599,9 +606,9 @@ namespace PARSE
         public BitmapSource getRGBTexture()
         {
             //Variables for point cloud generation
-            if (outputColorBitmap != null)
+            if (this.outputColorBitmap != null)
             {
-                BitmapSource colorbitmap = outputColorBitmap.Clone(); // null;
+                BitmapSource colorbitmap = this.outputColorBitmap.Clone(); // null;
                 return colorbitmap;
             }
             else
