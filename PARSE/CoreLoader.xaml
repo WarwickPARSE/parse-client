@@ -6,8 +6,8 @@
         Title="Body Measurement and Scanning Environment by PARSE" Loaded="Window_Loaded" Closing="WindowClosing">
     <Grid Height="526" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*" />
-            <RowDefinition Height="900*" />
+            <RowDefinition Height="50*" />
+            <RowDefinition Height="950*" />
         </Grid.RowDefinitions>
         
         <!--Menu definition-->
@@ -22,8 +22,15 @@
             <MenuItem Header="_Edit">
 
             </MenuItem>
-            <MenuItem Header="_View">
-
+            <MenuItem Header="_Feed">
+                <MenuItem Header="_RGB" IsCheckable="False" Click="itemRGB_click"/>
+                <MenuItem Header="_RGB-D" IsCheckable="False" Click="itemRGBCutoff_click"/>
+                <MenuItem Header="_Depth" IsCheckable="False" Click="itemDepth_click"/>
+                <MenuItem Header="_Depth-S" IsCheckable="False" Click="itemDepthCutoff_click"/>
+                <MenuItem Header="_Skeleton" IsCheckable="False" Click="itemSkeleton_click"/>
+            </MenuItem>
+            <MenuItem Header="_Control">
+                      
             </MenuItem>
             <MenuItem Header="Patient">
                 <MenuItem Header="Capture">

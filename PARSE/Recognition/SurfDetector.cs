@@ -5,11 +5,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
-using Emgu.CV;
+/*using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
+using Emgu.CV.Util;*/
 //using Emgu.CV.GPU;
 
 namespace PARSE
@@ -20,7 +20,7 @@ namespace PARSE
         ///Takes a model image and an observed image and outlines the matched features and homography projection
         ///</summary>
 
-       public Image<Bgr, Byte> Draw(Image<Gray, Byte> modelImage, Image<Gray, byte> observedImage, out long matchTime)
+      /* public Image<Bgr, Byte> Draw(Image<Gray, Byte> modelImage, Image<Gray, byte> observedImage, out long matchTime)
         {
             Stopwatch watch;
             HomographyMatrix homography = null;
@@ -98,7 +98,7 @@ namespace PARSE
             }
             else
             {
-              */  //Non CUDA Instantiation
+                //Non CUDA Instantiation
                 //extract features from the object image
                 modelKeyPoints = surfCPU.DetectKeyPointsRaw(modelImage, null);
                 Matrix<float> modelDescriptors = surfCPU.ComputeDescriptorsRaw(modelImage, null, modelKeyPoints);
@@ -153,6 +153,6 @@ namespace PARSE
             matchTime = watch.ElapsedMilliseconds;
             Console.WriteLine("Surf complete: " + matchTime);
             return result;
-        } 
+        } */
     }
 }

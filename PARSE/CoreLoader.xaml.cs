@@ -19,10 +19,9 @@ using System.Windows.Forms;
 using System.Speech.Synthesis;
 using System.Windows.Interop;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
-using Emgu.CV;
-using Emgu.CV.Structure;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -62,8 +61,6 @@ namespace PARSE
         {
             //Initialize Component
             InitializeComponent();
-
-            this.WindowState = WindowState.Maximized;
 
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
@@ -191,6 +188,47 @@ namespace PARSE
                 this.kinectInterp.kinectSensor.Stop();
             }
 
+        }
+
+        /* Feed Selection Subroutines */
+
+        private void itemRGB_click(object sender, RoutedEventArgs e)
+        {
+            kinectInterp.stopStreams();
+            kinectInterp.startRGBStream();
+            this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+        }
+
+        private void itemDepth_click(object sender, RoutedEventArgs e)
+        {
+            kinectInterp.stopStreams();
+            kinectInterp.startDepthStream();
+            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+        }
+
+        private void itemSkeleton_click(object sender, RoutedEventArgs e)
+        {
+            kinectInterp.stopStreams();
+            kinectInterp.startSkeletonStream();
+            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+        }
+
+        private void itemRGBCutoff_click(object sender, RoutedEventArgs e)
+        {
+            kinectInterp.stopStreams();
+            kinectInterp.startRGBStream();
+            kinectInterp.startDepthStream();
+            kinectInterp.startSkeletonStream();
+            this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+        }
+
+        private void itemDepthCutoff_click(object sender, RoutedEventArgs e)
+        {
+            kinectInterp.stopStreams();
+            kinectInterp.startDepthStream();
+            kinectInterp.startSkeletonStream();
+            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
         }
 
         private void btnVisualise_Click(object sender, RoutedEventArgs e)
@@ -399,7 +437,7 @@ namespace PARSE
 
         private void startSurfing()
         {
-            //Convert bitmap source to image
+           /* //Convert bitmap source to image
             MemoryStream outStream = new MemoryStream();
             BitmapEncoder enc = new BmpBitmapEncoder();
             System.Drawing.Bitmap resultBitmap;
@@ -427,7 +465,7 @@ namespace PARSE
             resultBitmap = result.ToBitmap();
             BitmapSource bs = Imaging.CreateBitmapSourceFromHBitmap(resultBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
             this.kinectImager.Source = bs;
-            surfTimer.Stop(); 
+            surfTimer.Stop(); */
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
@@ -440,7 +478,9 @@ namespace PARSE
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
-            SkeletonFigure sf = new SkeletonFigure(vpcanvas2);
+            
+            /*Requires generated model, raw depth array and previous*/
+
         }
 
         private void ImportScan_Click(object sender, RoutedEventArgs e)
