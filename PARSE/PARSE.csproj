@@ -74,14 +74,20 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Emgu.CV">
-      <HintPath>..\..\..\..\..\..\..\Emgu\x86\bin\Emgu.CV.dll</HintPath>
+    <Reference Include="AvalonDock">
+      <HintPath>..\packages\AvalonDock.2.0.1746\lib\net40\AvalonDock.dll</HintPath>
     </Reference>
-    <Reference Include="Emgu.CV.UI">
-      <HintPath>..\..\..\..\..\..\..\Emgu\x86\bin\Emgu.CV.UI.dll</HintPath>
+    <Reference Include="AvalonDock.Themes.Aero">
+      <HintPath>..\packages\AvalonDock.2.0.1746\lib\net40\AvalonDock.Themes.Aero.dll</HintPath>
     </Reference>
-    <Reference Include="Emgu.Util">
-      <HintPath>..\..\..\..\..\..\..\Emgu\x86\bin\Emgu.Util.dll</HintPath>
+    <Reference Include="AvalonDock.Themes.Expression">
+      <HintPath>..\packages\AvalonDock.2.0.1746\lib\net40\AvalonDock.Themes.Expression.dll</HintPath>
+    </Reference>
+    <Reference Include="AvalonDock.Themes.Metro">
+      <HintPath>..\packages\AvalonDock.2.0.1746\lib\net40\AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="AvalonDock.Themes.VS2010">
+      <HintPath>..\packages\AvalonDock.2.0.1746\lib\net40\AvalonDock.Themes.VS2010.dll</HintPath>
     </Reference>
     <Reference Include="HelixToolkit.Wpf, Version=2012.4.14.1, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -117,7 +123,9 @@
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
     <Compile Include="ICP\Downsampler.cs" />
+    <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
+    <Compile Include="ICP\Stitcher.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
     <Compile Include="Measurement\LimbCalculator.cs" />
     <Compile Include="Measurement\VolumeCalculator.cs" />
@@ -143,13 +151,11 @@
       <DependentUpon>Patients.xsd</DependentUpon>
     </Compile>
     <Compile Include="PointCloudHandler.cs" />
-    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
-      <DependentUpon>BasicTracker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
+    <Compile Include="Recognition\SurfResults.cs" />
+    <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Library\ScanSerializer.cs" />
-    <Compile Include="Recognition\SurfDetector.cs" />
+    <Compile Include="Tracking\SensorTracker.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Patients.xsc">
@@ -163,7 +169,6 @@
     <None Include="Patients.xss">
       <DependentUpon>Patients.xsd</DependentUpon>
     </None>
-    <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Page Include="CoreLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -176,9 +181,9 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="WhistlerBlue.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -253,12 +258,6 @@
     <Resource Include="Recognition\Classifiers\cascade.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="opencv_core240.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="opencv_imgproc240.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

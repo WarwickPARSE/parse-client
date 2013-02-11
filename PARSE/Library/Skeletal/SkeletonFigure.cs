@@ -171,7 +171,7 @@ namespace PARSE
             };
 
             //foreach (Line line in Bones.Values)
-                //canvas.Children.Add(line);
+            //canvas.Children.Add(line);
         }
 
         private void InitJoints()
@@ -201,7 +201,7 @@ namespace PARSE
             };
 
             //foreach (Ellipse ellipse in Joints.Values)
-                //canvas.Children.Add(ellipse);
+            //    canvas.Children.Add(ellipse);
         }
 
         private Ellipse GenerateEllipse(int size = JOINT_WIDTH)
