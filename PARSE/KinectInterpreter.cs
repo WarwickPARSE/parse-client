@@ -62,7 +62,8 @@ namespace PARSE
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
         private Boolean                                 updateSkelVars;
-        private float skelDepth = -1; 
+        private float skelDepth = -1;
+        public float                                    skelDepthPublic { get; private set; } 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
         private float skelL; 
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
@@ -309,6 +310,7 @@ namespace PARSE
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
 
                             skelDepth = skelDepth * 1000;
+                            skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
                         }
@@ -332,6 +334,11 @@ namespace PARSE
 
         }
 
+        public float getSkelDepth()
+        {
+            return skelDepthPublic;
+        }
+        
         /// <summary>
         /// Updates the specified drawn skeleton with the new positions
         /// </summary>
