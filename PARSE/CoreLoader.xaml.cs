@@ -57,6 +57,10 @@ namespace PARSE
         //speech synthesizer instances
         private SpeechSynthesizer                       ss;
 
+        private const double oneParseUnit = 2642.5;
+        private const double oneParseUnitDelta = 7.5;
+        //optimum distance for scanner
+
         public CoreLoader()
         {
             //Initialize Component
@@ -287,23 +291,38 @@ namespace PARSE
 
         private void btnStartScanning_Click(object sender, RoutedEventArgs e)
         {
+            if (kinectInterp.getSkelDepth() < (oneParseUnit - oneParseUnitDelta))
+            {
+                ss.Speak("Step Backward you fucker");
+                Console.WriteLine("Step Backward you fucker");
+            }
+            else if (kinectInterp.getSkelDepth() > (oneParseUnit + oneParseUnitDelta))
+            {
+                ss.Speak("Step Forward you fucker");
+                Console.Write("Step Forward you fucker");
+            }
+            else
+            {
+                ss.Speak("Your posiitoning is optimal, have some cake.");
+                Console.WriteLine("Your posiitoning is optimal, have some cake.");
+                fincloud = new List<PointCloud>();
 
-            fincloud = new List<PointCloud>();
+                //start new scanning timer.
+                pcTimer = new System.Windows.Forms.Timer();
+                pcTimer.Tick += new EventHandler(pcTimer_tick);
 
-            //start new scanning timer.
-            pcTimer = new System.Windows.Forms.Timer();
-            pcTimer.Tick += new EventHandler(pcTimer_tick);
+                //initalize speech sythesizer
+                ss.Rate = 1;
+                ss.Volume = 100;
+                ss.Speak("Please face the camera Bitch");
+                this.label4.Content = "Please face the camera";
 
-            //initalize speech sythesizer
-            ss.Rate = 1;
-            ss.Volume = 100;
-            ss.Speak("Please face the camera Bitch");
-            this.label4.Content = "Please face the camera";
-
-            //Initialize and start timerr
-            pcTimer.Interval = 10000;
-            countdown = 3;
-            pcTimer.Start();
+                //Initialize and start timerr
+                pcTimer.Interval = 10000;
+                countdown = 3;
+                pcTimer.Start();
+            }
+            
         }
 
         private void pcTimer_tick(Object sender, EventArgs e) 
