@@ -23,15 +23,17 @@ namespace PARSE
                 plane = PointSorter.rotSort(plane);
                 plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
-                double area = 0;
+                double circum = 0;
                 
                 for (int j = 0; j < plane.Count - 1; j++)
                 {
-                    area = area + ((plane[j].X * plane[j + 1].Y) - (plane[j + 1].X * plane[j].Y));
+                    circum = circum + Math.Sqrt(Math.Pow((plane[j + 1].X - plane[j].X), 2) + Math.Pow((plane[j + 1].Y - plane[j].Y), 2));
                 }
 
-                area = UnitConvertor.convertPCM(area);
-                return area;
+                Console.WriteLine("Circum Pre Multi: " + circum);
+                circum = UnitConvertor.convertPCM(circum);
+                Console.WriteLine("Circum: " + circum);
+                return circum;
             }
             else return -1;
         }
