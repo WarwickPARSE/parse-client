@@ -154,13 +154,18 @@
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Prototyping\Nathan\HSLTracker.xaml.cs">
+      <DependentUpon>HSLTracker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
+    <Compile Include="Recognition\SurfDetector.cs" />
     <Compile Include="Recognition\SurfResults.cs" />
     <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Library\ScanSerializer.cs" />
     <Compile Include="Tracking\SensorTracker.cs" />
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Patients.xsc">
       <DependentUpon>Patients.xsd</DependentUpon>
@@ -187,6 +192,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Prototyping\Nathan\BasicTracker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Prototyping\Nathan\HSLTracker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,6 +1,4 @@
 ﻿//System imports
-
-
 using System;
 using System.Threading;
 using System.Windows;
@@ -50,8 +48,10 @@ namespace PARSE.Prototyping.Nathan
         public int s = 4;
         public bool pc = false;
 
+        private bool takeFrame = true;
+
         // Frame counter
-        public Thread frameProcessorThread;
+        //public Thread frameProcessorThread;
         public int frames = 0;
 
         //Kinect sensor
@@ -59,7 +59,11 @@ namespace PARSE.Prototyping.Nathan
 
         public BasicTracker()
         {
+            Console.WriteLine("Basic Tracker started");
+
             InitializeComponent();
+
+            Console.WriteLine("Component Initialised!");
 
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
@@ -69,11 +73,17 @@ namespace PARSE.Prototyping.Nathan
                 //Initialize sensor
                 kinectSensor = KinectSensor.KinectSensors[0];
 
+                Console.WriteLine("Starting colour stream..");
+
                 //Enable streams
                 kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
+                Console.WriteLine("Starting kinect");
+
                 //Start streams
                 kinectSensor.Start();
+
+                Console.WriteLine("Attaching frameready event...");
 
                 //Check if streams are ready
                 //TODO: there is no justification for isolating these events, it makes life much harder
@@ -81,8 +91,8 @@ namespace PARSE.Prototyping.Nathan
 
                 statusbarStatus.Content = "Status: Device connected";
 
-                frameProcessorThread = new Thread(fpsCounter);
-                frameProcessorThread.Start();
+                //frameProcessorThread = new Thread(fpsCounter);
+                //frameProcessorThread.Start();
             }
             else
             {
@@ -94,6 +104,18 @@ namespace PARSE.Prototyping.Nathan
 
         private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         {
+            if (!takeFrame)
+            {
+                takeFrame = true;
+                return;
+            }
+            else
+            {
+                takeFrame = false;
+            }
+
+            Console.WriteLine("Color image ready!!");
+
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 if (colorFrame != null)
@@ -122,6 +144,8 @@ namespace PARSE.Prototyping.Nathan
 
                         this.blueBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Gray8, null);
                         this.rgbImage_BLUE.Source = this.blueBitmap;
+
+                        Console.WriteLine("Frame written?");
                     }
 
                     colorFrame.CopyPixelDataTo(this.colorpixelData);
@@ -283,7 +307,7 @@ namespace PARSE.Prototyping.Nathan
 
         private void fpsCounter()
         {
-            while (true)
+           /* while (true)
             {
                 Thread.Sleep(1000);
                 int temp = frames;
@@ -292,6 +316,8 @@ namespace PARSE.Prototyping.Nathan
                 Console.WriteLine("FPS: " + frames.ToString());
 
             }
+            
+            */
         }
 
         private void btn_FindColour_Click(object sender, RoutedEventArgs e)
