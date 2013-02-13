@@ -159,7 +159,19 @@
     <Compile Include="Recognition\SurfResults.cs" />
     <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Library\ScanSerializer.cs" />
+    <Compile Include="RuntimeLoader.xaml.cs">
+      <DependentUpon>RuntimeLoader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScanLoader.xaml.cs">
+      <DependentUpon>ScanLoader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tracking\SensorTracker.cs" />
+    <Compile Include="ViewLoader.xaml.cs">
+      <DependentUpon>ViewLoader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PatientLoader.xaml.cs">
+      <DependentUpon>PatientLoader.xaml</DependentUpon>
+    </Compile>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Patients.xsc">
@@ -190,9 +202,25 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="RuntimeLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScanLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WhistlerBlue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PatientLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -270,6 +298,10 @@
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\op3.PNG" />
+    <Resource Include="Resources\op2.PNG" />
+    <Resource Include="Resources\op1.PNG" />
+    <Resource Include="Resources\parseback.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

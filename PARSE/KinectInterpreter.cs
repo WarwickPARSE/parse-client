@@ -62,6 +62,7 @@ namespace PARSE
         private DepthImagePixel[]                       depthPixels;
        
         //Skeleton point array and frame definitions
+        private Skeleton                                activeSkel;
         private Skeleton[]                              skeletonData;
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
@@ -325,6 +326,7 @@ namespace PARSE
                             // If not, create a new drawing on our canvas
                             skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
                             skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            activeSkel = trackedSkeleton;
                             Canvas.SetTop(this.skeletonCanvas, 0);
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
@@ -587,14 +589,19 @@ namespace PARSE
                 }
                 
                 rawDepthClone = rawDepth;
-            
             }
 
             //skelDepth = -1;
             return this.depthFrame32;
         }
 
+
         //Kinect Interpreter Get Methods
+
+        public Dictionary<int,SkeletonFigure> getSkeletons()
+        {
+            return skeletons;
+        }
 
         public int[] getDepthArray()
         {

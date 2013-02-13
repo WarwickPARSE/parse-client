@@ -1,0 +1,32 @@
+﻿<Window x:Class="PARSE.ViewLoader"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation/shell"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        Title="Visualiser" Height="400" Width="600">
+    <Grid>
+    
+    <StatusBar Name="viewerStatus" VerticalAlignment="Bottom">
+        <StatusBarItem Name="capturetext">
+            <TextBlock>Capture Mode: </TextBlock>
+        </StatusBarItem>
+            <StatusBarItem>
+                <ComboBox Name="selection" SelectionChanged="feed_SelectionChanged">
+                    <ComboBoxItem Name="c1">RGB</ComboBoxItem>
+                    <ComboBoxItem Name="c2">RGB-D</ComboBoxItem>
+                    <ComboBoxItem Name="c3">RGB Isolation</ComboBoxItem>
+                    <ComboBoxItem Name="c4">Depth Isolation</ComboBoxItem>
+                    <ComboBoxItem Name="c5">Skeleton</ComboBoxItem>
+                </ComboBox>
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem Name="viewertext">
+                <TextBlock>Normalised Input</TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+
+    <Image Height="337" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="578" Name="kinectImager" />
+    <Canvas Grid.Row="1" Height="337" HorizontalAlignment="Left" Name="vpcanvas2" VerticalAlignment="Top" Width="578"></Canvas>
+
+    </Grid>
+</Window>
