@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
-using PARSE.ICP;
 
 namespace PARSE
 {
@@ -24,7 +23,7 @@ namespace PARSE
                 plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
                 double circum = 0;
-                
+
                 for (int j = 0; j < plane.Count - 1; j++)
                 {
                     circum = circum + Math.Sqrt(Math.Pow((plane[j + 1].X - plane[j].X), 2) + Math.Pow((plane[j + 1].Y - plane[j].Y), 2));
@@ -35,7 +34,11 @@ namespace PARSE
                 Console.WriteLine("Circum: " + circum);
                 return circum;
             }
-            else return -1;
+            else
+            {
+                Console.WriteLine("FIBRE'S ARE FUSSED TO THE HEAD!!!");
+                return -1;
+            }
         }
     }
 }
