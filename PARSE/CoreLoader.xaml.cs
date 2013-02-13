@@ -70,6 +70,9 @@ namespace PARSE
             //Initialize Component
             InitializeComponent();
 
+            //Initialize Database
+            DatabaseEngine db = new DatabaseEngine();
+
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
 
