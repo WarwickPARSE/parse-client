@@ -199,13 +199,15 @@ namespace PARSE
             if (this.IsColorStreamUpdating)
             {
                 this.kinectSensor.ColorStream.Disable();
+                //Don't need this code because this.IsColorStreamUpdating is only true if the colour stream is enabled
+                /*
                     try
                     {
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("KinectInterpreter/StopStreams() - closing streams that aren't open causes exceptions. Ignore them for now.");
-                    }
+                    }*/
             }
         }
 
