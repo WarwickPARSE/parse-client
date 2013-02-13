@@ -345,8 +345,6 @@ namespace PARSE
 
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
-                            Console.WriteLine("HELLO " + skelDepthPublic);
-                            Console.WriteLine(skelDepthPublic);
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
                         }
