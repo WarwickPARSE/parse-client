@@ -16,6 +16,8 @@ namespace PARSE
             double ymax = pc.getyMax();
             double[] limits = { xmin, ymin, xmax, ymax };
 
+            depth = (pc.getzMax() - pc.getzMin()) / 2;
+
             List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.05, limits);//0.05 might need changing
             if (plane.Count != 0)
             {

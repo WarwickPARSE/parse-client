@@ -559,6 +559,7 @@ namespace PARSE
         {
             
             /*Requires generated model, raw depth array and previous*/
+            LimbCalculator.calculate(0, fincloud[0]);
 
         }
 
