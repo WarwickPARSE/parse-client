@@ -59,7 +59,7 @@ namespace PARSE.Prototyping.Nathan
 
                 InitializeComponent();
 
-                interpreter = new KinectInterpreter(null);
+                //interpreter = new KinectInterpreter(null);
 
                 Console.WriteLine("Component Initialised!");
 
@@ -68,53 +68,64 @@ namespace PARSE.Prototyping.Nathan
                 {
                     kinectConnected = true;
 
+                    //Initialize sensor
+                    kinectSensor = KinectSensor.KinectSensors[0];
+
                     Console.WriteLine("Starting colour stream..");
 
                     //Enable streams
-                    interpreter.startRGBStream();
-                    //kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30); //.RgbResolution1280x960Fps12);  //.RawBayerResolution1280x960Fps12);
+                    //interpreter.startRGBStream();
+                    kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30); //.RgbResolution1280x960Fps12);  //.RawBayerResolution1280x960Fps12);
 
-                    Console.WriteLine("Starting kinect");
-
-                    //Start streams
-                    //kinectSensor.Start();
+                    Console.WriteLine("Starting kinect");                    
+                    kinectSensor.Start();
 
                     Console.WriteLine("Attaching frameready event...");
 
                     //Check if streams are ready
                     //TODO: there is no justification for isolating these events, it makes life much harder
                     //interpreter.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                    kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
                     Console.WriteLine("Done! Waiting for frames...");
 
-
-                    while(true)
+                    //while (true)
                     {
-                        Console.WriteLine(nextFrame != null);
-                        processFrame(nextFrame);
+                        //BitmapSource nextFrameBS = interpreter.getRGBTexture();
+                        //if (nextFrameBS != null)
+                        //procImage.Source = nextFrame;
+                        
+                        System.Threading.Thread.BeginCriticalRegion();
+                        ColorImageFrame currentFrame = nextFrame;
+                        processFrame(currentFrame);
+                        System.Threading.Thread.EndCriticalRegion();
+
                     }
-
-
                 }
                 else
                 {
                     Console.WriteLine("Status: No Kinect device detected");
                 }
-
             }
 
 
           private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
           {
-              ColorImageFrame frame = e.OpenColorImageFrame();
+              Console.WriteLine("frame ready!");
+              if(this.nextFrame != null)
+              {
+                  this.nextFrame.Dispose();
+              }
+              ColorImageFrame nextFrame = e.OpenColorImageFrame();
+
+              //processFrame(e.OpenColorImageFrame());
+              processFrame(nextFrame);
           }
 
           private void processFrame(ColorImageFrame colorFrame)
           {
               //using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
               {
-
-
                   if (colorFrame != null)
                   {
                       bool colorFormat = this.rgbImageFormat != colorFrame.Format;
@@ -136,9 +147,10 @@ namespace PARSE.Prototyping.Nathan
 
                       colorFrame.CopyPixelDataTo(this.colorpixelData);
 
-                      //colorpixelData = convertToHSL(colorpixelData);
+                      
 
                       // PROCESS THE DATA //
+                      //colorpixelData = convertToHSL(colorpixelData);
                       //frameProcessor(colorpixelData);
                       processedcolorpixelData = colorpixelData;
 
@@ -163,6 +175,8 @@ namespace PARSE.Prototyping.Nathan
 
                       this.procImage.Source = this.processedBitmap;
                       Console.WriteLine("Frame written");
+
+                      colorFrame.Dispose();
                   }
 
               }
