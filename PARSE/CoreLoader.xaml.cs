@@ -61,6 +61,10 @@ namespace PARSE
         //speech synthesizer instances
         private SpeechSynthesizer           ss;
 
+        private const double oneParseUnit = 2642.5;
+        private const double oneParseUnitDelta = 7.5;
+        //optimum distance for scanner
+
         public CoreLoader()
         {
             //Initialize Component
@@ -229,7 +233,10 @@ namespace PARSE
         {
             //open windowviewer with isolation method.
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
+            
+            /*Requires generated model, raw depth array and previous*/
             windowViewer.setLimbVisualisation();
+            LimbCalculator.calculate(0, fincloud[0]);
 
         }
 

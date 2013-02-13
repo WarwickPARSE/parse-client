@@ -43,7 +43,7 @@ namespace PARSE.ICP.KdTree
             double[] offset = new double[3] { 1, 1, 1 };
 
             //rotation vector 
-            Vector3D rotationAxis = new Vector3D(0, 0, 0);
+            double[] rotationAxis = new double[3]{0, 0, 0};
 
             //rotation angle
             double rotationAngle = 0.0;
@@ -57,26 +57,51 @@ namespace PARSE.ICP.KdTree
                     switch (i) {
                         case 1: 
                             //set the offeset
-                            offset = new double[3] { -0.5, -3.4, 1 };
-                            rotationAxis = new Vector3D(0, 0, 1);
-                            rotationAngle = 90;
+                            offset = new double[3] { -1, -2, 1 };                    
+                            //do not rotate
+                            rotationAngle = 0;
                             
                             break;
                         case 2: 
+                            //set the offset
+                            offset = new double[3] { -0.5, -3.4, 1 };
+                            rotationAxis = new double[3]{0, 0, 1};
+                            rotationAngle = 90;
+
                             break;
                         case 3: 
+                            //set the offset
+                            offset = new double[3] { 0.85, -2.95, 1 };
+                            rotationAxis = new double[3]{0, 0, 1};
+                            rotationAngle = 180;
+
                             break;
-                        case 4: 
+                        case 4:
+                            //set the offset
+                            offset = new double[3] { 0.30, -1.50, 1 };
+                            rotationAxis = new double[3]{0, 0, 1};
+                            rotationAngle = 270;
+
                             break;
                         default:
                             //throw an exception
                             break;
                     }
 
-                    //translate and rotate the point cloud 
+                    //translate the point cloud
+                    pointClouds[i].translate(offset);
+
+                    //rotate the point cloud (if rotation is defined)
+                    if (rotationAngle != 0) {
+                        pointClouds[i].rotate(rotationAxis,rotationAngle);
+                    }
 
                     //stick it in the existing point cloud 
+                    pcd.addPointCLoud(pointClouds[i]);
                 }
+
+                //process is now complete
+                processComplete = true; 
             }
             else { 
                 //throw an exception of some description 

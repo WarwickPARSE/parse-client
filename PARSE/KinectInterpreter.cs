@@ -67,7 +67,8 @@ namespace PARSE
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
         private Boolean                                 updateSkelVars;
-        private float skelDepth = -1; 
+        private float skelDepth = -1;
+        public float                                    skelDepthPublic { get; private set; } 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
         private float skelL; 
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
@@ -172,7 +173,9 @@ namespace PARSE
             skeletons = new Dictionary<int, SkeletonFigure>();
 
             this.kinectSensor.SkeletonStream.Enable();
+
             this.IsSkelStreamUpdating = true;
+            this.enableUpdateSkelVars();
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
@@ -339,6 +342,9 @@ namespace PARSE
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
 
                             skelDepth = skelDepth * 1000;
+                            skelDepthPublic = skelDepth;
+                            Console.WriteLine("HELLO " + skelDepthPublic);
+                            Console.WriteLine(skelDepthPublic);
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
                         }
@@ -364,8 +370,13 @@ namespace PARSE
 
         }
 
-        public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        public float getSkelDepth()
         {
+            return skelDepthPublic;
+        }
+        
+          public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e) {
+
             bool depthReceived = false;
             bool colorReceived = false;
             WriteableBitmap[] results = new WriteableBitmap[2];

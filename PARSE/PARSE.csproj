@@ -123,10 +123,12 @@
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
     <Compile Include="ICP\Downsampler.cs" />
-    <Compile Include="ICP\KdTree\SimpleStitcher.cs" />
+    <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
+    <Compile Include="Measurement\UnitConvertor.cs" />
+    <Compile Include="Measurement\PointSorter.cs" />
     <Compile Include="Measurement\LimbCalculator.cs" />
     <Compile Include="Measurement\VolumeCalculator.cs" />
     <Compile Include="ICP\PointRGB.cs" />
@@ -151,10 +153,6 @@
       <DependentUpon>Patients.xsd</DependentUpon>
     </Compile>
     <Compile Include="PointCloudHandler.cs" />
-    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
-      <DependentUpon>BasicTracker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
     <Compile Include="Recognition\SurfResults.cs" />
     <Compile Include="Recognition\MultiSurf.cs" />
@@ -185,7 +183,6 @@
     <None Include="Patients.xss">
       <DependentUpon>Patients.xsd</DependentUpon>
     </None>
-    <None Include="Prototyping\Greg\MainWindow.xaml.cs" />
     <Page Include="CoreLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -198,10 +195,6 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="RuntimeLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
