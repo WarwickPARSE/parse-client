@@ -84,7 +84,7 @@ namespace KdTree
 
                 catch (KeyDuplicateException e)
                 {
-                    throw e;
+                   // throw e;
                 }
 
             m_count++;
