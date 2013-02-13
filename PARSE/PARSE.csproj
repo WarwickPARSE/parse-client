@@ -127,6 +127,7 @@
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
+    <Compile Include="Measurement\PointSorter.cs" />
     <Compile Include="Measurement\LimbCalculator.cs" />
     <Compile Include="Measurement\VolumeCalculator.cs" />
     <Compile Include="ICP\PointRGB.cs" />
