@@ -114,9 +114,9 @@ namespace PARSE
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
 
-                if (kinectInterp.IsActive)
+                if (kinectInterp.IsEnabled)
                 {
-                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + kinectInterp.PersistId);
+                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 }
                 else
                 {
@@ -235,8 +235,8 @@ namespace PARSE
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             
             /*Requires generated model, raw depth array and previous*/
-            windowViewer.setLimbVisualisation();
-            LimbCalculator.calculate(0, fincloud[0]);
+            //windowViewer.setLimbVisualisation();
+            LimbCalculator.calculate(windowScanner.getPointClouds()[0], windowScanner.getJointMeasurements());
 
         }
 
@@ -293,8 +293,6 @@ namespace PARSE
                 String filename = dlg.FileName;
                 ScanSerializer.serialize(filename, windowScanner.getPointClouds());
             }
-
-            
 
         }
        
