@@ -10,8 +10,6 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        private const double pctorwtransform = 0.123195634;//to be determined experimentally
-        
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
@@ -27,7 +25,7 @@ namespace PARSE
             double zmax = pc.getzMax();
             double volume = getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
             Console.WriteLine("Volume Pre Multi: " + volume);
-            volume = volume * pctorwtransform;
+            volume = UnitConvertor.convertPCM(volume);
             return volume;
         }
 
@@ -69,7 +67,7 @@ namespace PARSE
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
-            volume = volume * pctorwtransform;
+            volume = UnitConvertor.convertPCM(volume);
             return volume;
         }
         
