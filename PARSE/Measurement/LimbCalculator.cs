@@ -21,11 +21,11 @@ namespace PARSE
                 //xmin,xmax,ymin,ymax values
                 double xmin = pc.getxMin();
                 double xmax = pc.getxMax();
-                double ymin = pc.getyMin();
-                double ymax = pc.getyMax();
+                double zmin = pc.getzMin();
+                double zmax = pc.getzMax();
 
                 //depth (with default)
-                double depth = (pc.getzMax() - pc.getzMin()) / 2;
+                double depth = (pc.getyMax() - pc.getyMin()) / 2;
 
                 //output
                 String output = "";
@@ -44,16 +44,16 @@ namespace PARSE
                 {
                     xmin = jointDepths[JointType.ShoulderLeft][1];
                     xmax = jointDepths[JointType.ElbowLeft][1];
-                    ymin = jointDepths[JointType.ElbowLeft][2];
-                    ymax = jointDepths[JointType.ShoulderLeft][2];
+                    zmin = jointDepths[JointType.ElbowLeft][2];
+                    zmax = jointDepths[JointType.ShoulderLeft][2];
                     depth = jointDepths[JointType.ElbowLeft][0];
 
                     System.Diagnostics.Debug.WriteLine("Measuring the upper left arm...");
                 }
 
-                double[] limits = { xmin, ymin, xmax, ymax };
+                double[] limits = { Math.Abs(xmin), Math.Abs(zmin), Math.Abs(xmax), Math.Abs(zmax) };
 
-                System.Diagnostics.Debug.WriteLine(xmin + "*" + xmax + "*" + ymin + "*" + ymax);
+                System.Diagnostics.Debug.WriteLine(xmin + "*" + xmax + "*" + zmin + "*" + zmax);
 
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.2, limits);//0.05 might need changing
                 if (plane.Count != 0)
@@ -71,7 +71,7 @@ namespace PARSE
                     Console.WriteLine("Circum Pre Multi: " + circum);
                     circum = UnitConvertor.convertPCM(circum);
                     Console.WriteLine("Circum: " + circum);
-                    //return circum;
+                    return circum;
                 }
                 else
                 {

@@ -13,8 +13,8 @@ namespace PARSE
             double aTanA, aTanB;
             //  Fetch the atans
 
-            aTanA = Math.Atan2(a.Y, a.X);
-            aTanB = Math.Atan2(b.Y, b.X);
+            aTanA = Math.Atan2(a.Z, a.X);
+            aTanB = Math.Atan2(b.Z, b.X);
 
             //  Determine next point in Clockwise rotation
             if (aTanA < aTanB) return -1;
@@ -26,8 +26,8 @@ namespace PARSE
         {
             double xmax = double.MinValue;
             double xmin = double.MaxValue;
-            double ymax = double.MinValue;
-            double ymin = double.MaxValue;
+            double zmax = double.MinValue;
+            double zmin = double.MaxValue;
             for (int i = 0; i < input.Count; i++)
             {
                 if (input[i].X > xmax)
@@ -38,28 +38,28 @@ namespace PARSE
                 {
                     xmin = input[i].X;
                 }
-                if (input[i].Y > ymax)
+                if (input[i].Z > zmax)
                 {
-                    ymax = input[i].Y;
+                    zmax = input[i].Z;
                 }
-                else if (input[i].Y < ymin)
+                else if (input[i].Z < zmin)
                 {
-                    ymin = input[i].Y;
+                    zmin = input[i].Z;
                 }
             }
 
-            Point3D center = new Point3D((xmax - xmin) / 2, (ymax - ymin) / 2, 0);
+            Point3D center = new Point3D((xmax - xmin) / 2, 0, (zmax - zmin) / 2);
 
             for (int i = 0; i < input.Count; i++)
             {
-                input[i] = new Point3D(input[i].X - center.X, input[i].Y - center.Y, 0);
+                input[i] = new Point3D(input[i].X - center.X, 0, input[i].Z - center.Z);
             }
 
             input.Sort(compareTwoPoints);
 
             for (int i = 0; i < input.Count; i++)
             {
-                input[i] = new Point3D(input[i].X + center.X, input[i].Y + center.Y, 0);
+                input[i] = new Point3D(input[i].X + center.X, 0, input[i].Z + center.Z);
             }
 
             return input;

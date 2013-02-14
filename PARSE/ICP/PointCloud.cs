@@ -15,6 +15,7 @@ using System.Xml.Serialization;
 using System.IO;
 
 using HelixToolkit.Wpf;
+using KdTree;
 
 namespace PARSE
 {
@@ -223,8 +224,9 @@ namespace PARSE
                         pointKey[0] = x;
                         pointKey[1] = y;
                         pointKey[2] = z;
+                        
 
-                        Point3D poLoc = new Point3D(z, y, z);
+                        Point3D poLoc = new Point3D(x, y, z);
                         PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r[i], g[i], b[i]);
 
                         this.points.insert(pointKey, po);
@@ -238,7 +240,7 @@ namespace PARSE
         /// Adds an existing point cloud into this point cloud 
         /// </summary>
         /// <param name="pc">The point cloud to add</param>
-        public void addPointCLoud(PointCloud pc) { 
+        public void addPointCloud(PointCloud pc) { 
             //retrieve the kd tree
             KdTree.KDTree kd = pc.getKDTree();
 
@@ -257,7 +259,16 @@ namespace PARSE
                 double[] key = new double[3] {value.point.X, value.point.Y, value.point.Z};
 
                 //jam the data into the existing kd-tree
-                this.points.insert(key, value);
+                int duplicates = 0;
+                try {
+                    this.points.insert(key, value);
+                }
+                catch (KeyDuplicateException) {
+                    //ignore duplicates
+                    duplicates++; 
+                }
+
+                Console.WriteLine("There were " + duplicates + " duplicate keys in the tree");
             }
         }
 

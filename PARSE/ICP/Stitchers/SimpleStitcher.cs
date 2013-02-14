@@ -97,7 +97,7 @@ namespace PARSE.ICP.KdTree
                     }
 
                     //stick it in the existing point cloud 
-                    pcd.addPointCLoud(pointClouds[i]);
+                    pcd.addPointCloud(pointClouds[i]);
                 }
 
                 //process is now complete

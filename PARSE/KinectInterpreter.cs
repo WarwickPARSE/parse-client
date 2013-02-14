@@ -66,7 +66,6 @@ namespace PARSE
         private Skeleton[]                              skeletonData;
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
-        private Boolean                                 updateSkelVars;
         private float skelDepth = -1;
         public float                                    skelDepthPublic { get; private set; } 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
@@ -86,7 +85,6 @@ namespace PARSE
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
-            updateSkelVars = true;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -119,12 +117,12 @@ namespace PARSE
 
         public void enableUpdateSkelVars()
         {
-            this.updateSkelVars = true;
+            this.IsSkelStreamUpdating = true;
         }
 
         public void disableUpdateSkelVars()
         {
-            this.updateSkelVars = false;
+            this.IsSkelStreamUpdating = false;
         }
 
         //Enable depthStream
@@ -199,13 +197,15 @@ namespace PARSE
             if (this.IsColorStreamUpdating)
             {
                 this.kinectSensor.ColorStream.Disable();
+                //Don't need this code because this.IsColorStreamUpdating is only true if the colour stream is enabled
+                /*
                     try
                     {
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("KinectInterpreter/StopStreams() - closing streams that aren't open causes exceptions. Ignore them for now.");
-                    }
+                    }*/
             }
         }
 
@@ -334,7 +334,7 @@ namespace PARSE
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        if (updateSkelVars)
+                        if (IsSkelStreamUpdating)
                         {
                             //update the depth of the tracked skeleton
                             skelDepth = trackedSkeleton.Position.Z;
