@@ -297,6 +297,51 @@ namespace PARSE
             }
 
         }
+
+        private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
+        {
+            //Create .PCD for use with the PCL Library
+            PointCloud pc = windowScanner.getPointClouds()[0];
+            String filename = "";
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".PCD";
+            dlg.Filter = "Point Cloud Data (.PCD)|*.PCD";
+
+            if (dlg.ShowDialog() == true)
+            {
+                filename = dlg.FileName;
+            }
+
+            //start subroutine to save to PCD File
+            TextWriter tw = new StreamWriter(filename);
+            ICP.PointRGB[] point;
+
+            //write versioning info
+            tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
+            tw.WriteLine("VERSION 1.6");
+
+            //write metadata
+            tw.WriteLine("FIELDS x y z rgb");
+            tw.WriteLine("SIZE 4 4 4 4");
+            tw.WriteLine("TYPE F F F F");
+            tw.WriteLine("COUNT 1 1 1 1");
+            tw.WriteLine("WIDTH 640");
+            tw.WriteLine("HEIGHT 480");
+            tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
+            tw.WriteLine("POINTS " + pc.getAllPoints().Length);
+            tw.WriteLine("DATA ascii");
+
+            //store all points.
+            point = pc.getAllPoints();
+
+            for(int i = 0; i < point.Length; i++) {
+                tw.WriteLine(point[i].point.X + " " + point[i].point.Y + " " + point[i].point.Z + " 4.2108e+06");
+            }
+
+            tw.Close();
+
+        }
        
     }
 }
