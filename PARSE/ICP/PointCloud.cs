@@ -15,6 +15,7 @@ using System.Xml.Serialization;
 using System.IO;
 
 using HelixToolkit.Wpf;
+using KdTree;
 
 namespace PARSE
 {
@@ -258,7 +259,16 @@ namespace PARSE
                 double[] key = new double[3] {value.point.X, value.point.Y, value.point.Z};
 
                 //jam the data into the existing kd-tree
-                this.points.insert(key, value);
+                int duplicates = 0;
+                try {
+                    this.points.insert(key, value);
+                }
+                catch (KeyDuplicateException) {
+                    //ignore duplicates
+                    duplicates++; 
+                }
+
+                Console.WriteLine("There were " + duplicates + " duplicate keys in the tree");
             }
         }
 
