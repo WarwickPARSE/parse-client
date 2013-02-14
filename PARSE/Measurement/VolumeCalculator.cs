@@ -40,7 +40,7 @@ namespace PARSE
 
             double ymin = pc.getzMin();
             double ymax = pc.getzMax();
-            double increment = 0.01;
+            double increment = 1;
             double volume = 0;
 
             for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
@@ -48,6 +48,7 @@ namespace PARSE
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 if (plane.Count != 0)
                 {
+                    Console.WriteLine("TAILS");
                     plane = PointSorter.rotSort(plane);
                     plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
@@ -61,9 +62,13 @@ namespace PARSE
                     innerVolume = Math.Abs(innerVolume / 2);
 
                     innerVolume = innerVolume * increment;
-                    
+
 
                     volume = volume + innerVolume;
+                }
+                else
+                {
+                    Console.WriteLine("HEAD");
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
