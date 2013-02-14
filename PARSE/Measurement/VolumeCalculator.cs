@@ -24,7 +24,7 @@ namespace PARSE
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
             double volume = getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
-            Console.WriteLine("Volume Pre Multi: " + volume);
+            System.Diagnostics.Debug.WriteLine("Volume Pre Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             return volume;
         }
@@ -66,15 +66,15 @@ namespace PARSE
                     volume = volume + innerVolume;
                 }
             }
-            Console.WriteLine("Volume Pre Multi: " + volume);
+            System.Diagnostics.Debug.WriteLine("Volume Pre Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             return volume;
         }
         
         public static double calculateVolume(PointCloud pc)
         {
-            Console.WriteLine("Upper Bound on Patient Volume: " + volume0thApprox(pc));
-            Console.WriteLine("Better Volume Patient Volume: " + volume1stApprox(pc));
+            System.Diagnostics.Debug.WriteLine("Upper Bound on Patient Volume: " + volume0thApprox(pc));
+            System.Diagnostics.Debug.WriteLine("Better Volume Patient Volume: " + volume1stApprox(pc));
             return 0;//volume1stApprox(pc);
         }
     }
