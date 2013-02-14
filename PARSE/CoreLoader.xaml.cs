@@ -116,7 +116,7 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome, Fucker!");
+                ss.Speak("Welcome!");
 
                 if (kinectInterp.IsEnabled)
                 {
@@ -229,7 +229,7 @@ namespace PARSE
         {
             //Static call to volume calculation method, pass persistent point cloud object
             VolumeCalculator.calculateVolume(windowScanner.getPointClouds()[0]);
-            ss.Speak("You are a fat bastard");
+            ss.Speak("You are fat");
             System.Windows.Forms.MessageBox.Show("You are too fat");
         }
 

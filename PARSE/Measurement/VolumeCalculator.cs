@@ -38,9 +38,9 @@ namespace PARSE
             double zmax = pc.getzMax();
             double[] limits = { xmin, zmin, xmax, zmax };
 
-            double ymin = pc.getzMin();
-            double ymax = pc.getzMax();
-            double increment = 1;
+            double ymin = pc.getyMin();
+            double ymax = pc.getyMax();
+            double increment = 0.01;
             double volume = 0;
 
             for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
