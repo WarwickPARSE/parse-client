@@ -57,6 +57,7 @@ namespace PARSE
                     for (int j = 0; j < plane.Count - 1; j++)
                     {
                         innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
+                        //Console.WriteLine("1: "+plane[j].Z+", 2: "+plane[j + 1].Z);
                     }
 
                     innerVolume = Math.Abs(innerVolume / 2);
@@ -64,7 +65,7 @@ namespace PARSE
                     innerVolume = innerVolume * increment;
 
 
-                    volume = volume + innerVolume;
+                    volume = innerVolume;
                 }
                 else
                 {

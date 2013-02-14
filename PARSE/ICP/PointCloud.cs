@@ -223,8 +223,9 @@ namespace PARSE
                         pointKey[0] = x;
                         pointKey[1] = y;
                         pointKey[2] = z;
+                        
 
-                        Point3D poLoc = new Point3D(z, y, z);
+                        Point3D poLoc = new Point3D(x, y, z);
                         PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r[i], g[i], b[i]);
 
                         this.points.insert(pointKey, po);
