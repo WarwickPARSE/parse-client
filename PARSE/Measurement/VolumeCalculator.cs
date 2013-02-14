@@ -48,7 +48,7 @@ namespace PARSE
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 if (plane.Count != 0)
                 {
-                    Console.WriteLine("TAILS");
+                    Console.WriteLine("Plane is not empty");
                     plane = PointSorter.rotSort(plane);
                     plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
@@ -69,7 +69,7 @@ namespace PARSE
                 }
                 else
                 {
-                    Console.WriteLine("HEAD");
+                    Console.WriteLine("Plane EMPTY!!! BAD THINGS WILL HAPPEN");
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
