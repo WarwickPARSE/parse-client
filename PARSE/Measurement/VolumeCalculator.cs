@@ -40,7 +40,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = 0.01;
+            double increment = (ymax - ymin) / 30;
             double volume = 0;
 
             for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
@@ -56,7 +56,7 @@ namespace PARSE
 
                     for (int j = 0; j < plane.Count - 1; j++)
                     {
-                        innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Y) - (plane[j + 1].X * plane[j].Y));
+                        innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
                     }
 
                     innerVolume = Math.Abs(innerVolume / 2);
