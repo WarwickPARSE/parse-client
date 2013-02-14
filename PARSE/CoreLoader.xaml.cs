@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Text;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -118,7 +119,7 @@ namespace PARSE
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
                 ss.Speak("Welcome!");
 
-                if (kinectInterp.IsEnabled)
+                if (KinectSensor.KinectSensors.Count>0)
                 {
                     windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 }

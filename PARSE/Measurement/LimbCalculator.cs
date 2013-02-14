@@ -55,7 +55,7 @@ namespace PARSE
 
                 System.Diagnostics.Debug.WriteLine(xmin + "*" + xmax + "*" + zmin + "*" + zmax);
 
-                List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.05, limits);//0.05 might need changing
+                List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.2, limits);//0.05 might need changing
                 if (plane.Count != 0)
                 {
                     plane = PointSorter.rotSort(plane);
