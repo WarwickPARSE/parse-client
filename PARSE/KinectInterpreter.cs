@@ -609,9 +609,9 @@ namespace PARSE
 
         //Kinect Interpreter Get Methods
 
-        public Dictionary<int,SkeletonFigure> getSkeletons()
+        public Skeleton getSkeletons()
         {
-            return skeletons;
+            return activeSkel;
         }
 
         public int[] getDepthArray()

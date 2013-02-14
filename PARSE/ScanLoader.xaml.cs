@@ -39,6 +39,7 @@ namespace PARSE
         private List<PointCloud> fincloud;
         private System.Windows.Forms.Timer pcTimer;
         private CloudVisualisation cloudvis;
+        private Dictionary<JointType, double[]> jointDepths;
 
         //speech synthesizer instances
         private SpeechSynthesizer ss;
@@ -137,10 +138,11 @@ namespace PARSE
                 this.kinectInterp.enableUpdateSkelVars();
 
                 //get current skeleton tracking state
-                Dictionary <int,SkeletonFigure> skeletons = this.kinectInterp.getSkeletons();
+                Skeleton skeleton = this.kinectInterp.getSkeletons();
+                jointDepths  = enumerateSkeletonDepths(skeleton);
 
                 //PointCloud structure methods
-                PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), averageDepthArray(this.kinectInterp.getDepthArray()));
+                PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(frontCloud);
 
                 //freeze skelL skelDepth and skelR
@@ -156,7 +158,7 @@ namespace PARSE
             {
 
                 //PointCloud structure methods
-                PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), averageDepthArray(this.kinectInterp.getDepthArray()));
+                PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(rightCloud);
 
                 ss.Speak("Turn left with your back to the camera");
@@ -167,7 +169,7 @@ namespace PARSE
             {
 
                 //PointCloud structure methods
-                PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), averageDepthArray(this.kinectInterp.getDepthArray()));
+                PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(backCloud);
 
                 ss.Speak("Turn left once more");
@@ -178,7 +180,7 @@ namespace PARSE
             {
 
                 //PointCloud structure methods
-                PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), averageDepthArray(this.kinectInterp.getDepthArray()));
+                PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(leftCloud);
 
                 //Visualisation instantiation based on int array clouds
@@ -297,16 +299,30 @@ namespace PARSE
 
         /*Publicly accessible methods*/
 
-        public double[] enumerateSkeletonDepths()
+        public Dictionary<JointType, double[]> enumerateSkeletonDepths(Skeleton sk)
         {
+            //Store double
+            Dictionary<JointType, double[]> jointDepths = new Dictionary<JointType, double[]>();
 
-            return null;
+            //Get depths and x,y locations at joints.
+            foreach (Joint j in sk.Joints)
+            {
+                double[] positions = { j.Position.Z, j.Position.X, j.Position.Y };
+                jointDepths.Add(j.JointType, positions);
+            }
+
+            return jointDepths;
         }
 
         /* Getters */
         public List<PointCloud> getPointClouds()
         {
             return fincloud;
+        }
+
+        public Dictionary<JointType, double[]> getJointMeasurements()
+        {
+            return jointDepths;
         }
 
         /* Setters */
