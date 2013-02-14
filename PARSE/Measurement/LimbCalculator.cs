@@ -51,11 +51,11 @@ namespace PARSE
                     System.Diagnostics.Debug.WriteLine("Measuring the upper left arm...");
                 }
 
-                double[] limits = { Math.Abs(xmin), Math.Abs(ymin), Math.Abs(xmax), Math.Abs(ymax) };
+                double[] limits = { xmin, ymin, xmax, ymax };
 
                 System.Diagnostics.Debug.WriteLine(xmin + "*" + xmax + "*" + ymin + "*" + ymax);
 
-                List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.05, limits);//0.05 might need changing
+                List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.2, limits);//0.05 might need changing
                 if (plane.Count != 0)
                 {
                     plane = PointSorter.rotSort(plane);
@@ -71,7 +71,7 @@ namespace PARSE
                     Console.WriteLine("Circum Pre Multi: " + circum);
                     circum = UnitConvertor.convertPCM(circum);
                     Console.WriteLine("Circum: " + circum);
-                    return circum;
+                    //return circum;
                 }
                 else
                 {
