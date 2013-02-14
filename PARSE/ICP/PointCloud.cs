@@ -239,7 +239,7 @@ namespace PARSE
         /// Adds an existing point cloud into this point cloud 
         /// </summary>
         /// <param name="pc">The point cloud to add</param>
-        public void addPointCLoud(PointCloud pc) { 
+        public void addPointCloud(PointCloud pc) { 
             //retrieve the kd tree
             KdTree.KDTree kd = pc.getKDTree();
 
