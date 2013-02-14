@@ -34,16 +34,16 @@ namespace PARSE
         {
             double xmin = pc.getxMin();
             double xmax = pc.getxMax();
-            double ymin = pc.getyMin();
-            double ymax = pc.getyMax();
-            double[] limits = { xmin, ymin, xmax, ymax };
-
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
+            double[] limits = { xmin, zmin, xmax, zmax };
+
+            double ymin = pc.getzMin();
+            double ymax = pc.getzMax();
             double increment = 0.01;
             double volume = 0;
 
-            for (double i = zmin + (increment / 2); i <= zmax - (increment / 2); i = i + increment)
+            for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 if (plane.Count != 0)

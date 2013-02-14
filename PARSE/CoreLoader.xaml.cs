@@ -116,6 +116,7 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
+                ss.Speak("Welcome, Fucker!");
 
                 if (kinectInterp.IsEnabled)
                 {
