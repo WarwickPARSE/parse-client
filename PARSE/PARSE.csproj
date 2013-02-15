@@ -157,6 +157,7 @@
     <Compile Include="Prototyping\Nathan\HSLTracker.xaml.cs">
       <DependentUpon>HSLTracker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Prototyping\Nathan\Matrix.cs" />
     <Compile Include="Prototyping\Robin\DeltaIsolator.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
     <Compile Include="Recognition\SurfDetector.cs" />
@@ -165,7 +166,6 @@
     <Compile Include="Library\ScanSerializer.cs" />
     <Compile Include="Tracking\SensorTracker.cs" />
     <None Include="app.config" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Patients.xsc">
       <DependentUpon>Patients.xsd</DependentUpon>

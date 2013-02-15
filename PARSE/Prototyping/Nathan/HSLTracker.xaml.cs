@@ -31,6 +31,10 @@ namespace PARSE.Prototyping.Nathan
             private const int GreenIndex = 1;
             private const int BlueIndex = 0;
 
+            byte hb = 0;
+            byte sb = 0;
+            byte lb = 0;
+
             //frame sizes
             private int width;
             private int height;
@@ -94,12 +98,12 @@ namespace PARSE.Prototyping.Nathan
                         //BitmapSource nextFrameBS = interpreter.getRGBTexture();
                         //if (nextFrameBS != null)
                         //procImage.Source = nextFrame;
-                        
+                        /*
                         System.Threading.Thread.BeginCriticalRegion();
                         ColorImageFrame currentFrame = nextFrame;
                         processFrame(currentFrame);
                         System.Threading.Thread.EndCriticalRegion();
-
+                        */
                     }
                 }
                 else
@@ -111,11 +115,13 @@ namespace PARSE.Prototyping.Nathan
 
           private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
           {
-              Console.WriteLine("frame ready!");
+              //Console.WriteLine("frame ready!");
+
               if(this.nextFrame != null)
               {
                   this.nextFrame.Dispose();
               }
+
               ColorImageFrame nextFrame = e.OpenColorImageFrame();
 
               //processFrame(e.OpenColorImageFrame());
@@ -147,14 +153,6 @@ namespace PARSE.Prototyping.Nathan
 
                       colorFrame.CopyPixelDataTo(this.colorpixelData);
 
-                      
-
-                      // PROCESS THE DATA //
-                      //colorpixelData = convertToHSL(colorpixelData);
-                      //frameProcessor(colorpixelData);
-                      processedcolorpixelData = colorpixelData;
-
-                      /*
                       // Output raw image
                       this.outputColorBitmap = new WriteableBitmap(colorFrame.Width, colorFrame.Height, 96, 96, PixelFormats.Bgr32, null);
                       this.outputColorBitmap.WritePixels(
@@ -162,7 +160,12 @@ namespace PARSE.Prototyping.Nathan
                           colorpixelData,
                           colorFrame.Width * Bgr32BytesPerPixel,
                           0);
-                      */
+                      this.raw_image.Source = this.outputColorBitmap;
+
+                      // PROCESS THE DATA //
+                      colorpixelData = convertToHSL(colorpixelData);
+                      frameProcessor(colorpixelData);
+                      //processedcolorpixelData = colorpixelData;
 
                       // Output processed image
                       this.processedBitmap.WritePixels(
@@ -174,7 +177,7 @@ namespace PARSE.Prototyping.Nathan
                       this.rgbImageFormat = colorFrame.Format;
 
                       this.procImage.Source = this.processedBitmap;
-                      Console.WriteLine("Frame written");
+                      //Console.WriteLine("Frame written");
 
                       colorFrame.Dispose();
                   }
@@ -186,13 +189,62 @@ namespace PARSE.Prototyping.Nathan
             {
                 //Console.WriteLine("Converting to HSL");
 
-                //byte[] hslImage = new byte [width * height * 4];
+                byte[] hslImage = new byte [width * height * 4];
 
+                for (int i = 0; i < (rgbImage.Length / 4); i += 1)
+                {
+                    int index = i * 4;
+                    float r = rgbImage[index + RedIndex];
+                    float g = rgbImage[index + GreenIndex];
+                    float b = rgbImage[index + BlueIndex];
+                    float h = 0;
+                    float s = 0;
+                    float l = 0;
+
+                    float mx = Math.Max(Math.Max(r, g), b);
+                    float mn = Math.Min(Math.Min(r, g), b);
+                    // imx?
+                    l = (mx + mn) / 2;
+                    if (mx - mn == 0)
+                    {
+                        s = 0;
+                        h = 0;
+
+                        hslImage[index] = (byte) (255 * h);
+                        hslImage[index + 1] = (byte)(255 * s);
+                        hslImage[index + 2] = (byte)(255 * l);
+
+                        continue;
+                    }
+
+                    if (l < 0.5)
+                        s = (mx - mn) / (mx + mn);
+                    else
+                        s = (mx - mn) / (2 - (mx + mn));
+
+                    if (r == mx)
+                        h = ((g - b) / (mx - mn)) / 6;
+                    if (g == mx)
+                        h = ((2 + (b - r)) / (mx - mn)) / 6;
+                    if (b == mx)
+                        h = ((4 + (r - g) / (mx - mn))) / 6;
+
+                    if (h < 0)
+                        h += 1;
+
+                    hslImage[index] = (byte)(255 * h);
+                    hslImage[index + 1] = (byte)(255 * s);
+                    hslImage[index + 2] = (byte)(255 * l);
+
+                }
+
+                /*
                 int HIndex = 0;
                 int SIndex = 1;
                 int LIndex = 2;
-                /*
-                for (int i = 0; i < (rgbImage.Length / 4); i += 1)
+                
+                //for (int i = 0; i < (rgbImage.Length / 4); i += 1)
+                int i = 0;
                 {
                     int index = i * 4;
 
@@ -209,41 +261,50 @@ namespace PARSE.Prototyping.Nathan
                     hslImage[(index + SIndex)] = 128;
                     hslImage[(index + LIndex)] = 128;
 
-                }*/
-
-                return rgbImage;
+                }
+                */
+                return hslImage;
+                //return rgbImage;
             }
 
             private void frameProcessor(byte[] image)
             {
-                Console.WriteLine("Processing frame");
+                //Console.WriteLine("Processing frame");
 
                 processedcolorpixelData = new byte [width * height * 4];
 
+                int hSlider = (int)slider1.Value;
+                int sSlider = (int)slider2.Value;
+                int lSlider = (int)slider3.Value;
+
                 double range = range_slider.Value;
-                double hMin = slider1.Value - 10;// *1 - range;
-                double hMax = slider1.Value + 10;// *1 + range;
+
+                double hMin = hSlider - range;// - 10;// *1 - range;
+                double hMax = hSlider + range;// + 10;// *1 + range;
                 hMax = Math.Min(hMax, 255);
-                double sMin = slider2.Value - 10;// *1 - range;
-                double sMax = slider2.Value + 10;// *1 + range;
-                sMax = Math.Min(sMax, 100);
-                double lMin = slider3.Value - 10;// *1 - range;
-                double lMax = slider3.Value + 10;// *1 + range;
-                lMax = Math.Min(lMax, 100);
+                hMin = Math.Max(hMin, 0);
+                double sMin = sSlider - range;// - 10;// *1 - range;
+                double sMax = sSlider + range;//+ 10;// *1 + range;
+                sMax = Math.Min(sMax, 255);
+                sMin = Math.Max(sMin, 0);
+                double lMin = lSlider - range;// - 10;// *1 - range;
+                double lMax = lSlider + range;// + 10;// *1 + range;
+                lMax = Math.Min(lMax, 255);
+                lMin = Math.Max(lMin, 0);
             
 
                 for (int i = 0; i < (image.Length / 4); i+=1)
                 {
                     // See where things are!
                     if (
-                        image[i*4 + 2] > hMin & image[i*4 + 2] < hMax &
+                        image[i*4] > hMin & image[i*4] < hMax &
                         image[i*4 + 1] > sMin & image[i*4 + 1] < sMax &
-                        image[i*4] > lMin & image[i*4] < lMax
+                        image[i*4 + 2] > lMin & image[i*4 + 2] < lMax
                         )
                     {
-                        processedcolorpixelData[i*4] = 128;
-                        processedcolorpixelData[i*4 + 1] = 128;
-                        processedcolorpixelData[1*4 + 2] = 128;
+                        processedcolorpixelData[i*4] = 255;
+                        processedcolorpixelData[i*4 + 1] = 255;
+                        processedcolorpixelData[1*4 + 2] = 255;
                         processedcolorpixelData[i*4 + 3] = image[i*4 + 3];
                     }                
                 }
@@ -265,7 +326,7 @@ namespace PARSE.Prototyping.Nathan
             private void slider1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
             {
                 // Throws exception on program load if allowed to fire event
-                if (slider1!=null & slider2!=null & slider3!=null)
+                if (slider1.IsInitialized & slider2.IsInitialized & slider3.IsInitialized & HSL_Target_Label.IsInitialized)
                     HSL_Target_Label.Content = "Current target- h:" + slider1.Value + " s:" + slider2.Value + " l:" + slider3.Value;
             }
 
@@ -294,5 +355,78 @@ namespace PARSE.Prototyping.Nathan
                 if (range_slider != null & range_label!= null)
                     range_label.Content = "Variance: " + range_slider.Value;
             }
+
+            private void raw_image_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+            {
+
+                double xCoordinate = e.GetPosition(raw_image).X / raw_image.Width;
+                double yCoordinate = e.GetPosition(raw_image).Y / raw_image.Height;
+
+                xCoordinate = xCoordinate * 640;
+                yCoordinate = yCoordinate * 480;
+
+                xCoordinate = Math.Floor(xCoordinate);
+                yCoordinate = Math.Floor(yCoordinate);
+
+                //Console.Write("   Relative crds: " + xCoordinate + ", " + yCoordinate);
+
+                int target = Convert.ToInt32((width * (yCoordinate - 1) + xCoordinate) * 4);
+
+                //Console.Write(colorpixelData[target + 2] + " - " + colorpixelData[target + 1] + " - " + colorpixelData[target]);
+
+                //rgbLabel_GET.Content = colorpixelData[target + 2] + "-" + colorpixelData[target + 1] + "-" + colorpixelData[target];
+
+                float r = colorpixelData[target + 2];
+                float g = colorpixelData[target + 1];
+                float b = colorpixelData[target];
+                float h = 0;
+                float s = 0;
+                float l = 0;
+
+                float mx = Math.Max(Math.Max(r, g), b);
+                float mn = Math.Min(Math.Min(r, g), b);
+                // imx?
+                l = (mx + mn) / 2;
+                if (mx - mn == 0)
+                {
+                    s = 0;
+                    h = 0;
+
+                    hb = (byte)(255 * h);
+                    sb = (byte)(255 * s);
+                    lb = (byte)(255 * l);
+
+                    selected_target.Content = "Selected HSL: " + hb.ToString() + ", " + sb.ToString() + ", " + lb.ToString();
+                    return;
+                }
+
+                if (l < 0.5)
+                    s = (mx - mn) / (mx + mn);
+                else
+                    s = (mx - mn) / (2 - (mx + mn));
+
+                if (r == mx)
+                    h = ((g - b) / (mx - mn)) / 6;
+                if (g == mx)
+                    h = ((2 + (b - r)) / (mx - mn)) / 6;
+                if (b == mx)
+                    h = ((4 + (r - g) / (mx - mn))) / 6;
+
+                if (h < 0)
+                    h += 1;
+
+                hb = (byte)(255 * h);
+                sb = (byte)(255 * s);
+                lb = (byte)(255 * l);
+                selected_target.Content = "Selected HSL: " + hb.ToString() + ", " + sb.ToString() + ", " + lb.ToString();
+            }
+
+            private void selected_target_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+            {
+                slider1.Value = hb;
+                slider2.Value = sb;
+                slider3.Value = lb;
+            }
     }
 }
+

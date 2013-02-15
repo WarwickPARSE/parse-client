@@ -12,11 +12,13 @@
                 <Image Grid.ColumnSpan="2" Height="480" HorizontalAlignment="Left" ImageFailed="procImage_ImageFailed" Margin="6,6,0,0" Name="procImage" Stretch="Fill" VerticalAlignment="Top" Width="640" />
             </Grid>
         </GroupBox>
-        <Slider Height="23" HorizontalAlignment="Left" Margin="676,60,0,0" Name="slider1" VerticalAlignment="Top" Width="390" ValueChanged="slider1_ValueChanged" Value="180" LargeChange="20" Maximum="360" SmallChange="1" TabIndex="1" />
-        <Slider Height="23" HorizontalAlignment="Left" Margin="676,129,0,0" Name="slider2" VerticalAlignment="Top" Width="390" Value="50" Maximum="100" SmallChange="1" TickFrequency="10" TabIndex="2" ValueChanged="slider2_ValueChanged" />
-        <Slider Height="23" HorizontalAlignment="Left" Margin="676,194,0,0" Name="slider3" VerticalAlignment="Top" Width="390" Maximum="100" LargeChange="10" Value="50" Interval="1" TickFrequency="10" TickPlacement="None" TabIndex="3" ValueChanged="slider3_ValueChanged" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="676,60,0,0" Name="slider1" VerticalAlignment="Top" Width="390" ValueChanged="slider1_ValueChanged" Value="0" LargeChange="20" Maximum="255" SmallChange="1" TabIndex="1" TickFrequency="1" IsSnapToTickEnabled="True" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="676,129,0,0" Name="slider2" VerticalAlignment="Top" Width="390" Value="0" Maximum="255" SmallChange="1" TickFrequency="10" TabIndex="2" ValueChanged="slider2_ValueChanged" IsSnapToTickEnabled="True" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="676,194,0,0" Name="slider3" VerticalAlignment="Top" Width="390" Maximum="255" LargeChange="10" Value="0" Interval="1" TickFrequency="10" TickPlacement="None" TabIndex="3" ValueChanged="slider3_ValueChanged" IsSnapToTickEnabled="True" />
         <Label Content="Current target:" Height="40" HorizontalAlignment="Left" Margin="695,275,0,0" Name="HSL_Target_Label" VerticalAlignment="Top" Width="358" />
-        <Slider Height="23" HorizontalAlignment="Left" Margin="676,380,0,0" Name="range_slider" VerticalAlignment="Top" Width="390" Maximum="50" SmallChange="1" LargeChange="5" ValueChanged="range_slider_ValueChanged" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="676,380,0,0" Name="range_slider" VerticalAlignment="Top" Width="390" Maximum="50" SmallChange="1" LargeChange="5" ValueChanged="range_slider_ValueChanged" IsSnapToTickEnabled="True" />
         <Label Content="Variance:" Height="28" HorizontalAlignment="Left" Margin="695,346,0,0" Name="range_label" VerticalAlignment="Top" Width="236" />
+        <Image Height="190" HorizontalAlignment="Left" Margin="705,442,0,0" Name="raw_image" Stretch="Fill" VerticalAlignment="Top" Width="338" MouseUp="raw_image_MouseUp" />
+        <Label Content="Selected HSL:" Height="28" HorizontalAlignment="Left" Margin="695,312,0,0" Name="selected_target" VerticalAlignment="Top" Width="375" MouseUp="selected_target_MouseUp" />
     </Grid>
 </Window>
