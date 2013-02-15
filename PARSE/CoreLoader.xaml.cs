@@ -304,7 +304,7 @@ namespace PARSE
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
         {
             //Create .PCD for use with the PCL Library
-            PointCloud pc = windowScanner.getPointClouds()[0];
+            PointCloud pc = windowScanner.getPointClouds()[1];
             String filename = "";
 
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -329,17 +329,19 @@ namespace PARSE
             tw.WriteLine("SIZE 4 4 4 4");
             tw.WriteLine("TYPE F F F F");
             tw.WriteLine("COUNT 1 1 1 1");
-            tw.WriteLine("WIDTH 640");
-            tw.WriteLine("HEIGHT 480");
+            tw.WriteLine("WIDTH " + pc.getAllPoints().Length);
+            tw.WriteLine("HEIGHT 1");
             tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
             tw.WriteLine("POINTS " + pc.getAllPoints().Length);
             tw.WriteLine("DATA ascii");
 
             //store all points.
+            pc.rotate(new double[] { 0, 1, 0 }, -90);
+            pc.translate(new double[] { 4, 0, -6 });
             point = pc.getAllPoints();
 
             for(int i = 0; i < point.Length; i++) {
-                tw.WriteLine(point[i].point.X + " " + point[i].point.Y + " " + point[i].point.Z + " 4.2108e+06");
+                tw.WriteLine(point[i].point.X + " " + point[i].point.Z + " " + point[i].point.Y + " 4.2108e+06");
             }
 
             tw.Close();

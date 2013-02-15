@@ -303,8 +303,9 @@ namespace PARSE
         /// <param name="tx">Up to three co-ords</param>
         public void translate(double[] tx) 
         {
-            if (!(tx.Length != 3)) {
+            if (tx.Length == 3) {
                 //turn the transformation vector into and object
+                Console.WriteLine("Translating");
                 TranslateTransform3D translation = new TranslateTransform3D(tx[0], tx[1], tx[2]);
 
                 //pull out the entire tree
@@ -353,7 +354,7 @@ namespace PARSE
                 {
                     //create rot matrix
                     Matrix3D mtx = new Matrix3D();
-                    Quaternion q = new Quaternion(new Vector3D(0, 1, 0), angle);
+                    Quaternion q = new Quaternion(new Vector3D(0, 0, 1), angle);
                     mtx.RotateAt(q, centre);
 
                     //complete rotation
