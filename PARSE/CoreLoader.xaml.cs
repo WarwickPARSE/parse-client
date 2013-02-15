@@ -337,7 +337,7 @@ namespace PARSE
 
             //store all points.
             pc.rotate(new double[] { 0, 1, 0 }, -90);
-            pc.translate(new double[] { 4, 0, -6 });
+            pc.translate(new double[] { 1, 0, -1 });
             point = pc.getAllPoints();
 
             for(int i = 0; i < point.Length; i++) {

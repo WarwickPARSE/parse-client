@@ -316,12 +316,22 @@ namespace PARSE
               
                 //iterate over every point and translate + jam in new tree
                 foreach(PARSE.ICP.PointRGB point in pts) {
-                    //perform the translation
-                    point.point.Offset(tx[0], tx[1], tx[2]);
+                    
+                    //perform the new translation which does appear to work.
+                    Matrix3D mtx = new Matrix3D();
+                    mtx.Translate(new Vector3D(tx[0], tx[1], tx[2]));
+
+                    //complete translation
+                    Point3D newPoint = mtx.Transform(point.point);
 
                     //jam into the tree 
-                    double[] key = new double[3]{point.point.X, point.point.Y, point.point.Z};
-                    newPoints.insert(key, point);
+                    double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
+                    newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
+                    
+                    //perform the old translation method which doesn't appear to work.
+                    //point.point.Offset(tx[0], tx[1], tx[2]);
+                    //double[] key = new double[3]{point.point.X, point.point.Y, point.point.Z};
+                    //newPoints.insert(key, point);
                 }
 
                 //replace the old kd tree with the new one
