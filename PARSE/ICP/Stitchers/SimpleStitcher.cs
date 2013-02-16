@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 
-namespace PARSE.ICP.KdTree
+namespace PARSE.ICP
 {
     /// <summary>
     /// This is basically ripped from bernie's code
     /// </summary>
-    class SimpleStitcher : Stitcher
+    public class SimpleStitcher : Stitcher
     {
         List<PointCloud> pointClouds;
         PointCloud pcd;
