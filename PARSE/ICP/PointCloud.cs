@@ -96,6 +96,7 @@ namespace PARSE
         public PointCloud()
         {
             //parameterless constructor needed for serialization
+            //this.points = new KdTree.KDTree(3);
         }
      
         /// <summary>
@@ -268,7 +269,7 @@ namespace PARSE
                     duplicates++; 
                 }
 
-                Console.WriteLine("There were " + duplicates + " duplicate keys in the tree");
+                //Console.WriteLine("There were " + duplicates + " duplicate keys in the tree");
             }
         }
 

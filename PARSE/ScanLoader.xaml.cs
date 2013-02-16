@@ -74,6 +74,19 @@ namespace PARSE
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
         }
 
+        public ScanLoader(PointCloud gcloud)
+        {
+            InitializeComponent();
+            //hide buttons from form
+            cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
+            this.instructionblock.Visibility = Visibility.Collapsed;
+
+            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
+            this.DataContext = new GroupVisualiser(gcloud);
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+        }
+
 
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {

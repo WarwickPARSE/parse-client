@@ -304,7 +304,7 @@ namespace PARSE
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
         {
             //Create .PCD for use with the PCL Library
-            PointCloud pc = windowScanner.getPointClouds()[1];
+            PointCloud pc = windowScanner.getPointClouds()[0];
             String filename = "";
 
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -336,8 +336,8 @@ namespace PARSE
             tw.WriteLine("DATA ascii");
 
             //store all points.
-            pc.rotate(new double[] { 0, 1, 0 }, -90);
-            pc.translate(new double[] { 1, 0, -1 });
+            //pc.rotate(new double[] { 0, 1, 0 }, -90);
+            //pc.translate(new double[] { -1.5, 1.25, 0 });
             point = pc.getAllPoints();
 
             for(int i = 0; i < point.Length; i++) {
@@ -345,6 +345,62 @@ namespace PARSE
             }
 
             tw.Close();
+
+        }
+
+        private void SimpleStitchTest_Click(object sender, RoutedEventArgs e)
+        {
+            List<PointCloud> pc = windowScanner.getPointClouds();
+            PointCloud groupedCloud = new PointCloud();
+
+            int counter = 0;
+
+            //group the point clouds together (alignment)
+
+            foreach (PointCloud cloud in pc)
+            {
+                if (counter == 0)
+                {
+                    groupedCloud = cloud;
+                    System.Diagnostics.Debug.WriteLine("Front face is now in the pointcloud");
+                    System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + groupedCloud.getAllPoints().Length);
+                }
+                else if (counter == 1)
+                {
+                    cloud.rotate(new double[] { 0, 1, 0 }, -90);
+                    cloud.translate(new double[] { -1.5, 1.25, 0 });
+                    groupedCloud.addPointCloud(cloud);
+                    System.Diagnostics.Debug.WriteLine("Left face is now in the pointcloud");
+                    System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + groupedCloud.getAllPoints().Length);
+                }
+                else if (counter == 2)
+                {
+                    cloud.rotate(new double[] { 0, 1, 0 }, -180);
+                    cloud.translate(new double[] { 0, 2.5, 0 });
+                    groupedCloud.addPointCloud(cloud);
+                    System.Diagnostics.Debug.WriteLine("Back face is now in the pointcloud");
+                    System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + groupedCloud.getAllPoints().Length);
+                }
+                else if (counter == 3)
+                {
+                    cloud.rotate(new double[] { 0, 1, 0 }, -270);
+                    cloud.translate(new double[] { 1.5, 1.25, 0 });
+                    groupedCloud.addPointCloud(cloud);
+                    System.Diagnostics.Debug.WriteLine("Right face is now in the pointcloud");
+                    System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + groupedCloud.getAllPoints().Length);
+                }
+
+                counter++;
+            }
+
+            //display the grouped point cloud
+
+            windowScanner.Close();
+            windowViewer.Close();
+            windowScanner = new ScanLoader(groupedCloud);
+            windowScanner.Owner = this;
+            windowScanner.Closed += new EventHandler(windowScanner_Closed);
+            windowScanner.Show();
 
         }
        
