@@ -37,6 +37,7 @@ namespace PARSE
     {
         //point cloud lists for visualisation
         private List<PointCloud> fincloud;
+        private PointCloud gCloud;
         private System.Windows.Forms.Timer pcTimer;
         private CloudVisualisation cloudvis;
         private Dictionary<JointType, double[]> jointDepths;
@@ -84,6 +85,7 @@ namespace PARSE
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.DataContext = new GroupVisualiser(gcloud);
+            gCloud = gcloud;
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
         }
 
@@ -332,6 +334,12 @@ namespace PARSE
         {
             return fincloud;
         }
+
+        public PointCloud getYourMum()
+        {
+            return gCloud;
+        }
+
 
         public Dictionary<JointType, double[]> getJointMeasurements()
         {

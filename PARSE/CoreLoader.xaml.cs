@@ -233,7 +233,7 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            VolumeCalculator.calculateVolume(windowScanner.getPointClouds()[0]);
+            VolumeCalculator.calculateVolume(windowScanner.getYourMum());
             ss.Speak("You are fat");
             System.Windows.Forms.MessageBox.Show("You are too fat");
         }

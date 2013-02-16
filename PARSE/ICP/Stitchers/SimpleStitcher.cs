@@ -59,9 +59,9 @@ namespace PARSE.ICP
                         case 1:
                             //stick the cloud in the main point cloud 
                             pcd = cloud;
-                           /* System.Diagnostics.Debug.WriteLine("Front face is now in the pointcloud");
-                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);*/
-
+                            System.Diagnostics.Debug.WriteLine("Front face is now in the pointcloud");
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
+                            
                             break;
                         case 2:
                             //rotate + translate 
@@ -69,9 +69,9 @@ namespace PARSE.ICP
                             cloud.translate(new double[] { -1.5, 1.25, 0 });
                             
                             pcd.addPointCloud(cloud);
-                            /*
+                            
                             System.Diagnostics.Debug.WriteLine("Left face is now in the pointcloud");
-                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);*/
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
 
                             break;
                         case 3:
@@ -80,9 +80,9 @@ namespace PARSE.ICP
                             cloud.translate(new double[] { 0, 2.5, 0 });
                             
                             pcd.addPointCloud(cloud);
-                            /*
+                            
                             System.Diagnostics.Debug.WriteLine("Back face is now in the pointcloud");
-                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);*/
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
 
                             break;
                         case 4:
@@ -91,9 +91,9 @@ namespace PARSE.ICP
                             cloud.translate(new double[] { 1.5, 1.25, 0 });
                             
                             pcd.addPointCloud(cloud);
-                            /*
+                            
                             System.Diagnostics.Debug.WriteLine("Right face is now in the pointcloud");
-                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);*/
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
 
                             break;
                         default:
