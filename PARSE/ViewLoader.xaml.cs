@@ -77,6 +77,7 @@ namespace PARSE
             }
             else if (tmp == "RGB Isolation")
             {
+                Environment.Exit(-1);
                 kinectInterp.stopStreams();
                 kinectInterp.startRGBStream();
                 kinectInterp.startDepthStream();
@@ -86,10 +87,17 @@ namespace PARSE
             else if (tmp == "Depth Isolation")
             {
                 kinectInterp.stopStreams();
+                kinectInterp.startRGBStream();
+                kinectInterp.startDepthStream();
+                kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+                /*
+                kinectInterp.stopStreams();
                 kinectInterp.startDepthStream();
                 kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                 */
             }
             else if (tmp == "Skeleton")
             {
