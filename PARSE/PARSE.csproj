@@ -155,6 +155,9 @@
       <DependentUpon>Patients.xsd</DependentUpon>
     </Compile>
     <Compile Include="PointCloudHandler.cs" />
+    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Prototyping\Nathan\HSLTracker.xaml.cs">
       <DependentUpon>HSLTracker.xaml</DependentUpon>
     </Compile>
@@ -211,6 +214,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Prototyping\Nathan\HSLTracker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
