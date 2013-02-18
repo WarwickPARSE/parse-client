@@ -349,13 +349,14 @@ namespace PARSE
                             skelDepth = trackedSkeleton.Position.Z;
                             skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
-                            skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
+                            //skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
 
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
+                            Console.WriteLine("BOO");
                             skelR = (320 * (1 + skelR)) * 4;
-                            skelB = 480 * (1-((1+skelB)/2));
+                            //skelB = 480 * (1-((1+skelB)/2));
                         }
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
@@ -379,24 +380,102 @@ namespace PARSE
 
         }
 
+        public void pissAndShit(object sender, SkeletonFrame skeletonFrame)
+        {
+                if (skeletonFrame != null)
+                {
+
+                    skeletonFrame.CopySkeletonDataTo(skeletonData);
+
+                    // Retrieves Skeleton objects with Tracked state
+                    var trackedSkeletons = skeletonData.Where(s => s.TrackingState == SkeletonTrackingState.Tracked);
+
+                    // By default, assume all the drawn skeletons are inactive
+                    foreach (SkeletonFigure skeleton in skeletons.Values)
+                    {
+                        skeleton.Status = ActivityState.Inactive;
+                    }
+
+                    foreach (Skeleton trackedSkeleton in trackedSkeletons)
+                    {
+                        SkeletonFigure skeletonFigure;
+                        // Checks if the tracked skeleton is already drawn.
+                        if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
+                        {
+                            // If not, create a new drawing on our canvas
+                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
+                            try
+                            {
+                                skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            }
+                            catch (Exception err)
+                            {
+                                //shhhhh
+                            }
+                            activeSkel = trackedSkeleton;
+                            Canvas.SetTop(this.skeletonCanvas, 0);
+                            Canvas.SetLeft(this.skeletonCanvas, 0);
+                        }
+
+                        if (IsSkelStreamUpdating)
+                        {
+                            //update the depth of the tracked skeleton
+                            skelDepth = trackedSkeleton.Position.Z;
+                            skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
+                            skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+                            //skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
+
+                            skelDepth = skelDepth * 1000;
+                            skelDepthPublic = skelDepth;
+                            skelL = (320 * (1 + skelL)) * 4;
+                            Console.WriteLine("BOO");
+                            skelR = (320 * (1 + skelR)) * 4;
+                            //skelB = 480 * (1-((1+skelB)/2));
+                        }
+                        // Update the drawing
+                        Update(trackedSkeleton, skeletonFigure);
+                        skeletonFigure.Status = ActivityState.Active;
+                    }
+
+                    foreach (SkeletonFigure skeleton in skeletons.Values)
+                    {
+                        // Erase all the still inactive drawings. It means they are not tracked anymore.
+                        if (skeleton.Status == ActivityState.Inactive)
+                        {
+                            skeleton.Erase();
+                        }
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            
+
+        }
+
+
         public float getSkelDepth()
         {
             return skelDepthPublic;
         }
-        
-          public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e) {
+
+        public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        {
+
+            pissAndShit(sender, e.OpenSkeletonFrame());
 
             bool depthReceived = false;
-            bool colorReceived = false;
+            bool colorReceived;
             WriteableBitmap[] results = new WriteableBitmap[2];
 
             DepthImageFormat DepthFormat = DepthImageFormat.Resolution640x480Fps30;
 
             ColorImageFormat ColorFormat = ColorImageFormat.RgbResolution640x480Fps30;
 
-            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
-            {
-                if (null != depthFrame)
+            DepthImageFrame depthFrame = e.OpenDepthImageFrame();
+
+            if (null != depthFrame)
                 {
                     // Copy the pixel data from the image to a temporary array
 
@@ -404,89 +483,94 @@ namespace PARSE
 
                     depthReceived = true;
                 }
-            }
 
-            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
-            {
-                if (null != colorFrame)
+                using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
                 {
-                    // Copy the pixel data from the image to a temporary array
-
-                    this.outputColorBitmap = new WriteableBitmap(640, 480, 96, 96, PixelFormats.Bgr32, null);
-
-                    colorFrame.CopyPixelDataTo(this.colorPixels);
-
-                    colorReceived = true;
-                }
-            }
-
-            if (true == depthReceived)
-            {
-                this.kinectSensor.CoordinateMapper.MapDepthFrameToColorFrame(
-                    DepthFormat,
-                    this.depthPixels,
-                    ColorFormat,
-                    this.colorCoordinates);
-
-                Array.Clear(this.greenScreenPixelData, 0, this.greenScreenPixelData.Length);
-
-                // loop over each row and column of the depth
-                for (int y = 0; y < 480; ++y)
-                {
-                    for (int x = 0; x < 640; ++x)
+                    if (null != colorFrame)
                     {
-                        // calculate index into depth array
-                        int depthIndex = x + (y * 640);
+                        // Copy the pixel data from the image to a temporary array
 
-                        DepthImagePixel depthPixel = this.depthPixels[depthIndex];
+                        this.outputColorBitmap = new WriteableBitmap(640, 480, 96, 96, PixelFormats.Bgr32, null);
 
-                        int player = depthPixel.PlayerIndex;
+                        colorFrame.CopyPixelDataTo(this.colorPixels);
 
-                        // if we're tracking a player for the current pixel, do green screen
-                        if (player > 0)
+                        colorReceived = true;
+                    }
+                }
+
+                if (true == depthReceived)
+                {
+                    this.kinectSensor.CoordinateMapper.MapDepthFrameToColorFrame(
+                        DepthFormat,
+                        this.depthPixels,
+                        ColorFormat,
+                        this.colorCoordinates);
+
+                    Array.Clear(this.greenScreenPixelData, 0, this.greenScreenPixelData.Length);
+
+                    // loop over each row and column of the depth
+                    for (int y = 0; y < 480; ++y)
+                    {
+                        for (int x = 0; x < 640; ++x)
                         {
-                            // retrieve the depth to color mapping for the current depth pixel
-                            ColorImagePoint colorImagePoint = this.colorCoordinates[depthIndex];
+                            // calculate index into depth array
+                            int depthIndex = x + (y * 640);
 
-                            // scale color coordinates to depth resolution
-                            int colorInDepthX = colorImagePoint.X / this.colorToDepthDivisor;
-                            int colorInDepthY = colorImagePoint.Y / this.colorToDepthDivisor;
+                            DepthImagePixel depthPixel = this.depthPixels[depthIndex];
 
-                            // make sure the depth pixel maps to a valid point in color space
-                            if (colorInDepthX > 0 && colorInDepthX < 640 && colorInDepthY >= 0 && colorInDepthY < 480)
+                            int player = depthPixel.PlayerIndex;
+
+                            // if we're tracking a player for the current pixel, do green screen
+                            if (player > 0)
                             {
-                                // calculate index into the green screen pixel array
-                                int greenScreenIndex = colorInDepthX + (colorInDepthY * 640);
+                                // retrieve the depth to color mapping for the current depth pixel
+                                ColorImagePoint colorImagePoint = this.colorCoordinates[depthIndex];
 
-                                // set opaque
-                                this.greenScreenPixelData[greenScreenIndex] = -1;
+                                // scale color coordinates to depth resolution
+                                int colorInDepthX = colorImagePoint.X / this.colorToDepthDivisor;
+                                int colorInDepthY = colorImagePoint.Y / this.colorToDepthDivisor;
 
-                                // compensate for depth/color not corresponding exactly by setting the pixel 
-                                // to the left to opaque as well
-                                this.greenScreenPixelData[greenScreenIndex - 1] = -1;
+                                // make sure the depth pixel maps to a valid point in color space
+                                if (colorInDepthX > 0 && colorInDepthX < 640 && colorInDepthY >= 0 && colorInDepthY < 480)
+                                {
+                                    // calculate index into the green screen pixel array
+                                    int greenScreenIndex = colorInDepthX + (colorInDepthY * 640);
+
+                                    // set opaque
+                                    this.greenScreenPixelData[greenScreenIndex] = -1;
+
+                                    // compensate for depth/color not corresponding exactly by setting the pixel 
+                                    // to the left to opaque as well
+                                    this.greenScreenPixelData[greenScreenIndex - 1] = -1;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (true == depthReceived)
-            {
-                // Write the pixel data into our bitmap
+                if (true == depthReceived)
+                {
+                    // Write the pixel data into our bitmap
 
-                this.outputBitmap = new WriteableBitmap(
-                        640,
-                        480,
-                        96, // DpiX
-                        96, // DpiY
-                        PixelFormats.Bgr32,
-                        null);
+                    this.outputBitmap = new WriteableBitmap(
+                            640,
+                            480,
+                            96, // DpiX
+                            96, // DpiY
+                            PixelFormats.Bgr32,
+                            null);
 
-                this.outputBitmap.WritePixels(
-                    new Int32Rect(0, 0, this.outputBitmap.PixelWidth, this.outputBitmap.PixelHeight),
-                    this.depthPixels,
-                    this.outputBitmap.PixelWidth * sizeof(int),
-                    0);
+                    this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
+                    this.depthPixelData = new short[depthFrame.PixelDataLength];
+                    depthFrame.CopyPixelDataTo(this.depthPixelData);
+
+                    this.convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
+                    
+                    this.outputBitmap.WritePixels(
+                        new Int32Rect(0, 0, this.outputBitmap.PixelWidth, this.outputBitmap.PixelHeight),
+                        this.convertedDepthBits,
+                        this.outputBitmap.PixelWidth * sizeof(int),
+                        0);
 
                     if (this.playerOpacityMaskImage == null)
                     {
@@ -510,9 +594,10 @@ namespace PARSE
                     results[0] = this.playerOpacityMaskImage;
                     results[1] = this.outputBitmap;
                     return results;
-            }
+                }
 
-            return results;
+                return results;
+            
         }
        
 
@@ -552,7 +637,7 @@ namespace PARSE
 
             for (int i = 0; i < depthFrame.Length; i++)
                 {
-                    this.rawDepth[i] = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                this.rawDepth[i] = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
                     realDepth = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
                     if (skelDepth < 0)
@@ -596,9 +681,8 @@ namespace PARSE
                     }
                     else
                     {
-                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))) && ((skelB + skelBDelta) > (colorPixelIndex / 2560)))
+                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))))
                         {
-                            //Console.WriteLine(skelDepth+" "+realDepth);
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
@@ -612,7 +696,10 @@ namespace PARSE
                             rawDepth[i] = -1;
                             ++colorPixelIndex;
                         }
-                }
+                    }
+            }
+
+                
                 
                 rawDepthClone = rawDepth;
 
