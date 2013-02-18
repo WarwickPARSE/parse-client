@@ -355,7 +355,6 @@ namespace PARSE
                             skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
-                            Console.WriteLine(skelB);
                             skelB = 480 * (1-((1+skelB)/2));
                         }
                         // Update the drawing
@@ -471,14 +470,22 @@ namespace PARSE
                 }
             }
 
-            if (true == colorReceived)
+            if (true == depthReceived)
             {
                 // Write the pixel data into our bitmap
-                    
-                    this.outputColorBitmap.WritePixels(
-                    new Int32Rect(0, 0, this.outputColorBitmap.PixelWidth, this.outputColorBitmap.PixelHeight),
-                    this.colorPixels,
-                    this.outputColorBitmap.PixelWidth * sizeof(int),
+
+                this.outputBitmap = new WriteableBitmap(
+                        640,
+                        480,
+                        96, // DpiX
+                        96, // DpiY
+                        PixelFormats.Bgr32,
+                        null);
+
+                this.outputBitmap.WritePixels(
+                    new Int32Rect(0, 0, this.outputBitmap.PixelWidth, this.outputBitmap.PixelHeight),
+                    this.depthPixels,
+                    this.outputBitmap.PixelWidth * sizeof(int),
                     0);
 
                     if (this.playerOpacityMaskImage == null)
@@ -501,7 +508,7 @@ namespace PARSE
                         0);
 
                     results[0] = this.playerOpacityMaskImage;
-                    results[1] = this.outputColorBitmap;
+                    results[1] = this.outputBitmap;
                     return results;
             }
 
@@ -541,7 +548,8 @@ namespace PARSE
             int colorPixelIndex = 0;
             this.rawDepth = new int[depthFrame.Length];
             int realDepth = 0;
-            
+            int depthPixelIndex = 0;
+
             for (int i = 0; i < depthFrame.Length; i++)
                 {
                     this.rawDepth[i] = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
@@ -549,7 +557,6 @@ namespace PARSE
 
                     if (skelDepth < 0)
                     {
-                        //Console.WriteLine(realDepth);
                         if (realDepth < 1066)
                         {
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
@@ -589,7 +596,6 @@ namespace PARSE
                     }
                     else
                     {
-
                         if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))) && ((skelB + skelBDelta) > (colorPixelIndex / 2560)))
                         {
                             //Console.WriteLine(skelDepth+" "+realDepth);
@@ -606,14 +612,11 @@ namespace PARSE
                             rawDepth[i] = -1;
                             ++colorPixelIndex;
                         }
-
                 }
                 
                 rawDepthClone = rawDepth;
-            }
 
-            //skelDepth = -1;
-            return this.depthFrame32;
+                return this.depthFrame32;
         }
 
 
