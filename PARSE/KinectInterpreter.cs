@@ -73,6 +73,8 @@ namespace PARSE
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
         private float skelR;
         private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+        private float skelB;
+        private float skelBDelta = 30;
 
         public String instruction = "Waiting for patient...";
 
@@ -328,7 +330,14 @@ namespace PARSE
                         {
                             // If not, create a new drawing on our canvas
                             skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
-                            skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            try
+                            {
+                                skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            }
+                            catch (Exception err)
+                            {
+                                //shhhhh
+                            }
                             activeSkel = trackedSkeleton;
                             Canvas.SetTop(this.skeletonCanvas, 0);
                             Canvas.SetLeft(this.skeletonCanvas, 0);
@@ -340,11 +349,14 @@ namespace PARSE
                             skelDepth = trackedSkeleton.Position.Z;
                             skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+                            skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
 
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
+                            Console.WriteLine(skelB);
+                            skelB = 480 * (1-((1+skelB)/2));
                         }
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
@@ -578,7 +590,7 @@ namespace PARSE
                     else
                     {
 
-                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))))
+                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))) && ((skelB + skelBDelta) > (colorPixelIndex / 2560)))
                         {
                             //Console.WriteLine(skelDepth+" "+realDepth);
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
