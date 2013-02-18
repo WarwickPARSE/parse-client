@@ -55,9 +55,8 @@ namespace PARSE.ICP.Stitchers
                 int i = 0;
                 foreach (PointCloud cloud in pointClouds) {
                     //calculate the depth on the first iteration only 
-                    if (i == 0) {
-                        depth = cloud.getzMax() - cloud.getzMin();
-                    }
+
+                    depth = cloud.getzMax() - cloud.getzMin();
 
                     //perform the rotation depending on which point cloud we are looking at 
                     switch (i) { 
