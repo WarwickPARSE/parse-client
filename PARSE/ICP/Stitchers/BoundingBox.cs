@@ -42,7 +42,64 @@ namespace PARSE.ICP.Stitchers
         /// Stitch the point clouds using the "bounding box" algorithm
         /// </summary>
         public void stitch() { 
-        
+            //this algorithm requires four clouds, so we first check that there are four clouds available
+            if (pointClouds.Count == 4) {
+                
+                //instantiate some initial variables
+                double depth = 0;
+                double rotationAngle = 0;
+                double[] translationValue = new double[3];
+
+                //iterate over every cloud 
+                int i = 0;
+                foreach (PointCloud cloud in pointClouds) {
+                    //calculate the depth on the first iteration only 
+                    if (i == 0) {
+                        depth = cloud.getzMax() - cloud.getzMin();
+                    }
+
+                    //perform the rotation depending on which point cloud we are looking at 
+                    switch (i) { 
+                        case 0:
+                            //this is nice, we don't need to do anything! 
+                            break;
+                        case 1:
+                            //set the rotation to a fixed value 
+                            rotationAngle = 90;
+
+                            //calculate the translation value 
+                            break;
+                        case 2:
+                            //set the rotation to a fixed value 
+                            rotationAngle = 180;
+
+                            //calculate the translation value 
+                            break;
+                        case 3:
+                            //set the rotation to a fixed value 
+                            rotationAngle = 270; 
+
+                            //calculate the translation value 
+                            break;
+                        default:
+                            //this should not occur... throw an exception 
+                            break;
+                    }
+
+                    if (i != 0) {
+                        //perform the rotation/translation 
+                    }
+
+                    //stick the result into the point cloud 
+                    this.pcd.addPointCloud(cloud);
+
+                    //increase iterator 
+                    i++;
+                }
+            }
+            else { 
+                //thow an exception 
+            }
         }
 
         /// <summary>
