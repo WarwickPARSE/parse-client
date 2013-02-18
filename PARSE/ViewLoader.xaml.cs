@@ -139,11 +139,12 @@ namespace PARSE
 
         private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            WriteableBitmap results = new WriteableBitmap();
+            //magic needs to come to PARSE
+            /*WriteableBitmap results = new WriteableBitmap();
             results = kinectInterp.SensorAllFramesReady(sender, e);
-            //magic from bernie
-            //this.kinectImager.Source = results[1];
-            //this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
+            
+            this.kinectImager.Source = results[1];
+            this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };*/
         }
 
     }
