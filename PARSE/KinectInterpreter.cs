@@ -460,7 +460,7 @@ namespace PARSE
             return skelDepthPublic;
         }
 
-        public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        public WriteableBitmap SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
 
             pissAndShit(sender, e.OpenSkeletonFrame());
@@ -508,6 +508,12 @@ namespace PARSE
 
                     Array.Clear(this.greenScreenPixelData, 0, this.greenScreenPixelData.Length);
 
+                    this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
+                    this.depthPixelData = new short[depthFrame.PixelDataLength];
+                    depthFrame.CopyPixelDataTo(this.depthPixelData);
+
+                    this.convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
+
                     // loop over each row and column of the depth
                     for (int y = 0; y < 480; ++y)
                     {
@@ -537,11 +543,15 @@ namespace PARSE
                                     int greenScreenIndex = colorInDepthX + (colorInDepthY * 640);
 
                                     // set opaque
-                                    this.greenScreenPixelData[greenScreenIndex] = -1;
+                                    this.convertedDepthBits[greenScreenIndex] = 0;
+                                    this.convertedDepthBits[greenScreenIndex+1] = 0;
+                                    this.convertedDepthBits[greenScreenIndex+2] = 0;
+                                    this.convertedDepthBits[greenScreenIndex+3] = 0;
+                                    //greenScreenPixelData[greenScreenIndex] = -1;
 
                                     // compensate for depth/color not corresponding exactly by setting the pixel 
                                     // to the left to opaque as well
-                                    this.greenScreenPixelData[greenScreenIndex - 1] = -1;
+                                    //this.greenScreenPixelData[greenScreenIndex - 1] = -1;
                                 }
                             }
                         }
@@ -560,43 +570,16 @@ namespace PARSE
                             PixelFormats.Bgr32,
                             null);
 
-                    this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
-                    this.depthPixelData = new short[depthFrame.PixelDataLength];
-                    depthFrame.CopyPixelDataTo(this.depthPixelData);
-
-                    this.convertedDepthBits = this.ConvertDepthFrame(this.depthPixelData, ((KinectSensor)sender).DepthStream);
-                    
                     this.outputBitmap.WritePixels(
                         new Int32Rect(0, 0, this.outputBitmap.PixelWidth, this.outputBitmap.PixelHeight),
                         this.convertedDepthBits,
                         this.outputBitmap.PixelWidth * sizeof(int),
                         0);
 
-                    if (this.playerOpacityMaskImage == null)
-                    {
-                        this.playerOpacityMaskImage = new WriteableBitmap(
-                            640,
-                            480,
-                            96,
-                            96,
-                            PixelFormats.Bgra32,
-                            null);
-
-                        results[0] = this.playerOpacityMaskImage;
-                    }
-
-                    this.playerOpacityMaskImage.WritePixels(
-                        new Int32Rect(0, 0, 640, 480),
-                        this.greenScreenPixelData,
-                        640 * ((this.playerOpacityMaskImage.Format.BitsPerPixel + 7) / 8),
-                        0);
-
-                    results[0] = this.playerOpacityMaskImage;
-                    results[1] = this.outputBitmap;
-                    return results;
+                    return this.outputBitmap;
                 }
 
-                return results;
+                return this.outputBitmap;
             
         }
        
