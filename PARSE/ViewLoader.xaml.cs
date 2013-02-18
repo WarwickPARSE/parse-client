@@ -77,7 +77,7 @@ namespace PARSE
             }
             else if (tmp == "RGB Isolation")
             {
-                Environment.Exit(-1);
+                Environment.Exit(1);
                 kinectInterp.stopStreams();
                 kinectInterp.startRGBStream();
                 kinectInterp.startDepthStream();
@@ -139,11 +139,11 @@ namespace PARSE
 
         private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            WriteableBitmap[] results = new WriteableBitmap[1];
+            WriteableBitmap results = new WriteableBitmap();
             results = kinectInterp.SensorAllFramesReady(sender, e);
-
-            this.kinectImager.Source = results[1];
-            this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
+            //magic from bernie
+            //this.kinectImager.Source = results[1];
+            //this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
         }
 
     }
