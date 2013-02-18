@@ -1,0 +1,44 @@
+﻿<Window x:Class="PARSE.PatientLoader"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Patient Viewer" Height="350" Width="588">
+    <Grid>
+        <TabControl>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Patient Data" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <Label Content="Patient ID" Height="21" Margin="2,-230,480,0" Name="patientIDLabel" Width="75" />
+                    <Label Content="Name" Height="21" Margin="2,-170,480,0" Name="nameLabel" Width="75" />
+                    <Label Content="Date Of Birth" Height="21" Margin="2,-110,480,0" Name="dobLabel" Width="75" />
+                    <Label Content="Nationality" Height="21" Margin="2,-50,480,0" Name="nationalityLabel" Width="75" />
+                    <Label Content="NHS Number" Height="21" Margin="2,10,480,0" Name="nhsNoLabel" Width="75" />
+                    <Label Content="Address" Height="21" Margin="2,70,480,0" Name="addressLabel" Width="75" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,-80,0,0" Name="patientIDText" VerticalAlignment="Top" Width="340" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,-50,0,0" Name="nameText" VerticalAlignment="Top" Width="340" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,-20,0,0" Name="dobText" VerticalAlignment="Top" Width="340" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,10,0,0" Name="nationalityText" VerticalAlignment="Top" Width="340" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,40,0,0" Name="nhsNoText" VerticalAlignment="Top" Width="340" />
+                    <TextBox Height="61" HorizontalAlignment="Left" Margin="150,70,0,0" Name="addressText" VerticalAlignment="Top" Width="340" />
+                </Grid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Condition" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="?" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

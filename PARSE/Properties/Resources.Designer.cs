@@ -59,5 +59,33 @@ namespace PARSE.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Bitmap op1 {
+            get {
+                object obj = ResourceManager.GetObject("op1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap op2 {
+            get {
+                object obj = ResourceManager.GetObject("op2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap op3 {
+            get {
+                object obj = ResourceManager.GetObject("op3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap parseback {
+            get {
+                object obj = ResourceManager.GetObject("parseback", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

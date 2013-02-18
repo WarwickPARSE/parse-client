@@ -1,0 +1,25 @@
+﻿<Window x:Class="PARSE.ScanLoader"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        Title="Scan Viewer" Height="400" Width="600">
+    <Grid>
+        <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas">
+            <h:HelixViewport3D.Camera>
+                <PerspectiveCamera Position="-1,-3,1" LookDirection="0,6,0" UpDirection="0,0,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
+            </h:HelixViewport3D.Camera>
+            <h:SunLight />
+            <ModelVisual3D x:Name="mod1" Content="{Binding Model}" />
+            <ModelVisual3D x:Name="mod2" Content="{Binding Model2}" />
+            <ModelVisual3D x:Name="mod3" Content="{Binding Model3}" />
+            <ModelVisual3D x:Name="mod4" Content="{Binding Model4}" />
+            <ModelVisual3D x:Name="mod5" Content="{Binding BaseModel}" />
+            <h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
+        </h:HelixViewport3D>
+        <Button Name="start_scan" Content="Start Scan Process" Width="120" Height="25" Margin="154,242,0,94" HorizontalAlignment="Left" Click="start_scan_Click" />
+        <Button Name="cancel_scan" Content="Cancel Scan Process" Width="120" Height="25" Margin="293,242,165,94" Click="cancel_scan_Click" />
+        <Canvas Name="skeloutline" />
+        <TextBlock Height="93" HorizontalAlignment="Left" TextWrapping="Wrap" TextAlignment="Center" Margin="62,108,0,0" Name="instructionblock" Text="Please prepare patient for scanning " VerticalAlignment="Top" FontSize="32" Width="451" />
+
+    </Grid>
+</Window>

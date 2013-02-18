@@ -84,7 +84,7 @@ namespace KdTree
 
                 catch (KeyDuplicateException e)
                 {
-                    throw e;
+                   // throw e;
                 }
 
             m_count++;
@@ -233,8 +233,8 @@ namespace KdTree
          */
         public List<Point3D> getAllPointsAt(double i, double r, double[] limits)
         {
-            double[] point1 = {limits[0], limits[1], i - r};
-            double[] point2 = {limits[2], limits[3], i + r};
+            double[] point1 = {limits[0], i - r, limits[1]};
+            double[] point2 = {limits[2], i + r, limits[3]};
 
             Object[] temp = range(point1,point2);
             List<Point3D> output = new List<Point3D>();

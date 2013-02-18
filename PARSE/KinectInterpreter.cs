@@ -62,11 +62,12 @@ namespace PARSE
         private DepthImagePixel[]                       depthPixels;
        
         //Skeleton point array and frame definitions
+        private Skeleton                                activeSkel;
         private Skeleton[]                              skeletonData;
         private Dictionary<int, SkeletonFigure>         skeletons;
         private Canvas                                  skeletonCanvas;
-        private Boolean                                 updateSkelVars;
-        private float skelDepth = -1; 
+        private float skelDepth = -1;
+        public float                                    skelDepthPublic { get; private set; } 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
         private float skelL; 
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
@@ -84,7 +85,6 @@ namespace PARSE
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
-            updateSkelVars = true;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -117,12 +117,12 @@ namespace PARSE
 
         public void enableUpdateSkelVars()
         {
-            this.updateSkelVars = true;
+            this.IsSkelStreamUpdating = true;
         }
 
         public void disableUpdateSkelVars()
         {
-            this.updateSkelVars = false;
+            this.IsSkelStreamUpdating = false;
         }
 
         //Enable depthStream
@@ -171,7 +171,9 @@ namespace PARSE
             skeletons = new Dictionary<int, SkeletonFigure>();
 
             this.kinectSensor.SkeletonStream.Enable();
+
             this.IsSkelStreamUpdating = true;
+            this.enableUpdateSkelVars();
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
@@ -195,13 +197,15 @@ namespace PARSE
             if (this.IsColorStreamUpdating)
             {
                 this.kinectSensor.ColorStream.Disable();
+                //Don't need this code because this.IsColorStreamUpdating is only true if the colour stream is enabled
+                /*
                     try
                     {
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("KinectInterpreter/StopStreams() - closing streams that aren't open causes exceptions. Ignore them for now.");
-                    }
+                    }*/
             }
         }
 
@@ -325,11 +329,12 @@ namespace PARSE
                             // If not, create a new drawing on our canvas
                             skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
                             skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            activeSkel = trackedSkeleton;
                             Canvas.SetTop(this.skeletonCanvas, 0);
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        if (updateSkelVars)
+                        if (IsSkelStreamUpdating)
                         {
                             //update the depth of the tracked skeleton
                             skelDepth = trackedSkeleton.Position.Z;
@@ -337,6 +342,7 @@ namespace PARSE
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
 
                             skelDepth = skelDepth * 1000;
+                            skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
                         }
@@ -362,8 +368,13 @@ namespace PARSE
 
         }
 
-        public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        public float getSkelDepth()
         {
+            return skelDepthPublic;
+        }
+        
+          public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e) {
+
             bool depthReceived = false;
             bool colorReceived = false;
             WriteableBitmap[] results = new WriteableBitmap[2];
@@ -587,14 +598,19 @@ namespace PARSE
                 }
                 
                 rawDepthClone = rawDepth;
-            
             }
 
             //skelDepth = -1;
             return this.depthFrame32;
         }
 
+
         //Kinect Interpreter Get Methods
+
+        public Skeleton getSkeletons()
+        {
+            return activeSkel;
+        }
 
         public int[] getDepthArray()
         {

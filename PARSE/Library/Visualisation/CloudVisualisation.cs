@@ -57,12 +57,6 @@ namespace PARSE
             this.clouds = pc;
             this.texture = texture;
 
-            System.Diagnostics.Debug.WriteLine(pc[0].getxMax());
-            System.Diagnostics.Debug.WriteLine(pc[0].getyMax());
-            System.Diagnostics.Debug.WriteLine(pc[0].getxMin());
-            System.Diagnostics.Debug.WriteLine(pc[0].getyMin());
-            System.Diagnostics.Debug.WriteLine(pc[0].getKDTree().numberOfNodes());
-
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
             depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
@@ -77,10 +71,22 @@ namespace PARSE
             for (int i = 0; i < this.clouds.Count; i++)
             {
                 this.rawDepth = this.clouds[i].rawDepth;
+
+                if (this.clouds.Count == 1)
+                {
+                    ICP.PointRGB[] pr = this.clouds[i].getAllPoints();
+                    int[] tester = new int[pr.Length];
+
+                    for (int x = 0; x < pr.Length; x++)
+                    {
+                        tester[x] = (int)pr[x].point.Z;
+                    }
+
+                    this.rawDepth = tester;
+                }
+
                 runDemoModel(i);
                 createDepthCoords();
-
-                System.Diagnostics.Debug.WriteLine(this.clouds[i].rawDepth.Length);
 
                 switch (i)
                 {
