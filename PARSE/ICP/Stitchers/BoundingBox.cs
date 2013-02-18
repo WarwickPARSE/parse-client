@@ -49,6 +49,7 @@ namespace PARSE.ICP.Stitchers
                 double depth = 0;
                 double rotationAngle = 0;
                 double[] translationValue = new double[3];
+                double[] rotationCentre = new double[3];
 
                 //iterate over every cloud 
                 int i = 0;
@@ -65,7 +66,12 @@ namespace PARSE.ICP.Stitchers
                             break;
                         case 1:
                             //set the rotation to a fixed value 
+                            rotationCentre = new double[3]{cloud.getxMax(), cloud.getyMin(), cloud.getzMax()};
+                            translationValue = new double[3]{depth, 0, 0};
                             rotationAngle = 90;
+
+                            cloud.rotate(rotationCentre, rotationAngle);
+                            cloud.translate(translationValue); 
 
                             //calculate the translation value 
                             break;
