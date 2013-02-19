@@ -75,7 +75,7 @@ namespace PARSE
                 kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
-            else if (tmp == "RGB Isolation")
+            else if (tmp == "RGB Isolation (Do Not Press!!!)")
             {
                 //Environment.Exit(1);
                 kinectInterp.stopStreams();
