@@ -41,7 +41,7 @@ namespace PARSE.ICP.Stitchers
         /// <summary>
         /// Stitch the point clouds using the "bounding box" algorithm
         /// </summary>
-        public void stitch() { 
+        public override void stitch() { 
             //this algorithm requires four clouds, so we first check that there are four clouds available
             if (pointClouds.Count == 4) {
                 
@@ -69,16 +69,16 @@ namespace PARSE.ICP.Stitchers
                             break;
                         case 1:
                             //set the rotation to a fixed value 
-                            rotationAngle = 90;
+                            rotationAngle = -90;
                             break;
                         case 2:
                             //set the rotation to a fixed value 
-                            rotationAngle = 180;
+                            rotationAngle = -180;
                             //calculate the translation value 
                             break;
                         case 3:
                             //set the rotation to a fixed value 
-                            rotationAngle = 270;
+                            rotationAngle = -270;
                             //calculate the translation value 
                             break;
                         default:
@@ -92,7 +92,13 @@ namespace PARSE.ICP.Stitchers
                     }
 
                     //stick the result into the point cloud 
-                    this.pcd.addPointCloud(cloud);
+                    if (i == 0) {
+                        this.pcd = cloud;
+                    }
+                    else {
+                        this.pcd.addPointCloud(cloud);
+                    }
+                    
 
                     //increase iterator 
                     i++;
