@@ -354,7 +354,7 @@ namespace PARSE
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
-                            Console.WriteLine("BOO");
+                            //Console.WriteLine("BOO");
                             skelR = (320 * (1 + skelR)) * 4;
                             //skelB = 480 * (1-((1+skelB)/2));
                         }
@@ -534,34 +534,55 @@ namespace PARSE
 
                             int player = depthPixel.PlayerIndex;
 
+                            // retrieve the depth to color mapping for the current depth pixel
+                            ColorImagePoint colorImagePoint = this.colorCoordinates[depthIndex];
+
+                            // scale color coordinates to depth resolution
+                            int colorInDepthX = colorImagePoint.X / this.colorToDepthDivisor;
+                            int colorInDepthY = colorImagePoint.Y / this.colorToDepthDivisor;
+
+
+                            //Console.WriteLine("HERE");
+
                             // if we're tracking a player for the current pixel, do green screen
                             if (player > 0)
                             {
-                                // retrieve the depth to color mapping for the current depth pixel
-                                ColorImagePoint colorImagePoint = this.colorCoordinates[depthIndex];
-
-                                // scale color coordinates to depth resolution
-                                int colorInDepthX = colorImagePoint.X / this.colorToDepthDivisor;
-                                int colorInDepthY = colorImagePoint.Y / this.colorToDepthDivisor;
+                                
 
                                 // make sure the depth pixel maps to a valid point in color space
                                 if (colorInDepthX > 0 && colorInDepthX < 640 && colorInDepthY >= 0 && colorInDepthY < 480)
                                 {
-                                    // calculate index into the green screen pixel array
+                                    /*// calculate index into the green screen pixel array
                                     int greenScreenIndex = 4 * (colorInDepthX + (colorInDepthY * 640));
 
                                     // set opaque
-                                    this.convertedDepthBits[greenScreenIndex] = 0;
-                                    this.convertedDepthBits[greenScreenIndex+1] = 0;
-                                    this.convertedDepthBits[greenScreenIndex+2] = 0;
-                                    this.convertedDepthBits[greenScreenIndex+3] = 0;
+                                    this.convertedDepthBits[greenScreenIndex] = 255;
+                                    this.convertedDepthBits[greenScreenIndex + 1] = 255;
+                                    this.convertedDepthBits[greenScreenIndex + 2] = 255;
+                                    this.convertedDepthBits[greenScreenIndex + 3] = 255;
                                     //greenScreenPixelData[greenScreenIndex] = -1;
 
                                     // compensate for depth/color not corresponding exactly by setting the pixel 
                                     // to the left to opaque as well
-                                    //this.greenScreenPixelData[greenScreenIndex - 1] = -1;
+                                    //this.greenScreenPixelData[greenScreenIndex - 1] = -1;*/
                                 }
                             }
+                            else
+                            {
+                                int greenScreenIndex = 4 * (colorInDepthX + (colorInDepthY * 640));
+                                if (greenScreenIndex < (1228800 - 4))
+                                {
+
+                                    //Console.WriteLine("BOO");
+                                    // set opaque
+                                    this.convertedDepthBits[greenScreenIndex] = 0;
+                                    this.convertedDepthBits[greenScreenIndex + 1] = 0;
+                                    this.convertedDepthBits[greenScreenIndex + 2] = 0;
+                                    this.convertedDepthBits[greenScreenIndex + 3] = 0;
+                                    //greenScreenPixelData[greenScreenIndex] = -1;
+                                }
+                            }
+                            
                         }
                     }
                 }
