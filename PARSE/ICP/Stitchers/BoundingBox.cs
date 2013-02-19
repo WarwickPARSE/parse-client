@@ -54,8 +54,6 @@ namespace PARSE.ICP.Stitchers
                 //iterate over every cloud 
                 int i = 0;
                 foreach (PointCloud cloud in pointClouds) {
-                    //calculate the depth 
-                    depth = cloud.getzMax() - cloud.getzMin();
 
                     //it turns out that the same translation works in most cases 
                     rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
@@ -98,7 +96,9 @@ namespace PARSE.ICP.Stitchers
                     else {
                         this.pcd.addPointCloud(cloud);
                     }
-                    
+
+                    //calculate the depth 
+                    depth = cloud.getzMax() - cloud.getzMin();
 
                     //increase iterator 
                     i++;
