@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Runtime Viewer" Height="300" Width="300">
     <Grid>
-        <TabControl Margin="0,-5,0,5">
+        <TabControl Margin="0,-5,0,5" Name="runtimeTab">
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
