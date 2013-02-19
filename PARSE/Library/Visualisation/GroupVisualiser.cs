@@ -33,6 +33,8 @@ namespace PARSE
         Point[] textureCoordinates;
         Vector3DCollection normals = new Vector3DCollection();
         List<int> triangleIndices = new List<int>();
+        PARSE.ICP.PointRGB[] prgbs;
+        Point3DCollection pcc;
 
         public GroupVisualiser()
         {
@@ -44,15 +46,18 @@ namespace PARSE
             mesh = new MeshGeometry3D();
 
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
-            //depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
             //get all points from the point cloud 
-            PARSE.ICP.PointRGB[] prgbs = pc.getAllPoints();
+            prgbs = pc.getAllPoints();
 
             //resize the depthframe array (for efficiency)
             depthFramePoints = new Point3D[prgbs.Length];
 
-            Point3DCollection pcc = new Point3DCollection();
+        }
+
+        public void preprocess()
+        {
+            pcc = new Point3DCollection();
 
             //iterate over each point and stick it in depthframe points
             for (int i = 0; i < depthFramePoints.Length; i++)
@@ -71,6 +76,7 @@ namespace PARSE
 
             this.Model.Geometry = createMesh();
             this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
+            this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
         }
 
         private Vector3D CalculateNormal(Point3D p0, Point3D p1, Point3D p2)
