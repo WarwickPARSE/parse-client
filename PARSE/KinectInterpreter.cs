@@ -423,14 +423,14 @@ namespace PARSE
                             skelDepth = trackedSkeleton.Position.Z;
                             skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
-                            //skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
+                            skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
 
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
                             Console.WriteLine("BOO");
                             skelR = (320 * (1 + skelR)) * 4;
-                            //skelB = 480 * (1-((1+skelB)/2));
+                            skelB = 480 * (1-((1+skelB)/2));
                         }
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
@@ -541,14 +541,9 @@ namespace PARSE
                             int colorInDepthX = colorImagePoint.X / this.colorToDepthDivisor;
                             int colorInDepthY = colorImagePoint.Y / this.colorToDepthDivisor;
 
-
-                            //Console.WriteLine("HERE");
-
                             // if we're tracking a player for the current pixel, do green screen
                             if (player > 0)
                             {
-                                
-
                                 // make sure the depth pixel maps to a valid point in color space
                                 if (colorInDepthX > 0 && colorInDepthX < 640 && colorInDepthY >= 0 && colorInDepthY < 480)
                                 {
@@ -572,8 +567,6 @@ namespace PARSE
                                 int greenScreenIndex = 4 * (colorInDepthX + (colorInDepthY * 640));
                                 if (greenScreenIndex < (1228800 - 4))
                                 {
-
-                                    //Console.WriteLine("BOO");
                                     // set opaque
                                     this.convertedDepthBits[greenScreenIndex] = 0;
                                     this.convertedDepthBits[greenScreenIndex + 1] = 0;
@@ -703,13 +696,22 @@ namespace PARSE
                     }
                     else
                     {
-                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))))
+                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))) && ((skelB + skelBDepth)<= (colorPixelIndex/2560)))
                         {
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             ++colorPixelIndex;
                         }
+                        /*
+                    New isolation code... not yet working
+                    if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))))
+                    {
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
+                        this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
+                        ++colorPixelIndex;
+                    }*/
                         else
                         {
                             this.depthFrame32[colorPixelIndex++] = 0;
