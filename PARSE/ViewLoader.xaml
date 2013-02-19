@@ -14,7 +14,7 @@
                 <ComboBox Name="selection" SelectionChanged="feed_SelectionChanged">
                     <ComboBoxItem Name="c1">RGB</ComboBoxItem>
                     <ComboBoxItem Name="c2">RGB-D</ComboBoxItem>
-                    <ComboBoxItem Name="c3">RGB Isolation</ComboBoxItem>
+                    <ComboBoxItem Name="c3">RGB Isolation (Do Not Press!!!)</ComboBoxItem>
                     <ComboBoxItem Name="c4">Depth Isolation</ComboBoxItem>
                     <ComboBoxItem Name="c5">Skeleton</ComboBoxItem>
                 </ComboBox>
