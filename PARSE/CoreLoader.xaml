@@ -42,12 +42,14 @@
                 <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
                 <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
             </MenuItem>
-            <MenuItem Header="_Details" IsCheckable="true"/>
+            <MenuItem Header="_Details" IsCheckable="False"/>
             <Separator/>
                 <MenuItem Header="_New Scan..." IsCheckable="False" Click="NewScan_Click" />
-                <MenuItem Header="_Import Scan" IsCheckable="true" Click="ImportScan_Click"/>
-            <MenuItem Header="_Export Scan" IsCheckable="true" Click="ExportScan_Click"/>
-        </MenuItem>
+                <MenuItem Header="_Import Scan" IsCheckable="False" Click="ImportScan_Click"/>
+                <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
+                <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
+                <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
+            </MenuItem>
         <MenuItem Header="_Help">
 
         </MenuItem>

@@ -15,6 +15,7 @@ using System.Xml.Serialization;
 using System.IO;
 
 using HelixToolkit.Wpf;
+using KdTree;
 
 namespace PARSE
 {
@@ -95,6 +96,7 @@ namespace PARSE
         public PointCloud()
         {
             //parameterless constructor needed for serialization
+            //this.points = new KdTree.KDTree(3);
         }
      
         /// <summary>
@@ -223,8 +225,9 @@ namespace PARSE
                         pointKey[0] = x;
                         pointKey[1] = y;
                         pointKey[2] = z;
+                        
 
-                        Point3D poLoc = new Point3D(z, y, z);
+                        Point3D poLoc = new Point3D(x, y, z);
                         PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r[i], g[i], b[i]);
 
                         this.points.insert(pointKey, po);
@@ -238,7 +241,7 @@ namespace PARSE
         /// Adds an existing point cloud into this point cloud 
         /// </summary>
         /// <param name="pc">The point cloud to add</param>
-        public void addPointCLoud(PointCloud pc) { 
+        public void addPointCloud(PointCloud pc) { 
             //retrieve the kd tree
             KdTree.KDTree kd = pc.getKDTree();
 
@@ -257,7 +260,16 @@ namespace PARSE
                 double[] key = new double[3] {value.point.X, value.point.Y, value.point.Z};
 
                 //jam the data into the existing kd-tree
-                this.points.insert(key, value);
+                int duplicates = 0;
+                try {
+                    this.points.insert(key, value);
+                }
+                catch (KeyDuplicateException) {
+                    //ignore duplicates
+                    duplicates++; 
+                }
+
+                //Console.WriteLine("There were " + duplicates + " duplicate keys in the tree");
             }
         }
 
@@ -292,8 +304,9 @@ namespace PARSE
         /// <param name="tx">Up to three co-ords</param>
         public void translate(double[] tx) 
         {
-            if (!(tx.Length != 3)) {
+            if (tx.Length == 3) {
                 //turn the transformation vector into and object
+                Console.WriteLine("Translating");
                 TranslateTransform3D translation = new TranslateTransform3D(tx[0], tx[1], tx[2]);
 
                 //pull out the entire tree
@@ -304,12 +317,22 @@ namespace PARSE
               
                 //iterate over every point and translate + jam in new tree
                 foreach(PARSE.ICP.PointRGB point in pts) {
-                    //perform the translation
-                    point.point.Offset(tx[0], tx[1], tx[2]);
+                    
+                    //perform the new translation which does appear to work.
+                    Matrix3D mtx = new Matrix3D();
+                    mtx.Translate(new Vector3D(tx[0], tx[1], tx[2]));
+
+                    //complete translation
+                    Point3D newPoint = mtx.Transform(point.point);
 
                     //jam into the tree 
-                    double[] key = new double[3]{point.point.X, point.point.Y, point.point.Z};
-                    newPoints.insert(key, point);
+                    double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
+                    newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
+                    
+                    //perform the old translation method which doesn't appear to work.
+                    //point.point.Offset(tx[0], tx[1], tx[2]);
+                    //double[] key = new double[3]{point.point.X, point.point.Y, point.point.Z};
+                    //newPoints.insert(key, point);
                 }
 
                 //replace the old kd tree with the new one
@@ -342,7 +365,7 @@ namespace PARSE
                 {
                     //create rot matrix
                     Matrix3D mtx = new Matrix3D();
-                    Quaternion q = new Quaternion(new Vector3D(0, 1, 0), angle);
+                    Quaternion q = new Quaternion(new Vector3D(0, 0, 1), angle);
                     mtx.RotateAt(q, centre);
 
                     //complete rotation

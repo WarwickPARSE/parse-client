@@ -24,7 +24,7 @@ namespace PARSE
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
             double volume = getBoundingBoxVolume(xmin,xmax,ymin,ymax,zmin,zmax);
-            Console.WriteLine("Volume Pre Multi: " + volume);
+            System.Diagnostics.Debug.WriteLine("Volume Pre Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             return volume;
         }
@@ -34,20 +34,21 @@ namespace PARSE
         {
             double xmin = pc.getxMin();
             double xmax = pc.getxMax();
-            double ymin = pc.getyMin();
-            double ymax = pc.getyMax();
-            double[] limits = { xmin, ymin, xmax, ymax };
-
             double zmin = pc.getzMin();
             double zmax = pc.getzMax();
-            double increment = 0.01;
+            double[] limits = { xmin, zmin, xmax, zmax };
+
+            double ymin = pc.getyMin();
+            double ymax = pc.getyMax();
+            double increment = (ymax - ymin) / 30;
             double volume = 0;
 
-            for (double i = zmin + (increment / 2); i <= zmax - (increment / 2); i = i + increment)
+            for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 if (plane.Count != 0)
                 {
+                    Console.WriteLine("Plane is not empty");
                     plane = PointSorter.rotSort(plane);
                     plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
@@ -55,26 +56,31 @@ namespace PARSE
 
                     for (int j = 0; j < plane.Count - 1; j++)
                     {
-                        innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Y) - (plane[j + 1].X * plane[j].Y));
+                        innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
+                        //Console.WriteLine("1: "+plane[j].Z+", 2: "+plane[j + 1].Z);
                     }
 
                     innerVolume = Math.Abs(innerVolume / 2);
 
                     innerVolume = innerVolume * increment;
-                    
 
-                    volume = volume + innerVolume;
+
+                    volume = innerVolume;
+                }
+                else
+                {
+                    Console.WriteLine("Plane EMPTY!!! BAD THINGS WILL HAPPEN");
                 }
             }
-            Console.WriteLine("Volume Pre Multi: " + volume);
+            System.Diagnostics.Debug.WriteLine("Volume Pre Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             return volume;
         }
         
         public static double calculateVolume(PointCloud pc)
         {
-            Console.WriteLine("Upper Bound on Patient Volume: " + volume0thApprox(pc));
-            Console.WriteLine("Better Volume Patient Volume: " + volume1stApprox(pc));
+            System.Diagnostics.Debug.WriteLine("Upper Bound on Patient Volume: " + volume0thApprox(pc));
+            System.Diagnostics.Debug.WriteLine("Better Volume Patient Volume: " + volume1stApprox(pc));
             return 0;//volume1stApprox(pc);
         }
     }

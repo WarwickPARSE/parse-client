@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Text;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,6 +27,7 @@ using HelixToolkit.Wpf;
 //Kinect imports
 using Microsoft.Kinect;
 using PARSE.Recognition;
+using PARSE.ICP;
 
 namespace PARSE
 {
@@ -57,6 +59,9 @@ namespace PARSE
 
         //point cloud lists for visualisation
         private List<PointCloud>            fincloud;
+
+        //a stitcher
+        private Stitcher                    stitcher; 
 
         //speech synthesizer instances
         private SpeechSynthesizer           ss;
@@ -116,10 +121,11 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
+                ss.Speak("Welcome to the PARSE Toolkit, Initializing Kinect Device.");
 
-                if (kinectInterp.IsActive)
+                if (KinectSensor.KinectSensors.Count>0)
                 {
-                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + kinectInterp.PersistId);
+                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 }
                 else
                 {
@@ -227,8 +233,8 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            VolumeCalculator.calculateVolume(windowScanner.getPointClouds()[0]);
-            ss.Speak("You are a fat bastard");
+            VolumeCalculator.calculateVolume(windowScanner.getYourMum());
+            ss.Speak("You are fat");
             System.Windows.Forms.MessageBox.Show("You are too fat");
         }
 
@@ -238,8 +244,8 @@ namespace PARSE
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             
             /*Requires generated model, raw depth array and previous*/
-            windowViewer.setLimbVisualisation();
-            LimbCalculator.calculate(0, fincloud[0]);
+            //windowViewer.setLimbVisualisation();
+            LimbCalculator.calculate(windowScanner.getPointClouds()[0], windowScanner.getJointMeasurements());
 
         }
 
@@ -297,7 +303,75 @@ namespace PARSE
                 ScanSerializer.serialize(filename, windowScanner.getPointClouds());
             }
 
+        }
+
+        private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
+        {
+            //Create .PCD for use with the PCL Library
+            PointCloud pc = windowScanner.getPointClouds()[0];
+            String filename = "";
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".PCD";
+            dlg.Filter = "Point Cloud Data (.PCD)|*.PCD";
+
+            if (dlg.ShowDialog() == true)
+            {
+                filename = dlg.FileName;
+            }
+
+            //start subroutine to save to PCD File
+            TextWriter tw = new StreamWriter(filename);
+            ICP.PointRGB[] point;
+
+            //write versioning info
+            tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
+            tw.WriteLine("VERSION 1.6");
+
+            //write metadata
+            tw.WriteLine("FIELDS x y z rgb");
+            tw.WriteLine("SIZE 4 4 4 4");
+            tw.WriteLine("TYPE F F F F");
+            tw.WriteLine("COUNT 1 1 1 1");
+            tw.WriteLine("WIDTH " + pc.getAllPoints().Length);
+            tw.WriteLine("HEIGHT 1");
+            tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
+            tw.WriteLine("POINTS " + pc.getAllPoints().Length);
+            tw.WriteLine("DATA ascii");
+
+            //store all points.
+            //pc.rotate(new double[] { 0, 1, 0 }, -90);
+            //pc.translate(new double[] { -1.5, 1.25, 0 });
+            point = pc.getAllPoints();
+
+            for(int i = 0; i < point.Length; i++) {
+                tw.WriteLine(point[i].point.X + " " + point[i].point.Z + " " + point[i].point.Y + " 4.2108e+06");
+            }
+
+            tw.Close();
+
+        }
+
+        private void SimpleStitchTest_Click(object sender, RoutedEventArgs e)
+        {
+            List<PointCloud> pc = windowScanner.getPointClouds();
+            PointCloud pcd= new PointCloud();
+
+            //instantiate the stitcher 
+            stitcher = new SimpleStitcher();
             
+            //jam points into stitcher
+            stitcher.add(pc);
+            stitcher.stitch();
+            
+            pcd = stitcher.getResult(); 
+            
+            windowScanner.Close();
+            windowViewer.Close();
+            windowScanner = new ScanLoader(pcd);
+            windowScanner.Owner = this;
+            windowScanner.Closed += new EventHandler(windowScanner_Closed);
+            windowScanner.Show();
 
         }
        

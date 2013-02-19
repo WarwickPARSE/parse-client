@@ -75,8 +75,9 @@ namespace PARSE
                 kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
-            else if (tmp == "RGB Isolation")
+            else if (tmp == "RGB Isolation (Do Not Press!!!)")
             {
+                //Environment.Exit(1);
                 kinectInterp.stopStreams();
                 kinectInterp.startRGBStream();
                 kinectInterp.startDepthStream();
@@ -85,11 +86,18 @@ namespace PARSE
             }
             else if (tmp == "Depth Isolation")
             {
+                /*kinectInterp.stopStreams();
+                kinectInterp.startRGBStream();
+                kinectInterp.startDepthStream();
+                kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+                /*/
                 kinectInterp.stopStreams();
                 kinectInterp.startDepthStream();
                 kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                //*/
             }
             else if (tmp == "Skeleton")
             {
@@ -131,11 +139,11 @@ namespace PARSE
 
         private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            WriteableBitmap[] results = new WriteableBitmap[1];
-            results = kinectInterp.SensorAllFramesReady(sender, e);
-
-            this.kinectImager.Source = results[1];
-            this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
+            //magic needs to come to PARSE
+            WriteableBitmap results = kinectInterp.SensorAllFramesReady(sender, e);
+            
+            this.kinectImager.Source = results;
+            //this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };*/
         }
 
     }

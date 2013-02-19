@@ -8,13 +8,16 @@ namespace PARSE.ICP
     /// <summary>
     /// Abstract class that can be extended by point cloud stitching algorithms
     /// </summary>
-    abstract class Stitcher
+    public abstract class Stitcher
     {
         //has the stitch method been called? This should default to false
         public bool processComplete = false; 
 
         //add a point cloud into the stitcher
         public abstract void add(PointCloud pc);
+
+        //add a list of point clouds into the stitcher
+        public abstract void add(List<PointCloud> pc);
 
         //this is where the stitching process takes place. This can be replalced by a dummy for on-the-fly stitching
         public abstract void stitch();

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 
-namespace PARSE.ICP.KdTree
+namespace PARSE.ICP
 {
     /// <summary>
     /// This is basically ripped from bernie's code
     /// </summary>
-    class SimpleStitcher : Stitcher
+    public class SimpleStitcher : Stitcher
     {
         List<PointCloud> pointClouds;
         PointCloud pcd;
@@ -17,7 +17,7 @@ namespace PARSE.ICP.KdTree
         /// <summary>
         /// Instantiates an empty point cloud, ready for us to input some data
         /// </summary>
-        SimpleStitcher() {
+        public SimpleStitcher() {
             //instantiate empty lists and point clouds 
             pointClouds = new List<PointCloud>();
             pcd = new PointCloud();
@@ -32,55 +32,68 @@ namespace PARSE.ICP.KdTree
         }
 
         /// <summary>
+        /// Add a list of point clouds to the list of point clouds
+        /// </summary>
+        /// <param name="pcs"></param>
+        public override void add(List<PointCloud> pcs) {
+            this.pointClouds = pcs;
+            Console.WriteLine("There are " + pcs.Count);
+        }
+
+        /// <summary>
         /// Stitch the point clouds together 
         /// </summary>
         public override void stitch() {
 
             //change the state to complete
             processComplete = true; 
-
-            //offset (x, y, z)
-            double[] offset = new double[3] { 1, 1, 1 };
-
-            //rotation vector 
-            double[] rotationAxis = new double[3]{0, 0, 0};
-
-            //rotation angle
-            double rotationAngle = 0.0;
-
-            //sanity check (this class can only handle up to four clouds)
+            
+            //sanity check (this class can only handle up to four clouds without setting fire)
             if (!(pointClouds.Count > 4)) {
+
                 //iterate over each of the point clouds
-                for (int i = 0; i <= pointClouds.Count; i++) { 
-                    
-                    //each cloud has something different happen to it
-                    switch (i) {
-                        case 1: 
-                            //set the offeset
-                            offset = new double[3] { -1, -2, 1 };                    
-                            //do not rotate
-                            rotationAngle = 0;
+                int i = 1;
+                foreach (PointCloud cloud in pointClouds) {
+                    switch (i)
+                    {
+                        case 1:
+                            //stick the cloud in the main point cloud 
+                            pcd = cloud;
+                            System.Diagnostics.Debug.WriteLine("Front face is now in the pointcloud");
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
                             
                             break;
-                        case 2: 
-                            //set the offset
-                            offset = new double[3] { -0.5, -3.4, 1 };
-                            rotationAxis = new double[3]{0, 0, 1};
-                            rotationAngle = 90;
+                        case 2:
+                            //rotate + translate 
+                            cloud.rotate(new double[] { 0, 1, 0 }, -90);
+                            cloud.translate(new double[] { -1.5, 1.25, 0 });
+                            
+                            pcd.addPointCloud(cloud);
+                            
+                            System.Diagnostics.Debug.WriteLine("Left face is now in the pointcloud");
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
 
                             break;
-                        case 3: 
-                            //set the offset
-                            offset = new double[3] { 0.85, -2.95, 1 };
-                            rotationAxis = new double[3]{0, 0, 1};
-                            rotationAngle = 180;
+                        case 3:
+                            //rotate + translate
+                            cloud.rotate(new double[] { 0, 1, 0 }, -180);
+                            cloud.translate(new double[] { 0, 2.5, 0 });
+                            
+                            pcd.addPointCloud(cloud);
+                            
+                            System.Diagnostics.Debug.WriteLine("Back face is now in the pointcloud");
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
 
                             break;
                         case 4:
-                            //set the offset
-                            offset = new double[3] { 0.30, -1.50, 1 };
-                            rotationAxis = new double[3]{0, 0, 1};
-                            rotationAngle = 270;
+                            //rotate + translate
+                            cloud.rotate(new double[] { 0, 1, 0 }, -270);
+                            cloud.translate(new double[] { 1.5, 1.25, 0 });
+                            
+                            pcd.addPointCloud(cloud);
+                            
+                            System.Diagnostics.Debug.WriteLine("Right face is now in the pointcloud");
+                            System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
 
                             break;
                         default:
@@ -88,33 +101,19 @@ namespace PARSE.ICP.KdTree
                             break;
                     }
 
-                    //translate the point cloud
-                    pointClouds[i].translate(offset);
-
-                    //rotate the point cloud (if rotation is defined)
-                    if (rotationAngle != 0) {
-                        pointClouds[i].rotate(rotationAxis,rotationAngle);
-                    }
-
-                    //stick it in the existing point cloud 
-                    pcd.addPointCLoud(pointClouds[i]);
+                    //iterate our counter 
+                    i++;
                 }
+            }
 
-                //process is now complete
-                processComplete = true; 
-            }
-            else { 
-                //throw an exception of some description 
-            }
         }
-
 
         /// <summary>
         /// Return the result of the stitching
         /// </summary>
         /// <returns>The result of the stitching</returns>
         public override PointCloud getResult() {
-            return null; 
+            return pcd;
         }
     }
 }

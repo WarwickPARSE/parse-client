@@ -30,7 +30,7 @@ namespace PARSE
             try
             {
                 con = new SqlCeConnection();
-                con.ConnectionString = "Data Source=C:\\Users\\Stefania\\Documents\\Visual Studio 2010\\Projects\\parse-client\\PARSE\\Patients.sdf";
+                con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
                 con.Open();
 
                 Console.WriteLine("open");
