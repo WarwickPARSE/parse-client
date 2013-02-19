@@ -54,36 +54,31 @@ namespace PARSE.ICP.Stitchers
                 //iterate over every cloud 
                 int i = 0;
                 foreach (PointCloud cloud in pointClouds) {
-                    //calculate the depth on the first iteration only 
-
+                    //calculate the depth 
                     depth = cloud.getzMax() - cloud.getzMin();
+
+                    //it turns out that the same translation works in most cases 
+                    rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+                    translationValue = new double[3] { depth, 0, 0 };
 
                     //perform the rotation depending on which point cloud we are looking at 
                     switch (i) { 
                         case 0:
                             //this is nice, we don't need to do anything! 
+                            rotationAngle = 0; 
                             break;
                         case 1:
                             //set the rotation to a fixed value 
-                            rotationCentre = new double[3]{cloud.getxMax(), cloud.getyMin(), cloud.getzMax()};
-                            translationValue = new double[3]{depth, 0, 0};
                             rotationAngle = 90;
-
-                            cloud.rotate(rotationCentre, rotationAngle);
-                            cloud.translate(translationValue); 
-
-                            //calculate the translation value 
                             break;
                         case 2:
                             //set the rotation to a fixed value 
                             rotationAngle = 180;
-
                             //calculate the translation value 
                             break;
                         case 3:
                             //set the rotation to a fixed value 
-                            rotationAngle = 270; 
-
+                            rotationAngle = 270;
                             //calculate the translation value 
                             break;
                         default:
@@ -92,7 +87,8 @@ namespace PARSE.ICP.Stitchers
                     }
 
                     if (i != 0) {
-                        //perform the rotation/translation 
+                        cloud.rotate(rotationCentre, rotationAngle);
+                        cloud.translate(translationValue); 
                     }
 
                     //stick the result into the point cloud 
