@@ -463,19 +463,19 @@ namespace PARSE
         public WriteableBitmap SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
 
-            pissAndShit(sender, e.OpenSkeletonFrame());
+            
 
             bool depthReceived = false;
-            bool colorReceived;
-            WriteableBitmap[] results = new WriteableBitmap[2];
-
+            bool colorReceived = false;
+            bool skelReceived = false;
+            
             DepthImageFormat DepthFormat = DepthImageFormat.Resolution640x480Fps30;
 
             ColorImageFormat ColorFormat = ColorImageFormat.RgbResolution640x480Fps30;
 
-            DepthImageFrame depthFrame = e.OpenDepthImageFrame();
-
-            if (null != depthFrame)
+            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
+            {
+                if (null != depthFrame)
                 {
                     // Copy the pixel data from the image to a temporary array
 
@@ -498,6 +498,14 @@ namespace PARSE
                     }
                 }
 
+                using (SkeletonFrame skelFrame = e.OpenSkeletonFrame())
+                {
+                    if (skelFrame != null)
+                    {
+                        pissAndShit(sender, skelFrame);
+                    }
+                }
+
                 if (true == depthReceived)
                 {
                     this.kinectSensor.CoordinateMapper.MapDepthFrameToColorFrame(
@@ -506,7 +514,7 @@ namespace PARSE
                         ColorFormat,
                         this.colorCoordinates);
 
-                    Array.Clear(this.greenScreenPixelData, 0, this.greenScreenPixelData.Length);
+                    //Array.Clear(this.greenScreenPixelData, 0, this.greenScreenPixelData.Length);
 
                     this.depthFrame32 = new byte[depthFrame.Width * depthFrame.Height * Bgr32BytesPerPixel];
                     this.depthPixelData = new short[depthFrame.PixelDataLength];
@@ -540,7 +548,7 @@ namespace PARSE
                                 if (colorInDepthX > 0 && colorInDepthX < 640 && colorInDepthY >= 0 && colorInDepthY < 480)
                                 {
                                     // calculate index into the green screen pixel array
-                                    int greenScreenIndex = colorInDepthX + (colorInDepthY * 640);
+                                    int greenScreenIndex = 4 * (colorInDepthX + (colorInDepthY * 640));
 
                                     // set opaque
                                     this.convertedDepthBits[greenScreenIndex] = 0;
@@ -582,6 +590,16 @@ namespace PARSE
                 return this.outputBitmap;
             
         }
+
+
+            }
+
+
+
+
+                
+
+                
        
 
         /// <summary>
