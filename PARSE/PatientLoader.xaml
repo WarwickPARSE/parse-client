@@ -10,20 +10,29 @@
                         <TextBlock Text="Patient Data" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Grid Margin="0,-10,0,0">
-                    <Label Content="Patient ID" Height="21" Margin="2,-230,479,0" Name="patientIDLabel" Width="75" />
-                    <Label Content="Name" Height="21" Margin="2,-170,479,0" Name="nameLabel" Width="75" />
-                    <Label Content="Date Of Birth" Height="21" Margin="2,-110,479,0" Name="dobLabel" Width="75" />
-                    <Label Content="Nationality" Height="21" Margin="2,-50,479,0" Name="nationalityLabel" Width="75" />
-                    <Label Content="NHS Number" Height="21" Margin="2,10,479,0" Name="nhsNoLabel" Width="75" />
-                    <Label Content="Address" Height="21" Margin="2,70,479,0" Name="addressLabel" Width="75" />
-                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,15,0,0" Name="patientIDText" VerticalAlignment="Top" Width="340" />
-                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,45,0,0" Name="nameText" VerticalAlignment="Top" Width="340" />
-                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,75,0,0" Name="dobText" VerticalAlignment="Top" Width="340" />
-                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,105,0,0" Name="nationalityText" VerticalAlignment="Top" Width="340" />
-                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,135,0,0" Name="nhsNoText" VerticalAlignment="Top" Width="340" />
-                    <TextBox Height="50" HorizontalAlignment="Left" Margin="150,165,0,0" Name="addressText" VerticalAlignment="Top" Width="340" />
-                    <Button Content="Save Changes" Height="23" HorizontalAlignment="Left" Margin="410,250,0,0" Name="button1" VerticalAlignment="Top" Width="100" />
+                <Grid Margin="0,-10,0,0" Height="288" Width="562">
+                    <Label Content="Patient ID" Height="21" Margin="2,-185,479,0" Name="patientIDLabel" Width="75" />
+                    <Label Content="Name" Height="21" Margin="2,-120,479,0" Name="nameLabel" Width="75" />
+                    <Label Content="Date Of Birth" Height="21" Margin="2,-60,479,0" Name="dobLabel" Width="75" />
+                    <Label Content="Nationality" Height="21" Margin="2,0,479,0" Name="nationalityLabel" Width="75" />
+                    <Label Content="NHS Number" Height="21" Margin="2,60,479,0" Name="nhsNoLabel" Width="75" />
+                    <Label Content="Address" Height="21" Margin="2,130,479,0" Name="addressLabel" Width="75" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,45,0,0" Name="patientIDText" VerticalAlignment="Top" Width="249" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,75,0,0" Name="nameText" VerticalAlignment="Top" Width="249" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,105,0,0" Name="dobText" VerticalAlignment="Top" Width="249" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,135,0,0" Name="nationalityText" VerticalAlignment="Top" Width="249" />
+                    <TextBox Height="21" HorizontalAlignment="Left" Margin="150,165,0,0" Name="nhsNoText" VerticalAlignment="Top" Width="249" />
+                    <RichTextBox Height="77" AcceptsReturn="True" HorizontalAlignment="Left" Margin="150,205,0,0" Name="addressText" VerticalAlignment="Top" Width="249" />
+                    <Button Content="Save Changes" Height="23" HorizontalAlignment="Left" Margin="410,205,0,0" Name="button1" VerticalAlignment="Top" Width="100" />
+                    <Button Content="Clear Changes" Height="23" HorizontalAlignment="Left" Margin="410,235,0,0" Name="button2" VerticalAlignment="Top" Width="100" />
+                    <Label Content="Patient Information Capture" Height="28" FontWeight="Bold" FontFamily="Arial" FontSize="22" HorizontalAlignment="Left" Margin="2,0,0,0" Name="label1" VerticalAlignment="Top" />
+                    <Image Height="110" HorizontalAlignment="Left" Margin="440,10,0,0" Name="imgid" Source="Resources/placeholder.png" Stretch="Fill" VerticalAlignment="Top" Width="100" />
+                    <Label Content="Loading..." Height="28" HorizontalAlignment="Left" Margin="150,36,0,0" Name="patientIDExisting" FontFamily="Arial" FontSize="20" VerticalAlignment="Top" />
+                    <Label Content="Loading..." Height="28" HorizontalAlignment="Left" Margin="150,70,0,0" Name="patientNameExisting" FontFamily="Arial" FontSize="20" VerticalAlignment="Top" />
+                    <Label Content="Loading..." Height="28" HorizontalAlignment="Left" Margin="150,100,0,0" Name="patientDOBExisting" FontFamily="Arial" FontSize="20" VerticalAlignment="Top" />
+                    <Label Content="Loading..." Height="28" HorizontalAlignment="Left" Margin="150,130,0,0" Name="patientNationalityExisting" FontFamily="Arial" FontSize="20" VerticalAlignment="Top" />
+                    <Label Content="Loading..." Height="28" HorizontalAlignment="Left" Margin="150,160,0,0" Name="patientNhsNoExisting" FontFamily="Arial" FontSize="20" VerticalAlignment="Top" />
+                    <TextBlock Text="Loading..." Height="68" TextWrapping="Wrap" HorizontalAlignment="Left" Width="250" Margin="150,195,0,0" Name="patientAddressExisting" FontFamily="Arial" FontSize="20" VerticalAlignment="Top" />
                 </Grid>
             </TabItem>
             <TabItem>
@@ -45,10 +54,15 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="?" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Recorded Scans" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
             </TabItem>
         </TabControl>
+        <StatusBar Name="patientStatus" VerticalAlignment="Bottom">
+            <StatusBarItem Name="capturetext">
+                <TextBlock Name="patientEntryStatus">Please enter Patient details</TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

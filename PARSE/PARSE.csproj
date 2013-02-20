@@ -309,6 +309,7 @@
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\placeholder.png" />
     <Resource Include="Resources\clock.png" />
     <Resource Include="Resources\open.png" />
     <Resource Include="Resources\person.png" />

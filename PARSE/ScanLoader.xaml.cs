@@ -65,10 +65,16 @@ namespace PARSE
         public ScanLoader(List<PointCloud> fcloud)
         {
             InitializeComponent();
+
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
+
+            //smooth list of pointcloud
+            for (int i = 0;i < fcloud.Count;i++) {
+                fcloud[i].rawDepth = averageDepthArray(fcloud[i].rawDepth);
+            }
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.DataContext = new CloudVisualisation(fcloud, false);
@@ -271,6 +277,8 @@ namespace PARSE
         public int[] averageDepthArray(int[] depthArray)
         {
             Queue<int[]> averageQueue = new Queue<int[]>();
+
+            System.Diagnostics.Debug.WriteLine("Smoothing depth array");
 
             averageQueue.Enqueue(depthArray);
 

@@ -109,7 +109,8 @@ namespace PARSE
                 windowViewer.Show();
 
                 //open patient detail viewer
-                windowPatient = new PatientLoader();
+                //TODO: need to abstract this for when we add a new patient.
+                windowPatient = new PatientLoader(true);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 
@@ -384,7 +385,7 @@ namespace PARSE
                 windowViewer.Show();
 
                 //open patient detail viewer
-                windowPatient = new PatientLoader();
+                windowPatient = new PatientLoader(false);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 
