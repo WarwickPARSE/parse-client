@@ -83,6 +83,9 @@ namespace PARSE
 
         //Constants
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        public static double oneParseUnit = 2642.5;
+        public static double oneParseUnitDelta = 7.5;
+        private static double oneParseRadian = -5;
 
         public KinectInterpreter(Canvas c)
         {
@@ -117,6 +120,21 @@ namespace PARSE
             }
         }
 
+        public Boolean tooFarBack()
+        {
+            return (skelDepthPublic > (oneParseUnit + oneParseUnitDelta));
+        }
+
+        public Boolean tooFarForward()
+        {
+            return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
+        }
+        
+        public Boolean isCalibrated()
+        {
+            return (this.kinectSensor.ElevationAngle == oneParseRadian);    
+        }
+        
         public void enableUpdateSkelVars()
         {
             this.IsSkelStreamUpdating = true;

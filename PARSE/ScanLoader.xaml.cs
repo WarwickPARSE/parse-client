@@ -122,39 +122,61 @@ namespace PARSE
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
 
-            //hide buttons from form
-            cancel_scan.Visibility = Visibility.Collapsed;
-            start_scan.Visibility = Visibility.Collapsed;
+            if (!kinectInterp.isCalibrated())
+            {
+                ss.Speak("The Kinect Device is not calibrated. Please do so from the menu");
+                Console.WriteLine("The Kinect Device is not calibrated. Please do so from the menu");
+            }
+            else if (kinectInterp.tooFarForward())
+            {
+                ss.Speak("Step Backward you fucker");
+                Console.WriteLine("Step Backward you fucker");
+            }
+            else if (kinectInterp.tooFarBack())
+            {
+                ss.Speak("Step Forward you fucker");
+                Console.Write("Step Forward you fucker");
+            }
+            else
+            {
+                ss.Speak("Your posiitoning is optimal, have some cake.");
+                Console.WriteLine("Your posiitoning is optimal, have some cake.");
+                fincloud = new List<PointCloud>();
 
-            //create new list of pc's
-            fincloud = new List<PointCloud>();
+                //hide buttons from form
+                cancel_scan.Visibility = Visibility.Collapsed;
+                start_scan.Visibility = Visibility.Collapsed;
 
-            //initialize kinect device
+                //create new list of pc's
+                fincloud = new List<PointCloud>();
 
-            kinectInterp.startDepthStream();
-            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                //initialize kinect device
 
-            kinectInterp.startSkeletonStream();
-            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                kinectInterp.startDepthStream();
+                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
 
-            kinectInterp.startRGBStream();
-            this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
 
-            //start new scanning timer.
-            pcTimer = new System.Windows.Forms.Timer();
-            pcTimer.Tick += new EventHandler(pcTimer_tick);
-            ss = new SpeechSynthesizer();
+                kinectInterp.startRGBStream();
+                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 
-            //initalize speech sythesizer
-            ss.Rate = 1;
-            ss.Volume = 100;
-            ss.Speak("Please face the camera.");
-            this.instructionblock.Text = "Please face the camera";
+                //start new scanning timer.
+                pcTimer = new System.Windows.Forms.Timer();
+                pcTimer.Tick += new EventHandler(pcTimer_tick);
+                ss = new SpeechSynthesizer();
 
-            //Initialize and start timerr
-            pcTimer.Interval = 10000;
-            countdown = 3;
-            pcTimer.Start();
+                //initalize speech sythesizer
+                ss.Rate = 1;
+                ss.Volume = 100;
+                ss.Speak("Please face the camera.");
+                this.instructionblock.Text = "Please face the camera";
+
+                //Initialize and start timerr
+                pcTimer.Interval = 10000;
+                countdown = 3;
+                pcTimer.Start();
+            }
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
