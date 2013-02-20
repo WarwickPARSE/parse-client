@@ -121,21 +121,34 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
-            ss = new SpeechSynthesizer();
 
-            //initalize speech sythesizer
-            ss.Rate = 1;
-            ss.Volume = 100;
+
+            if (ss == null)
+            {
+                //initalize speech sythesizer
+                ss = new SpeechSynthesizer();
+                ss.Rate = 1;
+                ss.Volume = 100;
+            }
             
             //init kinect
-            kinectInterp.startDepthStream();
-            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            if (!this.kinectInterp.IsDepthStreamUpdating)
+            {
+                this.kinectInterp.startDepthStream();
+                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            }
 
-            kinectInterp.startSkeletonStream();
-            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            if (!this.kinectInterp.IsSkelStreamUpdating)
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
 
-            kinectInterp.startRGBStream();
-            this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+            if (!this.kinectInterp.IsDepthStreamUpdating)
+            {
+                this.kinectInterp.startRGBStream();
+                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+            }
             
             if (!kinectInterp.isCalibrated())
             {

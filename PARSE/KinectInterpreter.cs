@@ -83,9 +83,9 @@ namespace PARSE
 
         //Constants
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
-        public static double oneParseUnit = 2642.5;
-        public static double oneParseUnitDelta = 7.5;
-        private static double oneParseRadian = -5;
+        public const double oneParseUnit = 2642.5;
+        public const double oneParseUnitDelta = 7.5;
+        public const int oneParseRadian = 0;
 
         public KinectInterpreter(Canvas c)
         {
@@ -117,6 +117,8 @@ namespace PARSE
                 int colorHeight = this.kinectSensor.ColorStream.FrameHeight;
 
                 this.colorToDepthDivisor = colorWidth / 640;
+
+                this.kinectSensor.Start();
             }
         }
 

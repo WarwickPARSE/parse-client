@@ -148,7 +148,8 @@ namespace PARSE
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnCalibrate_Click(object sender, RoutedEventArgs e)
         {
-            this.kinectInterp.kinectSensor.ElevationAngle = -5;
+            this.kinectInterp.kinectSensor.ElevationAngle = KinectInterpreter.oneParseRadian;
+            //KinectInterpreter.oneParseRadian;
         }
         
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
