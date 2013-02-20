@@ -34,7 +34,7 @@
 
         </MenuItem>
             <MenuItem Header="_Control">
-                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnSensorUp_Click"/>
+                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
                 <Separator/>
                 <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
                 <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>

@@ -28,6 +28,7 @@ using HelixToolkit.Wpf;
 using Microsoft.Kinect;
 using PARSE.Recognition;
 using PARSE.ICP;
+using PARSE.ICP.Stitchers;
 
 namespace PARSE
 {
@@ -147,6 +148,12 @@ namespace PARSE
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
+        private void btnCalibrate_Click(object sender, RoutedEventArgs e)
+        {
+            this.kinectInterp.kinectSensor.ElevationAngle = KinectInterpreter.oneParseRadian;
+            //KinectInterpreter.oneParseRadian;
+        }
+        
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
             if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
@@ -358,7 +365,7 @@ namespace PARSE
             PointCloud pcd= new PointCloud();
 
             //instantiate the stitcher 
-            stitcher = new SimpleStitcher();
+            stitcher = new BoundingBox();
             
             //jam points into stitcher
             stitcher.add(pc);
