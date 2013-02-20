@@ -311,6 +311,12 @@
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\clock.png" />
+    <Resource Include="Resources\open.png" />
+    <Resource Include="Resources\person.png" />
+    <Resource Include="Resources\plus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\op3.PNG" />
     <Resource Include="Resources\op2.PNG" />
     <Resource Include="Resources\op1.PNG" />

@@ -32,10 +32,5 @@ namespace PARSE
             this.Width = this.Owner.OwnedWindows[0].Width + 20;
             this.Height = this.Owner.OwnedWindows[0].Height;
         }
-
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
     }
 }

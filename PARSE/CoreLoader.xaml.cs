@@ -50,6 +50,7 @@ namespace PARSE
 
         //New KinectInterpreter Class
         private KinectInterpreter           kinectInterp;
+        private System.Threading.Timer      kinectCheck;
 
         //Image recognition specific definitions
         private bool                        capturedModel;
@@ -83,7 +84,6 @@ namespace PARSE
             kinectInterp = new KinectInterpreter(vpcanvas2);
 
             //ui initialization
-            lblStatus.Content = kinectInterp.kinectStatus;
             this.WindowState = WindowState.Maximized;
             ss = new SpeechSynthesizer();
 
@@ -102,7 +102,6 @@ namespace PARSE
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //Open child windows
-
             try
             {
                 //open default window viewer
@@ -122,7 +121,7 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome!");
+                ss.Speak("Welcome to the PARSE Toolkit, Initializing Kinect Device.");
 
                 if (KinectSensor.KinectSensors.Count>0)
                 {
@@ -131,6 +130,8 @@ namespace PARSE
                 else
                 {
                     windowRuntime.sendMessageToOutput("Warning", "No Kinect Found");
+                    //Check for kinect connection periodically
+                    kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
 
                 //initialize scanner detail viewer
@@ -205,7 +206,6 @@ namespace PARSE
             if ((countdown > 0) && (!capturedModel))
             {
                 countdown--;
-                label4.Content = "Present scanner to camera...." + countdown.ToString() + "...";
             }
             else if ((countdown == 0) && (!capturedModel))
             {
@@ -216,13 +216,11 @@ namespace PARSE
             else if ((countdown > 0) && (capturedModel))
             {
                 countdown--;
-                label4.Content = "Place scanner on patient..." + countdown.ToString() + "...";
             }
             else if ((countdown == 0) && (capturedModel))
             {
                 capturedObject = true;
                 objectimage = kinectInterp.getRGBTexture();
-                label4.Content = "Looking for scanner..";
             }
             else if ((capturedModel) && (capturedObject))
             {
@@ -237,6 +235,7 @@ namespace PARSE
             VolumeCalculator.calculateVolume(windowScanner.getYourMum());
             ss.Speak("You are fat");
             System.Windows.Forms.MessageBox.Show("You are too fat");
+            windowRuntime.runtimeTab.SelectedIndex = 1;
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
@@ -246,7 +245,7 @@ namespace PARSE
             
             /*Requires generated model, raw depth array and previous*/
             //windowViewer.setLimbVisualisation();
-            LimbCalculator.calculate(windowScanner.getPointClouds()[0], windowScanner.getJointMeasurements());
+            LimbCalculator.calculate(windowScanner.getYourMum(), windowScanner.getJointMeasurements());
 
         }
 
@@ -367,13 +366,65 @@ namespace PARSE
             
             pcd = stitcher.getResult(); 
             
-            windowScanner.Close();
+            //windowScanner.Close();
             windowViewer.Close();
             windowScanner = new ScanLoader(pcd);
             windowScanner.Owner = this;
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
 
+        }
+
+        private void AddNewPatient_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //open default window viewer
+                windowViewer = new ViewLoader();
+                windowViewer.Owner = this;
+                windowViewer.Show();
+
+                //open patient detail viewer
+                windowPatient = new PatientLoader();
+                windowPatient.Owner = this;
+                windowPatient.Show();
+
+                //open runtime detail viewer
+                windowRuntime = new RuntimeLoader();
+                windowRuntime.Owner = this;
+                windowRuntime.Show();
+
+                windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
+                windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
+                ss.Speak("Welcome!");
+
+                if (KinectSensor.KinectSensors.Count > 0)
+                {
+                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+                }
+                else
+                {
+                    windowRuntime.sendMessageToOutput("Warning", "No Kinect Found");
+                }
+
+                //initialize scanner detail viewer
+                windowScanner = new ScanLoader();
+                windowScanner.Owner = this;
+                windowScanner.Closed += new EventHandler(windowScanner_Closed);
+
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err);
+            }
+        }
+
+        private void checkKinectConnection(object state)
+        {
+            if (KinectSensor.KinectSensors.Count > 0)
+            {
+                System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+            }
         }
        
     }

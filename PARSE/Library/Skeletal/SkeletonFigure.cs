@@ -2,21 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Threading;
-using System.Speech.Synthesis;
-using System.Windows.Media;
-using System.Windows.Media.Media3D;
-
 using Microsoft.Kinect;
-using HelixToolkit.Wpf;
+using System.Windows;
+using System.Windows.Shapes;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace PARSE
 {
@@ -44,18 +34,15 @@ namespace PARSE
     class SkeletonFigure
     {
         public String instruction = "hello";
-        public bool labelsActive = false;
 
         private const int JOINT_WIDTH = 4;
         private const int HEAD_WIDTH = 10;
         private const int BONES_THICKNESS = 2;
 
         private Canvas canvas;
-        private double waistDistanceMeasure;
 
         private IDictionary<JointType, Ellipse> Joints;
         private IDictionary<SkeletonBones, Line> Bones;
-        private IDictionary<SkeletonBones, TextBlock> Labels;
 
         private double shoulder = 0;
 
@@ -66,14 +53,11 @@ namespace PARSE
         public SkeletonFigure(Canvas c)
         {
             this.canvas = c;
-            this.canvas.Height = 375;
-            this.canvas.Width = 600;
+            this.canvas.Height = 426;
+            this.canvas.Width = 543;
 
             InitJoints();
             InitBones();
-            InitLabels();
-
-            System.Diagnostics.Debug.WriteLine("Created the skeleton");
         }
 
         public void Erase()
@@ -89,14 +73,8 @@ namespace PARSE
                 canvas.Children.Remove(line);
             }
 
-            foreach (TextBlock text in Labels.Values)
-            {
-                canvas.Children.Remove(text);
-            }
-
             Joints.Clear();
             Bones.Clear();
-            Labels.Clear();
         }
 
         public void Update(JointType jointType, Point point, float distance = 2.0f)
@@ -107,7 +85,6 @@ namespace PARSE
             {
                 InitJoints();
                 InitBones();
-                InitLabels();
             }
 
             var ellipse = Joints[jointType];
@@ -123,26 +100,9 @@ namespace PARSE
 
             //double shoulder = 0;
 
-            //Set text labels for skeleton from identification subroutine
-
-
-            foreach (SkeletonBones bones in Labels.Keys.Where(b => b.joint1 == jointType || b.joint2 == jointType))
-            {
-                try
-                {
-                    Canvas.SetTop(Labels[bones], point.Y);
-                    Canvas.SetLeft(Labels[bones], point.X);
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e);
-                }
-
-            }
             foreach (SkeletonBones bones in Bones.Keys.Where(b => b.joint1 == jointType || b.joint2 == jointType))
             {
                 var line = Bones[bones];
-
                 if (bones.joint1 == jointType)
                 {
                     line.X1 = point.X;
@@ -154,10 +114,10 @@ namespace PARSE
                         {
                             //Console.WriteLine("stay there mate" + point.Y);
                             instruction = "Hold this pose!";
-                        }
-                        
-                    }
 
+                        }
+                        //x`ZConsole.WriteLine(point.X + " " + point.Y);
+                    }
                     if (bones.joint1 == JointType.ShoulderLeft || bones.joint1 == JointType.ShoulderRight)
                     {
                         shoulder = point.Y;
@@ -168,10 +128,9 @@ namespace PARSE
                 {
                     line.X2 = point.X;
                     line.Y2 = point.Y;
-
                 }
             }
-            
+
         }
 
         #region Private methods
@@ -191,26 +150,26 @@ namespace PARSE
                 { new SkeletonBones(JointType.Spine,JointType.HipRight), GenerateLine()},
                 { new SkeletonBones(JointType.HipCenter,JointType.HipLeft), GenerateLine()},
                 { new SkeletonBones(JointType.HipCenter,JointType.HipRight), GenerateLine()},
-                
+
                 { new SkeletonBones(JointType.ShoulderLeft,JointType.ElbowLeft), GenerateLine()},
                 { new SkeletonBones(JointType.ElbowLeft,JointType.WristLeft), GenerateLine()},
                 { new SkeletonBones(JointType.WristLeft,JointType.HandLeft), GenerateLine()},
-                
+
                 { new SkeletonBones(JointType.ShoulderRight,JointType.ElbowRight), GenerateLine()},
                 { new SkeletonBones(JointType.ElbowRight,JointType.WristRight), GenerateLine()},
                 { new SkeletonBones(JointType.WristRight,JointType.HandRight), GenerateLine()},
-                
+
                 { new SkeletonBones(JointType.HipRight,JointType.KneeRight), GenerateLine()},
                 { new SkeletonBones(JointType.KneeRight,JointType.AnkleRight), GenerateLine()},
                 { new SkeletonBones(JointType.AnkleRight,JointType.FootRight), GenerateLine()},
-                
+
                 { new SkeletonBones(JointType.HipLeft,JointType.KneeLeft), GenerateLine()},
                 { new SkeletonBones(JointType.KneeLeft,JointType.AnkleLeft), GenerateLine()},
                 { new SkeletonBones(JointType.AnkleLeft,JointType.FootLeft), GenerateLine()},
             };
 
             //foreach (Line line in Bones.Values)
-            //canvas.Children.Add(line);
+            //    canvas.Children.Add(line);
         }
 
         private void InitJoints()
@@ -243,43 +202,6 @@ namespace PARSE
             //    canvas.Children.Add(ellipse);
         }
 
-        private void InitLabels()
-        {
-            Labels = new Dictionary<SkeletonBones, TextBlock>
-            {
-                { new SkeletonBones(JointType.Head,JointType.ShoulderCenter), GenerateLabel("Neck")},
-                { new SkeletonBones(JointType.ShoulderCenter,JointType.ShoulderLeft), GenerateLabel("")},
-                { new SkeletonBones(JointType.ShoulderCenter,JointType.ShoulderRight), GenerateLabel("")},
-                { new SkeletonBones(JointType.ShoulderCenter,JointType.Spine), GenerateLabel("Chest")},
-                { new SkeletonBones(JointType.Spine,JointType.ShoulderLeft), GenerateLabel("")},
-                { new SkeletonBones(JointType.Spine,JointType.ShoulderRight), GenerateLabel("")},
-                { new SkeletonBones(JointType.Spine,JointType.HipCenter), GenerateLabel("Waist")},
-                { new SkeletonBones(JointType.Spine,JointType.HipLeft), GenerateLabel("")},
-                { new SkeletonBones(JointType.Spine,JointType.HipRight), GenerateLabel("")},
-                { new SkeletonBones(JointType.HipCenter,JointType.HipLeft), GenerateLabel("")},
-                { new SkeletonBones(JointType.HipCenter,JointType.HipRight), GenerateLabel("")},
-                
-                { new SkeletonBones(JointType.ShoulderLeft,JointType.ElbowLeft), GenerateLabel("Upper Left Arm")},
-                { new SkeletonBones(JointType.ElbowLeft,JointType.WristLeft), GenerateLabel("Forearm")},
-                { new SkeletonBones(JointType.WristLeft,JointType.HandLeft), GenerateLabel("Forearm left")},
-                
-                { new SkeletonBones(JointType.ShoulderRight,JointType.ElbowRight), GenerateLabel("Upper Right Arm")},
-                { new SkeletonBones(JointType.ElbowRight,JointType.WristRight), GenerateLabel("Forearm right")},
-                { new SkeletonBones(JointType.WristRight,JointType.HandRight), GenerateLabel("")},
-                
-                { new SkeletonBones(JointType.HipRight,JointType.KneeRight), GenerateLabel("Right Thigh")},
-                { new SkeletonBones(JointType.KneeRight,JointType.AnkleRight), GenerateLabel("Right Calf")},
-                { new SkeletonBones(JointType.AnkleRight,JointType.FootRight), GenerateLabel("")},
-                
-                { new SkeletonBones(JointType.HipLeft,JointType.KneeLeft), GenerateLabel("Left Thigh")},
-                { new SkeletonBones(JointType.KneeLeft,JointType.AnkleLeft), GenerateLabel("Left Calf")},
-                { new SkeletonBones(JointType.AnkleLeft,JointType.FootLeft), GenerateLabel("")},
-            };
-
-            //foreach (Ellipse ellipse in Joints.Values)
-            //    canvas.Children.Add(ellipse);
-        }
-
         private Ellipse GenerateEllipse(int size = JOINT_WIDTH)
         {
             var ellipse = new Ellipse() { Width = size, Height = size, Fill = Brushes.LightBlue };
@@ -292,26 +214,6 @@ namespace PARSE
             var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = Brushes.Blue, Stroke = Brushes.Blue };
             canvas.Children.Add(line);
             return line;
-        }
-
-        private TextBlock GenerateLabel(String bonelabel)
-        {
-            var text = new TextBlock() { Text = bonelabel, Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#000000"), FontSize = 14 };
-            canvas.Children.Add(text);
-            text.MouseDown += new MouseButtonEventHandler(text_MouseDown);
-            text.MouseUp += new MouseButtonEventHandler(text_MouseUp);
-            return text;
-        }
-
-        void text_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            System.Diagnostics.Debug.Write("Text clicked");
-            ((TextBlock)sender).Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#73B1B7");
-        }
-
-        void text_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-
         }
 
         #endregion
