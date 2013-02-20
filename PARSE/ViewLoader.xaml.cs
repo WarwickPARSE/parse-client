@@ -77,7 +77,6 @@ namespace PARSE
             }
             else if (tmp == "RGB Isolation")
             {
-                //Environment.Exit(1);
                 kinectInterp.stopStreams();
                 kinectInterp.startRGBStream();
                 kinectInterp.startDepthStream();
@@ -103,6 +102,11 @@ namespace PARSE
                 kinectInterp.stopStreams();
                 kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            }
+            else
+            {
+                Console.WriteLine("PISS and SHIT");
+                Environment.Exit(-9000);
             }
         }
 
