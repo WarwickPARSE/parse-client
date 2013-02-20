@@ -28,6 +28,7 @@ using HelixToolkit.Wpf;
 using Microsoft.Kinect;
 using PARSE.Recognition;
 using PARSE.ICP;
+using PARSE.ICP.Stitchers;
 
 namespace PARSE
 {
@@ -363,7 +364,7 @@ namespace PARSE
             PointCloud pcd= new PointCloud();
 
             //instantiate the stitcher 
-            stitcher = new SimpleStitcher();
+            stitcher = new BoundingBox();
             
             //jam points into stitcher
             stitcher.add(pc);

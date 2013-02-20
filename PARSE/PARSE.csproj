@@ -124,6 +124,7 @@
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
     <Compile Include="Database\DatabaseEngine.cs" />
     <Compile Include="ICP\Downsampler.cs" />
+    <Compile Include="ICP\Stitchers\BoundingBox.cs" />
     <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
@@ -300,6 +301,7 @@
     <Resource Include="ICP\KdTree\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ICP\Stitchers\Exceptions\" />
     <Folder Include="Library\PointCloud\" />
   </ItemGroup>
   <ItemGroup>
