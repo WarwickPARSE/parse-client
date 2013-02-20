@@ -121,11 +121,26 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
+            ss = new SpeechSynthesizer();
 
+            //initalize speech sythesizer
+            ss.Rate = 1;
+            ss.Volume = 100;
+            
+            //init kinect
+            kinectInterp.startDepthStream();
+            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+
+            kinectInterp.startSkeletonStream();
+            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+
+            kinectInterp.startRGBStream();
+            this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+            
             if (!kinectInterp.isCalibrated())
             {
-                ss.Speak("The Kinect Device is not calibrated. Please do so from the menu");
-                Console.WriteLine("The Kinect Device is not calibrated. Please do so from the menu");
+                ss.Speak("The Kinect Device is not calibrated. Please do so from the Control menu");
+                Console.WriteLine("The Kinect Device is not calibrated. Please do so from the Control menu");
             }
             else if (kinectInterp.tooFarForward())
             {
@@ -150,25 +165,10 @@ namespace PARSE
                 //create new list of pc's
                 fincloud = new List<PointCloud>();
 
-                //initialize kinect device
-
-                kinectInterp.startDepthStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-
-                kinectInterp.startRGBStream();
-                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-
                 //start new scanning timer.
                 pcTimer = new System.Windows.Forms.Timer();
                 pcTimer.Tick += new EventHandler(pcTimer_tick);
-                ss = new SpeechSynthesizer();
-
-                //initalize speech sythesizer
-                ss.Rate = 1;
-                ss.Volume = 100;
+                
                 ss.Speak("Please face the camera.");
                 this.instructionblock.Text = "Please face the camera";
 
