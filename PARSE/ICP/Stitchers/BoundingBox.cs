@@ -64,8 +64,6 @@ namespace PARSE.ICP.Stitchers
                     //calculate the width of the cloud 
                     width = cloud.getxMax() - cloud.getxMin();
 
-                    translationValue = new double[3] { depth, 0, 0 };
-
                     //perform the rotation depending on which point cloud we are looking at 
                     switch (i) { 
                         case 0:
@@ -82,7 +80,8 @@ namespace PARSE.ICP.Stitchers
                             //calculate the centre of rotation 
                             rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
 
-                            //
+                            //dont translate
+                            translationValue = new double[3] { 0, 0, 0 };
                             break;
                         case 2:
                             //set the rotation to a fixed value 
@@ -90,21 +89,37 @@ namespace PARSE.ICP.Stitchers
 
                             //calculate the centre of rotation (maxx',miny,maxz'+(maxx-minx))
                             rotationCentre = new double[3] { prevMax[0], cloud.getyMin(), prevMax[2] + (cloud.getxMax() - cloud.getxMin()) }; 
+
+                            /*
+                             * Translate by
+                             * x: -width
+                             * z: width'
+                             */
+                            translationValue = new double[3] { 0-width, 0, prevWidth};
                             break;
                         case 3:
                             //set the rotation to a fixed value 
                             rotationAngle = -270;
 
                             rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+
+                            /*
+                             * Translate by
+                             * x: -(depth + width')
+                             * z: width
+                             */
+                            translationValue = new double[3] { 0 - (depth + prevWidth), 0, width };
                             break;
                         default:
                             //this should not occur... throw an exception 
                             break;
                     }
 
-                    if (i != 0) {
-                        cloud.rotate(rotationCentre, rotationAngle);
-                        cloud.translate(translationValue); 
+                    //perform translation and rotations 
+                    if (i != 0 && i != 1) {                        
+                        cloud.translate(translationValue);
+                    } else if (i != 0) {
+                         cloud.rotate(rotationCentre, rotationAngle);
                     }
 
                     //stick the result into the point cloud 
