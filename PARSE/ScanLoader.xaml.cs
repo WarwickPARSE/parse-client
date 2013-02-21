@@ -65,6 +65,7 @@ namespace PARSE
         public ScanLoader(List<PointCloud> fcloud)
         {
             InitializeComponent();
+
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
@@ -122,39 +123,74 @@ namespace PARSE
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
 
-            //hide buttons from form
-            cancel_scan.Visibility = Visibility.Collapsed;
-            start_scan.Visibility = Visibility.Collapsed;
 
-            //create new list of pc's
-            fincloud = new List<PointCloud>();
+            if (ss == null)
+            {
+                //initalize speech sythesizer
+                ss = new SpeechSynthesizer();
+                ss.Rate = 1;
+                ss.Volume = 100;
+            }
+            
+            //init kinect
+            if (!this.kinectInterp.IsDepthStreamUpdating)
+            {
+                this.kinectInterp.startDepthStream();
+                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            }
 
-            //initialize kinect device
+            if (!this.kinectInterp.IsSkelStreamUpdating)
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
 
-            kinectInterp.startDepthStream();
-            this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            if (!this.kinectInterp.IsDepthStreamUpdating)
+            {
+                this.kinectInterp.startRGBStream();
+                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+            }
+            
+            if (!kinectInterp.isCalibrated())
+            {
+                ss.Speak("The Kinect Device is not calibrated. Please do so from the Control menu");
+                Console.WriteLine("The Kinect Device is not calibrated. Please do so from the Control menu");
+            }
+            else if (kinectInterp.tooFarForward())
+            {
+                ss.Speak("Step Backward you fucker");
+                Console.WriteLine("Step Backward you fucker");
+            }
+            else if (kinectInterp.tooFarBack())
+            {
+                ss.Speak("Step Forward you fucker");
+                Console.Write("Step Forward you fucker");
+            }
+            else
+            {
+                ss.Speak("Your posiitoning is optimal, have some cake.");
+                Console.WriteLine("Your posiitoning is optimal, have some cake.");
+                fincloud = new List<PointCloud>();
 
-            kinectInterp.startSkeletonStream();
-            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                //hide buttons from form
+                cancel_scan.Visibility = Visibility.Collapsed;
+                start_scan.Visibility = Visibility.Collapsed;
 
-            kinectInterp.startRGBStream();
-            this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                //create new list of pc's
+                fincloud = new List<PointCloud>();
 
-            //start new scanning timer.
-            pcTimer = new System.Windows.Forms.Timer();
-            pcTimer.Tick += new EventHandler(pcTimer_tick);
-            ss = new SpeechSynthesizer();
+                //start new scanning timer.
+                pcTimer = new System.Windows.Forms.Timer();
+                pcTimer.Tick += new EventHandler(pcTimer_tick);
+                
+                ss.Speak("Please face the camera.");
+                this.instructionblock.Text = "Please face the camera";
 
-            //initalize speech sythesizer
-            ss.Rate = 1;
-            ss.Volume = 100;
-            ss.Speak("Please face the camera.");
-            this.instructionblock.Text = "Please face the camera";
-
-            //Initialize and start timerr
-            pcTimer.Interval = 10000;
-            countdown = 3;
-            pcTimer.Start();
+                //Initialize and start timerr
+                pcTimer.Interval = 10000;
+                countdown = 3;
+                pcTimer.Start();
+            }
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
@@ -271,6 +307,8 @@ namespace PARSE
         public int[] averageDepthArray(int[] depthArray)
         {
             Queue<int[]> averageQueue = new Queue<int[]>();
+
+            System.Diagnostics.Debug.WriteLine("Smoothing depth array");
 
             averageQueue.Enqueue(depthArray);
 

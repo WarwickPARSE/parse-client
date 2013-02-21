@@ -43,6 +43,7 @@ namespace PARSE
         public ScanLoader                  windowScanner;
         public Window                      windowPatient;
         public RuntimeLoader               windowRuntime;
+        public MeasurementLoader           windowMeasurement;
 
         //Modelling specific definitions
         private GeometryModel3D             Model;
@@ -110,7 +111,8 @@ namespace PARSE
                 windowViewer.Show();
 
                 //open patient detail viewer
-                windowPatient = new PatientLoader();
+                //TODO: need to abstract this for when we add a new patient.
+                windowPatient = new PatientLoader(true);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 
@@ -121,7 +123,7 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome to the PARSE Toolkit, Initializing Kinect Device.");
+                ss.Speak("Welcome to the PARSE tookit, initializing Kenect Device");  
 
                 if (KinectSensor.KinectSensors.Count>0)
                 {
@@ -147,6 +149,12 @@ namespace PARSE
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
+        private void btnCalibrate_Click(object sender, RoutedEventArgs e)
+        {
+            this.kinectInterp.kinectSensor.ElevationAngle = KinectInterpreter.oneParseRadian;
+            //KinectInterpreter.oneParseRadian;
+        }
+        
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
             if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
@@ -375,6 +383,25 @@ namespace PARSE
 
         }
 
+        private void AddMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            if (KinectSensor.KinectSensors.Count != 0)
+            {
+                windowScanner.Close();
+                windowViewer.Close();
+                //Definition of window viewer seems to get lost somewhere
+                this.OwnedWindows[0].Close();
+
+                windowMeasurement = new MeasurementLoader();
+                windowMeasurement.Owner = this;
+                windowMeasurement.Show();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Please connect a Kinect Device");
+            }
+        }
+
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -385,7 +412,7 @@ namespace PARSE
                 windowViewer.Show();
 
                 //open patient detail viewer
-                windowPatient = new PatientLoader();
+                windowPatient = new PatientLoader(false);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace PARSE.Prototyping.Nathan
+namespace PARSE.Tracking
 {
     class Matrix
     {

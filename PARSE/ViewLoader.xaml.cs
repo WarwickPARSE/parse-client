@@ -75,9 +75,8 @@ namespace PARSE
                 kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
-            else if (tmp == "RGB Isolation (Do Not Press!!!)")
+            else if (tmp == "RGB Isolation")
             {
-                //Environment.Exit(1);
                 kinectInterp.stopStreams();
                 kinectInterp.startRGBStream();
                 kinectInterp.startDepthStream();
@@ -86,24 +85,28 @@ namespace PARSE
             }
             else if (tmp == "Depth Isolation")
             {
-                /*kinectInterp.stopStreams();
-                kinectInterp.startRGBStream();
-                kinectInterp.startDepthStream();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
-                /*/
                 kinectInterp.stopStreams();
                 kinectInterp.startDepthStream();
                 kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-                //*/
             }
             else if (tmp == "Skeleton")
             {
                 kinectInterp.stopStreams();
                 kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
+            else if (tmp == "Depth")
+            {
+                kinectInterp.stopStreams();
+                kinectInterp.startDepthStream();
+                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            }
+            else
+            {
+                //Console.WriteLine("PISS and SHIT");
+                Environment.Exit(-9000);
             }
         }
 
@@ -122,6 +125,9 @@ namespace PARSE
             this.kinectImager.Source = kinectInterp.ColorImageReady(sender, e);
         }
 
+
+        int count = 0;
+
         /// <summary>
         /// Kinect Depth Polling Method
         /// </summary>
@@ -129,7 +135,15 @@ namespace PARSE
         /// <param name="e">event ready identifier</param>
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
-            this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+            if (count == 0)
+            {
+                this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+            }
+            count++;
+            if (count > 9)
+            {
+                count = 0;
+            }
         }
 
         private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -139,11 +153,11 @@ namespace PARSE
 
         private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            //magic needs to come to PARSE
-            WriteableBitmap results = kinectInterp.SensorAllFramesReady(sender, e);
-            
-            this.kinectImager.Source = results;
-            //this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };*/
+            WriteableBitmap[] results = new WriteableBitmap[1];
+            results = kinectInterp.SensorAllFramesReady(sender, e);
+
+            this.kinectImager.Source = results[1];
+            this.kinectImager.OpacityMask = new ImageBrush { ImageSource = results[0] };
         }
 
     }

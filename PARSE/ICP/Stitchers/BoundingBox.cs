@@ -78,7 +78,7 @@ namespace PARSE.ICP.Stitchers
                             rotationAngle = -90;
 
                             //calculate the centre of rotation 
-                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMin() };
 
                             //dont translate
                             translationValue = new double[3] { 0, 0, 0 };
