@@ -173,6 +173,11 @@
     <Compile Include="ScanLoader.xaml.cs">
       <DependentUpon>ScanLoader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tracking\Matrix.cs" />
+    <Compile Include="Tracking\RGBTracker.cs" />
+    <Compile Include="Tracking\MeasurementLoader.xaml.cs">
+      <DependentUpon>MeasurementLoader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tracking\SensorTracker.cs" />
     <Compile Include="ViewLoader.xaml.cs">
       <DependentUpon>ViewLoader.xaml</DependentUpon>
@@ -212,6 +217,10 @@
     <Page Include="ScanLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tracking\MeasurementLoader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ViewLoader.xaml">
       <SubType>Designer</SubType>

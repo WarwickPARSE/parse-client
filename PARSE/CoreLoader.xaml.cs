@@ -42,6 +42,7 @@ namespace PARSE
         public ScanLoader                  windowScanner;
         public Window                      windowPatient;
         public RuntimeLoader               windowRuntime;
+        public MeasurementLoader           windowMeasurement;
 
         //Modelling specific definitions
         private GeometryModel3D             Model;
@@ -373,6 +374,17 @@ namespace PARSE
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
 
+        }
+
+        private void AddMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            windowScanner.Close();
+            windowViewer.Close();
+            windowPatient.Close();
+
+            windowMeasurement = new MeasurementLoader();
+            windowMeasurement.Owner = this;
+            windowMeasurement.Show();
         }
        
     }

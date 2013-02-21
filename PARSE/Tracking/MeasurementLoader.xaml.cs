@@ -1,0 +1,217 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Speech.Synthesis;
+using System.Windows;
+using System.Windows.Controls;
+using Microsoft.Kinect;
+using PARSE.Tracking;
+
+namespace PARSE
+{
+    /// <summary>
+    /// Interaction logic for MeasurementLoader.xaml
+    /// </summary>
+    public partial class MeasurementLoader : Window
+    {
+        
+        private System.Windows.Forms.Timer pcTimer;
+        private int countdown;
+
+        //Kinect instance
+        private KinectInterpreter kinectInterp;
+
+        private Dictionary<JointType, double[]> jointDepths;
+
+        //speech synthesizer instances
+        private SpeechSynthesizer ss;
+
+        private Canvas tmpCanvas;
+
+        SensorTracker tracker;
+
+
+        public MeasurementLoader()
+        {
+            System.Diagnostics.Debug.WriteLine("Measurement Window Starting...");
+
+            InitializeComponent();
+            this.Loaded += new RoutedEventHandler(MeasurementLoader_Loaded);
+        }
+
+        //Event handlers for viewport interaction
+
+        private void MeasurementLoader_Loaded(object Sender, RoutedEventArgs e)
+        {
+            //place relative to coreloader
+            this.Top = this.Owner.Top + 70;
+            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width -20;
+
+            //start scanning procedure
+            //kinectInterp = new KinectInterpreter(skeloutline);
+            //kinectInterp.stopStreams();
+
+            System.Diagnostics.Debug.WriteLine("Measurement Window Ready");
+        }
+
+        private void cancel_scan_Click(object sender, RoutedEventArgs e)
+        {
+            tracker.Stop();
+            //this.Close();
+        }
+
+        private void start_scan_Click(object sender, RoutedEventArgs e)
+        {
+            // hide buttons from form
+            //cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
+            //instructionblock.Visibility = Visibility.Collapsed;
+            instructionblock.Text = "-";
+            // show image
+            Visualisation.Visibility = Visibility.Visible;
+
+            System.Diagnostics.Debug.WriteLine("Starting measurement visualisation");
+
+            // Start tracking
+            tracker = new SensorTracker(Visualisation, this, true, instructionblock);
+            tracker.Start();
+
+
+            /*
+            //start new scanning timer.
+            pcTimer = new System.Windows.Forms.Timer();
+            pcTimer.Tick += new EventHandler(pcTimer_tick);
+            ss = new SpeechSynthesizer();
+
+            //initalize speech synthesizer
+            ss.Rate = 1;
+            ss.Volume = 100;
+            ss.Speak("Please face the camera.");
+            this.instructionblock.Text = "Please face the camera";
+
+            //Initialize and start timer
+            pcTimer.Interval = 10000;
+            countdown = 3;
+            pcTimer.Start();
+            */
+        }
+
+        private void pcTimer_tick(Object sender, EventArgs e)
+        {
+            if (countdown == 3)
+            {
+                //enable update of skelL, skelR, skelDepth
+                this.kinectInterp.enableUpdateSkelVars();
+
+                //get current skeleton tracking state
+                Skeleton skeleton = this.kinectInterp.getSkeletons();
+                jointDepths  = enumerateSkeletonDepths(skeleton);
+
+                //freeze skelL skelDepth and skelR
+                this.kinectInterp.disableUpdateSkelVars();
+
+                tmpCanvas = skeloutline;
+
+                ss.Speak("Turn left");
+                this.instructionblock.Text = "Please turn left";
+                countdown--;
+            }
+            else if (countdown == 2)
+            {
+
+                //PointCloud structure methods
+
+                ss.Speak("Turn left with your back to the camera");
+                this.instructionblock.Text = "Turn left with your back to the camera";
+                countdown--;
+            }
+            else if (countdown == 1)
+            {
+
+                //PointCloud structure methods
+
+                ss.Speak("Turn left once more");
+                this.instructionblock.Text = "Please turn left once more";
+                countdown--;
+            }
+            else if (countdown == 0)
+            {
+
+                //PointCloud structure methods
+
+                //Visualisation instantiation based on int array clouds
+
+                //stop streams
+                kinectInterp.stopStreams();
+                skeloutline = tmpCanvas;
+                skeloutline.Visibility = Visibility.Hidden;
+
+                //Visualisation instantiation based on KDTree array clouds
+                this.instructionblock.Text = "Scanning complete.";
+                this.instructionblock.Visibility = Visibility.Collapsed;
+                pcTimer.Stop();
+            }
+        }
+
+        /*
+        private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            kinectInterp.SkeletonFrameReady(sender, e);
+        }
+
+        private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
+        {
+            kinectInterp.ColorImageReady(sender, e);
+        }
+
+        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
+        {
+            kinectInterp.DepthImageReady(sender, e);
+        }
+
+        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            kinectInterp.SkeletonFrameReady(sender, e);
+        }
+        */
+        
+        /*Publicly accessible methods*/
+
+        public Dictionary<JointType, double[]> enumerateSkeletonDepths(Skeleton sk)
+        {
+            //Store double
+            Dictionary<JointType, double[]> jointDepths = new Dictionary<JointType, double[]>();
+
+            //Get depths and x,y locations at joints.
+            foreach (Joint j in sk.Joints)
+            {
+                double[] positions = { j.Position.Z, j.Position.X, j.Position.Y };
+                jointDepths.Add(j.JointType, positions);
+            }
+
+            return jointDepths;
+        }
+
+        public Dictionary<JointType, double[]> getJointMeasurements()
+        {
+            return jointDepths;
+        }
+
+        /* Setters */
+        public void setLimbCues(bool measureMode)
+        {
+            if (measureMode)
+            {
+                this.instructionblock.Visibility = Visibility.Visible;
+                skeloutline.Visibility = Visibility.Visible;
+                this.instructionblock.Text = "Click on an area of the body";
+            }
+        }
+
+        internal void capture(int x, int y, double angleXY, double angleZ)
+        {
+            System.Diagnostics.Debug.WriteLine("Scan captured! END");
+            tracker.Stop();
+            this.Close();
+        }
+    }
+}
