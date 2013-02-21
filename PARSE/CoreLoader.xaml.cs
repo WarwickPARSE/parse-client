@@ -123,7 +123,6 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome to the PARSE Toolkit, Initializing Kinect Device.");
 
                 if (KinectSensor.KinectSensors.Count>0)
                 {
@@ -385,13 +384,21 @@ namespace PARSE
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
         {
-            windowScanner.Close();
-            windowViewer.Close();
-            windowPatient.Close();
+            if (KinectSensor.KinectSensors.Count != 0)
+            {
+                windowScanner.Close();
+                windowViewer.Close();
+                //Definition of window viewer seems to get lost somewhere
+                this.OwnedWindows[0].Close();
 
-            windowMeasurement = new MeasurementLoader();
-            windowMeasurement.Owner = this;
-            windowMeasurement.Show();
+                windowMeasurement = new MeasurementLoader();
+                windowMeasurement.Owner = this;
+                windowMeasurement.Show();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Please connect a Kinect Device");
+            }
         }
 
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
