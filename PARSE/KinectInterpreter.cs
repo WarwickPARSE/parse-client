@@ -260,6 +260,8 @@ namespace PARSE
         
         }
 
+        int count = 10;
+
         public WriteableBitmap DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
 

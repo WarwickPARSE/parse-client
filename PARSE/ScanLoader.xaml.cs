@@ -71,11 +71,6 @@ namespace PARSE
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
 
-            //smooth list of pointcloud
-            for (int i = 0;i < fcloud.Count;i++) {
-                fcloud[i].rawDepth = averageDepthArray(fcloud[i].rawDepth);
-            }
-
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.DataContext = new CloudVisualisation(fcloud, false);
             fincloud = fcloud;

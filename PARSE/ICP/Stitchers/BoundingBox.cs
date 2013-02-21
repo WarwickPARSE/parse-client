@@ -73,7 +73,8 @@ namespace PARSE.ICP.Stitchers
                             rotationAngle = -90;
 
                             //calculate the centre of rotation 
-                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMin() };
+                            System.Diagnostics.Debug.WriteLine(cloud.getxMax() +" "+ cloud.getyMin() + " "+ cloud.getzMin());
                             break;
                         case 2:
                             //set the rotation to a fixed value 
