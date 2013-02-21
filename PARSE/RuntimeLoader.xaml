@@ -13,13 +13,16 @@
                 </TabItem.Header>
                 <RichTextBox Height="223" Name="textBox1" Width="268" />
             </TabItem>
-            <TabItem>
+            <TabItem Name="results" HorizontalContentAlignment="Right">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Height="18" Source="Resources/op2.png" />
                         <TextBlock Text="Results" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
+                <Canvas Name="VisCanvas" Width="340" Height="230" Background="Aqua" HorizontalAlignment="Right" >
+                    
+                </Canvas>
             </TabItem>
             <TabItem>
                 <TabItem.Header>

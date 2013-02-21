@@ -105,7 +105,7 @@ namespace PARSE
             }
             else
             {
-                Console.WriteLine("PISS and SHIT");
+                //Console.WriteLine("PISS and SHIT");
                 Environment.Exit(-9000);
             }
         }
@@ -125,6 +125,9 @@ namespace PARSE
             this.kinectImager.Source = kinectInterp.ColorImageReady(sender, e);
         }
 
+
+        int count = 0;
+
         /// <summary>
         /// Kinect Depth Polling Method
         /// </summary>
@@ -132,7 +135,15 @@ namespace PARSE
         /// <param name="e">event ready identifier</param>
         private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
-            this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+            if (count == 0)
+            {
+                this.kinectImager.Source = kinectInterp.DepthImageReady(sender, e);
+            }
+            count++;
+            if (count > 9)
+            {
+                count = 0;
+            }
         }
 
         private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
