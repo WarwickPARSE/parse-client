@@ -97,6 +97,17 @@ namespace PARSE
                 kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
+            else if (tmp == "Depth")
+            {
+                kinectInterp.stopStreams();
+                kinectInterp.startDepthStream();
+                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+            }
+            else
+            {
+                Console.WriteLine("PISS and SHIT");
+                Environment.Exit(-9000);
+            }
         }
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)

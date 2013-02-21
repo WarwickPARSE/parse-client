@@ -124,6 +124,7 @@
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
     <Compile Include="Database\DatabaseEngine.cs" />
     <Compile Include="ICP\Downsampler.cs" />
+    <Compile Include="ICP\Stitchers\BoundingBox.cs" />
     <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
@@ -309,6 +310,7 @@
     <Resource Include="ICP\KdTree\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ICP\Stitchers\Exceptions\" />
     <Folder Include="Library\PointCloud\" />
   </ItemGroup>
   <ItemGroup>
@@ -318,6 +320,13 @@
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\placeholder.png" />
+    <Resource Include="Resources\clock.png" />
+    <Resource Include="Resources\open.png" />
+    <Resource Include="Resources\person.png" />
+    <Resource Include="Resources\plus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\op3.PNG" />
     <Resource Include="Resources\op2.PNG" />
     <Resource Include="Resources\op1.PNG" />

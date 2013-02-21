@@ -73,6 +73,8 @@ namespace PARSE
         private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
         private float skelR;
         private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+        private float skelB;
+        private float skelBDelta = -50;
 
         public String instruction = "Waiting for patient...";
 
@@ -81,6 +83,9 @@ namespace PARSE
 
         //Constants
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        public const double oneParseUnit = 2642.5;
+        public const double oneParseUnitDelta = 7.5;
+        public const int oneParseRadian = 0;
 
         public KinectInterpreter(Canvas c)
         {
@@ -112,9 +117,26 @@ namespace PARSE
                 int colorHeight = this.kinectSensor.ColorStream.FrameHeight;
 
                 this.colorToDepthDivisor = colorWidth / 640;
+
+                this.kinectSensor.Start();
             }
         }
 
+        public Boolean tooFarBack()
+        {
+            return (skelDepthPublic > (oneParseUnit + oneParseUnitDelta));
+        }
+
+        public Boolean tooFarForward()
+        {
+            return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
+        }
+        
+        public Boolean isCalibrated()
+        {
+            return (this.kinectSensor.ElevationAngle == oneParseRadian);    
+        }
+        
         public void enableUpdateSkelVars()
         {
             this.IsSkelStreamUpdating = true;
@@ -328,7 +350,14 @@ namespace PARSE
                         {
                             // If not, create a new drawing on our canvas
                             skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
-                            skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            try
+                            {
+                                skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
+                            }
+                            catch (Exception err)
+                            {
+                                //shhhhh
+                            }
                             activeSkel = trackedSkeleton;
                             Canvas.SetTop(this.skeletonCanvas, 0);
                             Canvas.SetLeft(this.skeletonCanvas, 0);
@@ -340,11 +369,14 @@ namespace PARSE
                             skelDepth = trackedSkeleton.Position.Z;
                             skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
                             skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+                            skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
 
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
                             skelL = (320 * (1 + skelL)) * 4;
+                            //Console.WriteLine("BOO");
                             skelR = (320 * (1 + skelR)) * 4;
+                            skelB = 480 * (1-((1+skelB)/2));
                         }
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
@@ -372,8 +404,9 @@ namespace PARSE
         {
             return skelDepthPublic;
         }
-        
-          public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e) {
+
+        public WriteableBitmap[] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        {
 
             bool depthReceived = false;
             bool colorReceived = false;
@@ -450,7 +483,7 @@ namespace PARSE
                                 // set opaque
                                 this.greenScreenPixelData[greenScreenIndex] = -1;
 
-                                // compensate for depth/color not corresponding exactly by setting the pixel 
+                                // compensate for depth/color not corresponding exactly by setting the pixel
                                 // to the left to opaque as well
                                 this.greenScreenPixelData[greenScreenIndex - 1] = -1;
                             }
@@ -462,35 +495,35 @@ namespace PARSE
             if (true == colorReceived)
             {
                 // Write the pixel data into our bitmap
-                    
-                    this.outputColorBitmap.WritePixels(
-                    new Int32Rect(0, 0, this.outputColorBitmap.PixelWidth, this.outputColorBitmap.PixelHeight),
-                    this.colorPixels,
-                    this.outputColorBitmap.PixelWidth * sizeof(int),
-                    0);
 
-                    if (this.playerOpacityMaskImage == null)
-                    {
-                        this.playerOpacityMaskImage = new WriteableBitmap(
-                            640,
-                            480,
-                            96,
-                            96,
-                            PixelFormats.Bgra32,
-                            null);
+                this.outputColorBitmap.WritePixels(
+                new Int32Rect(0, 0, this.outputColorBitmap.PixelWidth, this.outputColorBitmap.PixelHeight),
+                this.colorPixels,
+                this.outputColorBitmap.PixelWidth * sizeof(int),
+                0);
 
-                        results[0] = this.playerOpacityMaskImage;
-                    }
-
-                    this.playerOpacityMaskImage.WritePixels(
-                        new Int32Rect(0, 0, 640, 480),
-                        this.greenScreenPixelData,
-                        640 * ((this.playerOpacityMaskImage.Format.BitsPerPixel + 7) / 8),
-                        0);
+                if (this.playerOpacityMaskImage == null)
+                {
+                    this.playerOpacityMaskImage = new WriteableBitmap(
+                        640,
+                        480,
+                        96,
+                        96,
+                        PixelFormats.Bgra32,
+                        null);
 
                     results[0] = this.playerOpacityMaskImage;
-                    results[1] = this.outputColorBitmap;
-                    return results;
+                }
+
+                this.playerOpacityMaskImage.WritePixels(
+                    new Int32Rect(0, 0, 640, 480),
+                    this.greenScreenPixelData,
+                    640 * ((this.playerOpacityMaskImage.Format.BitsPerPixel + 7) / 8),
+                    0);
+
+                results[0] = this.playerOpacityMaskImage;
+                results[1] = this.outputColorBitmap;
+                return results;
             }
 
             return results;
@@ -529,15 +562,15 @@ namespace PARSE
             int colorPixelIndex = 0;
             this.rawDepth = new int[depthFrame.Length];
             int realDepth = 0;
-            
+            int depthPixelIndex = 0;
+
             for (int i = 0; i < depthFrame.Length; i++)
                 {
-                    this.rawDepth[i] = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+                this.rawDepth[i] = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
                     realDepth = depthFrame[i] >> DepthImageFrame.PlayerIndexBitmaskWidth;
 
                     if (skelDepth < 0)
                     {
-                        //Console.WriteLine(realDepth);
                         if (realDepth < 1066)
                         {
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * realDepth / 1066);
@@ -577,10 +610,8 @@ namespace PARSE
                     }
                     else
                     {
-
-                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))))
+                        if ((((skelDepth - skelDepthDelta) <= realDepth) && (realDepth < (skelDepth + skelDepthDelta))) && (((skelL - skelLDelta) <= (colorPixelIndex % 2560)) && ((colorPixelIndex % 2560) < (skelR + skelRDelta))) && ((skelB + skelBDelta) >= (colorPixelIndex / 2560)))
                         {
-                            //Console.WriteLine(skelDepth+" "+realDepth);
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
                             this.depthFrame32[colorPixelIndex++] = (byte)(255 * (realDepth - skelDepth + skelDepthDelta) / (2 * skelDepthDelta));
@@ -594,14 +625,14 @@ namespace PARSE
                             rawDepth[i] = -1;
                             ++colorPixelIndex;
                         }
-
-                }
-                
-                rawDepthClone = rawDepth;
+                    }
             }
 
-            //skelDepth = -1;
-            return this.depthFrame32;
+                
+                
+                rawDepthClone = rawDepth;
+
+                return this.depthFrame32;
         }
 
 

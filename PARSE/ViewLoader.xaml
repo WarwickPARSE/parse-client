@@ -17,6 +17,7 @@
                     <ComboBoxItem Name="c3">RGB Isolation</ComboBoxItem>
                     <ComboBoxItem Name="c4">Depth Isolation</ComboBoxItem>
                     <ComboBoxItem Name="c5">Skeleton</ComboBoxItem>
+                    <ComboBoxItem Name="c6">Depth</ComboBoxItem>
                 </ComboBox>
             </StatusBarItem>
             <Separator />

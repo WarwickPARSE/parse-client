@@ -29,10 +29,10 @@ namespace PARSE
         private void RuntimeLoader_Loaded(object Sender, RoutedEventArgs e)
         {
             //place relative to coreloader
-            this.Top = this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height + 20;
             this.Left = this.Owner.Left + 20;
             this.Width = (this.Owner.OwnedWindows[0].Width * 2.075);
-            this.Height = this.Owner.OwnedWindows[0].Height - 125;
+            this.Height = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - (this.Owner.OwnedWindows[0].Width/1.25);
+            this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
             this.textBox1.Width = this.Width - 20;
             this.textBox1.Height = this.Height - 75;
             //set console out to this control
@@ -55,6 +55,7 @@ namespace PARSE
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine("[CRITICAL]: Output window failed to update");
+                System.Diagnostics.Debug.WriteLine(e);
             }
         }
     }
