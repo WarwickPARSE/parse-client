@@ -221,10 +221,13 @@ namespace PARSE
                         //create a new point key
                         double[] pointKey = new double[3];
 
+                        /*
+                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
+                         */
                         //set key
                         pointKey[0] = x;
-                        pointKey[1] = y;
-                        pointKey[2] = z;
+                        pointKey[2] = y;
+                        pointKey[1] = z;
                         
 
                         Point3D poLoc = new Point3D(x, y, z);
