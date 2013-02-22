@@ -233,8 +233,8 @@ namespace KdTree
          */
         public List<Point3D> getAllPointsAt(double i, double r, double[] limits)
         {
-            double[] pointMin = {limits[0], i - r, limits[1]};
-            double[] pointMax = {limits[2], i + r, limits[3]};
+            double[] pointMin = { limits[0], limits[1], i - r, };//pack that
+            double[] pointMax = { limits[2], limits[3], i + r, };//fudge
 
             Object[] temp = range(pointMin,pointMax);
             List<Point3D> output = new List<Point3D>();

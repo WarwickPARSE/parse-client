@@ -118,6 +118,8 @@ namespace PARSE
                         using (StreamWriter w = File.AppendText("output.txt"))
                         {
                             w.WriteLine(planes[i][j].X + "," + planes[i][j].Y);
+                            w.Flush();
+                            w.Close();
                         }
 
                         Canvas.SetLeft(circle, 230+ (planes[i][j].X * 100));
@@ -127,6 +129,8 @@ namespace PARSE
                 using (StreamWriter w = File.AppendText("output.txt"))
                 {
                     w.WriteLine("end of plane, end of plane");
+                    w.Flush();
+                    w.Close();
                 }
             }
 
