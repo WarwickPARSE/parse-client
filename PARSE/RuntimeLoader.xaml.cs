@@ -10,7 +10,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Threading;
 using System.Diagnostics;
+using System.Windows.Media.Media3D;
 using System.IO;
 
 namespace PARSE
@@ -57,6 +59,91 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("[CRITICAL]: Output window failed to update");
                 System.Diagnostics.Debug.WriteLine(e);
             }
+        }
+
+        public void visualisePlanes(List<List<Point3D>> planes)
+        {
+            System.Diagnostics.Debug.WriteLine("Number of caught planes: " + planes.Count);
+
+            double xmin = 0;
+            double xmax = 0;
+            double zmin = 0;
+            double zmax = 0;
+
+            for (int i = 0; i < planes.Count; i++)
+            {
+
+                VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
+
+                for (int j = 0; j < planes[i].Count; j++) {
+
+                        Ellipse circle = new Ellipse();
+                        circle.Width = 1;
+                        circle.Height = 1;
+                        circle.StrokeThickness = 0.1;
+                        circle.Stroke = Brushes.Black;
+
+                        VisCanvas.Children.Add(circle);
+
+                        //Boundary check of points.
+                        if (planes[i][j].X > xmax)
+                        {
+                            xmax = planes[i][j].X;
+                        }
+
+                        if (planes[i][j].Y > zmax)
+                        {
+                            zmax = planes[i][j].Y;
+                        }
+
+                        if (planes[i][0].X < xmin)
+                        {
+                            xmin = planes[i][0].X;
+                        }
+                        if (planes[i][j].X < xmin)
+                        {
+                            xmin = planes[i][j].X;
+                        }
+
+                        if (planes[i][0].Y < zmin)
+                        {
+                            zmin = planes[i][0].Y;
+                        }
+                        if (planes[i][j].Y < zmin)
+                        {
+                            zmin = planes[i][j].Y;
+                        }
+
+                        using (StreamWriter w = File.AppendText("output.txt"))
+                        {
+                            w.WriteLine(planes[i][j].X + "," + planes[i][j].Y);
+                        }
+
+                        Canvas.SetLeft(circle, 230+ (planes[i][j].X * 100));
+                        Canvas.SetTop(circle, 100+(planes[i][j].Y * 5));
+                }
+
+                using (StreamWriter w = File.AppendText("output.txt"))
+                {
+                    w.WriteLine("end of plane, end of plane");
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("Planes visualised");
+            System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
+            System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
+            System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
+            System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
+            System.Diagnostics.Debug.WriteLine("points on canvas: " + VisCanvas.Children.Count);
+        }
+
+        private void VisCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Point location = Mouse.GetPosition(VisCanvas);
+            st.CenterX = location.X;
+            st.CenterY = location.Y;
+            st.ScaleX *= 1.5;
+            st.ScaleY *= 1.5;
         }
     }
 

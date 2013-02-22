@@ -153,22 +153,22 @@ namespace PARSE
             
             if (!kinectInterp.isCalibrated())
             {
-                ss.Speak("The Kinect Device is not calibrated. Please do so from the Control menu");
+                ss.Speak("The Kinect Device is not calibrated.");
                 Console.WriteLine("The Kinect Device is not calibrated. Please do so from the Control menu");
             }
             else if (kinectInterp.tooFarForward())
             {
-                ss.Speak("Step Backward you fucker");
-                Console.WriteLine("Step Backward you fucker");
+                ss.Speak("Step Backward");
+                Console.WriteLine("Step Backward");
             }
             else if (kinectInterp.tooFarBack())
             {
-                ss.Speak("Step Forward you fucker");
-                Console.Write("Step Forward you fucker");
+                ss.Speak("Step Forward");
+                Console.Write("Step Forward");
             }
             else
             {
-                ss.Speak("Your posiitoning is optimal, have some cake.");
+                ss.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
 

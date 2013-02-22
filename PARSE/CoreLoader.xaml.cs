@@ -240,10 +240,9 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            VolumeCalculator.calculateVolume(windowScanner.getYourMum());
-            ss.Speak("You are fat");
-            System.Windows.Forms.MessageBox.Show("You are too fat");
+            List<List<Point3D>> planes = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
             windowRuntime.runtimeTab.SelectedIndex = 1;
+            windowRuntime.visualisePlanes(planes);
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
