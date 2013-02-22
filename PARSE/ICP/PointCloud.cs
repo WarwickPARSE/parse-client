@@ -201,16 +201,14 @@ namespace PARSE
                     {
                         double zz = rawDepth[i] * scale;
                         double x = (cx - ix) * zz * fxinv;
-                        double y = zz;
-                        double z = (cy - iy) * zz * fyinv;
+                        double y = (cy - iy) * zz * fyinv;
+                        double z = zz;
 
                         /*
                          * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
                          */
-                        double yTemp = z;
-                        y = z;
-                        y = yTemp;
-
+                     
+                        
                         //check min values
                         if (x < minx) { minx = x; }
                         if (y < miny) { miny = y; }
@@ -220,7 +218,7 @@ namespace PARSE
                         if (x > maxx) { maxx = x; }
                         if (y > maxy) { maxy = y; }
                         if (z > maxz) { maxz = z; }
-
+                        
                         //create a new point key
                         double[] pointKey = new double[3];
 
@@ -367,7 +365,7 @@ namespace PARSE
                 {
                     //create rot matrix
                     Matrix3D mtx = new Matrix3D();
-                    Quaternion q = new Quaternion(new Vector3D(0, 0, 1), angle);
+                    Quaternion q = new Quaternion(new Vector3D(0, 1, 0), angle);
                     mtx.RotateAt(q, centre);
 
                     //complete rotation
