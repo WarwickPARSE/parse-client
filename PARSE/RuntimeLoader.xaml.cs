@@ -73,7 +73,8 @@ namespace PARSE
             for (int i = 0; i < planes.Count; i++)
             {
 
-                VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
+            //int i = planes.Count / 2;    
+            VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
 
                 for (int j = 0; j < planes[i].Count; j++) {
 

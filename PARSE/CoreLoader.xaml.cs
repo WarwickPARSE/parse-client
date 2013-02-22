@@ -241,8 +241,8 @@ namespace PARSE
         {
             //Static call to volume calculation method, pass persistent point cloud object
             List<List<Point3D>> planes = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
-            windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes);
+            //windowRuntime.runtimeTab.SelectedIndex = 1;
+            //windowRuntime.visualisePlanes(planes);
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)

@@ -42,7 +42,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = (ymax - ymin) / 30;
+            double increment = (ymax - ymin) / 10;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
 
@@ -61,7 +61,6 @@ namespace PARSE
                     for (int j = 0; j < plane.Count - 1; j++)
                     {
                         innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
-                        //Console.WriteLine("1: "+plane[j].Z+", 2: "+plane[j + 1].Z);
                     }
 
                     innerVolume = Math.Abs(innerVolume / 2);
