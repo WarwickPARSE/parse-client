@@ -42,7 +42,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = (ymax - ymin) / 10;
+            double increment = (ymax - ymin) / 20;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
 
@@ -73,6 +73,7 @@ namespace PARSE
                 else
                 {
                     Console.WriteLine("Plane EMPTY!!! BAD THINGS WILL HAPPEN");
+                    Environment.Exit(-1);
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
