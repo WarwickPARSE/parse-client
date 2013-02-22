@@ -76,8 +76,8 @@ namespace PARSE
             group.Children.Add(new TranslateTransform(VisCanvas.Width/2, VisCanvas.Height/2));
             group.Children.Add(new ScaleTransform(1.0,1.0));
 
-            for (int i = 0; i < planes.Count; i++)
-            {
+            //for (int i = 0; i < planes.Count; i++)
+            //{
 
             int i = planes.Count / 2;    
             VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
