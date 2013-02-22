@@ -72,8 +72,12 @@ namespace PARSE
             double zmin = 0;
             double zmax = 0;
 
-            //for (int i = 0; i < planes.Count; i++)
-            //{
+            TransformGroup group = new TransformGroup();
+            group.Children.Add(new TranslateTransform(VisCanvas.Width/2, VisCanvas.Height/2));
+            group.Children.Add(new ScaleTransform(1.0,1.0));
+
+            for (int i = 0; i < planes.Count; i++)
+            {
 
             int i = planes.Count / 2;    
             VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
@@ -85,6 +89,7 @@ namespace PARSE
                         circle.Height = 1;
                         circle.StrokeThickness = 0.1;
                         circle.Stroke = Brushes.Black;
+                        circle.Fill = Brushes.Black;
 
                         VisCanvas.Children.Add(circle);
 
@@ -124,8 +129,8 @@ namespace PARSE
                             w.Close();
                         }
 
-                        Canvas.SetLeft(circle, 230+ (planes[i][j].X * 100));
-                        Canvas.SetTop(circle, 100+(planes[i][j].Y * 5));
+                        Canvas.SetLeft(circle, planes[i][j].X);
+                        Canvas.SetTop(circle, planes[i][j].Z);
                 }
 
                 using (StreamWriter w = File.AppendText("./output.csv"))
@@ -137,6 +142,7 @@ namespace PARSE
                 Console.WriteLine("end of plane, end of plane");
             //}
 
+            VisCanvas.RenderTransform = group;
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
@@ -149,10 +155,10 @@ namespace PARSE
         private void VisCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point location = Mouse.GetPosition(VisCanvas);
-            st.CenterX = location.X;
-            st.CenterY = location.Y;
-            st.ScaleX *= 1.5;
-            st.ScaleY *= 1.5;
+            //st.CenterX = location.X;
+            //st.CenterY = location.Y;
+            //st.ScaleX *= 1.5;
+            //st.ScaleY *= 1.5;
         }
     }
 

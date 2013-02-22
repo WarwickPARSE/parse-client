@@ -47,6 +47,7 @@ namespace PARSE.ICP.Stitchers
                 
                 //instantiate some initial variables
                 double depth = 0;
+                double width = 0; 
                 double rotationAngle = 0;
                 double[] translationValue = new double[3];
                 double[] rotationCentre = new double[3];
@@ -54,19 +55,23 @@ namespace PARSE.ICP.Stitchers
                 //instantiate previous coord variables 
                 double[] prevMin = new double[3];
                 double[] prevMax = new double[3];
+                double prevWidth = 0; 
 
                 //iterate over every cloud 
                 int i = 0;
                 foreach (PointCloud cloud in pointClouds) {
 
-                    //it turns out that the same translation works in most cases 
-                    translationValue = new double[3] { depth, 0, 0 };
+                    //calculate the width of the cloud 
+                    width = cloud.getxMax() - cloud.getxMin();
 
                     //perform the rotation depending on which point cloud we are looking at 
                     switch (i) { 
                         case 0:
                             //this is nice, we don't need to do anything! 
                             rotationAngle = 0; 
+
+                            //dont translate
+                            translationValue = new double[3] { 0, 0, 0 };
                             break;
                         case 1:
                             //set the rotation to a fixed value 
@@ -74,7 +79,9 @@ namespace PARSE.ICP.Stitchers
 
                             //calculate the centre of rotation 
                             rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMin() };
-                            System.Diagnostics.Debug.WriteLine(cloud.getxMax() +" "+ cloud.getyMin() + " "+ cloud.getzMin());
+
+                            //dont translate
+                            translationValue = new double[3] { 0, 0, 0 };
                             break;
                         case 2:
                             //set the rotation to a fixed value 
@@ -82,21 +89,38 @@ namespace PARSE.ICP.Stitchers
 
                             //calculate the centre of rotation (maxx',miny,maxz'+(maxx-minx))
                             rotationCentre = new double[3] { prevMax[0], cloud.getyMin(), prevMax[2] + (cloud.getxMax() - cloud.getxMin()) }; 
+
+                            /*
+                             * Translate by
+                             * x: -width
+                             * z: width'
+                             */
+                            translationValue = new double[3] { 0-width, 0, prevWidth};
                             break;
                         case 3:
                             //set the rotation to a fixed value 
                             rotationAngle = -270;
 
                             rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+
+                            /*
+                             * Translate by
+                             * x: -(depth + width')
+                             * z: width
+                             */
+                            translationValue = new double[3] { 0 - (depth + prevWidth), 0, width };
                             break;
                         default:
                             //this should not occur... throw an exception 
                             break;
                     }
 
-                    if (i != 0) {
+                    //perform translation and rotations 
+                    if (i != 0 && i != 1) {                        
                         cloud.rotate(rotationCentre, rotationAngle);
                         cloud.translate(translationValue); 
+                    } else if (i != 0) {
+                         cloud.rotate(rotationCentre, rotationAngle);
                     }
 
                     //stick the result into the point cloud 
@@ -110,6 +134,7 @@ namespace PARSE.ICP.Stitchers
                     //store current values for the next iteration 
                     prevMin = new double[3]{cloud.getxMin(), cloud.getyMin(), cloud.getzMin()};
                     prevMax = new double[3]{cloud.getxMax(), cloud.getyMax(), cloud.getzMax()};
+                    prevWidth = width; 
 
                     //calculate the depth 
                     depth = cloud.getzMax() - cloud.getzMin();

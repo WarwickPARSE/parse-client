@@ -21,9 +21,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
-                    <Canvas.RenderTransform>
-                        <ScaleTransform CenterX="243" CenterY="108" ScaleX="1" ScaleY="-1"  x:Name="st"/>
-                    </Canvas.RenderTransform>
+                
                 </Canvas>
             </TabItem>
             <TabItem>
