@@ -123,7 +123,7 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome to the PARSE tookit, initializing Kenect Device");  
+
 
                 if (KinectSensor.KinectSensors.Count>0)
                 {
@@ -380,6 +380,52 @@ namespace PARSE
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
 
+        }
+
+        private void CloudProcessor_Click(object sender, RoutedEventArgs e)
+        {
+            /*Automates the following procedure:
+             * 1) adds selected point cloud to visualiser
+             * 2) groups it
+             * 3) peforms volume processing*/
+
+
+     /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".PARSE";
+            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+            if (dlg.ShowDialog() == true)
+            {
+                String filename = dlg.FileName;
+                this.DataContext = ScanSerializer.deserialize(filename);
+                fincloud = ScanSerializer.depthPc;
+            }
+
+            System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
+
+     /*2)*/ PointCloud pcd = new PointCloud();
+
+            //instantiate the stitcher 
+            stitcher = new BoundingBox();
+
+            //jam points into stitcher
+            stitcher.add(fincloud);
+            stitcher.stitch();
+
+            pcd = stitcher.getResult();
+
+            //windowScanner.Close();
+            windowViewer.Close();
+            windowScanner = new ScanLoader(pcd);
+            windowScanner.Owner = this;
+            windowScanner.Closed += new EventHandler(windowScanner_Closed);
+            windowScanner.Show();
+
+                 
+     /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
+            List<List<Point3D>> planes = VolumeCalculator.volume1stApprox(pcd);
+            windowRuntime.runtimeTab.SelectedIndex = 1;
+            windowRuntime.visualisePlanes(planes);
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
