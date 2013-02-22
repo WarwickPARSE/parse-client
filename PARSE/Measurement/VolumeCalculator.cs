@@ -73,7 +73,7 @@ namespace PARSE
                 else
                 {
                     Console.WriteLine("Plane EMPTY!!! BAD THINGS WILL HAPPEN");
-                    //Environment.Exit(-1);
+                    Environment.Exit(-1);
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
