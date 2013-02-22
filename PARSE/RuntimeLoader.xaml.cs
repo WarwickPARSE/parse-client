@@ -72,10 +72,10 @@ namespace PARSE
             double zmin = 0;
             double zmax = 0;
 
-            //for (int i = 0; i < planes.Count; i++)
-            //{
+            for (int i = 0; i < planes.Count; i++)
+            {
 
-            int i = planes.Count / 2;    
+            //int i = planes.Count / 2;    
             VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
 
                 for (int j = 0; j < planes[i].Count; j++) {
@@ -135,7 +135,7 @@ namespace PARSE
                     w.Close();
                 }
                 Console.WriteLine("end of plane, end of plane");
-            //}
+            }
 
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
@@ -143,7 +143,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
             System.Diagnostics.Debug.WriteLine("points on canvas: " + VisCanvas.Children.Count);
-            Environment.Exit(1);
+            //Environment.Exit(1);
         }
 
         private void VisCanvas_MouseDown(object sender, MouseButtonEventArgs e)

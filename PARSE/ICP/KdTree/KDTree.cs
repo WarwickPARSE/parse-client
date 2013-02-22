@@ -245,7 +245,7 @@ namespace KdTree
             if (output.Count == 0)
             {
                 Console.WriteLine("OH GOD MY EYES! IT BURNS!");
-                Environment.Exit(-1);
+                //Environment.Exit(-1);
             }
             return output;
         }
