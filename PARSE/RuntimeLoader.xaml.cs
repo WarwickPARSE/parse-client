@@ -79,7 +79,8 @@ namespace PARSE
             //for (int i = 0; i < planes.Count; i++)
             //{
 
-            int i = planes.Count / 2;    
+            int i = planes.Count / 2;
+            PointSorter.rotSort(planes[i]);
             VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
 
                 for (int j = 0; j < planes[i].Count; j++) {
@@ -122,6 +123,7 @@ namespace PARSE
                             zmin = planes[i][j].Z;
                         }
 
+                        
                         using (StreamWriter w = File.AppendText("./output.csv"))
                        {
                             w.WriteLine(planes[i][j].X + "," + planes[i][j].Z);
