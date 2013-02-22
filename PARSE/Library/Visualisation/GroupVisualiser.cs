@@ -134,14 +134,14 @@ namespace PARSE
                 int offset = mesh.Positions.Count;
 
                 //add triangle corners into the mesh 
-                mesh.Positions.Add(new Point3D(centre.X - size, centre.Y + size, centre.Z - size));
-                mesh.Positions.Add(new Point3D(centre.X + size, centre.Y + size, centre.Z - size));
-                mesh.Positions.Add(new Point3D(centre.X + size, centre.Y + size, centre.Z + size));
-                mesh.Positions.Add(new Point3D(centre.X - size, centre.Y + size, centre.Z + size));
-                mesh.Positions.Add(new Point3D(centre.X - size, centre.Y - size, centre.Z - size));
-                mesh.Positions.Add(new Point3D(centre.X + size, centre.Y - size, centre.Z - size));
-                mesh.Positions.Add(new Point3D(centre.X + size, centre.Y - size, centre.Z + size));
-                mesh.Positions.Add(new Point3D(centre.X - size, centre.Y - size, centre.Z + size));
+                mesh.Positions.Add(new Point3D(centre.X - size, centre.Z + size, centre.Y - size));
+                mesh.Positions.Add(new Point3D(centre.X + size, centre.Z + size, centre.Y - size));
+                mesh.Positions.Add(new Point3D(centre.X + size, centre.Z + size, centre.Y + size));
+                mesh.Positions.Add(new Point3D(centre.X - size, centre.Z + size, centre.Y + size));
+                mesh.Positions.Add(new Point3D(centre.X - size, centre.Z - size, centre.Y - size));
+                mesh.Positions.Add(new Point3D(centre.X + size, centre.Z - size, centre.Y - size));
+                mesh.Positions.Add(new Point3D(centre.X + size, centre.Z - size, centre.Y + size));
+                mesh.Positions.Add(new Point3D(centre.X - size, centre.Z - size, centre.Y + size));
 
                 //add triangle indices because WPF loves triangles  
                 mesh.TriangleIndices.Add(offset + 3);

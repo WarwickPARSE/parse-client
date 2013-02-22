@@ -30,17 +30,7 @@ namespace PARSE
                 //output
                 String output = "";
 
-                if (points.Key == JointType.HipCenter)
-                {
-                   // xmax = jointDepths[JointType.HipLeft][1];
-                   // xmin = jointDepths[JointType.HipRight][1];
-                   // ymin = jointDepths[JointType.HipLeft][2];
-                   // ymax = jointDepths[JointType.HipRight][2];
-                   // depth = jointDepths[JointType.HipCenter][0];
-
-                   // System.Diagnostics.Debug.WriteLine("Measuring Waist...");
-                }
-                else if (points.Key == JointType.ElbowLeft)
+                if (points.Key == JointType.ElbowLeft)
                 {
                     xmin = jointDepths[JointType.ShoulderLeft][1];
                     xmax = jointDepths[JointType.ElbowLeft][1];
