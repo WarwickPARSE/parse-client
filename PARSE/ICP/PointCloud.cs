@@ -201,10 +201,14 @@ namespace PARSE
                     {
                         double zz = rawDepth[i] * scale;
                         double x = (cx - ix) * zz * fxinv;
-                        double y = zz;
-                        double z = (cy - iy) * zz * fyinv;
-                        //this.depthFramePoints[i] = new Point3D(x, y, z);
+                        double y = (cy - iy) * zz * fyinv;
+                        double z = zz;
 
+                        /*
+                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
+                         */
+                     
+                        
                         //check min values
                         if (x < minx) { minx = x; }
                         if (y < miny) { miny = y; }
@@ -214,21 +218,14 @@ namespace PARSE
                         if (x > maxx) { maxx = x; }
                         if (y > maxy) { maxy = y; }
                         if (z > maxz) { maxz = z; }
-
-                        //create a new colour using the info given
-                        //System.Drawing.Color c = System.Drawing.Color.FromArgb(opacity, r[i], g[i], b[i]);
-
+                        
                         //create a new point key
                         double[] pointKey = new double[3];
 
-                        /*
-                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
-                         */
                         //set key
                         pointKey[0] = x;
-                        pointKey[2] = y;
-                        pointKey[1] = z;
-                        
+                        pointKey[1] = y;
+                        pointKey[2] = z;                        
 
                         Point3D poLoc = new Point3D(x, y, z);
                         PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r[i], g[i], b[i]);
@@ -368,7 +365,7 @@ namespace PARSE
                 {
                     //create rot matrix
                     Matrix3D mtx = new Matrix3D();
-                    Quaternion q = new Quaternion(new Vector3D(0, 0, 1), angle);
+                    Quaternion q = new Quaternion(new Vector3D(0, 1, 0), angle);
                     mtx.RotateAt(q, centre);
 
                     //complete rotation

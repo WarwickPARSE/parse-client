@@ -95,8 +95,8 @@ namespace PARSE.ICP.Stitchers
                     }
 
                     if (i != 0) {
-                        cloud.rotate(rotationCentre, rotationAngle);
-                        cloud.translate(translationValue); 
+                        //cloud.rotate(rotationCentre, rotationAngle);
+                        //cloud.translate(translationValue); 
                     }
 
                     //stick the result into the point cloud 
@@ -104,7 +104,7 @@ namespace PARSE.ICP.Stitchers
                         this.pcd = cloud;
                     }
                     else {
-                        this.pcd.addPointCloud(cloud);
+                        //this.pcd.addPointCloud(cloud);
                     }
 
                     //store current values for the next iteration 
