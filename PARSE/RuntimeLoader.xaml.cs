@@ -91,9 +91,9 @@ namespace PARSE
                             xmax = planes[i][j].X;
                         }
 
-                        if (planes[i][j].Y > zmax)
+                        if (planes[i][j].Z > zmax)
                         {
-                            zmax = planes[i][j].Y;
+                            zmax = planes[i][j].Z;
                         }
 
                         if (planes[i][0].X < xmin)
@@ -105,13 +105,13 @@ namespace PARSE
                             xmin = planes[i][j].X;
                         }
 
-                        if (planes[i][0].Y < zmin)
+                        if (planes[i][0].Z < zmin)
                         {
-                            zmin = planes[i][0].Y;
+                            zmin = planes[i][0].Z;
                         }
-                        if (planes[i][j].Y < zmin)
+                        if (planes[i][j].Z < zmin)
                         {
-                            zmin = planes[i][j].Y;
+                            zmin = planes[i][j].Z;
                         }
 
                         using (StreamWriter w = File.AppendText("output.txt"))
