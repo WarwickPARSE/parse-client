@@ -74,27 +74,14 @@ namespace PARSE
             double zmin = 0;
             double zmax = 0;
 
-
-            //for (int i = 0; i < planes.Count; i++)
-            //{
-
+            //currently taking the midpoint on the body (waist/stomach area)
             int i = planes.Count / 2;
             PointSorter.rotSort(planes[i]);
 
+            double[] x = new double[planes[i].Count];
+            double[] z = new double[planes[i].Count];
+
                 for (int j = 0; j < planes[i].Count; j++) {
-
-                    //draw the chart on the last plane captured!
-                    if (j == planes[i].Count - 1)
-                    {
-                        
-                    }
-
-                        Ellipse circle = new Ellipse();
-                        circle.Width = 1;
-                        circle.Height = 1;
-                        circle.StrokeThickness = 0.1;
-                        circle.Stroke = Brushes.Black;
-                        circle.Fill = Brushes.Black;
 
                         //Boundary check of points.
                         if (planes[i][j].X > xmax)
@@ -125,17 +112,23 @@ namespace PARSE
                             zmin = planes[i][j].Z;
                         }
 
-                        
+                        //write points to output.csv file
                         using (StreamWriter w = File.AppendText("./output.csv"))
                        {
                             w.WriteLine(planes[i][j].X + "," + planes[i][j].Z);
                             w.Flush();
                             w.Close();
-                        }
+                       }
 
-                        //Canvas.SetLeft(circle, planes[i][j].X);
-                        //Canvas.SetTop(circle, planes[i][j].Z);
+                       //assign to arrays
+                        x[j] = planes[i][j].X;
+                        z[j] = planes[i][j].Z;
+
                 }
+
+                //write points to plane renderer class for visualisation.
+                this.DataContext = new PlaneVisualisation(x,z);
+
 
                 using (StreamWriter w = File.AppendText("./output.csv"))
                 {
@@ -144,24 +137,13 @@ namespace PARSE
                     w.Close();
                 }
                 Console.WriteLine("end of plane, end of plane");
-            //}
 
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-            //System.Diagnostics.Debug.WriteLine("points on canvas: " + VisCanvas.Children.Count);
             Environment.Exit(1);
-        }
-
-        private void VisCanvas_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            /*Point location = Mouse.GetPosition(VisCanvas);
-            st.CenterX = location.X;
-            st.CenterY = location.Y;
-            st.ScaleX *= 1.5;
-            st.ScaleY *= 1.5;*/
         }
     }
 
