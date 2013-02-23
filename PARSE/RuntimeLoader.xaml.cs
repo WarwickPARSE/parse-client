@@ -66,6 +66,8 @@ namespace PARSE
 
         public void visualisePlanes(List<List<Point3D>> planes)
         {
+            File.Delete("./output.csv");
+            
             System.Diagnostics.Debug.WriteLine("Number of caught planes: " + planes.Count);
 
             double xmin = 0;
@@ -74,10 +76,12 @@ namespace PARSE
             double zmax = 0;
 
 
-            for (int i = 0; i < planes.Count; i++)
-            {
+            //for (int i = 0; i < planes.Count; i++)
+            //{
 
-                //VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
+            int i = planes.Count / 2;
+            PointSorter.rotSort(planes[i]);
+            VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
 
                 for (int j = 0; j < planes[i].Count; j++) {
 
@@ -95,6 +99,7 @@ namespace PARSE
                         circle.Fill = Brushes.Black;
 
                         //VisCanvas.Children.Add(circle);
+                        VisCanvas.Children.Add(circle);
 
                         //Boundary check of points.
                         if (planes[i][j].X > xmax)
@@ -125,20 +130,26 @@ namespace PARSE
                             zmin = planes[i][j].Z;
                         }
 
-                        using (StreamWriter w = File.AppendText("output.txt"))
-                        {
+                        
+                        using (StreamWriter w = File.AppendText("./output.csv"))
+                       {
                             w.WriteLine(planes[i][j].X + "," + planes[i][j].Z);
+                            w.Flush();
+                            w.Close();
                         }
 
                         //Canvas.SetLeft(circle, planes[i][j].X);
                         //Canvas.SetTop(circle, planes[i][j].Z);
                 }
 
-                using (StreamWriter w = File.AppendText("output.txt"))
+                using (StreamWriter w = File.AppendText("./output.csv"))
                 {
                     w.WriteLine("end of plane, end of plane");
+                    w.Flush();
+                    w.Close();
                 }
-            }
+                Console.WriteLine("end of plane, end of plane");
+            //}
 
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
@@ -146,6 +157,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
             //System.Diagnostics.Debug.WriteLine("points on canvas: " + VisCanvas.Children.Count);
+            Environment.Exit(1);
         }
 
         private void VisCanvas_MouseDown(object sender, MouseButtonEventArgs e)

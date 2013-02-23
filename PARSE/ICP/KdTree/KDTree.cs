@@ -233,14 +233,19 @@ namespace KdTree
          */
         public List<Point3D> getAllPointsAt(double i, double r, double[] limits)
         {
-            double[] point1 = {limits[0], i - r, limits[1]};
-            double[] point2 = {limits[2], i + r, limits[3]};
+            double[] pointMin = { limits[0], i - r, limits[1]};
+            double[] pointMax = { limits[2], i + r, limits[3]};
 
-            Object[] temp = range(point1,point2);
+            Object[] temp = range(pointMin,pointMax);
             List<Point3D> output = new List<Point3D>();
             for (int j = 0; j < temp.Length; j++)
             {
                 output.Add(((PointRGB)temp[j]).point);
+            }
+            if (output.Count == 0)
+            {
+                Console.WriteLine("OH GOD MY EYES! IT BURNS!");
+                //Environment.Exit(-1);
             }
             return output;
         }
