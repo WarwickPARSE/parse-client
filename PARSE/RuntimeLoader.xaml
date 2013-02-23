@@ -1,6 +1,8 @@
 ﻿<Window x:Class="PARSE.RuntimeLoader"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         Title="Runtime Viewer" Height="300" Width="300">
     <Grid>
         <TabControl Margin="0,-5,0,5" Name="runtimeTab">
@@ -20,9 +22,19 @@
                         <TextBlock Text="Results" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
-                
-                </Canvas>
+                <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas" Width="486" Height="216">
+                    <h:HelixViewport3D.Camera>
+                        <PerspectiveCamera Position="-1,-3,1" LookDirection="0,6,0" UpDirection="0,0,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
+                    </h:HelixViewport3D.Camera>
+                    <h:SunLight />
+                    <ModelVisual3D x:Name="planePlot" Content="{Binding Model}" />
+                    <h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
+                </h:HelixViewport3D>
+                <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
+                    <Canvas.RenderTransform>
+                        <ScaleTransform x:Name="st"/>
+                    </Canvas.RenderTransform>
+                </Canvas>-->
             </TabItem>
             <TabItem>
                 <TabItem.Header>

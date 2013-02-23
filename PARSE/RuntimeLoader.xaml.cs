@@ -15,6 +15,9 @@ using System.Diagnostics;
 using System.Windows.Media.Media3D;
 using System.IO;
 
+using Microsoft.Windows.Controls;
+using System.Windows.Controls.DataVisualization.Charting;
+
 namespace PARSE
 {
     /// <summary>
@@ -70,16 +73,19 @@ namespace PARSE
             double zmin = 0;
             double zmax = 0;
 
-            TransformGroup group = new TransformGroup();
-            group.Children.Add(new TranslateTransform(VisCanvas.Width/2, VisCanvas.Height/2));
-            group.Children.Add(new ScaleTransform(1.0,1.0));
 
             for (int i = 0; i < planes.Count; i++)
             {
 
-                VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
+                //VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
 
                 for (int j = 0; j < planes[i].Count; j++) {
+
+                    //draw the chart on the last plane captured!
+                    if (j == planes[i].Count - 1)
+                    {
+                        
+                    }
 
                         Ellipse circle = new Ellipse();
                         circle.Width = 1;
@@ -88,7 +94,7 @@ namespace PARSE
                         circle.Stroke = Brushes.Black;
                         circle.Fill = Brushes.Black;
 
-                        VisCanvas.Children.Add(circle);
+                        //VisCanvas.Children.Add(circle);
 
                         //Boundary check of points.
                         if (planes[i][j].X > xmax)
@@ -124,8 +130,8 @@ namespace PARSE
                             w.WriteLine(planes[i][j].X + "," + planes[i][j].Z);
                         }
 
-                        Canvas.SetLeft(circle, planes[i][j].X);
-                        Canvas.SetTop(circle, planes[i][j].Z);
+                        //Canvas.SetLeft(circle, planes[i][j].X);
+                        //Canvas.SetTop(circle, planes[i][j].Z);
                 }
 
                 using (StreamWriter w = File.AppendText("output.txt"))
@@ -134,22 +140,21 @@ namespace PARSE
                 }
             }
 
-            VisCanvas.RenderTransform = group;
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-            System.Diagnostics.Debug.WriteLine("points on canvas: " + VisCanvas.Children.Count);
+            //System.Diagnostics.Debug.WriteLine("points on canvas: " + VisCanvas.Children.Count);
         }
 
         private void VisCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Point location = Mouse.GetPosition(VisCanvas);
-            //st.CenterX = location.X;
-            //st.CenterY = location.Y;
-            //st.ScaleX *= 1.5;
-            //st.ScaleY *= 1.5;
+            /*Point location = Mouse.GetPosition(VisCanvas);
+            st.CenterX = location.X;
+            st.CenterY = location.Y;
+            st.ScaleX *= 1.5;
+            st.ScaleY *= 1.5;*/
         }
     }
 
