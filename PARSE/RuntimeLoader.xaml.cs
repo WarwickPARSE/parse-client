@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.Windows.Media.Media3D;
 using System.IO;
 
-using Microsoft.Windows.Controls;
 using System.Windows.Controls.DataVisualization.Charting;
 
 namespace PARSE
@@ -81,7 +80,6 @@ namespace PARSE
 
             int i = planes.Count / 2;
             PointSorter.rotSort(planes[i]);
-            VisCanvas.Children.RemoveRange(0, VisCanvas.Children.Count);
 
                 for (int j = 0; j < planes[i].Count; j++) {
 
@@ -97,9 +95,6 @@ namespace PARSE
                         circle.StrokeThickness = 0.1;
                         circle.Stroke = Brushes.Black;
                         circle.Fill = Brushes.Black;
-
-                        //VisCanvas.Children.Add(circle);
-                        VisCanvas.Children.Add(circle);
 
                         //Boundary check of points.
                         if (planes[i][j].X > xmax)
