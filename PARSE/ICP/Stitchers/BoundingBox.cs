@@ -125,7 +125,6 @@ namespace PARSE.ICP.Stitchers
                         this.pcd.addPointCloud(cloud);
                     }
                     
-
                     //store current values for the next iteration 
                     prevMin = new double[3]{cloud.getxMin(), cloud.getyMin(), cloud.getzMin()};
                     prevMax = new double[3]{cloud.getxMax(), cloud.getyMax(), cloud.getzMax()};
