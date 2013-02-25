@@ -99,16 +99,16 @@ namespace PARSE.ICP.Stitchers
                             break;
                         case 3:
                             //set the rotation to a fixed value 
-                            rotationAngle = -270;
+                            rotationAngle = 270;
 
-                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+                            rotationCentre = new double[3] { cloud.getxMin(), cloud.getyMin(), cloud.getzMin() }; 
 
                             /*
                              * Translate by
                              * x: -(depth + width')
                              * z: width
                              */
-                            translationValue = new double[3] { 0 - (depth + prevWidth), 0, width };
+                            translationValue = new double[3] { prevWidth,0,0 };
                             break;
                         default:
                             //this should not occur... throw an exception 
