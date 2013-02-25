@@ -88,14 +88,14 @@ namespace PARSE.ICP.Stitchers
                             rotationAngle = 180;
 
                             //calculate the centre of rotation (maxx',miny,maxz'+(maxx-minx))
-                            rotationCentre = new double[3] { prevMax[0], cloud.getyMin(), /*prevMax[2] + (cloud.getxMax() - cloud.getxMin()0)*/ 0  }; 
+                            rotationCentre = new double[3] { cloud.getxMin(), cloud.getyMin(), cloud.getzMin() }; 
 
                             /*
                              * Translate by
                              * x: -width
                              * z: width'
                              */
-                            translationValue = new double[3] { 0-width, 0, prevWidth};
+                            translationValue = new double[3] { width,0,prevWidth};
                             break;
                         case 3:
                             //set the rotation to a fixed value 
@@ -134,7 +134,7 @@ namespace PARSE.ICP.Stitchers
                     */
 
                     //debugging (joining the first two clouds only)
-                    if (i == 0 || i == 1 || i == 2) {
+                    if (i == 0 || i == 1 || i == 2 || i == 3) {
 
                         if (i != 0) {
                             cloud.rotate(rotationCentre, rotationAngle);
