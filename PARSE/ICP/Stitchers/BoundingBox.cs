@@ -115,39 +115,16 @@ namespace PARSE.ICP.Stitchers
                             break;
                     }
 
-                    /*
-                    //perform translation and rotations 
-                    if (i != 0 && i != 1) {                        
-                        cloud.rotate(rotationCentre, rotationAngle);
-                        cloud.translate(translationValue); 
-                    } else if (i != 0) {
-                         cloud.rotate(rotationCentre, rotationAngle);
-                    }
-
-                    //stick the result into the point cloud 
+                    //add the translated cloud into the grouped cloud (only tx/rt if not the first panel)
                     if (i == 0) {
                         this.pcd = cloud;
                     }
                     else {
+                        cloud.rotate(rotationCentre, rotationAngle);
+                        cloud.translate(translationValue);
                         this.pcd.addPointCloud(cloud);
                     }
-                    */
-
-                    //debugging (joining the first two clouds only)
-                    if (i == 0 || i == 1 || i == 2 || i == 3) {
-
-                        if (i != 0) {
-                            cloud.rotate(rotationCentre, rotationAngle);
-                            cloud.translate(translationValue);
-                        }
-
-                        if (i == 0) {
-                            this.pcd = cloud;
-                        }
-                        else {
-                            this.pcd.addPointCloud(cloud);
-                        }
-                    }
+                    
 
                     //store current values for the next iteration 
                     prevMin = new double[3]{cloud.getxMin(), cloud.getyMin(), cloud.getzMin()};
