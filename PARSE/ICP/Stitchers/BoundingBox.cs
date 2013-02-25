@@ -75,20 +75,20 @@ namespace PARSE.ICP.Stitchers
                             break;
                         case 1:
                             //set the rotation to a fixed value 
-                            rotationAngle = -90;
+                            rotationAngle = 90;
 
                             //calculate the centre of rotation 
-                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMin() };
+                            rotationCentre = new double[3] { cloud.getxMin(), cloud.getyMin(), cloud.getzMin() };
 
                             //dont translate
-                            translationValue = new double[3] { 0, 0, 0 };
+                            translationValue = new double[3] { 0, 0, width };
                             break;
                         case 2:
                             //set the rotation to a fixed value 
-                            rotationAngle = -180;
+                            rotationAngle = 180;
 
                             //calculate the centre of rotation (maxx',miny,maxz'+(maxx-minx))
-                            rotationCentre = new double[3] { prevMax[0], cloud.getyMin(), prevMax[2] + (cloud.getxMax() - cloud.getxMin()) }; 
+                            rotationCentre = new double[3] { prevMax[0], cloud.getyMin(), /*prevMax[2] + (cloud.getxMax() - cloud.getxMin()0)*/ 0  }; 
 
                             /*
                              * Translate by
@@ -115,6 +115,7 @@ namespace PARSE.ICP.Stitchers
                             break;
                     }
 
+                    /*
                     //perform translation and rotations 
                     if (i != 0 && i != 1) {                        
                         cloud.rotate(rotationCentre, rotationAngle);
@@ -129,6 +130,23 @@ namespace PARSE.ICP.Stitchers
                     }
                     else {
                         this.pcd.addPointCloud(cloud);
+                    }
+                    */
+
+                    //debugging (joining the first two clouds only)
+                    if (i == 0 || i == 1 || i == 2) {
+
+                        if (i != 0) {
+                            cloud.rotate(rotationCentre, rotationAngle);
+                            cloud.translate(translationValue);
+                        }
+
+                        if (i == 0) {
+                            this.pcd = cloud;
+                        }
+                        else {
+                            this.pcd.addPointCloud(cloud);
+                        }
                     }
 
                     //store current values for the next iteration 
