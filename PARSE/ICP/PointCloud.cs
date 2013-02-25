@@ -325,6 +325,17 @@ namespace PARSE
                     //complete translation
                     Point3D newPoint = mtx.Transform(point.point);
 
+                    //check if the x, y and z max and min coords need updating
+                    //check min values
+                    if (newPoint.X < minx) { minx = newPoint.X; }
+                    if (newPoint.Y < miny) { miny = newPoint.Y; }
+                    if (newPoint.Z < minz) { minz = newPoint.Z; }
+
+                    //check max values
+                    if (newPoint.X > maxx) { maxx = newPoint.X; }
+                    if (newPoint.Y > maxy) { maxy = newPoint.Y; }
+                    if (newPoint.Z > maxz) { maxz = newPoint.Z; }                    
+
                     //jam into the tree 
                     double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
                     newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
