@@ -15,7 +15,7 @@ using System.Diagnostics;
 using System.Windows.Media.Media3D;
 using System.IO;
 
-using System.Windows.Controls.DataVisualization.Charting;
+//using System.Windows.Controls.DataVisualization.Charting;
 
 namespace PARSE
 {
