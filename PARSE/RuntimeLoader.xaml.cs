@@ -143,7 +143,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-            Environment.Exit(1);
+           // Environment.Exit(1);
         }
     }
 

@@ -24,7 +24,7 @@
                 </TabItem.Header>
                 <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas" Width="486" Height="216">
                     <h:HelixViewport3D.Camera>
-                        <PerspectiveCamera Position="-1,-3,1" LookDirection="0,6,0" UpDirection="0,0,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
+                        <PerspectiveCamera Position="0,-1,1" LookDirection="0,1,0" UpDirection="0,-3,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
                     </h:HelixViewport3D.Camera>
                     <h:SunLight />
                     <ModelVisual3D x:Name="planePlot" Content="{Binding Model}" />
