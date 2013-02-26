@@ -22,14 +22,19 @@
                         <TextBlock Text="Results" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas" Width="486" Height="216">
+                <Grid>
+                    <TextBlock Text="Plane Outline: " Name="planeNo" FontFamily="Arial" FontSize="14" FontWeight="Bold" Foreground="Red"></TextBlock>
+                    <Border BorderThickness="0.25" BorderBrush="DarkGray">
+                    <h:HelixViewport3D Name="hvpcanvas" Width="486" Height="216">
                     <h:HelixViewport3D.Camera>
-                        <PerspectiveCamera Position="0,-1,1" LookDirection="0,1,0" UpDirection="0,-3,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
+                        <PerspectiveCamera Position="0,-3.8, 1" LookDirection="0,1,0" UpDirection="0,-2,0.1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="77" />
                     </h:HelixViewport3D.Camera>
                     <h:SunLight />
-                    <ModelVisual3D x:Name="planePlot" Content="{Binding Model}" />
-                    <h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
+                    <ModelVisual3D x:Name="planePlot" Content="{Binding Model}"/>
+                    <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
                 </h:HelixViewport3D>
+                </Border>
+                </Grid>
                 <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
                     <Canvas.RenderTransform>
                         <ScaleTransform x:Name="st"/>
@@ -45,5 +50,5 @@
                 </TabItem.Header>
             </TabItem>
         </TabControl>
-    </Grid>
+        </Grid>
 </Window>
