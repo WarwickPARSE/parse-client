@@ -46,7 +46,7 @@ namespace PARSE
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
 
-            for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
+            for (double i = ymin + (3* increment / 2); i <= ymax - (increment / 2); i = i + increment)
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 if (plane.Count != 0)
