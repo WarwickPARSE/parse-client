@@ -10,7 +10,7 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        private static List<Point3D> plane;
+        private const int number = 30;
 
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
@@ -42,7 +42,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = (ymax - ymin) / 30;
+            double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
 
@@ -87,10 +87,5 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Upper PENIS Bound on Patient Volume: " + volume0thApprox(pc));
             return 0;//volume1stApprox(pc);
         }*/
-
-        public static List<Point3D> getPlane()
-        {
-            return plane;
-        }
     }
 }
