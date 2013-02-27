@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        Title="Runtime Viewer" Height="300" Width="300">
+        Title="Runtime Viewer" Height="300" Width="650" Loaded="Window_Loaded">
     <Grid>
         <TabControl Margin="0,-5,0,5" Name="runtimeTab">
             <TabItem>
@@ -22,18 +22,19 @@
                         <TextBlock Text="Results" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Grid>
-                    <TextBlock Text="Plane Outline: " Name="planeNo" FontFamily="Arial" FontSize="14" FontWeight="Bold" Foreground="Red"></TextBlock>
-                    <Border BorderThickness="0.25" BorderBrush="DarkGray">
-                    <h:HelixViewport3D Name="hvpcanvas" Width="486" Height="216">
-                    <h:HelixViewport3D.Camera>
-                        <PerspectiveCamera Position="0,-3.8, 1" LookDirection="0,1,0" UpDirection="0,-2,0.1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="77" />
-                    </h:HelixViewport3D.Camera>
-                    <h:SunLight />
-                    <ModelVisual3D x:Name="planePlot" Content="{Binding Model}"/>
-                    <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
-                </h:HelixViewport3D>
-                </Border>
+                 <Grid Width="650" Height="240">
+                    <Border BorderThickness="0.25" Width="482" Height="224" BorderBrush="DarkGray" Margin="135,0,33,16"></Border>
+                    <TextBlock Text="Plane Outline: " Margin="140,2,340,216" Name="planeNo" FontFamily="Arial" FontSize="14" FontWeight="Bold" Foreground="Red"></TextBlock>
+                    <Slider Name="planeChooser" Orientation="Vertical" Width="21" Minimum="0" Maximum="60" TickPlacement="Both" TickFrequency="1" IsDirectionReversed="True" HorizontalAlignment="Center" ValueChanged="planeChooser_ValueChanged" Margin="113,4,516,31" />
+                    <Image Source="Resources/hb.png" Margin="0,2,534,21" />
+                     <h:HelixViewport3D Name="hvpcanvas" Width="482" Height="224" Margin="140,2,28,14">
+                        <h:HelixViewport3D.Camera>
+                            <PerspectiveCamera Position="0,-3.8, 1" LookDirection="0,1,0" UpDirection="0,-2,0.1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="77" />
+                        </h:HelixViewport3D.Camera>
+                        <h:SunLight />
+                        <ModelVisual3D x:Name="planePlot" Content="{Binding Model}" />
+                        <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
+                    </h:HelixViewport3D>
                 </Grid>
                 <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
                     <Canvas.RenderTransform>

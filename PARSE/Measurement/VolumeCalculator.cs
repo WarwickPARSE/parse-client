@@ -42,7 +42,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = (ymax - ymin) / 30;
+            double increment = (ymax - ymin) / 60;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
 
