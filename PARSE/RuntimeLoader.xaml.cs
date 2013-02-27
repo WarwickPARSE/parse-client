@@ -41,16 +41,34 @@ namespace PARSE
         {
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
-            this.Width = (this.Owner.OwnedWindows[0].Width * 2.075);
+            this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
             this.Height = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - (this.Owner.OwnedWindows[0].Width/1.25);
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
             this.textBox1.Width = this.Width - 20;
             this.textBox1.Height = this.Height - 75;
-            //set console out to this control
 
+            //set console out to this control
             TraceListener debugListener = new MyTraceListener(textBox1);
             Debug.Listeners.Add(debugListener);
             //Trace.Listeners.Add(debugListener);
+
+            //check if a scan event is in place
+
+            if (storedPlanes.Count == 0)
+            {
+                bodyimg.Visibility = Visibility.Collapsed;
+                planeNo.Visibility = Visibility.Collapsed;
+                viewborder.Visibility = Visibility.Collapsed;
+                hvpcanvas.Visibility = Visibility.Hidden;
+                planeChooser.Visibility = Visibility.Collapsed;
+                vollabel.Visibility = Visibility.Collapsed;
+                voLconclabel.Visibility = Visibility.Collapsed;
+
+            }
+            else
+            {
+
+            }
         }
 
         public void sendMessageToOutput(String type, String message) {
@@ -73,6 +91,18 @@ namespace PARSE
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
             File.Delete("./output.csv");
+
+            bodyimg.Visibility = Visibility.Visible;
+            planeNo.Visibility = Visibility.Visible;
+            viewborder.Visibility = Visibility.Visible;
+            hvpcanvas.Visibility = Visibility.Visible;
+            planeChooser.Visibility = Visibility.Visible;
+            vollabel.Visibility = Visibility.Visible;
+            voLconclabel.Visibility = Visibility.Visible;
+            noresults.Visibility = Visibility.Collapsed;
+            newscan.Visibility = Visibility.Collapsed;
+
+            planeNo.Text = "Plane Outline: " + (int) planeIndex;
             
             System.Diagnostics.Debug.WriteLine("Number of caught planes: " + planes.Count);
 
