@@ -156,12 +156,12 @@ namespace PARSE
                         }
 
                         //write points to output.csv file
-                        using (StreamWriter w = File.AppendText("./output.csv"))
+                        /*using (StreamWriter w = File.AppendText("./output.csv"))
                        {
                             w.WriteLine(storedPlanes[i][j].X + "," + storedPlanes[i][j].Z);
                             w.Flush();
                             w.Close();
-                       }
+                       }*/
 
                        //assign to arrays
                         x[j] = storedPlanes[i][j].X;
@@ -173,13 +173,13 @@ namespace PARSE
                 this.DataContext = new PlaneVisualisation(x,z);
 
 
-                using (StreamWriter w = File.AppendText("./output.csv"))
+               /* using (StreamWriter w = File.AppendText("./output.csv"))
                 {
                     w.WriteLine("end of plane, end of plane");
                     w.Flush();
                     w.Close();
                 }
-                Console.WriteLine("end of plane, end of plane");
+                Console.WriteLine("end of plane, end of plane");*/
 
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
