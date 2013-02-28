@@ -28,6 +28,7 @@ using HelixToolkit.Wpf;
 using Microsoft.Kinect;
 using PARSE.Recognition;
 using PARSE.ICP;
+using PARSE.ICP.Stitchers;
 
 namespace PARSE
 {
@@ -42,6 +43,7 @@ namespace PARSE
         public ScanLoader                  windowScanner;
         public Window                      windowPatient;
         public RuntimeLoader               windowRuntime;
+        public MeasurementLoader           windowMeasurement;
 
         //Modelling specific definitions
         private GeometryModel3D             Model;
@@ -109,7 +111,8 @@ namespace PARSE
                 windowViewer.Show();
 
                 //open patient detail viewer
-                windowPatient = new PatientLoader();
+                //TODO: need to abstract this for when we add a new patient.
+                windowPatient = new PatientLoader(true);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 
@@ -120,7 +123,7 @@ namespace PARSE
 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome to the PARSE Toolkit, Initializing Kinect Device.");
+
 
                 if (KinectSensor.KinectSensors.Count>0)
                 {
@@ -146,6 +149,12 @@ namespace PARSE
         }
 
         //TODO: prevent the following two methods from crashing if called in quick succession
+        private void btnCalibrate_Click(object sender, RoutedEventArgs e)
+        {
+            this.kinectInterp.kinectSensor.ElevationAngle = KinectInterpreter.oneParseRadian;
+            //KinectInterpreter.oneParseRadian;
+        }
+        
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
             if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
@@ -231,10 +240,9 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            VolumeCalculator.calculateVolume(windowScanner.getYourMum());
-            ss.Speak("You are fat");
-            System.Windows.Forms.MessageBox.Show("You are too fat");
+            List<List<Point3D>> planes = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
             windowRuntime.runtimeTab.SelectedIndex = 1;
+            windowRuntime.visualisePlanes(planes);
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
@@ -357,7 +365,7 @@ namespace PARSE
             PointCloud pcd= new PointCloud();
 
             //instantiate the stitcher 
-            stitcher = new SimpleStitcher();
+            stitcher = new BoundingBox();
             
             //jam points into stitcher
             stitcher.add(pc);
@@ -374,6 +382,71 @@ namespace PARSE
 
         }
 
+        private void CloudProcessor_Click(object sender, RoutedEventArgs e)
+        {
+            /*Automates the following procedure:
+             * 1) adds selected point cloud to visualiser
+             * 2) groups it
+             * 3) peforms volume processing*/
+
+
+     /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".PARSE";
+            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+            if (dlg.ShowDialog() == true)
+            {
+                String filename = dlg.FileName;
+                this.DataContext = ScanSerializer.deserialize(filename);
+                fincloud = ScanSerializer.depthPc;
+            }
+
+            System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
+
+     /*2)*/ PointCloud pcd = new PointCloud();
+
+            //instantiate the stitcher 
+            stitcher = new BoundingBox();
+
+            //jam points into stitcher
+            stitcher.add(fincloud);
+            stitcher.stitch();
+
+            pcd = stitcher.getResult();
+
+            //windowScanner.Close();
+            windowViewer.Close();
+            windowScanner = new ScanLoader(pcd);
+            windowScanner.Owner = this;
+            windowScanner.Closed += new EventHandler(windowScanner_Closed);
+            windowScanner.Show();
+
+                 
+     /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
+            List<List<Point3D>> planes = VolumeCalculator.volume1stApprox(pcd);
+            windowRuntime.runtimeTab.SelectedIndex = 1;
+            windowRuntime.visualisePlanes(planes);
+        }
+
+        private void AddMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            if (KinectSensor.KinectSensors.Count != 0)
+            {
+                windowScanner.Close();
+                windowViewer.Close();
+                //Definition of window viewer seems to get lost somewhere
+                this.OwnedWindows[0].Close();
+
+                windowMeasurement = new MeasurementLoader();
+                windowMeasurement.Owner = this;
+                windowMeasurement.Show();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Please connect a Kinect Device");
+            }
+        }
+
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -384,7 +457,7 @@ namespace PARSE
                 windowViewer.Show();
 
                 //open patient detail viewer
-                windowPatient = new PatientLoader();
+                windowPatient = new PatientLoader(false);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 

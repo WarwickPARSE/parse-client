@@ -10,8 +10,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Threading;
 using System.Diagnostics;
+using System.Windows.Media.Media3D;
 using System.IO;
+
+using System.Windows.Controls.DataVisualization.Charting;
 
 namespace PARSE
 {
@@ -57,6 +61,89 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("[CRITICAL]: Output window failed to update");
                 System.Diagnostics.Debug.WriteLine(e);
             }
+        }
+
+        public void visualisePlanes(List<List<Point3D>> planes)
+        {
+            File.Delete("./output.csv");
+            
+            System.Diagnostics.Debug.WriteLine("Number of caught planes: " + planes.Count);
+
+            double xmin = 0;
+            double xmax = 0;
+            double zmin = 0;
+            double zmax = 0;
+
+            //currently taking the midpoint on the body (waist/stomach area)
+            int i = planes.Count / 2;
+            PointSorter.rotSort(planes[i]);
+
+            double[] x = new double[planes[i].Count];
+            double[] z = new double[planes[i].Count];
+
+                for (int j = 0; j < planes[i].Count; j++) {
+
+                        //Boundary check of points.
+                        if (planes[i][j].X > xmax)
+                        {
+                            xmax = planes[i][j].X;
+                        }
+
+                        if (planes[i][j].Z > zmax)
+                        {
+                            zmax = planes[i][j].Z;
+                        }
+
+                        if (planes[i][0].X < xmin)
+                        {
+                            xmin = planes[i][0].X;
+                        }
+                        if (planes[i][j].X < xmin)
+                        {
+                            xmin = planes[i][j].X;
+                        }
+
+                        if (planes[i][0].Z < zmin)
+                        {
+                            zmin = planes[i][0].Z;
+                        }
+                        if (planes[i][j].Z < zmin)
+                        {
+                            zmin = planes[i][j].Z;
+                        }
+
+                        //write points to output.csv file
+                        using (StreamWriter w = File.AppendText("./output.csv"))
+                       {
+                            w.WriteLine(planes[i][j].X + "," + planes[i][j].Z);
+                            w.Flush();
+                            w.Close();
+                       }
+
+                       //assign to arrays
+                        x[j] = planes[i][j].X;
+                        z[j] = planes[i][j].Z;
+
+                }
+
+                //write points to plane renderer class for visualisation.
+                this.DataContext = new PlaneVisualisation(x,z);
+
+
+                using (StreamWriter w = File.AppendText("./output.csv"))
+                {
+                    w.WriteLine("end of plane, end of plane");
+                    w.Flush();
+                    w.Close();
+                }
+                Console.WriteLine("end of plane, end of plane");
+
+            System.Diagnostics.Debug.WriteLine("Planes visualised");
+            System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
+            System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
+            System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
+            System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
+            Environment.Exit(1);
         }
     }
 

@@ -9,11 +9,10 @@ namespace PARSE
 {
     class DatabaseEngine
     {
-        SqlCeConnection con;
+        public SqlCeConnection con;
 
         Insertion insertQueries;
         Selection selectQueries;
-
 
         public DatabaseEngine()
         {
@@ -24,16 +23,16 @@ namespace PARSE
 
             //Object[] patients = getAllPatients();
 
-            dbClose();
+            //dbClose();
         }
 
         private void dbOpen()
         {
             try
             {
-                con = new SqlCeConnection();
-                con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
-                con.Open();
+                this.con = new SqlCeConnection();
+                this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+                this.con.Open();
 
                 Console.WriteLine("open");
             }

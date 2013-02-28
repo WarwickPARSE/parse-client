@@ -34,7 +34,7 @@
 
         </MenuItem>
             <MenuItem Header="_Control">
-                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnSensorUp_Click"/>
+                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
                 <Separator/>
                 <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
                 <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
@@ -51,6 +51,8 @@
                 <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
                 <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
                 <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
+                <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
+                <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
             </MenuItem>
         <MenuItem Header="_Help">
 
