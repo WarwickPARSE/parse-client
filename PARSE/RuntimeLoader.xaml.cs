@@ -104,7 +104,7 @@ namespace PARSE
 
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
-            File.Delete("./output.csv");
+            //File.Delete("./output.csv");
 
             bodyimg.Visibility = Visibility.Visible;
             planeNo.Visibility = Visibility.Visible;
@@ -143,8 +143,7 @@ namespace PARSE
             double zmin = 0;
             double zmax = 0;
 
-            //currently taking the midpoint on the body (waist/stomach area)
-            int i = (int) planeIndex;
+            int i = (int)planeIndex;
             PointSorter.rotSort(storedPlanes[i]);
 
             double[] x = new double[storedPlanes[i].Count];
@@ -182,12 +181,12 @@ namespace PARSE
                         }
 
                         //write points to output.csv file
-                        using (StreamWriter w = File.AppendText("./output.csv"))
+                        /*using (StreamWriter w = File.AppendText("./output.csv"))
                        {
                             w.WriteLine(storedPlanes[i][j].X + "," + storedPlanes[i][j].Z);
                             w.Flush();
                             w.Close();
-                       }
+                       }*/
 
                        //assign to arrays
                         x[j] = storedPlanes[i][j].X;
@@ -199,20 +198,20 @@ namespace PARSE
                 this.DataContext = new PlaneVisualisation(x,z);
 
 
-                using (StreamWriter w = File.AppendText("./output.csv"))
+               /* using (StreamWriter w = File.AppendText("./output.csv"))
                 {
                     w.WriteLine("end of plane, end of plane");
                     w.Flush();
                     w.Close();
                 }
-                Console.WriteLine("end of plane, end of plane");
+                Console.WriteLine("end of plane, end of plane");*/
 
             System.Diagnostics.Debug.WriteLine("Planes visualised");
             System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-           // Environment.Exit(1);
+            //Environment.Exit(1);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -170,6 +170,7 @@
       <DependentUpon>MeasurementLoader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tracking\SensorTracker.cs" />
+    <Compile Include="Tracking\SkeletonPosition.cs" />
     <Compile Include="ViewLoader.xaml.cs">
       <DependentUpon>ViewLoader.xaml</DependentUpon>
     </Compile>
