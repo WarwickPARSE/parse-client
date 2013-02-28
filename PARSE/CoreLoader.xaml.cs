@@ -315,7 +315,7 @@ namespace PARSE
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
         {
             //Create .PCD for use with the PCL Library
-            PointCloud pc = windowScanner.getPointClouds()[0];
+            PointCloud pc = windowScanner.getYourMum();
             String filename = "";
 
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
