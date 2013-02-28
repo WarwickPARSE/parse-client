@@ -10,7 +10,7 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        private const int number = 30;
+        private const int number = 60;
 
         private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
