@@ -20,9 +20,10 @@ namespace PARSE
         //Kinect instance
         private KinectInterpreter kinectInterp;
 
+        // Skeleton
         private Dictionary<JointType, double[]> jointDepths;
 
-        //speech synthesizer instances
+        // speech synthesizer instances
         private SpeechSynthesizer ss;
 
         private Canvas tmpCanvas;
@@ -49,8 +50,10 @@ namespace PARSE
             //start scanning procedure
             //kinectInterp = new KinectInterpreter(skeloutline);
             //kinectInterp.stopStreams();
-
-            System.Diagnostics.Debug.WriteLine("Measurement Window Ready");
+            if (KinectSensor.KinectSensors.Count > 0)
+                System.Diagnostics.Debug.WriteLine("Measurement Window Ready");
+            else
+                System.Diagnostics.Debug.WriteLine("Measurement Window Ready, but no Kinect detected");
         }
 
         private void cancel_scan_Click(object sender, RoutedEventArgs e)
@@ -74,106 +77,8 @@ namespace PARSE
             // Start tracking
             tracker = new SensorTracker(Visualisation, this, true, instructionblock);
             tracker.Start();
-
-
-            /*
-            //start new scanning timer.
-            pcTimer = new System.Windows.Forms.Timer();
-            pcTimer.Tick += new EventHandler(pcTimer_tick);
-            ss = new SpeechSynthesizer();
-
-            //initalize speech synthesizer
-            ss.Rate = 1;
-            ss.Volume = 100;
-            ss.Speak("Please face the camera.");
-            this.instructionblock.Text = "Please face the camera";
-
-            //Initialize and start timer
-            pcTimer.Interval = 10000;
-            countdown = 3;
-            pcTimer.Start();
-            */
         }
 
-        private void pcTimer_tick(Object sender, EventArgs e)
-        {
-            if (countdown == 3)
-            {
-                //enable update of skelL, skelR, skelDepth
-                this.kinectInterp.enableUpdateSkelVars();
-
-                //get current skeleton tracking state
-                Skeleton skeleton = this.kinectInterp.getSkeletons();
-                jointDepths  = enumerateSkeletonDepths(skeleton);
-
-                //freeze skelL skelDepth and skelR
-                this.kinectInterp.disableUpdateSkelVars();
-
-                tmpCanvas = skeloutline;
-
-                ss.Speak("Turn left");
-                this.instructionblock.Text = "Please turn left";
-                countdown--;
-            }
-            else if (countdown == 2)
-            {
-
-                //PointCloud structure methods
-
-                ss.Speak("Turn left with your back to the camera");
-                this.instructionblock.Text = "Turn left with your back to the camera";
-                countdown--;
-            }
-            else if (countdown == 1)
-            {
-
-                //PointCloud structure methods
-
-                ss.Speak("Turn left once more");
-                this.instructionblock.Text = "Please turn left once more";
-                countdown--;
-            }
-            else if (countdown == 0)
-            {
-
-                //PointCloud structure methods
-
-                //Visualisation instantiation based on int array clouds
-
-                //stop streams
-                kinectInterp.stopStreams();
-                skeloutline = tmpCanvas;
-                skeloutline.Visibility = Visibility.Hidden;
-
-                //Visualisation instantiation based on KDTree array clouds
-                this.instructionblock.Text = "Scanning complete.";
-                this.instructionblock.Visibility = Visibility.Collapsed;
-                pcTimer.Stop();
-            }
-        }
-
-        /*
-        private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
-        {
-            kinectInterp.SkeletonFrameReady(sender, e);
-        }
-
-        private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
-        {
-            kinectInterp.ColorImageReady(sender, e);
-        }
-
-        private void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
-        {
-            kinectInterp.DepthImageReady(sender, e);
-        }
-
-        private void SkeletonImageReady(object sender, SkeletonFrameReadyEventArgs e)
-        {
-            kinectInterp.SkeletonFrameReady(sender, e);
-        }
-        */
-        
         /*Publicly accessible methods*/
 
         public Dictionary<JointType, double[]> enumerateSkeletonDepths(Skeleton sk)
