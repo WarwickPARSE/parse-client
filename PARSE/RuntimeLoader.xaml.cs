@@ -117,7 +117,6 @@ namespace PARSE
             double zmin = 0;
             double zmax = 0;
 
-            //currently taking the midpoint on the body (waist/stomach area)
             int i = (int)planeIndex;
             PointSorter.rotSort(storedPlanes[i]);
 
