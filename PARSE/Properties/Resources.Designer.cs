@@ -67,6 +67,13 @@ namespace PARSE.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap hb {
+            get {
+                object obj = ResourceManager.GetObject("hb", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap op1 {
             get {
                 object obj = ResourceManager.GetObject("op1", resourceCulture);
