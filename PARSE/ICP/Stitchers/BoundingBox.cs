@@ -75,62 +75,56 @@ namespace PARSE.ICP.Stitchers
                             break;
                         case 1:
                             //set the rotation to a fixed value 
-                            rotationAngle = -90;
+                            rotationAngle = 90;
 
                             //calculate the centre of rotation 
-                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMin() };
+                            rotationCentre = new double[3] { cloud.getxMin(), cloud.getyMin(), cloud.getzMin() };
 
                             //dont translate
-                            translationValue = new double[3] { 0, 0, 0 };
+                            translationValue = new double[3] { 0, 0, width };
                             break;
                         case 2:
                             //set the rotation to a fixed value 
-                            rotationAngle = -180;
+                            rotationAngle = 180;
 
                             //calculate the centre of rotation (maxx',miny,maxz'+(maxx-minx))
-                            rotationCentre = new double[3] { prevMax[0], cloud.getyMin(), prevMax[2] + (cloud.getxMax() - cloud.getxMin()) }; 
+                            rotationCentre = new double[3] { cloud.getxMin(), cloud.getyMin(), cloud.getzMin() }; 
 
                             /*
                              * Translate by
                              * x: -width
                              * z: width'
                              */
-                            translationValue = new double[3] { 0-width, 0, prevWidth};
+                            translationValue = new double[3] { width,0,prevWidth};
                             break;
                         case 3:
                             //set the rotation to a fixed value 
-                            rotationAngle = -270;
+                            rotationAngle = 270;
 
-                            rotationCentre = new double[3] { cloud.getxMax(), cloud.getyMin(), cloud.getzMax() };
+                            rotationCentre = new double[3] { cloud.getxMin(), cloud.getyMin(), cloud.getzMin() }; 
 
                             /*
                              * Translate by
                              * x: -(depth + width')
                              * z: width
                              */
-                            translationValue = new double[3] { 0 - (depth + prevWidth), 0, width };
+                            translationValue = new double[3] { prevWidth,0,0 };
                             break;
                         default:
                             //this should not occur... throw an exception 
                             break;
                     }
 
-                    //perform translation and rotations 
-                    if (i != 0 && i != 1) {                        
-                        cloud.rotate(rotationCentre, rotationAngle);
-                        cloud.translate(translationValue); 
-                    } else if (i != 0) {
-                         cloud.rotate(rotationCentre, rotationAngle);
-                    }
-
-                    //stick the result into the point cloud 
+                    //add the translated cloud into the grouped cloud (only tx/rt if not the first panel)
                     if (i == 0) {
                         this.pcd = cloud;
                     }
                     else {
+                        cloud.rotate(rotationCentre, rotationAngle);
+                        cloud.translate(translationValue);
                         this.pcd.addPointCloud(cloud);
                     }
-
+                    
                     //store current values for the next iteration 
                     prevMin = new double[3]{cloud.getxMin(), cloud.getyMin(), cloud.getzMin()};
                     prevMax = new double[3]{cloud.getxMax(), cloud.getyMax(), cloud.getzMax()};
