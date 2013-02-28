@@ -90,7 +90,7 @@ namespace PARSE
 
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
-            File.Delete("./output.csv");
+            //File.Delete("./output.csv");
 
             bodyimg.Visibility = Visibility.Visible;
             planeNo.Visibility = Visibility.Visible;
@@ -118,7 +118,7 @@ namespace PARSE
             double zmax = 0;
 
             //currently taking the midpoint on the body (waist/stomach area)
-            int i = (int) planeIndex;
+            int i = (int)planeIndex;
             PointSorter.rotSort(storedPlanes[i]);
 
             double[] x = new double[storedPlanes[i].Count];
@@ -186,7 +186,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-           // Environment.Exit(1);
+            //Environment.Exit(1);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
