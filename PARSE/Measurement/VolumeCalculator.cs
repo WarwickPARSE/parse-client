@@ -32,7 +32,7 @@ namespace PARSE
         }
 
         //only works on an amorphus blob
-        public static List<List<Point3D>> volume1stApprox(PointCloud pc)
+        public static Tuple<double, List<List<Point3D>>> volume1stApprox(PointCloud pc)
         {
             double xmin = pc.getxMin();
             double xmax = pc.getxMax();
@@ -79,7 +79,7 @@ namespace PARSE
             Console.WriteLine("Volume Pre Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             Console.WriteLine("Better Volume Patient Volume: " + volume);
-            return planes;
+            return Tuple.Create(volume,planes);
         }
         
         /*public static double calculateVolume(PointCloud pc)
