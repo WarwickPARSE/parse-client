@@ -23,6 +23,7 @@ namespace PARSE.Tracking
         private volatile int frameCounter = 0;  // frameCounter % gapbetweenframes ==0  -> process frame
         private volatile int frames = 0;
         RGBTracker tracker;                     // Reference to RGBTracker
+        bool capturePosition = false;
 
         // Sensor properties
         public int x = 0;
@@ -47,6 +48,11 @@ namespace PARSE.Tracking
         private System.Windows.Controls.Image Visualisation;
         private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
 
+        // Skeletons
+        private bool skeletonsIdentified = false;
+        private bool captureSkeleton = false;
+        private byte doctorSkeletonIndex;
+        private byte patientSkeletonIndex;
  
         public bool Start()
         {
@@ -59,6 +65,7 @@ namespace PARSE.Tracking
                 lock (this)
                 {
                     tracking = true;
+                    captureSkeleton = true;
                 }
                 return true;
             }
@@ -116,12 +123,14 @@ namespace PARSE.Tracking
         {
             //Console.WriteLine("Frame!");
             bool run;
+            bool skel;
             byte[] thisColorFrame;
 
             lock (this)
             {
                 this.frameCounter++;
                 run = ((frameCounter % gapBetweenFrames) == 0   &   (tracking = true));
+                skel = captureSkeleton;
             }
 
             // Process the frame?
@@ -139,13 +148,13 @@ namespace PARSE.Tracking
                         CIF.CopyPixelDataTo(colorFrame);
 
                         DIF.CopyPixelDataTo(depthFrame);
-                        //frames.OpenSkeletonFrame().CopySkeletonDataTo(skeletonFrame);
-
-                        //disposeFrames(frames);
+                        
+                        if (skel)
+                            SD.CopySkeletonDataTo(skeletonFrame);
                     }
                     else
                     {
-                        //disposeFrames(frames);
+                        // Frames automatically disposed via using statement
                         return;
                     }
 
@@ -182,7 +191,10 @@ namespace PARSE.Tracking
 
                         if (this.CaptureOnStill)
                             if (x != 0 & y != 0 & this.framesStill > 10)
+                            {
                                 this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
+                                CapturePosition();
+                            }
                     }
                 }
             }
@@ -202,8 +214,39 @@ namespace PARSE.Tracking
 
             }
 
+            // Post-frame work
+            FrameReady();
+        }
+
+        private void FrameReady()
+        {
             // Put the most recent colour frame up
             UpdateVisualisation();
+
+            bool skeletonNeeded = false;
+            lock (this)
+            {
+                skeletonNeeded = captureSkeleton;
+            }
+            if (skeletonNeeded && !skeletonsIdentified)
+                identifySkeletons();
+
+            bool capture = false;
+            lock (this)
+            {
+                capture = capturePosition;
+            }
+            if (capture)
+                CapturePosition();
+                
+        }
+
+        /*
+         * Take the x, y, z, angles, depthframe & skeletonframe and convert to a skeleton-relative position.
+         */
+        private void CapturePosition()
+        {
+            
         }
 
         private void UpdateVisualisation()
@@ -233,8 +276,44 @@ namespace PARSE.Tracking
 
                 Visualisation.Source = VisualisationOutput;
             }
+        }
 
-            
+        private void identifySkeletons()
+        {
+            if (skeletonFrame != null)
+            {
+                Skeleton[] frame;
+                lock (this)
+                {
+                    frame = skeletonFrame;
+                }
+
+                int doctorIndex;
+                float distance = float.MaxValue;
+                for (int person = 0; person < frame.GetLength(0); person++)
+                {
+
+                    float left_hand_X = frame[person].Joints[JointType.HandLeft].Position.X;
+                    float left_hand_Y = frame[person].Joints[JointType.HandLeft].Position.Y;
+
+                    float left_hand_distance = (float) Math.Pow( (Math.Pow(((double)(left_hand_X - x)), 2) + Math.Pow(((double)(left_hand_Y - y)), 2)) , 0.5);
+                    if (left_hand_distance < distance)
+                    {
+                        distance = left_hand_distance;
+                        doctorIndex = person;
+                    }
+                }
+
+
+                // Finally, reset the variables
+                lock (this)
+                {
+                    captureSkeleton = false;
+                    skeletonFrame = null;
+                }
+            }
+            else
+                return;
         }
 
         public void Stop()

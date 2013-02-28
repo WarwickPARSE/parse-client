@@ -56,6 +56,7 @@ namespace PARSE
 
             if (storedPlanes.Count == 0)
             {
+                //in the case when we have no planes to show, modify the ui.
                 bodyimg.Visibility = Visibility.Collapsed;
                 planeNo.Visibility = Visibility.Collapsed;
                 viewborder.Visibility = Visibility.Collapsed;
@@ -63,6 +64,19 @@ namespace PARSE
                 planeChooser.Visibility = Visibility.Collapsed;
                 vollabel.Visibility = Visibility.Collapsed;
                 voLconclabel.Visibility = Visibility.Collapsed;
+
+                voloutput.Visibility = Visibility.Collapsed;
+                heightlabel.Visibility = Visibility.Collapsed;
+                heightoutput.Visibility = Visibility.Collapsed;
+                otherlabel.Visibility = Visibility.Collapsed;
+
+                scanno.Visibility = Visibility.Collapsed;
+                scantime.Visibility = Visibility.Collapsed;
+                scanfileref.Visibility = Visibility.Collapsed;
+                scanvoxel.Visibility = Visibility.Collapsed;
+                maxarea.Visibility = Visibility.Collapsed;
+                totalarea.Visibility = Visibility.Collapsed;
+                totalperimiter.Visibility = Visibility.Collapsed;
 
             }
             else
@@ -99,6 +113,18 @@ namespace PARSE
             planeChooser.Visibility = Visibility.Visible;
             vollabel.Visibility = Visibility.Visible;
             voLconclabel.Visibility = Visibility.Visible;
+            voloutput.Visibility = Visibility.Visible;
+            heightlabel.Visibility = Visibility.Visible;
+            heightoutput.Visibility = Visibility.Visible;
+            otherlabel.Visibility = Visibility.Visible;
+            scanno.Visibility = Visibility.Visible;
+            scantime.Visibility = Visibility.Visible;
+            scanfileref.Visibility = Visibility.Visible;
+            scanvoxel.Visibility = Visibility.Visible;
+            maxarea.Visibility = Visibility.Visible;
+            totalarea.Visibility = Visibility.Visible;
+            totalperimiter.Visibility = Visibility.Visible;
+
             noresults.Visibility = Visibility.Collapsed;
             newscan.Visibility = Visibility.Collapsed;
 
