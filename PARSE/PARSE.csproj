@@ -170,6 +170,7 @@
       <DependentUpon>MeasurementLoader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tracking\SensorTracker.cs" />
+    <Compile Include="Tracking\SkeletonPosition.cs" />
     <Compile Include="ViewLoader.xaml.cs">
       <DependentUpon>ViewLoader.xaml</DependentUpon>
     </Compile>
@@ -310,6 +311,7 @@
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\hb.png" />
     <Resource Include="Resources\placeholder.png" />
     <Resource Include="Resources\clock.png" />
     <Resource Include="Resources\open.png" />

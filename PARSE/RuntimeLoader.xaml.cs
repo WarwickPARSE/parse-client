@@ -15,18 +15,25 @@ using System.Diagnostics;
 using System.Windows.Media.Media3D;
 using System.IO;
 
-using System.Windows.Controls.DataVisualization.Charting;
+//using System.Windows.Controls.DataVisualization.Charting;
 
 namespace PARSE
 {
     /// <summary>
     /// Interaction logic for RuntimeLoader.xaml
     /// </summary>
+    /// 
+
     public partial class RuntimeLoader : Window
     {
+
+        //persistently store our list of planes
+        private List<List<Point3D>> storedPlanes;
+
         public RuntimeLoader()
         {
             InitializeComponent();
+            storedPlanes = new List<List<Point3D>>();
             this.Loaded += new RoutedEventHandler(RuntimeLoader_Loaded);
         }
 
@@ -34,16 +41,48 @@ namespace PARSE
         {
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
-            this.Width = (this.Owner.OwnedWindows[0].Width * 2.075);
+            this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
             this.Height = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - (this.Owner.OwnedWindows[0].Width/1.25);
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
             this.textBox1.Width = this.Width - 20;
             this.textBox1.Height = this.Height - 75;
-            //set console out to this control
 
+            //set console out to this control
             TraceListener debugListener = new MyTraceListener(textBox1);
             Debug.Listeners.Add(debugListener);
             //Trace.Listeners.Add(debugListener);
+
+            //check if a scan event is in place
+
+            if (storedPlanes.Count == 0)
+            {
+                //in the case when we have no planes to show, modify the ui.
+                bodyimg.Visibility = Visibility.Collapsed;
+                planeNo.Visibility = Visibility.Collapsed;
+                viewborder.Visibility = Visibility.Collapsed;
+                hvpcanvas.Visibility = Visibility.Hidden;
+                planeChooser.Visibility = Visibility.Collapsed;
+                vollabel.Visibility = Visibility.Collapsed;
+                voLconclabel.Visibility = Visibility.Collapsed;
+
+                voloutput.Visibility = Visibility.Collapsed;
+                heightlabel.Visibility = Visibility.Collapsed;
+                heightoutput.Visibility = Visibility.Collapsed;
+                otherlabel.Visibility = Visibility.Collapsed;
+
+                scanno.Visibility = Visibility.Collapsed;
+                scantime.Visibility = Visibility.Collapsed;
+                scanfileref.Visibility = Visibility.Collapsed;
+                scanvoxel.Visibility = Visibility.Collapsed;
+                maxarea.Visibility = Visibility.Collapsed;
+                totalarea.Visibility = Visibility.Collapsed;
+                totalperimiter.Visibility = Visibility.Collapsed;
+
+            }
+            else
+            {
+
+            }
         }
 
         public void sendMessageToOutput(String type, String message) {
@@ -63,11 +102,41 @@ namespace PARSE
             }
         }
 
-        public void visualisePlanes(List<List<Point3D>> planes)
+        public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
             File.Delete("./output.csv");
+
+            bodyimg.Visibility = Visibility.Visible;
+            planeNo.Visibility = Visibility.Visible;
+            viewborder.Visibility = Visibility.Visible;
+            hvpcanvas.Visibility = Visibility.Visible;
+            planeChooser.Visibility = Visibility.Visible;
+            vollabel.Visibility = Visibility.Visible;
+            voLconclabel.Visibility = Visibility.Visible;
+            voloutput.Visibility = Visibility.Visible;
+            heightlabel.Visibility = Visibility.Visible;
+            heightoutput.Visibility = Visibility.Visible;
+            otherlabel.Visibility = Visibility.Visible;
+            scanno.Visibility = Visibility.Visible;
+            scantime.Visibility = Visibility.Visible;
+            scanfileref.Visibility = Visibility.Visible;
+            scanvoxel.Visibility = Visibility.Visible;
+            maxarea.Visibility = Visibility.Visible;
+            totalarea.Visibility = Visibility.Visible;
+            totalperimiter.Visibility = Visibility.Visible;
+
+            noresults.Visibility = Visibility.Collapsed;
+            newscan.Visibility = Visibility.Collapsed;
+
+            planeNo.Text = "Plane Outline: " + (int) planeIndex;
             
             System.Diagnostics.Debug.WriteLine("Number of caught planes: " + planes.Count);
+
+            if (storedPlanes.Count == 0)
+            {
+                storedPlanes = planes;
+                storedPlanes.Reverse();
+            }
 
             double xmin = 0;
             double xmax = 0;
@@ -75,54 +144,54 @@ namespace PARSE
             double zmax = 0;
 
             //currently taking the midpoint on the body (waist/stomach area)
-            int i = planes.Count / 2;
-            PointSorter.rotSort(planes[i]);
+            int i = (int) planeIndex;
+            PointSorter.rotSort(storedPlanes[i]);
 
-            double[] x = new double[planes[i].Count];
-            double[] z = new double[planes[i].Count];
+            double[] x = new double[storedPlanes[i].Count];
+            double[] z = new double[storedPlanes[i].Count];
 
-                for (int j = 0; j < planes[i].Count; j++) {
+                for (int j = 0; j < storedPlanes[i].Count; j++) {
 
                         //Boundary check of points.
-                        if (planes[i][j].X > xmax)
+                        if (storedPlanes[i][j].X > xmax)
                         {
-                            xmax = planes[i][j].X;
+                            xmax = storedPlanes[i][j].X;
                         }
 
-                        if (planes[i][j].Z > zmax)
+                        if (storedPlanes[i][j].Z > zmax)
                         {
-                            zmax = planes[i][j].Z;
+                            zmax = storedPlanes[i][j].Z;
                         }
 
-                        if (planes[i][0].X < xmin)
+                        if (storedPlanes[i][0].X < xmin)
                         {
-                            xmin = planes[i][0].X;
+                            xmin = storedPlanes[i][0].X;
                         }
-                        if (planes[i][j].X < xmin)
+                        if (storedPlanes[i][j].X < xmin)
                         {
-                            xmin = planes[i][j].X;
+                            xmin = storedPlanes[i][j].X;
                         }
 
-                        if (planes[i][0].Z < zmin)
+                        if (storedPlanes[i][0].Z < zmin)
                         {
-                            zmin = planes[i][0].Z;
+                            zmin = storedPlanes[i][0].Z;
                         }
-                        if (planes[i][j].Z < zmin)
+                        if (storedPlanes[i][j].Z < zmin)
                         {
-                            zmin = planes[i][j].Z;
+                            zmin = storedPlanes[i][j].Z;
                         }
 
                         //write points to output.csv file
                         using (StreamWriter w = File.AppendText("./output.csv"))
                        {
-                            w.WriteLine(planes[i][j].X + "," + planes[i][j].Z);
+                            w.WriteLine(storedPlanes[i][j].X + "," + storedPlanes[i][j].Z);
                             w.Flush();
                             w.Close();
                        }
 
                        //assign to arrays
-                        x[j] = planes[i][j].X;
-                        z[j] = planes[i][j].Z;
+                        x[j] = storedPlanes[i][j].X;
+                        z[j] = storedPlanes[i][j].Z;
 
                 }
 
@@ -143,7 +212,17 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-            Environment.Exit(1);
+           // Environment.Exit(1);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void planeChooser_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            visualisePlanes(storedPlanes, e.NewValue);
         }
     }
 
