@@ -8,6 +8,7 @@ namespace PARSE.ICP.Stitchers
     class BoundingBox : Stitcher
     {
         List<PointCloud> pointClouds;
+        List<PointCloud> txpointClouds; 
         PointCloud pcd;
 
         /// <summary>
@@ -124,6 +125,9 @@ namespace PARSE.ICP.Stitchers
                         cloud.translate(translationValue);
                         this.pcd.addPointCloud(cloud);
                     }
+
+                    //store in a list of point clouds
+                    txpointClouds.Add(cloud);
                     
                     //store current values for the next iteration 
                     prevMin = new double[3]{cloud.getxMin(), cloud.getyMin(), cloud.getzMin()};
@@ -149,6 +153,10 @@ namespace PARSE.ICP.Stitchers
         public override PointCloud getResult()
         {
             return pcd;
+        }
+
+        public List<PointCloud> getResultList() {
+            return txpointClouds; 
         }
 
     }
