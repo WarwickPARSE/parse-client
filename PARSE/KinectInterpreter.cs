@@ -131,6 +131,11 @@ namespace PARSE
         {
             return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
         }
+
+        public void calibrate()
+        {
+            this.kinectSensor.ElevationAngle = oneParseRadian;
+        }
         
         public Boolean isCalibrated()
         {
