@@ -137,10 +137,10 @@ namespace PARSE
             this.kinectSensor.ElevationAngle = oneParseRadian;
         }
         
-        public Boolean isCalibrated()
+        /*public Boolean isCalibrated()
         {
             return (this.kinectSensor.ElevationAngle == oneParseRadian);    
-        }
+        }*/
         
         public void enableUpdateSkelVars()
         {
