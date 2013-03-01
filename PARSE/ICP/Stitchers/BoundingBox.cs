@@ -156,7 +156,7 @@ namespace PARSE.ICP.Stitchers
             return pcd;
         }
 
-        public List<PointCloud> getResultList() {
+        public override List<PointCloud> getResultList() {
             return txpointClouds; 
         }
 

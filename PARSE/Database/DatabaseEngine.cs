@@ -11,15 +11,17 @@ namespace PARSE
     {
         public SqlCeConnection con;
 
+        Insertion insertQueries;
+        Selection selectQueries;
+
         public DatabaseEngine()
         {
             dbOpen();
 
-            //AddTest();
+            insertQueries = new Insertion(this.con);
+            selectQueries = new Selection(this.con);
 
-            //GetTest();
-
-            Selection newQueries = new Selection(this.con);
+            //Object[] patients = getAllPatients();
 
             //dbClose();
         }
@@ -45,6 +47,35 @@ namespace PARSE
             con.Close();
 
             Console.WriteLine("closed");
+        }
+
+        public Object[] getAllPatients()
+        {
+            Object[] patients = selectQueries.SelectAllPatients();
+
+            return patients;
+        }
+
+        public Object[] getAllConditions()
+        {
+            Object[] conditions = selectQueries.SelectAllConditions();
+
+            return conditions;
+        }
+
+        public Object[] getPatientInformation(int patientID)
+        {
+            object[] patientInfo = selectQueries.SelectPatientInformation(patientID);
+
+            return patientInfo;
+        }
+
+        public String[] getPatientCondition(int patientID)
+        {
+            int conditionID = selectQueries.SelectID("conditionID", "PatientCondition", "patientID", patientID);
+            String[] conditionInfo = selectQueries.SelectStringTableData("Conditions", "conditionID", conditionID);
+
+            return conditionInfo;
         }
     }
 
@@ -147,10 +178,10 @@ namespace PARSE
         {
             Object[] allPatients = new Object[3];
 
-            int pSize = 0;
-            int[] ids = new int[pSize];
-            String[] names = new String[pSize];
-            int[] nhsNos = new int[pSize];
+            //int pSize = 0;
+            LinkedList<int> ids = new LinkedList<int>();
+            LinkedList<String> names = new LinkedList<String>();
+            LinkedList<int> nhsNos = new LinkedList<int>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT patientID, name, nhsNo FROM PatientInformation";
@@ -159,10 +190,10 @@ namespace PARSE
 
             while (reader.Read())
             {
-                pSize = pSize + 1;
-                ids[pSize] = reader.GetInt32(0);
-                names[pSize] = reader.GetString(1);
-                nhsNos[pSize] = reader.GetInt32(2);
+                //pSize = pSize + 1;
+                ids.AddLast(reader.GetInt32(0));
+                names.AddLast(reader.GetString(1));
+                nhsNos.AddLast(reader.GetInt32(2));
             }
             reader.Close();
 
@@ -177,10 +208,10 @@ namespace PARSE
         {
             Object[] allConditions = new Object[3];
 
-            int cSize = 0;
-            int[] ids = new int[cSize];
-            String[] conditions = new String[cSize];
-            String[] descriptions = new String[cSize];
+            //int cSize = 0;
+            LinkedList<int> ids = new LinkedList<int>();
+            LinkedList<String> conditions = new LinkedList<String>();
+            LinkedList<String> descriptions = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT * FROM Condition";
@@ -189,10 +220,10 @@ namespace PARSE
 
             while (reader.Read())
             {
-                cSize = cSize + 1;
-                ids[cSize] = reader.GetInt32(0);
-                conditions[cSize] = reader.GetString(1);
-                descriptions[cSize] = reader.GetString(2);
+                //cSize = cSize + 1;
+                ids.AddLast(reader.GetInt32(0));
+                conditions.AddLast(reader.GetString(1));
+                descriptions.AddLast(reader.GetString(2));
             }
             reader.Close();
 
@@ -226,12 +257,10 @@ namespace PARSE
             return patient;
         }
 
-        //generalised method
-        public String[] SelectAllTableData(String tableName, String column, int value)
+        //generalised method for all table data
+        public String[] SelectStringTableData(String tableName, String column, int value)
         {
             String[] tableData = new String[2];
-            List<String> test = new List<String>();
-            int counter = 0;
 
             tableData[0] = "Default";
             tableData[1] = "Default";
@@ -245,17 +274,38 @@ namespace PARSE
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
-
-                test.Add(reader.GetString(counter));
-                counter++;
-                tableData[0] = reader.GetString(0);
-                tableData[1] = reader.GetString(1);
+                tableData[0] = reader.GetString(1);
+                tableData[1] = reader.GetString(2);
             }
-            Console.WriteLine(tableData[0], tableData[1]);
+            Console.WriteLine(tableData[0] + tableData[1]);
 
             reader.Close();
 
             return tableData;
+        }
+
+        //generalised method for getting ids
+        public int SelectID(String columnNeeded, String tableName, String column, int value)
+        {
+            int id = 0;
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT @ColumnNeeded FROM @TableName WHERE @Column LIKE @Value";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ColumnNeeded", columnNeeded);
+            selectQuery.Parameters.Add("@TableName", tableName);
+            selectQuery.Parameters.Add("@Column", column);
+            selectQuery.Parameters.Add("@Value", value);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                id = reader.GetInt32(1);
+            }
+            Console.WriteLine(id);
+
+            reader.Close();
+
+            return id;
         }
     }
 }

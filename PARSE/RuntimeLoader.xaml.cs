@@ -77,12 +77,11 @@ namespace PARSE
                 maxarea.Visibility = Visibility.Collapsed;
                 totalarea.Visibility = Visibility.Collapsed;
                 totalperimiter.Visibility = Visibility.Collapsed;
+                btnresults.Visibility = Visibility.Collapsed;
+                btnrescan.Visibility = Visibility.Collapsed;
 
             }
-            else
-            {
 
-            }
         }
 
         public void sendMessageToOutput(String type, String message) {
@@ -106,6 +105,7 @@ namespace PARSE
         {
             //File.Delete("./output.csv");
 
+            //Set relevant UI components to visisble
             bodyimg.Visibility = Visibility.Visible;
             planeNo.Visibility = Visibility.Visible;
             viewborder.Visibility = Visibility.Visible;
@@ -124,7 +124,10 @@ namespace PARSE
             maxarea.Visibility = Visibility.Visible;
             totalarea.Visibility = Visibility.Visible;
             totalperimiter.Visibility = Visibility.Visible;
+            btnresults.Visibility = Visibility.Visible;
+            btnrescan.Visibility = Visibility.Visible;
 
+            //Set relevant ui components to collapsed
             noresults.Visibility = Visibility.Collapsed;
             newscan.Visibility = Visibility.Collapsed;
 
@@ -136,6 +139,7 @@ namespace PARSE
             {
                 storedPlanes = planes;
                 storedPlanes.Reverse();
+                planeChooser.Maximum = storedPlanes.Count;
             }
 
             double xmin = 0;
