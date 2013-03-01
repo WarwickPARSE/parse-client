@@ -150,7 +150,14 @@ namespace PARSE.Tracking
                         DIF.CopyPixelDataTo(depthFrame);
                         
                         if (skel)
-                            SD.CopySkeletonDataTo(skeletonFrame);
+                            try
+                            {
+                                SD.CopySkeletonDataTo(skeletonFrame);
+                            }
+                            catch (Exception e)
+                            {
+                                //shhh
+                            }
                     }
                     else
                     {

@@ -62,6 +62,7 @@ namespace PARSE
 
         //point cloud lists for visualisation
         private List<PointCloud>            fincloud;
+        private List<PointCloud>            pcdl;
 
         //a stitcher
         private Stitcher                    stitcher; 
@@ -316,9 +317,10 @@ namespace PARSE
 
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
         {
-            //Create .PCD for use with the PCL Library
-            PointCloud pc = windowScanner.getYourMum();
+            //Create .PCDs for use with the PCL Library to test stitching
+            
             String filename = "";
+            ICP.PointRGB[] point;
 
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.DefaultExt = ".PCD";
@@ -326,38 +328,42 @@ namespace PARSE
 
             if (dlg.ShowDialog() == true)
             {
-                filename = dlg.FileName;
+                filename = dlg.FileName;   
             }
 
-            //start subroutine to save to PCD File
-            TextWriter tw = new StreamWriter(filename);
-            ICP.PointRGB[] point;
+            for (int j = 0; j < pcdl.Count; j++)
+            {
+                //start subroutine to save to the PCD File's in a new directory
+                TextWriter tw = new StreamWriter(filename+"_"+j);
 
-            //write versioning info
-            tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
-            tw.WriteLine("VERSION 1.6");
+                //write versioning info
+                tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
+                tw.WriteLine("VERSION 1.6");
 
-            //write metadata
-            tw.WriteLine("FIELDS x y z rgb");
-            tw.WriteLine("SIZE 4 4 4 4");
-            tw.WriteLine("TYPE F F F F");
-            tw.WriteLine("COUNT 1 1 1 1");
-            tw.WriteLine("WIDTH " + pc.getAllPoints().Length);
-            tw.WriteLine("HEIGHT 1");
-            tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
-            tw.WriteLine("POINTS " + pc.getAllPoints().Length);
-            tw.WriteLine("DATA ascii");
+                //write metadata
+                tw.WriteLine("FIELDS x y z rgb");
+                tw.WriteLine("SIZE 4 4 4 4");
+                tw.WriteLine("TYPE F F F F");
+                tw.WriteLine("COUNT 1 1 1 1");
+                tw.WriteLine("WIDTH " + pcdl[j].getAllPoints().Length);
+                tw.WriteLine("HEIGHT 1");
+                tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
+                tw.WriteLine("POINTS " + pcdl[j].getAllPoints().Length);
+                tw.WriteLine("DATA ascii");
 
-            //store all points.
-            //pc.rotate(new double[] { 0, 1, 0 }, -90);
-            //pc.translate(new double[] { -1.5, 1.25, 0 });
-            point = pc.getAllPoints();
+                //store all points.
+                //pc.rotate(new double[] { 0, 1, 0 }, -90);
+                //pc.translate(new double[] { -1.5, 1.25, 0 });
 
-            for(int i = 0; i < point.Length; i++) {
-                tw.WriteLine(point[i].point.X + " " + point[i].point.Z + " " + point[i].point.Y + " 4.2108e+06");
+                point = pcdl[j].getAllPoints();
+
+                for (int i = 0; i < point.Length; i++)
+                {
+                    tw.WriteLine(point[i].point.X + " " + point[i].point.Y + " " + point[i].point.Z + " 4.2108e+06");
+                }
+
+                tw.Close();
             }
-
-            tw.Close();
 
         }
 
@@ -406,6 +412,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
 
      /*2)*/ PointCloud pcd = new PointCloud();
+            pcdl = new List<PointCloud>();
 
             //instantiate the stitcher 
             stitcher = new BoundingBox();
@@ -415,7 +422,8 @@ namespace PARSE
             stitcher.stitch();
 
             pcd = stitcher.getResult();
-
+            pcdl = stitcher.getResultList();
+            
             //windowScanner.Close();
             windowViewer.Close();
             windowScanner = new ScanLoader(pcd);
@@ -430,6 +438,11 @@ namespace PARSE
             double volume = T.Item1;
             windowRuntime.runtimeTab.SelectedIndex = 1;
             windowRuntime.visualisePlanes(planes, 1);
+            windowRuntime.voloutput.Content = volume+" m3";
+
+    /*4)*/ //Call export to pcd method for now to test if 4 point cloud stitch together sufficiently enough.
+
+
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)

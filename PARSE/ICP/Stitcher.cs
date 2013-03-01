@@ -31,6 +31,9 @@ namespace PARSE.ICP
         }
 
         //returns the result of the stitching (PointCloud)
-        public abstract PointCloud getResult(); 
+        public abstract PointCloud getResult();
+
+        //returns the constituent parts of the stitching (PointCloud)
+        public abstract List<PointCloud> getResultList();
     }
 }
