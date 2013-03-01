@@ -240,9 +240,10 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
-            List<List<Point3D>> planes = T.Item2;
+            Tuple<double, double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
+            List<List<Point3D>> planes = T.Item3;
             double volume = T.Item1;
+            double height = T.Item2;
             windowRuntime.runtimeTab.SelectedIndex = 1;
             windowRuntime.visualisePlanes(planes,1);
         }
@@ -425,9 +426,10 @@ namespace PARSE
 
                  
      /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
-            List<List<Point3D>> planes = T.Item2;
+            Tuple<double, double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
+            List<List<Point3D>> planes = T.Item3;
             double volume = T.Item1;
+            double height = T.Item2;
             windowRuntime.runtimeTab.SelectedIndex = 1;
             windowRuntime.visualisePlanes(planes, 1);
         }
