@@ -59,7 +59,7 @@ namespace PARSE
                     }
 
                     Console.WriteLine("Circum Pre Multi: " + circum);
-                    circum = UnitConvertor.convertPCM(circum);
+                    circum = UnitConvertor.convertPCVolumeMeasurement(circum);
                     Console.WriteLine("Circum: " + circum);
                     return circum;
                 }
