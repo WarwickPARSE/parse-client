@@ -12,7 +12,7 @@ namespace PARSE
     {
         private const int number = 60;
 
-        private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
+        /*private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
         }
@@ -29,7 +29,7 @@ namespace PARSE
             //System.Diagnostics.Debug.WriteLine("Volume Cock Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             return volume;
-        }
+        }*/
 
         //only works on an amorphus blob
         public static Tuple<double, List<List<Point3D>>> volume1stApprox(PointCloud pc)
@@ -42,6 +42,8 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
+            double height = ymax - ymin;
+            Console.WriteLine("SCANEE'S HEIGHT IN PCS: "+height);
             double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
