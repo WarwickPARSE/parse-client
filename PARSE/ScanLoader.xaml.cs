@@ -150,13 +150,10 @@ namespace PARSE
                 this.kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
             }
-            
-            if (!kinectInterp.isCalibrated())
-            {
-                ss.Speak("The Kinect Device is not calibrated.");
-                Console.WriteLine("The Kinect Device is not calibrated. Please do so from the Control menu");
-            }
-            else if (kinectInterp.tooFarForward())
+
+            kinectInterp.calibrate();
+
+            if (kinectInterp.tooFarForward())
             {
                 ss.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
