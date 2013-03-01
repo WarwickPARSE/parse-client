@@ -21,6 +21,7 @@ namespace PARSE
         {
             double output = -1;
             output = PCM * Math.Pow(pctorwtransform,1/3);//needs to be cube rooted because the constant is for 3 dimensions and convertPC1D is 1d
+            //not working
             return output;
         }
 

@@ -44,8 +44,8 @@ namespace PARSE
             double ymax = pc.getyMax();
             double height = ymax - ymin;
             Console.WriteLine("SCANEE'S HEIGHT IN PCS: "+height);
-            height = UnitConvertor.convertPC1DMeasurement(height);
-            Console.WriteLine("SCANEE'S HEIGHT IN PCS: " + height);
+            double height2 = UnitConvertor.convertPC1DMeasurement(height);
+            Console.WriteLine("VICTIMS HEIGHT IN RWS: " +height2);
             double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
