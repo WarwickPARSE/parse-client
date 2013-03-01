@@ -44,7 +44,7 @@ namespace PARSE
             double ymax = pc.getyMax();
             double height = ymax - ymin;
             Console.WriteLine("SCANEE'S HEIGHT IN PCS: "+height);
-            height = UnitConvertor.convertPCVHeightMeasurement(height);
+            height = UnitConvertor.convertPC1DMeasurement(height);
             double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
@@ -80,7 +80,7 @@ namespace PARSE
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
-            volume = UnitConvertor.convertPCVolumeMeasurement(volume);
+            volume = UnitConvertor.convertPC3DMeasurement(volume);
             Console.WriteLine("Better Volume Patient Volume: " + volume);
             return Tuple.Create(volume,height,planes);
         }
