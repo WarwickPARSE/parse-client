@@ -12,7 +12,7 @@ namespace PARSE
     {
         private const int number = 60;
 
-        private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
+        /*private static double getBoundingBoxVolume(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
         {
             return ((xmax - xmin) * (ymax - ymin) * (zmax - zmin));
         }
@@ -29,10 +29,10 @@ namespace PARSE
             //System.Diagnostics.Debug.WriteLine("Volume Cock Multi: " + volume);
             volume = UnitConvertor.convertPCM(volume);
             return volume;
-        }
+        }*/
 
         //only works on an amorphus blob
-        public static Tuple<double, List<List<Point3D>>> volume1stApprox(PointCloud pc)
+        public static Tuple<double, double, List<List<Point3D>>> volume1stApprox(PointCloud pc)
         {
             double xmin = pc.getxMin();
             double xmax = pc.getxMax();
@@ -42,6 +42,9 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
+            double height = ymax - ymin;
+            Console.WriteLine("SCANEE'S HEIGHT IN PCS: "+height);
+            height = UnitConvertor.convertPC1DMeasurement(height);
             double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
@@ -77,9 +80,9 @@ namespace PARSE
                 }
             }
             Console.WriteLine("Volume Pre Multi: " + volume);
-            volume = UnitConvertor.convertPCM(volume);
+            volume = UnitConvertor.convertPC3DMeasurement(volume);
             Console.WriteLine("Better Volume Patient Volume: " + volume);
-            return Tuple.Create(volume,planes);
+            return Tuple.Create(volume,height,planes);
         }
         
         /*public static double calculateVolume(PointCloud pc)
