@@ -17,6 +17,7 @@ namespace PARSE.ICP.Stitchers
         public BoundingBox() {
             //instantiate empty lists and point clouds 
             pointClouds = new List<PointCloud>();
+            txpointClouds = new List<PointCloud>();
             pcd = new PointCloud();
         }
 
