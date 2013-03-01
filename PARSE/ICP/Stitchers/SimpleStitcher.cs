@@ -12,6 +12,7 @@ namespace PARSE.ICP
     public class SimpleStitcher : Stitcher
     {
         List<PointCloud> pointClouds;
+        List<PointCloud> txpointClouds;
         PointCloud pcd;
 
         /// <summary>
@@ -20,6 +21,7 @@ namespace PARSE.ICP
         public SimpleStitcher() {
             //instantiate empty lists and point clouds 
             pointClouds = new List<PointCloud>();
+            txpointClouds = new List<PointCloud>();
             pcd = new PointCloud();
         }
 
@@ -101,6 +103,8 @@ namespace PARSE.ICP
                             break;
                     }
 
+                    //store in a list of point clouds
+                    txpointClouds.Add(cloud);
                     //iterate our counter 
                     i++;
                 }
@@ -114,6 +118,11 @@ namespace PARSE.ICP
         /// <returns>The result of the stitching</returns>
         public override PointCloud getResult() {
             return pcd;
+        }
+
+        public override List<PointCloud> getResultList()
+        {
+            return txpointClouds;
         }
     }
 }
