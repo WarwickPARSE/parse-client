@@ -243,10 +243,11 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            Tuple<double, double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
-            List<List<Point3D>> planes = T.Item3;
+            PointCloud pc = windowScanner.getYourMum();
+            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
+            List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
-            double height = T.Item2;
+            double height = HeightCalculator.getHeight(pc);
             windowRuntime.runtimeTab.SelectedIndex = 1;
             windowRuntime.visualisePlanes(planes,1);
         }
@@ -436,12 +437,13 @@ namespace PARSE
 
                  
      /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
-            Tuple<double, double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(windowScanner.getYourMum());
-            List<List<Point3D>> planes = T.Item3;
+            PointCloud pc = windowScanner.getYourMum();
+            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
+            List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
-            double height = T.Item2;
+            double height = HeightCalculator.getHeight(pc);
             windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes, 1);
+            windowRuntime.visualisePlanes(planes,1);
             windowRuntime.voloutput.Content = volume+" m3";
 
     /*4)*/ //Call export to pcd method for now to test if 4 point cloud stitch together sufficiently enough.
