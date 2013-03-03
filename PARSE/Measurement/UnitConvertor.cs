@@ -21,7 +21,6 @@ namespace PARSE
         {
             double output = -1;
             output = PCM * pctorwtransform;
-            //not working
             return output;
         }
 
