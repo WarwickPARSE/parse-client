@@ -15,6 +15,8 @@ namespace PARSE
             {
                area = area + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
             }
+            area = Math.Abs(area / 2);
+            Console.WriteLine("Area1:" + UnitConvertor.convertPC2DMeasurement(area));
             return area;
         }
     }

@@ -13,8 +13,8 @@ namespace PARSE
             double aTanA, aTanB;
             //  Fetch the atans
 
-            aTanA = Math.Atan2(a.Z, a.X);
-            aTanB = Math.Atan2(b.Z, b.X);
+            aTanA = Math.Atan2(a.Z, a.X) + Math.PI;
+            aTanB = Math.Atan2(b.Z, b.X) + Math.PI;
 
             //  Determine next point in Clockwise rotation
             if (aTanA < aTanB) return -1;
@@ -48,8 +48,7 @@ namespace PARSE
                 }
             }
 
-            Point3D center = new Point3D((xmax - xmin) / 2, 0, (zmax - zmin) / 2);
-
+            Point3D center = new Point3D((xmax + xmin) / 2, 0, (zmax + zmin) / 2);
             for (int i = 0; i < input.Count; i++)
             {
                 input[i] = new Point3D(input[i].X - center.X, 0, input[i].Z - center.Z);
