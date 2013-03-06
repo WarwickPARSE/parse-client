@@ -60,7 +60,8 @@ namespace PARSE.ICP
                     {
                         case 1:
                             //stick the cloud in the main point cloud 
-                            pcd = cloud;
+                            pcd = cloud.setColour(cloud,255,51,51);
+
                             System.Diagnostics.Debug.WriteLine("Front face is now in the pointcloud");
                             System.Diagnostics.Debug.WriteLine("Pointcloud size now: " + pcd.getAllPoints().Length);
                             
@@ -69,6 +70,7 @@ namespace PARSE.ICP
                             //rotate + translate 
                             cloud.rotate(new double[] { 0, 1, 0 }, -90);
                             cloud.translate(new double[] { -1.5, 1.25, 0 });
+                            pcd = cloud.setColour(cloud, 51, 255, 51);
                             
                             pcd.addPointCloud(cloud);
                             
@@ -80,6 +82,7 @@ namespace PARSE.ICP
                             //rotate + translate
                             cloud.rotate(new double[] { 0, 1, 0 }, -180);
                             cloud.translate(new double[] { 0, 2.5, 0 });
+                            pcd = cloud.setColour(cloud, 51, 153, 255);
                             
                             pcd.addPointCloud(cloud);
                             
@@ -91,7 +94,8 @@ namespace PARSE.ICP
                             //rotate + translate
                             cloud.rotate(new double[] { 0, 1, 0 }, -270);
                             cloud.translate(new double[] { 1.5, 1.25, 0 });
-                            
+                            pcd = cloud.setColour(cloud, 255, 153, 51);
+
                             pcd.addPointCloud(cloud);
                             
                             System.Diagnostics.Debug.WriteLine("Right face is now in the pointcloud");

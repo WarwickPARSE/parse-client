@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+//using Emgu.cv;
+
 namespace PARSE.ICP
 {
     /// <summary>
@@ -18,9 +20,8 @@ namespace PARSE.ICP
         /// <param name="pointClouds">An arbitrary number of point clouds</param>
         public PCR(params PointCloud[] pointClouds) {
             this.pointClouds = pointClouds; 
-
-
         }
+
         private void computeSurfaceNormal() {
         
         }
@@ -28,7 +29,6 @@ namespace PARSE.ICP
         private void generateOrientationHistogram() { 
         
         }
-
 
     }
 }

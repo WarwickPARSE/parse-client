@@ -447,9 +447,6 @@ namespace PARSE
             windowRuntime.voloutput.Content = volume + "m^3";
             windowRuntime.heightoutput.Content = height + "m";
 
-    /*4)*/ //Call export to pcd method for now to test if 4 point cloud stitch together sufficiently enough.
-
-
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)

@@ -180,6 +180,61 @@ namespace PARSE
             setPoints(rawDepth, r, g, b);
         }
 
+        public void setPoints(int[] rawDepth, int r, int g, int b)
+        {
+            for (int iy = 0; iy < 480; iy++)
+            {
+                for (int ix = 0; ix < 640; ix++)
+                {
+                    int i = (iy * 640) + ix;
+
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
+                    {
+                        rawDepth[i] = -1;
+
+                        //at the moment we seem to be deleting points that are too far away, this will need changing at some point
+                        //this.depthFramePoints[i] = new Point3D();
+                    }
+                    else
+                    {
+                        double zz = rawDepth[i] * scale;
+                        double x = (cx - ix) * zz * fxinv;
+                        double y = (cy - iy) * zz * fyinv;
+                        double z = zz;
+
+                        /*
+                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
+                         */
+
+
+                        //check min values
+                        if (x < minx) { minx = x; }
+                        if (y < miny) { miny = y; }
+                        if (z < minz) { minz = z; }
+
+                        //check max values
+                        if (x > maxx) { maxx = x; }
+                        if (y > maxy) { maxy = y; }
+                        if (z > maxz) { maxz = z; }
+
+                        //create a new point key
+                        double[] pointKey = new double[3];
+
+                        //set key
+                        pointKey[0] = x;
+                        pointKey[1] = y;
+                        pointKey[2] = z;
+
+                        Point3D poLoc = new Point3D(x, y, z);
+                        PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r, g, b);
+
+                        this.points.insert(pointKey, po);
+                    }
+                }
+            }
+
+        }
+
         //this is not fully implemented as I don't know how colours are represented!
         //TODO: throw an exception if the rawdepth is not the same length as rgb
         public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) 
@@ -404,6 +459,20 @@ namespace PARSE
             else{
                 //throw an exception and annoy Bernie in the process ;)
             }
+        }
+
+        /// <summary>
+        /// Colours all the points in the point cloud based on specified RGB. Sets overall texture colour.
+        /// </summary>
+        /// <param name="r">r value</param>
+        /// <param name="g">g value</param>
+        /// <param name="g">b value</param>
+        /// 
+        public PointCloud setColour(PointCloud pc, int r, int g, int b)
+        {
+            pc.setPoints(pc.rawDepth, r, g, b);
+
+            return pc;
         }
 
         /// <summary>
