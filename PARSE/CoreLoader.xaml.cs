@@ -444,7 +444,8 @@ namespace PARSE
             double height = HeightCalculator.getHeight(pc);
             windowRuntime.runtimeTab.SelectedIndex = 1;
             windowRuntime.visualisePlanes(planes,1);
-            windowRuntime.voloutput.Content = volume+" m3";
+            windowRuntime.voloutput.Content = volume + "m^3";
+            windowRuntime.heightoutput.Content = height + "m";
 
     /*4)*/ //Call export to pcd method for now to test if 4 point cloud stitch together sufficiently enough.
 

@@ -5,6 +5,7 @@ using System.Text;
 //using Emgu.CV.CvEnum;
 using System.Windows.Media.Media3D;
 using PARSE.ICP;
+using System.IO;
 
 namespace PARSE
 {
@@ -42,15 +43,12 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double height = ymax - ymin;
-            Console.WriteLine("SCANEE'S HEIGHT IN PCS: "+height);
-            double height2 = UnitConvertor.convertPC1DMeasurement(height);
-            Console.WriteLine("VICTIMS HEIGHT IN RWS: " +height2);
+            double height = UnitConvertor.convertPC1DMeasurement(ymax - ymin);
             double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
 
-            for (double i = ymin + (3* increment / 2); i <= ymax - (increment / 2); i = i + increment)
+            for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
                 if (plane.Count != 0)
@@ -60,19 +58,13 @@ namespace PARSE
                     planes.Add(plane);
                     plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
 
-                    double innerVolume = 0;
+                    double area = 0;
 
-                    for (int j = 0; j < plane.Count - 1; j++)
-                    {
-                        innerVolume = innerVolume + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
-                    }
+                    area = AreaCalculator.calculateArea(plane);
+                    
+                    Console.WriteLine("Area2:" + UnitConvertor.convertPC2DMeasurement(area));
 
-                    innerVolume = Math.Abs(innerVolume / 2);
-
-                    innerVolume = innerVolume * increment;
-
-
-                    volume = innerVolume;
+                    volume = volume + (area * increment);
                 }
                 else
                 {
@@ -80,9 +72,7 @@ namespace PARSE
                     Environment.Exit(-1);
                 }
             }
-            Console.WriteLine("Volume Pre Multi: " + volume);
             volume = UnitConvertor.convertPC3DMeasurement(volume);
-            Console.WriteLine("Better Volume Patient Volume: " + volume);
             return Tuple.Create(volume,planes);
         }
         
