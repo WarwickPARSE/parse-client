@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
         Title="Runtime Viewer" Height="300" Width="{x:Static SystemParameters.PrimaryScreenWidth}" Loaded="Window_Loaded">
     <Grid>
         <TabControl Margin="0,-5,0,5" Name="runtimeTab">
@@ -79,6 +80,7 @@
                     <!--"Headline" Labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchange" Height="20" Content="Change in Volume:" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchangeoutput" Height="20" Content="100%" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                
                 </Grid>
             </TabItem>
         </TabControl>
