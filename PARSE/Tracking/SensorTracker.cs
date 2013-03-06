@@ -14,16 +14,21 @@ namespace PARSE.Tracking
     {
         // Scan Process
         MeasurementLoader ScanProcessManager;
-        bool CaptureOnStill;
+            //bool CaptureOnStill;
         System.Windows.Controls.TextBlock displayText;
+        enum Capture_Modes {Capture_On_Still, Capture_At_Position};
+        int Capture_Mode;
+        bool capture_timer_running;
+        int capture_timer_length = 15;
+        bool tracking = false;
+
 
         // Tracking & frame processing
-        bool tracking = false;                          // Determines the state of the tracker
         private int gapBetweenFrames = 10;       // How many frames to skip between processed frames?
         private volatile int frameCounter = 0;  // frameCounter % gapbetweenframes ==0  -> process frame
         private volatile int frames = 0;
         RGBTracker tracker;                     // Reference to RGBTracker
-        bool capturePosition = false;
+        //bool capturePosition = false;
 
         // Sensor properties
         public int x = 0;
@@ -32,7 +37,7 @@ namespace PARSE.Tracking
         private int prevY = 0;
         private int dx = 0;
         private int dy = 0;
-        public int framesStill = 0;
+        public int captureTimer = 0;
         public double angleXY = 0;
         public double angleZ = 0;
 
@@ -50,11 +55,12 @@ namespace PARSE.Tracking
 
         // Skeletons
         private bool skeletonsIdentified = false;
-        private bool captureSkeleton = false;
-        private byte doctorSkeletonIndex;
-        private byte patientSkeletonIndex;
+        //private bool captureSkeleton = false;
+        private byte doctorSkeletonID;
+        private byte patientSkeletonID;
+        private int activeSkeletons = 0;
  
-        public bool Start()
+        private bool start()
         {
             System.Diagnostics.Debug.WriteLine("Start!");
 
@@ -65,8 +71,11 @@ namespace PARSE.Tracking
                 lock (this)
                 {
                     tracking = true;
-                    captureSkeleton = true;
+                    //captureSkeleton = true;
                 }
+
+                this.displayText.Foreground = Brushes.White;
+
                 return true;
             }
             else
@@ -76,10 +85,30 @@ namespace PARSE.Tracking
             }
         }
 
+        internal void captureNewLocation()
+        {
+            this.Capture_Mode = (int)Capture_Modes.Capture_On_Still;
+            this.capture_timer_running = true;
+            this.start();
+        }
+
+        internal void captureAtLocation()
+        {
+            this.Capture_Mode = (int)Capture_Modes.Capture_At_Position;
+            this.capture_timer_running = false;
+            this.start();
+        }
+
+        private void capture()
+        {
+            CapturePosition();
+
+            this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
+        }
+
         public SensorTracker(System.Windows.Controls.Image visualisation, MeasurementLoader manager, bool captureOnStill, System.Windows.Controls.TextBlock textBlock)
         {
             this.ScanProcessManager = manager;
-            this.CaptureOnStill = captureOnStill;
             this.displayText = textBlock;
 
             kinectConnected = (KinectSensor.KinectSensors.Count > 0); // true;
@@ -99,6 +128,7 @@ namespace PARSE.Tracking
                 //Enable streams
                 kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+                kinectSensor.SkeletonStream.Enable();
 
                 // Set up frame event
                 tracking = true;
@@ -123,41 +153,47 @@ namespace PARSE.Tracking
         {
             //Console.WriteLine("Frame!");
             bool run;
-            bool skel;
             byte[] thisColorFrame;
 
             lock (this)
             {
                 this.frameCounter++;
-                run = ((frameCounter % gapBetweenFrames) == 0   &   (tracking = true));
-                skel = captureSkeleton;
+                run = ((frameCounter % gapBetweenFrames) == 0  & (tracking = true));
             }
 
             // Process the frame?
             if (run == true)
             {
+                //Console.WriteLine("Running!!!!!");
+
                 using (ColorImageFrame CIF = frames.OpenColorImageFrame())
                 using (DepthImageFrame DIF = frames.OpenDepthImageFrame())
-                using (SkeletonFrame SD = frames.OpenSkeletonFrame())
+                using (SkeletonFrame SF = frames.OpenSkeletonFrame())
                 {
                     // Get the frames
                     if (CIF != null & DIF != null)
                     {
+                        //Console.WriteLine("Get frames");
                         thisColorFrame = new byte[640 * 480 * 4];
                         CIF.CopyPixelDataTo(thisColorFrame);
                         CIF.CopyPixelDataTo(colorFrame);
-
                         DIF.CopyPixelDataTo(depthFrame);
-                        
-                        if (skel)
-                            try
+
+                        if (SF != null)
+                        {
+                            skeletonFrame = new Skeleton[SF.SkeletonArrayLength];
+                            SF.CopySkeletonDataTo(skeletonFrame);
+                            
+                            int skeletons = 0;
+                            foreach (var skeleton in skeletonFrame)
                             {
-                                SD.CopySkeletonDataTo(skeletonFrame);
+                                if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                                    skeletons++;
                             }
-                            catch (Exception e)
-                            {
-                                //shhh
-                            }
+
+                            System.Diagnostics.Debug.WriteLine("There should be " + skeletons + " skeletons");
+
+                        }
                     }
                     else
                     {
@@ -165,6 +201,7 @@ namespace PARSE.Tracking
                         return;
                     }
 
+                    //Console.WriteLine("Do stuff");
                     // Need to use local copies to maintain volatility of actual variables
                     int tempX = 0;
                     int tempY = 0;
@@ -184,67 +221,49 @@ namespace PARSE.Tracking
                         this.prevY = this.y;
                         this.y = tempY;
                         this.dy = this.prevY - tempY;
-
-                        if (this.dx < 10 & this.dy < 10)
-                            this.framesStill++;
-                        else
-                            this.framesStill = 0;
-
-                        this.displayText.Text = (10 - framesStill).ToString();
-
                         this.angleXY = tempAngle;
 
                         this.colorFrame = thisColorFrame;
-
-                        if (this.CaptureOnStill)
-                            if (x != 0 & y != 0 & this.framesStill > 10)
-                            {
-                                this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
-                                CapturePosition();
-                            }
                     }
+
+                    // Post-frame work
+                    FrameReady();
                 }
             }
             else
             {
+                //Console.WriteLine("Ignore frame - frames = " + this.frameCounter);
+
                 // Ignore the frame & dispose
                 using (ColorImageFrame CIF = frames.OpenColorImageFrame())
                 using (DepthImageFrame DIF = frames.OpenDepthImageFrame())
-                using (SkeletonFrame SD = frames.OpenSkeletonFrame())
+                using (SkeletonFrame SF = frames.OpenSkeletonFrame())
                 {
                     // But, get the latest colour frame for display, first!
                     if (frames.OpenColorImageFrame() != null)
                         frames.OpenColorImageFrame().CopyPixelDataTo(colorFrame);
 
                 }
-                   //disposeFrames(frames);
-
             }
-
-            // Post-frame work
-            FrameReady();
         }
 
         private void FrameReady()
         {
+            //Console.WriteLine("Frame ready running");
+
             // Put the most recent colour frame up
             UpdateVisualisation();
 
-            bool skeletonNeeded = false;
-            lock (this)
-            {
-                skeletonNeeded = captureSkeleton;
-            }
-            if (skeletonNeeded && !skeletonsIdentified)
+            // Update timer
+            updateCaptureTimer();
+
+            // Identify skeletons if not done yet
+            if (!skeletonsIdentified)
                 identifySkeletons();
 
-            bool capture = false;
-            lock (this)
-            {
-                capture = capturePosition;
-            }
-            if (capture)
-                CapturePosition();
+            // Capture at end of timer
+            if (this.captureTimer == capture_timer_length)
+                capture();
                 
         }
 
@@ -253,11 +272,59 @@ namespace PARSE.Tracking
          */
         private void CapturePosition()
         {
-            
+            Console.WriteLine("Capture position!!!");   
+        }
+
+        private void updateCaptureTimer()
+        {
+            // If mode is new scan
+            if (this.Capture_Mode == (int)Capture_Modes.Capture_On_Still)
+            {
+                int temp_activeSkeletons = 0;
+                lock (this)
+                {
+                    temp_activeSkeletons = activeSkeletons;
+                }
+
+                // TODO Probably shouldn't do this here
+                temp_activeSkeletons = 0;
+                if (skeletonFrame != null)
+                    for (int index = 0; index < skeletonFrame.Length; index++)
+                        if (skeletonFrame[index].TrackingState == SkeletonTrackingState.Tracked)
+                            temp_activeSkeletons++;
+
+                lock (this)
+                    activeSkeletons = temp_activeSkeletons;
+
+                // If the scanner hasn't moved too much, and there are still two skeletons in the frame!
+                if ( (this.dx < 10 & this.dy < 10 & this.x != 0 & this.y != 0)
+                    &&
+                    (skeletonFrame != null)  // Need this check before trying to check the frame length! (otherwise get NPE)
+                    &&
+                     (temp_activeSkeletons == 2)
+                    )
+                    this.captureTimer++;
+                else
+                    this.captureTimer = 0;
+
+            }
+            else
+            {
+                // Convert to skeleton-relative position, and find the distance.
+                // If distance < threshold, start timer.
+                
+                if (capture_timer_running)
+                {
+                    // If distance > threshold, stop timer.
+                    // If distance < threshold, increment.
+                }
+            }
+
         }
 
         private void UpdateVisualisation()
         {
+            //Console.WriteLine("Updating visualisation!");
             bool display = true;
             lock (this)
             {
@@ -270,7 +337,7 @@ namespace PARSE.Tracking
             if (display)
             {
                 HighlightSensor(this.x, this.y);
-
+            }
                 // Output processed image
                 if (VisualisationOutput == null)
                     VisualisationOutput = new WriteableBitmap(640, 480, 90, 90, PixelFormats.Bgr32, null);
@@ -282,45 +349,114 @@ namespace PARSE.Tracking
                     0);
 
                 Visualisation.Source = VisualisationOutput;
+
+            // Update text
+            if (activeSkeletons < 2)
+            {
+                this.displayText.Text = "Waiting for doctor and patient";
             }
+            else if (activeSkeletons == 2)
+            {
+                if (!skeletonsIdentified)
+                {
+                    this.displayText.Text = "Identifying doctor & searching for scanner";
+                }
+                else
+                {
+                    if ((capture_timer_length - captureTimer) < 11)
+                    {
+                        this.displayText.FontSize = Math.Max(4 * captureTimer, this.displayText.FontSize);
+                        //this.displayText.Foreground.Opacity = Math.Max(5 * (captureTimer), 20);
+                        this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                    }
+                    else
+                    {
+                        this.displayText.FontSize = 16;
+                        //this.displayText.Foreground.Opacity = Math.Max(5 * (captureTimer), 20);
+                        this.displayText.Text = "Waiting...";
+                    }
+                }
+
+            }   
         }
 
         private void identifySkeletons()
         {
+            System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
+
             if (skeletonFrame != null)
             {
                 Skeleton[] frame;
+
                 lock (this)
                 {
                     frame = skeletonFrame;
                 }
 
-                int doctorIndex;
+                int doctorID = -1;
                 float distance = float.MaxValue;
-                for (int person = 0; person < frame.GetLength(0); person++)
+                for (int person = 0; person < frame.Length; person++)
                 {
-
-                    float left_hand_X = frame[person].Joints[JointType.HandLeft].Position.X;
-                    float left_hand_Y = frame[person].Joints[JointType.HandLeft].Position.Y;
-
-                    float left_hand_distance = (float) Math.Pow( (Math.Pow(((double)(left_hand_X - x)), 2) + Math.Pow(((double)(left_hand_Y - y)), 2)) , 0.5);
-                    if (left_hand_distance < distance)
+                    if (frame[person].TrackingState == SkeletonTrackingState.Tracked)
                     {
-                        distance = left_hand_distance;
-                        doctorIndex = person;
+                        float left_hand_X = frame[person].Joints[JointType.HandLeft].Position.X;
+                        float left_hand_Y = frame[person].Joints[JointType.HandLeft].Position.Y;
+
+                        float left_hand_distance = (float)Math.Pow((Math.Pow(((double)(left_hand_X - x)), 2) + Math.Pow(((double)(left_hand_Y - y)), 2)), 0.5);
+                        if (left_hand_distance < distance)
+                        {
+                            distance = left_hand_distance;
+                            doctorID = frame[person].TrackingId;
+                        }
+
+                        float right_hand_X = frame[person].Joints[JointType.HandRight].Position.X;
+                        float right_hand_Y = frame[person].Joints[JointType.HandRight].Position.Y;
+
+                        float right_hand_distance = (float)Math.Pow((Math.Pow(((double)(right_hand_X - x)), 2) + Math.Pow(((double)(right_hand_Y - y)), 2)), 0.5);
+                        if (right_hand_distance < distance)
+                        {
+                            distance = right_hand_distance;
+                            doctorID = frame[person].TrackingId;
+                        }
                     }
                 }
 
-
-                // Finally, reset the variables
-                lock (this)
+                if (distance < 30 & doctorID != -1)
                 {
-                    captureSkeleton = false;
-                    skeletonFrame = null;
+                    skeletonsIdentified = true;
+                    System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID);
                 }
+                else if (doctorID == -1)
+                {
+                    System.Diagnostics.Debug.WriteLine("Sensor tracker could not identify the doctor");
+                    if (x == 0 || y == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("This could be because the sensor has not yet been located");
+                    }
+                }
+
+                int activeSkeletons = 0;
+                for (int index = 0; index < skeletonFrame.Length; index ++)
+                    if (skeletonFrame[index].TrackingState == SkeletonTrackingState.Tracked)
+                    {
+                        activeSkeletons++;
+                        if (skeletonFrame[index].TrackingId != doctorID)
+                            patientSkeletonID = (byte)skeletonFrame[index].TrackingId;
+                    }
+
+                if (activeSkeletons > 2)
+                {
+                    System.Diagnostics.Debug.WriteLine("There are too many skeletons");
+                    doctorSkeletonID = 8;
+                    patientSkeletonID = 8;
+                }
+
             }
             else
+            {
+                System.Diagnostics.Debug.WriteLine("Frame is null -> No skeletons detected");
                 return;
+            }
         }
 
         public void Stop()
@@ -330,6 +466,12 @@ namespace PARSE.Tracking
                 tracking = false;
                 kinectSensor.Stop();
             }
+        }
+
+        public void close()
+        {
+            this.Stop();
+            kinectSensor.Stop();
         }
 
         private void HighlightSensor(int posX, int posY)
@@ -353,22 +495,6 @@ namespace PARSE.Tracking
                         colorFrame[index + 3] = 0;
                     }
                 }
-        }
-
-        private void disposeFrames(AllFramesReadyEventArgs frames)
-        {
-            // Dispose of the frames when finished
-            try
-            {
-                if (frames.OpenColorImageFrame() != null)
-                    frames.OpenColorImageFrame().Dispose();
-                if (frames.OpenDepthImageFrame() != null)
-                    frames.OpenDepthImageFrame().Dispose(); 
-                if (frames.OpenSkeletonFrame() != null)
-                    frames.OpenSkeletonFrame().Dispose();
-            }
-            catch (Exception noFrameException) { };            
-        }
-
+        }        
     }
 }
