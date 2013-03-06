@@ -8,6 +8,17 @@ namespace PARSE
 {
     static class AreaCalculator
     {
+        public static List<double> getAllAreas(List<List<Point3D>> planes)
+        {
+            List<double> output = new List<double>();
+            for (int i = 0; i < planes.Count; i++)
+            {
+                List<Point3D> plane = planes[i];
+                output.Add(calculateArea(plane));
+            }
+            return output;
+        }
+        
         public static double calculateArea(List<Point3D> plane)
         {
             double area = 0;
