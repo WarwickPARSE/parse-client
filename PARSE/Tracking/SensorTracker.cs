@@ -272,7 +272,9 @@ namespace PARSE.Tracking
          */
         private void CapturePosition()
         {
-            Console.WriteLine("Capture position!!!");   
+            Console.WriteLine("Capture position!!!"); 
+  
+
         }
 
         private void updateCaptureTimer()
@@ -436,12 +438,12 @@ namespace PARSE.Tracking
                 }
 
                 int activeSkeletons = 0;
-                for (int index = 0; index < skeletonFrame.Length; index ++)
-                    if (skeletonFrame[index].TrackingState == SkeletonTrackingState.Tracked)
+                for (int index = 0; index < frame.Length; index ++)
+                    if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
                     {
                         activeSkeletons++;
-                        if (skeletonFrame[index].TrackingId != doctorID)
-                            patientSkeletonID = (byte)skeletonFrame[index].TrackingId;
+                        if (frame[index].TrackingId != doctorID)
+                            patientSkeletonID = (byte)frame[index].TrackingId;
                     }
 
                 if (activeSkeletons > 2)
