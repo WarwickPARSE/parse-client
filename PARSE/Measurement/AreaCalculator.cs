@@ -14,8 +14,7 @@ namespace PARSE
             List<double> output = new List<double>();
             for (int i = 0; i < planes.Count; i++)
             {
-                List<Point3D> plane = planes[i];
-                output.Add(UnitConvertor.convertPC2DMeasurement(AreaCalculator.calculateArea(plane)));
+                output.Add(UnitConvertor.convertPC2DMeasurement(AreaCalculator.calculateArea(planes[i])));
             }
             return output;
         }
