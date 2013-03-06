@@ -256,6 +256,7 @@ namespace PARSE
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
                 pcTimer.Stop();
+                kinectInterp.kinectSensor.Stop();
             }
         }
 
