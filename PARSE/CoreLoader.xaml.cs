@@ -430,14 +430,14 @@ namespace PARSE
             
             //windowScanner.Close();
             windowViewer.Close();
-            windowScanner = new ScanLoader(pcd);
+            windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
 
                  
      /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
-            PointCloud pc = windowScanner.getYourMum();
+            PointCloud pc = pcd;
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;

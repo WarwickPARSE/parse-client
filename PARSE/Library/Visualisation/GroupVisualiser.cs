@@ -27,6 +27,7 @@ namespace PARSE
         private int depthFrameHeight = 480;
 
         MeshGeometry3D mesh;
+        List<PointCloud> clouds;
 
         //Geometry for visualisation computation.
         Point3D[] depthFramePoints;
@@ -35,6 +36,7 @@ namespace PARSE
         List<int> triangleIndices = new List<int>();
         PARSE.ICP.PointRGB[] prgbs;
         Point3DCollection pcc;
+        List<Point3DCollection> cloudList;
 
         public GroupVisualiser()
         {
@@ -52,31 +54,130 @@ namespace PARSE
 
             //resize the depthframe array (for efficiency)
             depthFramePoints = new Point3D[prgbs.Length];
+        }
+
+        public GroupVisualiser(List<PointCloud> pcs)
+        {
+            //This is present in group visualiser when we want to texture the point cloud according to cloud index.
+            mesh = new MeshGeometry3D();
+
+            this.clouds = pcs;
+
+            textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
+            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
         }
 
         public void preprocess()
         {
-            pcc = new Point3DCollection();
-
-            //iterate over each point and stick it in depthframe points
-            for (int i = 0; i < depthFramePoints.Length; i++)
+            if (this.clouds == null)
             {
-                pcc.Add(prgbs[i].point);
+                //preprocess condition for when we have a single point cloud to convert into point 3ds
+                pcc = new Point3DCollection();
+
+                //iterate over each point and stick it in depthframe points
+                for (int i = 0; i < depthFramePoints.Length; i++)
+                {
+                    pcc.Add(prgbs[i].point);
+                }
+
+                createPointCloud(pcc);
+
+                render();
             }
+            else
+            {
+                //preprocess condition for when we have multiple point clouds to convert into point 3ds
 
-            createPointCloud(pcc);
+                cloudList = new List<Point3DCollection>();
 
-            render();
+                //create a list of point 3d collections
+                for (int i = 0; i < this.clouds.Count; i++)
+                {
+
+                    Point3DCollection pcc = new Point3DCollection();
+                    depthFramePoints = new Point3D[this.clouds[i].getAllPoints().Length];
+                    ICP.PointRGB[] tmp = clouds[i].getAllPoints();
+
+                    for (int j = 0; j < depthFramePoints.Length; j++)
+                    {
+                        pcc.Add(tmp[j].point);
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("creating new pc's " + pcc.Count);
+
+                    cloudList.Add(pcc);
+                }
+
+                render();
+
+            }
         }
 
         public void render()
         {
-            runDemoModel();
 
-            this.Model.Geometry = createMesh();
-            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
-            this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+            if (this.cloudList == null)
+            {
+
+                System.Diagnostics.Debug.WriteLine("Now here");
+                GradientStopCollection gsc = new GradientStopCollection(4);
+                gsc.Add(new GradientStop(Colors.Red, 0.1));
+                gsc.Add(new GradientStop(Colors.Green, 0.2));
+                gsc.Add(new GradientStop(Colors.Blue, 0.3));
+                gsc.Add(new GradientStop(Colors.Orange, 0.4));
+
+                runDemoModel();
+
+                this.Model.Geometry = createMesh();
+                this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new LinearGradientBrush(gsc, new Point(0, 0), new Point(100, 100)));
+                //this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
+                this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+
+            }
+            else
+            {
+
+                runDemoModel();
+
+                for (int i = 0; i < this.cloudList.Count; i++)
+                {
+
+                    System.Diagnostics.Debug.WriteLine("Producing model " + i);
+
+                    switch (i)
+                    {
+                        case 0:
+                            createPointCloud(this.cloudList[0]);
+                            this.Model.Geometry = createMesh();
+                            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+                            this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                        case 1:
+                            mesh = new MeshGeometry3D();
+                            createPointCloud(this.cloudList[1]);
+                            this.Model2.Geometry = createMesh();
+                            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Blue));
+                            this.Model2.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                        case 2:
+                            mesh = new MeshGeometry3D();
+                            createPointCloud(this.cloudList[2]);
+                            this.Model3.Geometry = createMesh();
+                            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
+                            this.Model3.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                        case 3:
+                            mesh = new MeshGeometry3D();
+                            createPointCloud(this.cloudList[3]);
+                            this.Model4.Geometry = createMesh();
+                            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
+                            this.Model4.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                    } 
+                }
+            
+            }
         }
 
         private Vector3D CalculateNormal(Point3D p0, Point3D p1, Point3D p2)
@@ -89,6 +190,7 @@ namespace PARSE
 
         public MeshGeometry3D createMesh()
         {
+            if (this.mesh == null) { System.Diagnostics.Debug.WriteLine("null"); }
             return this.mesh;
         }
 
@@ -108,12 +210,22 @@ namespace PARSE
             // Create some materials
             var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
 
-            //create a model
-            this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            if (cloudList != null)
+            {
+                this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; 
+                this.Model2 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; 
+                this.Model3 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; 
+                this.Model4 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial }; 
+            }
+            else
+            {
+                this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };          
+            }
         }
 
         private void createPointCloud(Point3DCollection points)
         {
+
             for (int i = 0; i < points.Count; i++)
             {
                 //AddCubeToMesh(pointCloudMesh, points[i], 0.005);
@@ -199,6 +311,10 @@ namespace PARSE
         /// </summary>
         /// <value>The model.</value>
         public GeometryModel3D Model { get; set; }
+        public GeometryModel3D BaseModel { get; set; }
+        public GeometryModel3D Model2 { get; set; }
+        public GeometryModel3D Model3 { get; set; }
+        public GeometryModel3D Model4 { get; set; }
 
     }
 }
