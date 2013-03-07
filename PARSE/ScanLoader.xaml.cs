@@ -277,6 +277,7 @@ namespace PARSE
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
+                ss.Speak("FUCKING GIT");
                 pcTimer.Stop();
             }
         }
