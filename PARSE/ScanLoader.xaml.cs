@@ -261,18 +261,17 @@ namespace PARSE
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(leftCloud);
 
+                //stop streams
+                kinectInterp.stopStreams();
+
                 //Visualisation instantiation based on int array clouds
                 cloudvis = new CloudVisualisation(fincloud, false);
                 this.DataContext = cloudvis;
 
-                //stop streams
-                kinectInterp.stopStreams();
-                
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
                 pcTimer.Stop();
-                //kinectInterp.kinectSensor.Stop();
             }
         }
 
