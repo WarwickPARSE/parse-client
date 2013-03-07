@@ -106,18 +106,18 @@ namespace PARSE
             //Open child windows
             try
             {
-                //open default window viewer
+                //open Visualiser
                 windowViewer = new ViewLoader();
                 windowViewer.Owner = this;
                 windowViewer.Show();
-
-                //open patient detail viewer
+                
+                //open Patient Details
                 //TODO: need to abstract this for when we add a new patient.
                 windowPatient = new PatientLoader(true);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 
-                //open runtime detail viewer
+                //open Runtime viewer (aka results,history,output)
                 windowRuntime = new RuntimeLoader();
                 windowRuntime.Owner = this;
                 windowRuntime.Show();
@@ -141,7 +141,6 @@ namespace PARSE
                 windowScanner = new ScanLoader();
                 windowScanner.Owner = this;
                 windowScanner.Closed += new EventHandler(windowScanner_Closed);
-
             }
             catch (Exception err)
             {
