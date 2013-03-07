@@ -31,12 +31,12 @@ namespace PARSE.Tracking
         //bool capturePosition = false;
 
         // Sensor properties
-        public int x = 0;
-        public int y = 0;
-        private int prevX = 0;
-        private int prevY = 0;
-        private int dx = 0;
-        private int dy = 0;
+        public double x = 0;
+        public double y = 0;
+        private double prevX = 0;
+        private double prevY = 0;
+        private double dx = 0;
+        private double dy = 0;
         public int captureTimer = 0;
         public double angleXY = 0;
         public double angleZ = 0;
@@ -491,7 +491,7 @@ namespace PARSE.Tracking
             kinectSensor.Stop();
         }
 
-        private void HighlightSensor(int posX, int posY)
+        private void HighlightSensor(double posX, double posY)
         {
             // Get row pointers
             int[] rowHeaders = new int[480];
@@ -500,8 +500,8 @@ namespace PARSE.Tracking
                 rowHeaders[row] = row * 640 * 4;
             }
 
-            for (int row = posY - 4; row < posY + 4; row++)
-                for (int col = posX - 4; col < posX + 4; col++)
+            for (int row = (int) Math.Round(posY) - 4; row < posY + 4; row++)
+                for (int col = (int) Math.Round(posX) - 4; col < posX + 4; col++)
                 {
                     if (row > 0 & col > 0 & row < 480 & col < 640)
                     {

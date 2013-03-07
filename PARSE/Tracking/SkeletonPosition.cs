@@ -8,18 +8,26 @@ namespace PARSE.Tracking
 {
     class SkeletonPosition
     {
-        public SkeletonPoint point1 {get; set;}
-        public SkeletonPoint point2 {get; set;}
-        public SkeletonPoint point3 {get; set;}
+        //public SkeletonPoint point1 {get; set;}
+        //public SkeletonPoint point2 {get; set;}
+        //public SkeletonPoint point3 {get; set;}
 
-        public float anglexy { get; set; }
-        public float anglez { get; set; }
+        //public float anglexy { get; set; }
+        //public float anglez { get; set; }
 
         Skeleton patient;
+        double scannerX;
+        double scannerY;
+        double angleXY;
+        double angleZ;
 
-        public SkeletonPosition(Skeleton p)
+        public SkeletonPosition(Skeleton p, double x, double y, double anglexy, double anglez)
         {
             this.patient = p;
+            this.scannerX = x;
+            this.scannerY = y;
+            this.angleXY = anglexy;
+            this.angleZ = anglez;
         }
 
         public String getBoneName()
