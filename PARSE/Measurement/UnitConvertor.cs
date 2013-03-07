@@ -9,7 +9,7 @@ namespace PARSE
     {
         private const double pctorwtransform = 0.829104109;//to be determined experimentally
 
-        public static double convertMeasurement(double PCM, int dimension)
+        public static double convertPCM(double PCM, int dimension)
         {
             double output = -1;
             output = PCM * Math.Pow(pctorwtransform, dimension);
