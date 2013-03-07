@@ -35,9 +35,6 @@ namespace PARSE
         public KinectSensor                             kinectSensor { get; private set; }
         public string                                   kinectStatus { get; private set; }
         public bool                                     kinectReady { get; private set; }
-        public bool                                     IsColorStreamUpdating { get; set; }
-        public bool                                     IsDepthStreamUpdating { get; set; }
-        public bool                                     IsSkelStreamUpdating { get; set; }
 
         //RGB point array and frame definitions
         private byte[]                                  colorpixelData;
@@ -134,29 +131,14 @@ namespace PARSE
 
         public void calibrate()
         {
+            
             this.kinectSensor.ElevationAngle = oneParseRadian;
         }
         
-        /*public Boolean isCalibrated()
-        {
-            return (this.kinectSensor.ElevationAngle == oneParseRadian);    
-        }*/
-        
-        public void enableUpdateSkelVars()
-        {
-            this.IsSkelStreamUpdating = true;
-        }
-
-        public void disableUpdateSkelVars()
-        {
-            this.IsSkelStreamUpdating = false;
-        }
-
         //Enable depthStream
         public void startDepthStream()
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-            this.IsDepthStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus+", Depth Ready";
         }
@@ -186,7 +168,6 @@ namespace PARSE
         public void startRGBStream()
         {
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-            this.IsColorStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", RGB Ready";
         }
@@ -199,8 +180,6 @@ namespace PARSE
 
             this.kinectSensor.SkeletonStream.Enable();
 
-            this.IsSkelStreamUpdating = true;
-            this.enableUpdateSkelVars();
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
@@ -213,16 +192,16 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
-            if (this.IsSkelStreamUpdating)
+            if (this.kinectSensor.SkeletonStream.IsEnabled)
             {
                 this.kinectSensor.SkeletonStream.Disable();
                 Console.WriteLine("DISABLED");
             }
-            if (this.IsDepthStreamUpdating)
+            if (this.kinectSensor.DepthStream.IsEnabled)
             {
                 this.kinectSensor.DepthStream.Disable();
             }
-            if (this.IsColorStreamUpdating)
+            if (this.kinectSensor.ColorStream.IsEnabled)
             {
                 this.kinectSensor.ColorStream.Disable();
             }
@@ -362,7 +341,7 @@ namespace PARSE
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        if (IsSkelStreamUpdating)
+                        if (this.kinectSensor.SkeletonStream.IsEnabled)
                         {
                             //update the depth of the tracked skeleton
                             skelDepth = trackedSkeleton.Position.Z;
@@ -560,7 +539,6 @@ namespace PARSE
             int colorPixelIndex = 0;
             this.rawDepth = new int[depthFrame.Length];
             int realDepth = 0;
-            int depthPixelIndex = 0;
 
             for (int i = 0; i < depthFrame.Length; i++)
                 {

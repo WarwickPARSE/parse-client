@@ -152,20 +152,20 @@ namespace PARSE
             }
             
             //init kinect
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.kinectSensor.DepthStream.IsEnabled)
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
 
-            if (!this.kinectInterp.IsSkelStreamUpdating)
+            if (!this.kinectInterp.kinectSensor.SkeletonStream.IsEnabled)
             {
                 this.kinectInterp.startSkeletonStream();
                 Console.WriteLine("ENABLED");
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!!this.kinectInterp.kinectSensor.ColorStream.IsEnabled)
             {
                 this.kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
@@ -173,7 +173,7 @@ namespace PARSE
 
             kinectInterp.calibrate();
 
-            if (kinectInterp.tooFarForward())
+           /* if (kinectInterp.tooFarForward())
             {
                 ss.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
@@ -184,7 +184,7 @@ namespace PARSE
                 Console.Write("Step Forward");
             }
             else
-            {
+            {*/
                 ss.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
@@ -207,16 +207,13 @@ namespace PARSE
                 pcTimer.Interval = 10000;
                 countdown = 3;
                 pcTimer.Start();
-            }
+            //}
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
         {
             if (countdown == 3)
             {
-                //enable update of skelL, skelR, skelDepth
-                this.kinectInterp.enableUpdateSkelVars();
-
                 //get current skeleton tracking state
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
                 jointDepths  = enumerateSkeletonDepths(skeleton);
@@ -226,9 +223,11 @@ namespace PARSE
                 fincloud.Add(frontCloud);
 
                 //freeze skelL skelDepth and skelR
-                this.kinectInterp.disableUpdateSkelVars();
+                this.kinectInterp.kinectSensor.SkeletonStream.Disable();
 
                 tmpCanvas = skeloutline;
+                skeloutline = tmpCanvas;
+                skeloutline.Visibility = Visibility.Hidden;
 
                 ss.Speak("Turn left");
                 this.instructionblock.Text = "Please turn left";
@@ -236,7 +235,6 @@ namespace PARSE
             }
             else if (countdown == 2)
             {
-
                 //PointCloud structure methods
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(rightCloud);
@@ -269,26 +267,7 @@ namespace PARSE
 
                 //stop streams
                 kinectInterp.stopStreams();
-                if (kinectInterp.IsSkelStreamUpdating)
-                {
-                    Console.WriteLine("Skel Stream Should be updating");
-                }
-                else
-                {
-                    Console.WriteLine("Skel Stream Should NOT be updating");
-                }
-                if (kinectInterp.kinectSensor.SkeletonStream.IsEnabled)
-                {
-                    Console.WriteLine("But it is!");
-                }
-                else
-                {
-                    Console.WriteLine("and it's not");
-                }
-                Environment.Exit(-1);
-                skeloutline = tmpCanvas;
-                skeloutline.Visibility = Visibility.Hidden;
-
+                
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
