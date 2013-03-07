@@ -289,7 +289,7 @@ namespace PARSE.Tracking
                        patient = frame[index];
                 }
 
-            SkeletonPosition skeletonPosition = new SkeletonPosition(patient);
+            SkeletonPosition skeletonPosition = new SkeletonPosition(patient, this.x, this.y, this.angleXY, this.angleZ);
         }
 
         private void updateCaptureTimer()
