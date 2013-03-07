@@ -452,7 +452,7 @@ namespace PARSE
                     if (newPoint.Y > maxy) { maxy = newPoint.Y; }
                     if (newPoint.Z > maxz) { maxz = newPoint.Z; }  
 
-                    //jam into the tree 
+                    //jam into the tree hole
                     double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
                     newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
                 }
@@ -522,12 +522,19 @@ namespace PARSE
                 miny = double.MaxValue;
                 minz = double.MaxValue;
 
+                maxx = double.MinValue;
+                maxy = double.MinValue;
+                maxz = double.MinValue;
+
                 for (int i = 0; i < points3d.Length; i++)
                 {
                     Point3D oldPoint = ((PointRGB)(points3d[i])).point;
                     if (oldPoint.X < minx) { minx = oldPoint.X; }
                     if (oldPoint.Y < miny) { miny = oldPoint.Y; }
                     if (oldPoint.Z < minz) { minz = oldPoint.Z; }
+                    if (oldPoint.X > maxx) { maxx = oldPoint.X; }
+                    if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
+                    if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
                 }
             }
         }
