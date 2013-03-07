@@ -394,6 +394,14 @@ namespace PARSE
 
         }
 
+        private Boolean chopfeetoff;
+
+        private void CloudProcessorGreg_Click(object sender, RoutedEventArgs e)
+        {
+            chopfeetoff = true;
+            CloudProcessor_Click(sender, e);
+        }
+
         private void CloudProcessor_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
@@ -411,6 +419,14 @@ namespace PARSE
                 String filename = dlg.FileName;
                 this.DataContext = ScanSerializer.deserialize(filename);
                 fincloud = ScanSerializer.depthPc;
+            }
+
+            if (chopfeetoff)
+            {
+                for (int i = 0; i < fincloud.Count; i++)
+                {
+                    fincloud[i].deleteFloor();
+                }
             }
 
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");

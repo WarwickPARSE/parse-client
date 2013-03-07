@@ -52,6 +52,7 @@
                 <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
                 <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
                 <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
+                <MenuItem Header="_Cloud Processor (Remove Floor)" IsCheckable="False" Click="CloudProcessorGreg_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
             </MenuItem>
         <MenuItem Header="_Help">
