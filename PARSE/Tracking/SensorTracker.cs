@@ -272,9 +272,24 @@ namespace PARSE.Tracking
          */
         private void CapturePosition()
         {
-            Console.WriteLine("Capture position!!!"); 
-  
+            Console.WriteLine("Capture position!!!");
 
+            Skeleton[] frame;
+            Skeleton patient = new Skeleton();
+
+            lock (this)
+            {
+                frame = skeletonFrame;
+            }
+
+            for (int index = 0; index < frame.Length; index++)
+                if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
+                {
+                    if (frame[index].TrackingId == patientSkeletonID)
+                       patient = frame[index];
+                }
+
+            SkeletonPosition skeletonPosition = new SkeletonPosition(patient);
         }
 
         private void updateCaptureTimer()
