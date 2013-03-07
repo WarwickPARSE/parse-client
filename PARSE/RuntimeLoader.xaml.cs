@@ -30,6 +30,9 @@ namespace PARSE
         //persistently store our list of planes
         private List<List<Point3D>> storedPlanes;
 
+        //publicly accessible area list from previous calculations
+        public List<double> areaList;
+
         public RuntimeLoader()
         {
             InitializeComponent();
@@ -215,6 +218,8 @@ namespace PARSE
         private void planeChooser_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             visualisePlanes(storedPlanes, e.NewValue);
+            this.totalarea.Content = "Total Area: " + areaList[(int)e.NewValue];
+            this.maxarea.Content = "Plane " + (int) e.NewValue;
         }
     }
 

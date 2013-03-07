@@ -387,15 +387,30 @@ namespace PARSE
 
         ModelVisual3D GetHitTestResult(Point location)
         {
-           /* RayHitTestResult result = (RayHitTestResult) VisualTreeHelper.HitTest(hvpcanvas, location);
-            if (result != null && result.VisualHit is ModelVisual3D)
-            {
-                ModelVisual3D visual = (ModelVisual3D)result.VisualHit;
-                System.Diagnostics.Debug.WriteLine("We hit point (" + result.PointHit.X + ", " + result.PointHit.Y + ", " + result.PointHit.Z + ")");
-                return visual;
-            }
-            */
+            PointHitTestParameters hitParams = new PointHitTestParameters(location);
+            VisualTreeHelper.HitTest(hvpcanvas, null, resultCallback, hitParams);
+
             return null;
+        }
+
+        public HitTestResultBehavior resultCallback(HitTestResult result)
+        {
+            RayHitTestResult rayResult = result as RayHitTestResult;
+            if (rayResult != null)
+            {
+                // Did we hit a MeshGeometry3D?
+                RayMeshGeometry3DHitTestResult rayMeshResult =
+                    rayResult as RayMeshGeometry3DHitTestResult;
+
+                System.Diagnostics.Debug.WriteLine("(" + rayResult.PointHit.X + ", " + rayResult.PointHit.Y + ", " + rayResult.PointHit.Z + ")");
+
+                if (rayMeshResult != null)
+                {
+                 
+                }
+            }
+
+            return HitTestResultBehavior.Stop;
         }
 
         /*Publicly accessible methods*/
