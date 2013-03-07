@@ -15,10 +15,53 @@ namespace PARSE.Tracking
         public float anglexy { get; set; }
         public float anglez { get; set; }
 
-        public SkeletonPosition()
+        Skeleton patient;
+
+        public SkeletonPosition(Skeleton p)
         {
-            
+            this.patient = p;
         }
 
+        public String getBoneName()
+        {
+            String bone = "default";
+
+            return bone;
+        }
+
+        public String getJoint1Name()
+        {
+            String joint1 = "default";
+
+            return joint1;
+        }
+
+        public String getJoint2Name()
+        {
+            String joint2 = "default";
+
+            return joint2;
+        }
+
+        public float getDistanceFromJoint1()
+        {
+            float dist1 = 0;
+
+            return dist1;
+        }
+
+        public float getDistanceFromJoint2()
+        {
+            float dist2 = 0;
+
+            return dist2;
+        }
+
+        public float getBoneLenght()
+        {
+            float boneLength = 0;
+
+            return boneLength;
+        }
     }
 }
