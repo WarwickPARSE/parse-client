@@ -11,7 +11,7 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        private const int number = 60;
+        public const int number = 60;
 
         //only works on an amorphus blob
         public static Tuple<double, List<List<Point3D>>> volume1stApprox(PointCloud pc)
