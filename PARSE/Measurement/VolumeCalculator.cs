@@ -11,7 +11,7 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        private const int number = 60;
+        public const int number = 60;
 
         //only works on an amorphus blob
         public static Tuple<double, List<List<Point3D>>> volume1stApprox(PointCloud pc)
@@ -24,7 +24,6 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double height = UnitConvertor.convertPC1DMeasurement(ymax - ymin);
             double increment = (ymax - ymin) / number;
             double volume = 0;
             List<List<Point3D>> planes = new List<List<Point3D>>();
@@ -47,10 +46,10 @@ namespace PARSE
                 else
                 {
                     Console.WriteLine("Plane EMPTY!!! BAD THINGS WILL HAPPEN");
-                    Environment.Exit(-1);
+                    //Environment.Exit(-1);
                 }
             }
-            volume = UnitConvertor.convertPC3DMeasurement(volume);
+            volume = UnitConvertor.convertPCM(volume,3);
             return Tuple.Create(volume,planes);
         }
     }

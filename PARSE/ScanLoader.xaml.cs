@@ -152,20 +152,19 @@ namespace PARSE
             }
             
             //init kinect
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.isDepthEnabled())
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
 
-            if (!this.kinectInterp.IsSkelStreamUpdating)
+            if (!this.kinectInterp.isSkeletonEnabled())
             {
                 this.kinectInterp.startSkeletonStream();
-                Console.WriteLine("ENABLED");
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.isColorEnabled())
             {
                 this.kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
@@ -214,34 +213,35 @@ namespace PARSE
         {
             if (countdown == 3)
             {
-                //enable update of skelL, skelR, skelDepth
-                this.kinectInterp.enableUpdateSkelVars();
-
                 //get current skeleton tracking state
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
                 jointDepths  = enumerateSkeletonDepths(skeleton);
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                frontCloud.deleteFloor();
                 fincloud.Add(frontCloud);
+                ss.Speak("Scan Added.");
 
                 //freeze skelL skelDepth and skelR
-                this.kinectInterp.disableUpdateSkelVars();
+                this.kinectInterp.kinectSensor.SkeletonStream.Disable();
 
                 tmpCanvas = skeloutline;
+                skeloutline = tmpCanvas;
+                skeloutline.Visibility = Visibility.Hidden;
 
-                ss.Speak("Turn left");
+                ss.Speak("Please turn left.");
                 this.instructionblock.Text = "Please turn left";
                 countdown--;
             }
             else if (countdown == 2)
             {
-
                 //PointCloud structure methods
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                rightCloud.deleteFloor();
                 fincloud.Add(rightCloud);
-
-                ss.Speak("Turn left with your back to the camera");
+                ss.Speak("Scan Added.");
+                ss.Speak("Please turn left with your back to the camera.");
                 this.instructionblock.Text = "Turn left with your back to the camera";
                 countdown--;
             }
@@ -250,50 +250,35 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                backCloud.deleteFloor();
                 fincloud.Add(backCloud);
-
-                ss.Speak("Turn left once more");
-                this.instructionblock.Text = "Please turn left once more";
+                ss.Speak("Scan Added.");
+                ss.Speak("Please turn left once more.");
+                this.instructionblock.Text = "Please turn left once more.";
                 countdown--;
             }
             else if (countdown == 0)
             {
-
                 //PointCloud structure methods
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
+
+                ss.Speak("Scan Added.");
+                ss.Speak("Thank you for your time, you have now been captured.");
+
+                //stop streams
+                kinectInterp.stopStreams();
 
                 //Visualisation instantiation based on int array clouds
                 cloudvis = new CloudVisualisation(fincloud, false);
                 this.DataContext = cloudvis;
 
-                //stop streams
-                kinectInterp.stopStreams();
-                if (kinectInterp.IsSkelStreamUpdating)
-                {
-                    Console.WriteLine("Skel Stream Should be updating");
-                }
-                else
-                {
-                    Console.WriteLine("Skel Stream Should NOT be updating");
-                }
-                if (kinectInterp.kinectSensor.SkeletonStream.IsEnabled)
-                {
-                    Console.WriteLine("But it is!");
-                }
-                else
-                {
-                    Console.WriteLine("and it's not");
-                }
-
-                skeloutline = tmpCanvas;
-                skeloutline.Visibility = Visibility.Hidden;
-
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
+                ss.Speak("FUCKING GIT");
                 pcTimer.Stop();
-                //kinectInterp.kinectSensor.Stop();
             }
         }
 

@@ -14,7 +14,7 @@ namespace PARSE
             List<double> output = new List<double>();
             for (int i = 0; i < planes.Count; i++)
             {
-                output.Add(UnitConvertor.convertPC2DMeasurement(AreaCalculator.calculateArea(planes[i])));
+                output.Add(UnitConvertor.convertPCM(AreaCalculator.calculateArea(planes[i]),2));
             }
             return output;
         }
