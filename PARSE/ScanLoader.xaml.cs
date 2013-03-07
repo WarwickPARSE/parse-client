@@ -142,6 +142,7 @@ namespace PARSE
             if (!this.kinectInterp.IsSkelStreamUpdating)
             {
                 this.kinectInterp.startSkeletonStream();
+                Console.WriteLine("ENABLED");
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
@@ -249,6 +250,23 @@ namespace PARSE
 
                 //stop streams
                 kinectInterp.stopStreams();
+                if (kinectInterp.IsSkelStreamUpdating)
+                {
+                    Console.WriteLine("Skel Stream Should be updating");
+                }
+                else
+                {
+                    Console.WriteLine("Skel Stream Should NOT be updating");
+                }
+                if (kinectInterp.kinectSensor.SkeletonStream.IsEnabled)
+                {
+                    Console.WriteLine("But it is!");
+                }
+                else
+                {
+                    Console.WriteLine("and it's not");
+                }
+                Environment.Exit(-1);
                 skeloutline = tmpCanvas;
                 skeloutline.Visibility = Visibility.Hidden;
 
