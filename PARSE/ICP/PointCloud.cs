@@ -45,6 +45,9 @@ namespace PARSE
         private const int cx = 640 / 2;
         private const int cy = 480 / 2;
 
+        //boolean to determine if floor has been rmoved
+        private Boolean floorHasBeenRemoved = false;
+
         //fiddle values (they make it work but I don't know why!)
         private const double fxinv = 1.0 / 476;
         private const double fyinv = 1.0 / 476;
@@ -494,16 +497,20 @@ namespace PARSE
 
         public void deleteFloor()
         {
-            double[] pointMin = { minx, miny, minz};
-            double[] pointMax = { maxx, miny + ((maxy - miny)/(VolumeCalculator.number)), maxz};
-
-            Object[] temp = points.range(pointMin,pointMax);
-
-            for (int i = 0; i < temp.Length; i++)
+            if (!floorHasBeenRemoved)
             {
-                Point3D tempPoint = ((PointRGB)temp[i]).point;
-                double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
-                this.points.delete(tempArray);
+                double[] pointMin = { minx, miny, minz };
+                double[] pointMax = { maxx, miny + ((maxy - miny) / (VolumeCalculator.number)), maxz };
+
+                Object[] temp = points.range(pointMin, pointMax);
+
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    Point3D tempPoint = ((PointRGB)temp[i]).point;
+                    double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
+                    this.points.delete(tempArray);
+                }
+                floorHasBeenRemoved = true;
             }
         }
     }
