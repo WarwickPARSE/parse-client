@@ -152,20 +152,19 @@ namespace PARSE
             }
             
             //init kinect
-            if (!this.kinectInterp.kinectSensor.DepthStream.IsEnabled)
+            if (!this.kinectInterp.isDepthEnabled())
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
 
-            if (!this.kinectInterp.kinectSensor.SkeletonStream.IsEnabled)
+            if (!this.kinectInterp.isSkeletonEnabled())
             {
                 this.kinectInterp.startSkeletonStream();
-                Console.WriteLine("ENABLED");
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
-            if (!!this.kinectInterp.kinectSensor.ColorStream.IsEnabled)
+            if (!this.kinectInterp.isColorEnabled())
             {
                 this.kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
@@ -173,7 +172,7 @@ namespace PARSE
 
             kinectInterp.calibrate();
 
-           /* if (kinectInterp.tooFarForward())
+            if (kinectInterp.tooFarForward())
             {
                 ss.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
@@ -184,7 +183,7 @@ namespace PARSE
                 Console.Write("Step Forward");
             }
             else
-            {*/
+            {
                 ss.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
@@ -207,7 +206,7 @@ namespace PARSE
                 pcTimer.Interval = 10000;
                 countdown = 3;
                 pcTimer.Start();
-            //}
+            }
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
@@ -261,7 +260,7 @@ namespace PARSE
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 fincloud.Add(leftCloud);
 
-                //stop streams
+                                //stop streams
                 kinectInterp.stopStreams();
 
                 //Visualisation instantiation based on int array clouds
