@@ -510,7 +510,25 @@ namespace PARSE
                     double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
                     this.points.delete(tempArray);
                 }
+
                 floorHasBeenRemoved = true;
+
+                //re calc minx, miny, minz
+                double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
+                double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
+                Object[] points3d = points.range(minPoint,maxPoint);
+
+                minx = double.MaxValue;
+                miny = double.MaxValue;
+                minz = double.MaxValue;
+
+                for (int i = 0; i < points3d.Length; i++)
+                {
+                    Point3D oldPoint = ((PointRGB)(points3d[i])).point;
+                    if (oldPoint.X < minx) { minx = oldPoint.X; }
+                    if (oldPoint.Y < miny) { miny = oldPoint.Y; }
+                    if (oldPoint.Z < minz) { minz = oldPoint.Z; }
+                }
             }
         }
     }
