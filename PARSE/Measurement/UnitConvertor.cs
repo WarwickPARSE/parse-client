@@ -7,7 +7,7 @@ namespace PARSE
 {
     class UnitConvertor
     {
-        private const double pctorwtransform = 0.815159897;//to be determined experimentally for 3 dimensional content such as volume.
+        private const double pctorwtransform = 0.829104109;//to be determined experimentally
         
         public static double convertPC3DMeasurement(double PCM)
         {
