@@ -13,7 +13,7 @@ namespace PARSE
             double ymax = pc.getyMax();
             double height = ymax - ymin;
             Console.WriteLine(height);
-            height = UnitConvertor.convertPC1DMeasurement(height);
+            height = UnitConvertor.convertPCM(height,1);
             //Environment.Exit(1);
             return height;
         }
