@@ -32,7 +32,7 @@ namespace PARSE
     class KinectInterpreter : Window
     {
         //Kinect sensor definitions
-        public KinectSensor                             kinectSensor { get; private set; }
+        public KinectSensor                            kinectSensor { get; private set; }
         public string                                   kinectStatus { get; private set; }
         public bool                                     kinectReady { get; private set; }
 
@@ -117,6 +117,51 @@ namespace PARSE
 
                 this.kinectSensor.Start();
             }
+        }
+
+        public void disableDepth()
+        {
+            this.kinectSensor.DepthStream.Disable();
+        }
+
+        public Boolean isDepthEnabled()
+        {
+            return this.kinectSensor.DepthStream.IsEnabled;
+        }
+
+        public void enableDepth()
+        {
+            this.kinectSensor.DepthStream.Enable();
+        }
+
+        public void disableColor()
+        {
+            this.kinectSensor.ColorStream.Disable();
+        }
+
+        public Boolean isColorEnabled()
+        {
+            return this.kinectSensor.ColorStream.IsEnabled;
+        }
+
+        public void enableColor()
+        {
+            this.kinectSensor.ColorStream.Enable();
+        }
+
+        public void disableSkeleton()
+        {
+            this.kinectSensor.SkeletonStream.Disable();
+        }
+
+        public Boolean isSkeletonEnabled()
+        {
+            return this.kinectSensor.SkeletonStream.IsEnabled;
+        }
+
+        public void enableSkeleton()
+        {
+            this.kinectSensor.SkeletonStream.Enable();
         }
 
         public Boolean tooFarBack()
