@@ -58,8 +58,9 @@ namespace PARSE
 
         private void cancel_scan_Click(object sender, RoutedEventArgs e)
         {
-            tracker.Stop();
-            //this.Close();
+            if (tracker != null)
+                tracker.Stop();
+            this.Close();
         }
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
@@ -76,7 +77,8 @@ namespace PARSE
 
             // Start tracking
             tracker = new SensorTracker(Visualisation, this, true, instructionblock);
-            tracker.Start();
+            tracker.captureNewLocation();
+            //tracker.captureAtLocation();
         }
 
         /*Publicly accessible methods*/
@@ -117,6 +119,21 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Scan captured! END");
             tracker.Stop();
             this.Close();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (tracker != null)
+            {
+                tracker.Stop();
+                tracker.close();
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process myProcess = System.Diagnostics.Process.GetCurrentProcess();
+            myProcess.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
         }
     }
 }

@@ -71,10 +71,29 @@ namespace PARSE
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
 
+            GroupVisualiser gv = new GroupVisualiser(fcloud);
+
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
+
+            //Threading of data context population to speed up model generation.
+            System.Diagnostics.Debug.WriteLine("Loading model");
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                gv.preprocess();
+            }));
+
+            //Assigned threaded object result to the data context.
+            this.DataContext = gv;
+            //gCloud = fcloud;
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            System.Diagnostics.Debug.WriteLine("Model loaded");
+
+            //Old visualisation method.
+
+            /*this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.DataContext = new CloudVisualisation(fcloud, false);
             fincloud = fcloud;
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);*/
         }
 
         public ScanLoader(PointCloud gcloud)
@@ -368,13 +387,14 @@ namespace PARSE
 
         ModelVisual3D GetHitTestResult(Point location)
         {
-            HitTestResult result = VisualTreeHelper.HitTest(hvpcanvas, location);
+           /* RayHitTestResult result = (RayHitTestResult) VisualTreeHelper.HitTest(hvpcanvas, location);
             if (result != null && result.VisualHit is ModelVisual3D)
             {
                 ModelVisual3D visual = (ModelVisual3D)result.VisualHit;
+                System.Diagnostics.Debug.WriteLine("We hit point (" + result.PointHit.X + ", " + result.PointHit.Y + ", " + result.PointHit.Z + ")");
                 return visual;
             }
-
+            */
             return null;
         }
 
