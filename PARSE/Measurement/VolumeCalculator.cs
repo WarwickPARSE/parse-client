@@ -47,7 +47,7 @@ namespace PARSE
                 else
                 {
                     Console.WriteLine("Plane EMPTY!!! BAD THINGS WILL HAPPEN");
-                    Environment.Exit(-1);
+                    //Environment.Exit(-1);
                 }
             }
             volume = UnitConvertor.convertPC3DMeasurement(volume);
