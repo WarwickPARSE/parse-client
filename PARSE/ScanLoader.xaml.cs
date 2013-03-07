@@ -219,7 +219,9 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                frontCloud.deleteFloor();
                 fincloud.Add(frontCloud);
+                ss.Speak("Scan Added.");
 
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.kinectSensor.SkeletonStream.Disable();
@@ -228,7 +230,7 @@ namespace PARSE
                 skeloutline = tmpCanvas;
                 skeloutline.Visibility = Visibility.Hidden;
 
-                ss.Speak("Turn left");
+                ss.Speak("Please turn left.");
                 this.instructionblock.Text = "Please turn left";
                 countdown--;
             }
@@ -236,9 +238,10 @@ namespace PARSE
             {
                 //PointCloud structure methods
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                rightCloud.deleteFloor();
                 fincloud.Add(rightCloud);
-
-                ss.Speak("Turn left with your back to the camera");
+                ss.Speak("Scan Added.");
+                ss.Speak("Please turn left with your back to the camera.");
                 this.instructionblock.Text = "Turn left with your back to the camera";
                 countdown--;
             }
@@ -247,20 +250,24 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                backCloud.deleteFloor();
                 fincloud.Add(backCloud);
-
-                ss.Speak("Turn left once more");
-                this.instructionblock.Text = "Please turn left once more";
+                ss.Speak("Scan Added.");
+                ss.Speak("Please turn left once more.");
+                this.instructionblock.Text = "Please turn left once more.";
                 countdown--;
             }
             else if (countdown == 0)
             {
-
                 //PointCloud structure methods
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
 
-                                //stop streams
+                ss.Speak("Scan Added.");
+                ss.Speak("Thank you for your time, you have now been captured.");
+
+                //stop streams
                 kinectInterp.stopStreams();
 
                 //Visualisation instantiation based on int array clouds
