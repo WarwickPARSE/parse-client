@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
+using PARSE.ICP;
 
 using HelixToolkit.Wpf;
 using KdTree;
@@ -490,6 +491,20 @@ namespace PARSE
         public double getxMin() { return minx; }
         public double getyMin() { return miny; }
         public double getzMin() { return minz; }
-    
+
+        public void deleteFloor()
+        {
+            double[] pointMin = { minx, miny, minz};
+            double[] pointMax = { maxx, miny + ((maxy - miny)/(VolumeCalculator.number)), maxz};
+
+            Object[] temp = points.range(pointMin,pointMax);
+
+            for (int i = 0; i < temp.Length; i++)
+            {
+                Point3D tempPoint = ((PointRGB)temp[i]).point;
+                double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
+                this.points.delete(tempArray);
+            }
+        }
     }
 }
