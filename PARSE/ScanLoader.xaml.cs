@@ -285,7 +285,7 @@ namespace PARSE
                 {
                     Console.WriteLine("and it's not");
                 }
-                Environment.Exit(-1);
+
                 skeloutline = tmpCanvas;
                 skeloutline.Visibility = Visibility.Hidden;
 
