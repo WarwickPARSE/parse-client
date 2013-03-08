@@ -34,6 +34,7 @@
                 <MenuItem Header="View Feed">
                     <MenuItem Header="RGB" Click="RGB_Click"/>
                     <MenuItem Header="Depth" Click="Depth_Click"/>
+                    <MenuItem Header="Skeleton" Click="Skeleton_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
             <Separator/>
