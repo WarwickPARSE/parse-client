@@ -43,6 +43,7 @@
             <MenuItem Header="Capture">
                 <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
                 <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
+                <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
             </MenuItem>
             <MenuItem Header="_Details" IsCheckable="False"/>
             <Separator/>
@@ -52,7 +53,6 @@
                 <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
                 <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
                 <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
-                <MenuItem Header="_Cloud Processor (Remove Floor)" IsCheckable="False" Click="CloudProcessorGreg_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
             </MenuItem>
         <MenuItem Header="_Help">
