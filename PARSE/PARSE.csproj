@@ -164,8 +164,8 @@
     <Compile Include="Recognition\SurfResults.cs" />
     <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Library\ScanSerializer.cs" />
-    <Compile Include="RuntimeLoader.xaml.cs">
-      <DependentUpon>RuntimeLoader.xaml</DependentUpon>
+    <Compile Include="HistoryLoader.xaml.cs">
+      <DependentUpon>HistoryLoader.xaml</DependentUpon>
     </Compile>
     <Compile Include="ScanLoader.xaml.cs">
       <DependentUpon>ScanLoader.xaml</DependentUpon>
@@ -211,7 +211,7 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="RuntimeLoader.xaml">
+    <Page Include="HistoryLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
