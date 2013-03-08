@@ -116,6 +116,12 @@ namespace PARSE.ICP
 
         }
 
+        public override TranslateTransform3D refine(Model3D pc1, Model3D pc2, Point3D p1, Point3D p2)
+        {
+
+            return new TranslateTransform3D();
+        }
+
         /// <summary>
         /// Return the result of the stitching
         /// </summary>

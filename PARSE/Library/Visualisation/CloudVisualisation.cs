@@ -301,7 +301,6 @@ namespace PARSE
                 TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
                 TriangleIndices = new Int32Collection(triangleIndices),
                 Normals = this.normals
-
             };
         }
 

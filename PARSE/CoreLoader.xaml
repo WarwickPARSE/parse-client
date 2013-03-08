@@ -41,8 +41,11 @@
             </MenuItem>
         <MenuItem Header="Patient">
             <MenuItem Header="Capture">
-                <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
+                <MenuItem Header="Volume" IsCheckable="false" Click="VolumeOption_Click"/>
+                <MenuItem Header="Limb Circumference" IsCheckable="false" Click="LimbOption_Click"/>
+            </MenuItem>
+            <MenuItem Header="Alignment">
+                <MenuItem Header="Refine Alignment" IsCheckable="false" Click="RefineAlignment_Click"/>
             </MenuItem>
             <MenuItem Header="_Details" IsCheckable="False"/>
             <Separator/>

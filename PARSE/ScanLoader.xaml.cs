@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Windows.Interop;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,18 +14,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Threading;
 using System.Speech.Synthesis;
-using System.Windows.Media;
 using System.IO;
 using System.Windows.Media.Media3D;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Kinect;
 using HelixToolkit.Wpf;
+
+using PARSE.ICP.Stitchers;
 
 namespace PARSE
 {
@@ -41,7 +37,14 @@ namespace PARSE
         private System.Windows.Forms.Timer pcTimer;
         private CloudVisualisation cloudvis;
         private Dictionary<JointType, double[]> jointDepths;
-        private Thread visThread;
+        private RayHitTestResult rayResult;
+        private Point3D point1;
+        private Point3D point2;
+        private Model3D model1;
+        private Model3D model2;
+
+        //Coreloader modifiable hit state
+        public int hitState;
 
         //speech synthesizer instances
         private SpeechSynthesizer ss;
@@ -58,6 +61,7 @@ namespace PARSE
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            hitState = 0;
         }
 
         //Event handlers for viewport interaction
@@ -88,12 +92,7 @@ namespace PARSE
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             System.Diagnostics.Debug.WriteLine("Model loaded");
 
-            //Old visualisation method.
-
-            /*this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
-            this.DataContext = new CloudVisualisation(fcloud, false);
-            fincloud = fcloud;
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);*/
+            hitState = 0;
         }
 
         public ScanLoader(PointCloud gcloud)
@@ -119,6 +118,8 @@ namespace PARSE
             gCloud = gcloud;
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             System.Diagnostics.Debug.WriteLine("Model loaded");
+
+            hitState = 0;
         }
 
 
@@ -130,7 +131,6 @@ namespace PARSE
 
             //start scanning procedure
             kinectInterp = new KinectInterpreter(skeloutline);
-            kinectInterp.stopStreams();
           
         }
 
@@ -228,7 +228,7 @@ namespace PARSE
 
                 tmpCanvas = skeloutline;
                 skeloutline = tmpCanvas;
-                skeloutline.Visibility = Visibility.Hidden;
+                skeloutline.Visibility = Visibility.Collapsed;
 
                 ss.Speak("Please turn left.");
                 this.instructionblock.Text = "Please turn left";
@@ -305,21 +305,34 @@ namespace PARSE
         void hvpcanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
 
+            //TODO: Comment this to explain what is actually being performed here.
             Point location = e.GetPosition(hvpcanvas);
-            ModelVisual3D result = GetHitTestResult(location);
+            BoundingBox fineStitcher = new BoundingBox();
+            TranslateTransform3D translationVector = new TranslateTransform3D();
 
-            this.instructionblock.Visibility = Visibility.Collapsed;
-
-            if (result == null)
+            if (hitState == 1)
             {
-                System.Diagnostics.Debug.WriteLine("No click point bubbled");
-                return;
+                ModelVisual3D result = GetHitTestResult(location);
+                point1 = rayResult.PointHit;
+                model1 = rayResult.ModelHit;
+
+                System.Diagnostics.Debug.WriteLine(point1.X);
+
+                hitState = 2;
             }
-
-            if (result is ModelVisual3D)
+            else if (hitState == 2)
             {
-                System.Diagnostics.Debug.WriteLine("You clicked " + location.X + "," + location.Y);
-                return;
+                ModelVisual3D result = GetHitTestResult(location);
+                point2 = rayResult.PointHit;
+                model2 = rayResult.ModelHit;
+
+                System.Diagnostics.Debug.WriteLine(point2.X);
+
+                this.viewertext.Content = "Select corresponding point on 2nd point cloud (pairwise)";
+
+                translationVector = fineStitcher.refine(model1,model2,point1,point2);
+
+                hitState = 3;
             }
 
         }
@@ -380,19 +393,13 @@ namespace PARSE
 
         public HitTestResultBehavior resultCallback(HitTestResult result)
         {
-            RayHitTestResult rayResult = result as RayHitTestResult;
+            rayResult = result as RayHitTestResult;
             if (rayResult != null)
             {
                 // Did we hit a MeshGeometry3D?
                 RayMeshGeometry3DHitTestResult rayMeshResult =
                     rayResult as RayMeshGeometry3DHitTestResult;
 
-                System.Diagnostics.Debug.WriteLine("(" + rayResult.PointHit.X + ", " + rayResult.PointHit.Y + ", " + rayResult.PointHit.Z + ")");
-
-                if (rayMeshResult != null)
-                {
-                 
-                }
             }
 
             return HitTestResultBehavior.Stop;

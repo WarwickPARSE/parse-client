@@ -538,6 +538,12 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
             }
         }
+
+        private void RefineAlignment_Click(object sender, RoutedEventArgs e)
+        {
+            windowScanner.viewertext.Content = "Select corresponding point on 1st point cloud (pairwise)";
+            windowScanner.hitState = 1;
+        }
        
     }
 }
