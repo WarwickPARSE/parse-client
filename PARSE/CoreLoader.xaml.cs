@@ -392,12 +392,20 @@ namespace PARSE
 
         }
 
-        private Boolean chopfeetoff;
-
-        private void CloudProcessorGreg_Click(object sender, RoutedEventArgs e)
+        private void RemoveFeet_Click(object sender, RoutedEventArgs e)
         {
-            chopfeetoff = true;
-            CloudProcessor_Click(sender, e);
+            for (int i = 0; i < fincloud.Count; i++)
+                {
+                    pcdl[i].deleteFloor();
+                }
+            
+            
+            windowScanner.Close();
+            windowViewer.Close();
+            windowScanner = new ScanLoader(pcdl);
+            windowScanner.Owner = this;
+            windowScanner.Closed += new EventHandler(windowScanner_Closed);
+            windowScanner.Show();
         }
 
         private void CloudProcessor_Click(object sender, RoutedEventArgs e)
@@ -419,14 +427,6 @@ namespace PARSE
                 fincloud = ScanSerializer.depthPc;
             }
 
-            if (chopfeetoff)
-            {
-                for (int i = 0; i < fincloud.Count; i++)
-                {
-                    fincloud[i].deleteFloor();
-                }
-            }
-
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
 
      /*2)*/ PointCloud pcd = new PointCloud();
@@ -441,7 +441,7 @@ namespace PARSE
 
             pcd = stitcher.getResult();
             pcdl = stitcher.getResultList();
-            
+
             //windowScanner.Close();
             windowViewer.Close();
             windowScanner = new ScanLoader(pcdl);
