@@ -265,6 +265,9 @@ namespace PARSE
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
+            
+            ss.Speak("Your Volume is "+Math.Round(volume/0.058,2)+" Bernards!");
+            
             double height = HeightCalculator.getHeight(pc);
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
