@@ -110,7 +110,7 @@ namespace PARSE
                 //open Runtime viewer (aka results,history,output)
                 windowRuntime = new RuntimeLoader();
                 windowRuntime.Owner = this;
-                //windowRuntime.Show();
+                windowRuntime.Show();
                 
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
