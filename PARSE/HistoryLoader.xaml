@@ -8,15 +8,6 @@
         Title="History Viewer" Height="300" Width="{x:Static SystemParameters.PrimaryScreenWidth}" Loaded="Window_Loaded">
     <Grid>
         <TabControl Margin="0,-5,0,5" Name="runtimeTab">
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="18" Source="Resources/op1.png" />
-                        <TextBlock Text="Output" Margin="2,0,0,0" VerticalAlignment="Center" />
-                    </StackPanel>
-                </TabItem.Header>
-                <RichTextBox Height="223" Name="textBox1" Width="268" />
-            </TabItem>
             <TabItem Name="results" HorizontalContentAlignment="Right">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">

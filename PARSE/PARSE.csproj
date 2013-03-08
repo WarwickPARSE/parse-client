@@ -116,6 +116,9 @@
     <Compile Include="BodyScanner\ScannerState.cs" />
     <Compile Include="BodyScanner\ScannerStateContext.cs" />
     <Compile Include="Database\DatabaseEngine.cs" />
+    <Compile Include="DebugLoader.xaml.cs">
+      <DependentUpon>DebugLoader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ICP\Downsampler.cs" />
     <Compile Include="ICP\Stitchers\BoundingBox.cs" />
     <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
@@ -211,6 +214,10 @@
       <DependentUpon>CoreLoader.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="DebugLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="HistoryLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

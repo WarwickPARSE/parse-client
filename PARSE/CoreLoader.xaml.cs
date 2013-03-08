@@ -44,6 +44,7 @@ namespace PARSE
         public Window                      windowPatient;
         public HistoryLoader               windowHistory;
         public MeasurementLoader           windowMeasurement;
+        public DebugLoader                 windowDebug;
 
         //Modelling specific definitions
         private GeometryModel3D             Model;
@@ -107,22 +108,21 @@ namespace PARSE
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //Open child windows
-                //open Runtime viewer (aka results,history,output)
-                windowHistory = new HistoryLoader();
-                windowHistory.Owner = this;
-                windowHistory.Show();
-                
-                windowHistory.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
-                windowHistory.sendMessageToOutput("Status", "Initializing Kinect Device");
 
+            //define debug window
+            windowDebug = new DebugLoader();
+            windowDebug.Owner = this;
 
-                if (KinectSensor.KinectSensors.Count>0)
+            windowDebug.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
+            windowDebug.sendMessageToOutput("Status", "Initializing Kinect Device");
+
+            if (KinectSensor.KinectSensors.Count>0)
                 {
-                    windowHistory.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+                    windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 }
                 else
                 {
-                    windowHistory.sendMessageToOutput("Warning", "No Kinect Found");
+                    windowDebug.sendMessageToOutput("Warning", "No Kinect Found");
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
@@ -137,6 +137,10 @@ namespace PARSE
             if (windowScanner != null)
             {
                 windowScanner.Close();
+            }
+            if (windowHistory != null)
+            {
+                windowHistory.Close();
             }
         }
         
@@ -253,16 +257,23 @@ namespace PARSE
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
+            //define
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
+
             //Static call to volume calculation method, pass persistent point cloud object
             PointCloud pc = pcd;
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
             double height = HeightCalculator.getHeight(pc);
-            windowHistory.runtimeTab.SelectedIndex = 1;
+            windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m^3";
             windowHistory.heightoutput.Content = height + "m";
+
+            //open Runtime viewer (aka results,history,output)
+            windowHistory.Show();
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
@@ -372,10 +383,9 @@ namespace PARSE
                 {
                     pcdl[i].deleteFloor();
                 }
-            
-            
-            windowScanner.Close();
-            windowViewer.Close();
+
+
+            this.shutAnyWindows();
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Show();
@@ -454,7 +464,6 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
             }
         }
-
 
         void MenuItem_Exit(object sender, RoutedEventArgs e)
         {
