@@ -70,6 +70,9 @@ namespace PARSE
         //speech synthesizer instances
         private SpeechSynthesizer           ss;
 
+        //prevents crashing on adjustment
+        private Boolean kinectMovingLock = false;
+
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
         //optimum distance for scanner
@@ -197,21 +200,24 @@ namespace PARSE
             windowViewer.Show();
         }
 
-        //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
+            if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle + 5 <= this.kinectInterp.kinectSensor.MaxElevationAngle))
             {
+                kinectMovingLock = true;
                 this.kinectInterp.kinectSensor.ElevationAngle += 5;
             }
+            kinectMovingLock = false;
         }
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MinElevationAngle)
+            if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle - 5) >= (this.kinectInterp.kinectSensor.MinElevationAngle))
             {
+                kinectMovingLock = true;
                 this.kinectInterp.kinectSensor.ElevationAngle -= 5;
             }
+            kinectMovingLock = false;
         }
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
