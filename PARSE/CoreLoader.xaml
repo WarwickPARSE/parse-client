@@ -54,7 +54,6 @@
                 <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
                 <MenuItem Header="_Cloud Processor (Remove Floor)" IsCheckable="False" Click="CloudProcessorGreg_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
-                <MenuItem Header="Measurement Hub" Click="MeasurementHub_Click" />
             </MenuItem>
         <MenuItem Header="_Help">
 

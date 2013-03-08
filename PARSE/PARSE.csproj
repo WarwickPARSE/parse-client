@@ -171,14 +171,8 @@
       <DependentUpon>ScanLoader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tracking\Matrix.cs" />
-    <Compile Include="Tracking\MeasurementHub.xaml.cs">
-      <DependentUpon>MeasurementHub.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Tracking\MeasurementRecord.xaml.cs">
       <DependentUpon>MeasurementRecord.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Tracking\RecordHolder.xaml.cs">
-      <DependentUpon>RecordHolder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tracking\RGBTracker.cs" />
     <Compile Include="Tracking\MeasurementLoader.xaml.cs">
@@ -225,19 +219,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tracking\MeasurementHub.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Tracking\MeasurementLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Tracking\MeasurementRecord.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tracking\RecordHolder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

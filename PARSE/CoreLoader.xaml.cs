@@ -487,14 +487,6 @@ namespace PARSE
             }
         }
 
-        private void MeasurementHub_Click(object sender, RoutedEventArgs e)
-        {
-            
-            
-            PARSE.Tracking.MeasurementHub hub = new PARSE.Tracking.MeasurementHub();
-            hub.Show();
-        }
-
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
             try
