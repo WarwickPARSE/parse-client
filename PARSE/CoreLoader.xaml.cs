@@ -241,13 +241,19 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            PointCloud pc = windowScanner.getYourMum();
+
+
+            /*3)*/
+            //Static call to volume calculation method, pass persistent point cloud object
+            PointCloud pc = pcd;
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
             double height = HeightCalculator.getHeight(pc);
             windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes,1);
+            windowRuntime.visualisePlanes(planes, 1);
+            windowRuntime.voloutput.Content = volume + "m^3";
+            windowRuntime.heightoutput.Content = height + "m";
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
@@ -445,19 +451,6 @@ namespace PARSE
             windowScanner.Owner = this;
             windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
-
-                 
-     /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
-            PointCloud pc = pcd;
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
-            List<List<Point3D>> planes = T.Item2;
-            double volume = T.Item1;
-            double height = HeightCalculator.getHeight(pc);
-            windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes,1);
-            windowRuntime.voloutput.Content = volume + "m^3";
-            windowRuntime.heightoutput.Content = height + "m";
-
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
