@@ -271,6 +271,10 @@ namespace PARSE
             windowHistory.voloutput.Content = volume + "m^3";
             windowHistory.heightoutput.Content = height + "m";
 
+            List<double> areaList = AreaCalculator.getAllAreas(planes);
+
+            windowHistory.areaList = areaList;
+
             //open Runtime viewer (aka results,history,output)
             windowHistory.Show();
         }
@@ -431,11 +435,7 @@ namespace PARSE
 
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
-            windowViewer.Close();
             windowScanner.Show();
-            List<double> areaList = AreaCalculator.getAllAreas(planes);
-
-            windowRuntime.areaList = areaList;
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
