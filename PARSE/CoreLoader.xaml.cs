@@ -397,7 +397,7 @@ namespace PARSE
             windowScanner.Show();
         }
 
-        private void OldScan_Click(object sender, RoutedEventArgs e)
+        private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
              * 0) closes any viewer
