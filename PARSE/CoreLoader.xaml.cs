@@ -150,11 +150,26 @@ namespace PARSE
 
         private void RGB_Click(object sender, RoutedEventArgs e)
         {
+            if (windowViewer != null)
+            {
+                windowViewer.Close();
+            }
             windowViewer = new ViewLoader("RGB");
             windowViewer.Owner = this;
             windowViewer.Show();
         }
-        
+
+        private void Depth_Click(object sender, RoutedEventArgs e)
+        {
+            if (windowViewer != null)
+            {
+                windowViewer.Close();
+            } 
+            windowViewer = new ViewLoader("Depth");
+            windowViewer.Owner = this;
+            windowViewer.Show();
+        }
+
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnCalibrate_Click(object sender, RoutedEventArgs e)
         {
