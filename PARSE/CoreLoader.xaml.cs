@@ -440,8 +440,7 @@ namespace PARSE
         {
             if (KinectSensor.KinectSensors.Count != 0)
             {
-                windowScanner.Close();
-                windowViewer.Close();
+                this.shutAnyWindows();
                 //Definition of window viewer seems to get lost somewhere
                 this.OwnedWindows[0].Close();
 
