@@ -456,45 +456,11 @@ namespace PARSE
 
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                /*//open default window viewer
-                windowViewer = new ViewLoader();
-                windowViewer.Owner = this;
-                windowViewer.Show();*/
-
-                //open patient detail viewer
-                windowPatient = new PatientLoader(false);
-                windowPatient.Owner = this;
-                windowPatient.Show();
-
-                //open runtime detail viewer
-                windowRuntime = new RuntimeLoader();
-                windowRuntime.Owner = this;
-                windowRuntime.Show();
-
-                windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
-                windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome!");
-
-                if (KinectSensor.KinectSensors.Count > 0)
-                {
-                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
-                }
-                else
-                {
-                    windowRuntime.sendMessageToOutput("Warning", "No Kinect Found");
-                }
-
-                //initialize scanner detail viewer
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }
+            //open patient detail viewer
+            this.shutAnyWindows();
+            windowPatient = new PatientLoader(false);
+            windowPatient.Owner = this;
+            windowPatient.Show();
         }
 
         private void checkKinectConnection(object state)
