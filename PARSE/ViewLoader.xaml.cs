@@ -23,57 +23,19 @@ namespace PARSE
 
         private KinectInterpreter kinectInterp;
 
-        public ViewLoader()
+        public ViewLoader(String tmp)
         {
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(ViewLoader_Loaded);
-        }
 
-        private void ViewLoader_Loaded(object Sender, RoutedEventArgs e) {
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width - 20;
             //start kinectinterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
-        }
-
-        protected override void OnInitialized(EventArgs e)
-        {
- 	        base.OnInitialized(e);
-        }
-
-        public void setLimbVisualisation()
-        {
-            //Streams for visualisation.
-            kinectInterp.stopStreams();
-            kinectInterp.startRGBStream();
-            kinectInterp.startDepthStream();
-            kinectInterp.startSkeletonStream();
-            this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
-
-            //set skeletal cues.
-            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-
-            //track waist cue.
-
-
-        }
-
-        private void feed_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            string tmp = (selection.SelectedValue as ComboBoxItem).Content.ToString();
 
             if (tmp == "RGB")
             {
                 kinectInterp.stopStreams();
                 kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-            }
-            else if (tmp == "RGB-D")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
             else if (tmp == "RGB Isolation")
             {
@@ -105,9 +67,35 @@ namespace PARSE
             }
             else
             {
-                //Console.WriteLine("PISS and SHIT");
-                Environment.Exit(-9000);
+                //not sure if this will break
+                this.Close();
             }
+        }
+
+        private void ViewLoader_Loaded(object Sender, RoutedEventArgs e) {
+            //place relative to coreloader
+            this.Top = this.Owner.Top + 70;
+            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width - 20;
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+ 	        base.OnInitialized(e);
+        }
+
+        public void setLimbVisualisation()
+        {
+            //Streams for visualisation.
+            kinectInterp.stopStreams();
+            kinectInterp.startRGBStream();
+            kinectInterp.startDepthStream();
+            kinectInterp.startSkeletonStream();
+            this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+
+            //set skeletal cues.
+            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+
+            //track waist cue.
         }
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)

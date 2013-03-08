@@ -61,14 +61,17 @@ namespace PARSE
         private int                         countdown;
 
         //point cloud lists for visualisation
-        private List<PointCloud>            fincloud;
         private List<PointCloud>            pcdl;
+        private PointCloud                  pcd;
 
         //a stitcher
         private Stitcher                    stitcher; 
 
         //speech synthesizer instances
         private SpeechSynthesizer           ss;
+
+        //prevents crashing on adjustment
+        private Boolean kinectMovingLock = false;
 
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
@@ -106,18 +109,13 @@ namespace PARSE
             //Open child windows
             try
             {
-                //open default window viewer
-                windowViewer = new ViewLoader();
-                windowViewer.Owner = this;
-                windowViewer.Show();
-
-                //open patient detail viewer
+                //open Patient Details
                 //TODO: need to abstract this for when we add a new patient.
                 windowPatient = new PatientLoader(true);
                 windowPatient.Owner = this;
                 windowPatient.Show();
 
-                //open runtime detail viewer
+                //open Runtime viewer (aka results,history,output)
                 windowRuntime = new RuntimeLoader();
                 windowRuntime.Owner = this;
                 windowRuntime.Show();
@@ -140,8 +138,6 @@ namespace PARSE
                 //initialize scanner detail viewer
                 windowScanner = new ScanLoader();
                 windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
-
             }
             catch (Exception err)
             {
@@ -149,68 +145,102 @@ namespace PARSE
             }
         }
 
-        //TODO: prevent the following two methods from crashing if called in quick succession
-        private void btnCalibrate_Click(object sender, RoutedEventArgs e)
+        private void shutAnyWindows()
         {
-            ss.Speak("this button should really set the calibrate angle, this is the last thing greg will do, please remind him.");
-            ss.Speak("This was a triumph. I'm making a note here: HUGE SUCCESS. It's hard to overstate my satisfaction. Aperture Science, We do what we must because we can. For the good of all of us. Except the ones who are dead. But there's no sense crying over every mistake. You just keep on trying till you run out of cake. And the Science gets done. And you make a neat gun. For the people who are still alive. I'm not even angry. I'm being so sincere right now. Even though you broke my heart. And killed me. And tore me to pieces. And threw every piece into a fire. As they burned it hurt because I was so happy for you! Now these points of data make a beautiful line. And we're out of beta. We're releasing on time. So I'm GLaD.  I got burned. Think of all the things we learned for the people who are still alive. Go ahead and leave me. I think I prefer to stay inside. Maybe you'll find someone else to help you. Maybe Black Mesa. THAT WAS A JOKE. HAHA.  FAT CHANCE. Anyway, this cake is great. It's so delicious and moist. Look at me still talking when there's Science to do. When I look out there, it makes me GLaD I'm not you. I've experiments to run. There is research to be done. On the people who are still alive. And believe me I am still alive. I'm doing Science and I'm still alive. I feel FANTASTIC and I'm still alive. While you're dying I'll be still alive. And when you're dead I will be still alive. STILL ALIVE. STILL ALIVE. ");
-            this.kinectInterp.kinectSensor.ElevationAngle = KinectInterpreter.oneParseRadian;
-            //KinectInterpreter.oneParseRadian;
-        }
-        
-        private void btnSensorUp_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MaxElevationAngle)
+            if (windowViewer != null)
             {
-                this.kinectInterp.kinectSensor.ElevationAngle += 5;
-            }
-        }
-
-        private void btnSensorDown_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.kinectInterp.kinectSensor.ElevationAngle != this.kinectInterp.kinectSensor.MinElevationAngle)
-            {
-                this.kinectInterp.kinectSensor.ElevationAngle -= 5;
-            }
-        }
-
-        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-            if (this.kinectInterp.kinectReady)
-            {
-                this.kinectInterp.kinectSensor.Stop();
-            }
-
-        }
-
-        private void NewScan_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
-                windowScanner.Show();
                 windowViewer.Close();
             }
-            catch (Exception err)
+            if (windowScanner != null)
             {
-                System.Diagnostics.Debug.WriteLine(err);
-            }  
+                windowScanner.Close();
+            }
         }
-
-        void windowScanner_Closed(object sender, EventArgs e)
+        
+        private void RGB_Click(object sender, RoutedEventArgs e)
         {
-            windowViewer = new ViewLoader();
+            this.shutAnyWindows();
+            windowViewer = new ViewLoader("RGB");
             windowViewer.Owner = this;
             windowViewer.Show();
         }
 
+        private void Depth_Click(object sender, RoutedEventArgs e)
+        {
+            this.shutAnyWindows(); 
+            windowViewer = new ViewLoader("Depth");
+            windowViewer.Owner = this;
+            windowViewer.Show();
+        }
+
+        private void Skeleton_Click(object sender, RoutedEventArgs e)
+        {
+            this.shutAnyWindows();
+            windowViewer = new ViewLoader("Skeleton");
+            windowViewer.Owner = this;
+            windowViewer.Show();
+        }
+
+        private void DepthIso_Click(object sender, RoutedEventArgs e)
+        {
+            this.shutAnyWindows();
+            windowViewer = new ViewLoader("Depth Isolation");
+            windowViewer.Owner = this;
+            windowViewer.Show();
+        }
+
+        private void RGBIso_Click(object sender, RoutedEventArgs e)
+        {
+            this.shutAnyWindows();
+            windowViewer = new ViewLoader("RGB Isolation");
+            windowViewer.Owner = this;
+            windowViewer.Show();
+        }
+
+        private void btnSensorUp_Click(object sender, RoutedEventArgs e)
+        {
+            if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle + 5 <= this.kinectInterp.kinectSensor.MaxElevationAngle))
+            {
+                kinectMovingLock = true;
+                this.kinectInterp.kinectSensor.ElevationAngle += 5;
+            }
+            kinectMovingLock = false;
+        }
+
+        private void btnSensorDown_Click(object sender, RoutedEventArgs e)
+        {
+            if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle - 5) >= (this.kinectInterp.kinectSensor.MinElevationAngle))
+            {
+                kinectMovingLock = true;
+                this.kinectInterp.kinectSensor.ElevationAngle -= 5;
+            }
+            kinectMovingLock = false;
+        }
+
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.kinectInterp.kinectReady)
+            {
+                Console.WriteLine("Stopping Kinect");
+                this.kinectInterp.stopStreams();
+                this.kinectInterp.kinectSensor.Stop();
+            }
+            Environment.Exit(0);
+            Console.WriteLine("Main Window Closed - Exiting (0)");
+            Environment.Exit(0);
+        }
+
+        private void NewScan_Click(object sender, RoutedEventArgs e)
+        {
+            this.shutAnyWindows(); 
+            windowScanner = new ScanLoader();
+            windowScanner.Owner = this;
+            windowScanner.Show();
+            
+        }
 
         /* This will eventually form the recogniser *mechanism* for what ever
          * recognition will occur in the system. */
-
         private void surfTimer_tick(Object sender, EventArgs e)
         {
 
@@ -243,59 +273,22 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            PointCloud pc = windowScanner.getYourMum();
+            PointCloud pc = pcd;
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
             double height = HeightCalculator.getHeight(pc);
             windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes,1);
+            windowRuntime.visualisePlanes(planes, 1);
+            windowRuntime.voloutput.Content = volume + "m^3";
+            windowRuntime.heightoutput.Content = height + "m";
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
-            //open windowviewer with isolation method.
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
-            
             /*Requires generated model, raw depth array and previous*/
             //windowViewer.setLimbVisualisation();
             LimbCalculator.calculate(windowScanner.getYourMum(), windowScanner.getJointMeasurements());
-
-        }
-
-        private void ImportScan_Click(object sender, RoutedEventArgs e)
-        {
-
-            /*Import scan currently imports files based on the assumption that they
-             * have been serialized as a visualisation object. Once the point cloud 
-             * class has been been implemented, it will assume that it is dealing
-             * with point cloud objects which will then be passed to the visualisation
-             * method as appropriate */
-
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".PARSE";
-            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
-
-            if (dlg.ShowDialog() == true)
-            {
-                String filename = dlg.FileName;
-                this.DataContext = ScanSerializer.deserialize(filename);
-                fincloud = ScanSerializer.depthPc;
-            }
-
-            try
-            {
-                windowScanner = new ScanLoader(fincloud);
-                windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
-                windowScanner.Show();
-                windowViewer.Close();
-            }
-
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }  
 
         }
 
@@ -385,30 +378,38 @@ namespace PARSE
             
             pcd = stitcher.getResult(); 
             
-            //windowScanner.Close();
             windowViewer.Close();
             windowScanner = new ScanLoader(pcd);
             windowScanner.Owner = this;
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
 
         }
 
-        private Boolean chopfeetoff;
-
-        private void CloudProcessorGreg_Click(object sender, RoutedEventArgs e)
+        private void RemoveFeet_Click(object sender, RoutedEventArgs e)
         {
-            chopfeetoff = true;
-            CloudProcessor_Click(sender, e);
+            for (int i = 0; i < pcdl.Count; i++)
+                {
+                    pcdl[i].deleteFloor();
+                }
+            
+            
+            windowScanner.Close();
+            windowViewer.Close();
+            windowScanner = new ScanLoader(pcdl);
+            windowScanner.Owner = this;
+            windowScanner.Show();
         }
 
-        private void CloudProcessor_Click(object sender, RoutedEventArgs e)
+        private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
+             * 0) closes any viewer
              * 1) adds selected point cloud to visualiser
              * 2) groups it
-             * 3) peforms volume processing*/
+             */
 
+            /*0)*/
+            this.shutAnyWindows();
 
      /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".PARSE";
@@ -418,62 +419,35 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 this.DataContext = ScanSerializer.deserialize(filename);
-                fincloud = ScanSerializer.depthPc;
-            }
-
-            if (chopfeetoff)
-            {
-                for (int i = 0; i < fincloud.Count; i++)
-                {
-                    fincloud[i].deleteFloor();
-                }
+                pcdl = ScanSerializer.depthPc;
             }
 
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
 
-     /*2)*/ PointCloud pcd = new PointCloud();
-            pcdl = new List<PointCloud>();
-
-            //instantiate the stitcher 
+     /*2)*/ //instantiate the stitcher 
             stitcher = new BoundingBox();
 
             //jam points into stitcher
-            stitcher.add(fincloud);
+            stitcher.add(pcdl);
             stitcher.stitch();
 
             pcd = stitcher.getResult();
             pcdl = stitcher.getResultList();
-            
-            //windowScanner.Close();
+
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowViewer.Close();
             windowScanner.Show();
-
-                 
-     /*3)*/ //Static call to volume calculation method, pass persistent point cloud object
-            PointCloud pc = pcd;
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
-            List<List<Point3D>> planes = T.Item2;
             List<double> areaList = AreaCalculator.getAllAreas(planes);
-            double volume = T.Item1;
-            double height = HeightCalculator.getHeight(pc);
 
             windowRuntime.areaList = areaList;
-            windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes,1);
-            windowRuntime.voloutput.Content = volume + "m^3";
-            windowRuntime.heightoutput.Content = height + "m";
-
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
         {
             if (KinectSensor.KinectSensors.Count != 0)
             {
-                windowScanner.Close();
-                windowViewer.Close();
+                this.shutAnyWindows();
                 //Definition of window viewer seems to get lost somewhere
                 this.OwnedWindows[0].Close();
 
@@ -489,46 +463,11 @@ namespace PARSE
 
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                //open default window viewer
-                windowViewer = new ViewLoader();
-                windowViewer.Owner = this;
-                windowViewer.Show();
-
-                //open patient detail viewer
-                windowPatient = new PatientLoader(false);
-                windowPatient.Owner = this;
-                windowPatient.Show();
-
-                //open runtime detail viewer
-                windowRuntime = new RuntimeLoader();
-                windowRuntime.Owner = this;
-                windowRuntime.Show();
-
-                windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
-                windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-                ss.Speak("Welcome!");
-
-                if (KinectSensor.KinectSensors.Count > 0)
-                {
-                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
-                }
-                else
-                {
-                    windowRuntime.sendMessageToOutput("Warning", "No Kinect Found");
-                }
-
-                //initialize scanner detail viewer
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
-
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }
+            //open patient detail viewer
+            this.shutAnyWindows();
+            windowPatient = new PatientLoader(false);
+            windowPatient.Owner = this;
+            windowPatient.Show();
         }
 
         private void checkKinectConnection(object state)
@@ -539,11 +478,15 @@ namespace PARSE
             }
         }
 
-        private void RefineAlignment_Click(object sender, RoutedEventArgs e)
+
+        void MenuItem_Exit(object sender, RoutedEventArgs e)
         {
-            windowScanner.viewertext.Content = "Select corresponding point on 1st point cloud (pairwise)";
-            windowScanner.hitState = 1;
+            //kinectInterp.stopStreams();
+            //kinectInterp.kinectSensor.Stop();
+            Environment.Exit(0);
         }
+        
+        
        
     }
 }

@@ -24,44 +24,39 @@
         <Menu>
         <!--Menu definition-->
         <MenuItem Header="_File">
-            <MenuItem Header="_New Patient" IsCheckable="true"/>
-            <MenuItem Header="_Open Patient" IsCheckable="true"/>
-            <MenuItem Header="_Save Patient" IsCheckable="true"/>
+            <MenuItem Header="_New Patient" IsCheckable="false"/>
+            <MenuItem Header="_Open Patient" />
+            <MenuItem Header="_Save Patient" />
             <Separator/>
-            <MenuItem Header="Exit" IsCheckable="true"/>
+            <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
-        <MenuItem Header="_Edit">
-
-        </MenuItem>
-            <MenuItem Header="_Control">
-                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
-                <Separator/>
+        <MenuItem Header="Kinect">
+                <MenuItem Header="View Feed">
+                    <MenuItem Header="RGB" Click="RGB_Click"/>
+                    <MenuItem Header="Depth" Click="Depth_Click"/>
+                    <MenuItem Header="Skeleton" Click="Skeleton_Click"/>
+                    <MenuItem Header="RGB Isolation" Click="RGBIso_Click"/>
+                    <MenuItem Header="Depth Isolation" Click="DepthIso_Click"/>
+                </MenuItem>
                 <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
                 <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
-            </MenuItem>
-        <MenuItem Header="Patient">
-            <MenuItem Header="Capture">
-                <MenuItem Header="Volume" IsCheckable="false" Click="VolumeOption_Click"/>
-                <MenuItem Header="Limb Circumference" IsCheckable="false" Click="LimbOption_Click"/>
-            </MenuItem>
-            <MenuItem Header="Alignment">
-                <MenuItem Header="Refine Alignment" IsCheckable="false" Click="RefineAlignment_Click"/>
-            </MenuItem>
-            <MenuItem Header="_Details" IsCheckable="False"/>
-            <Separator/>
-                <MenuItem Header="_New Scan..." IsCheckable="False" Click="NewScan_Click" />
-                <MenuItem Header="_Import Scan" IsCheckable="False" Click="ImportScan_Click"/>
+        </MenuItem>
+    <MenuItem Header="Patient">
+                <MenuItem Header="New Scan" IsCheckable="False" Click="NewScan_Click" />
+                <MenuItem Header="View Previous Scan" IsCheckable="False" Click="LoadScan_Click"/>
                 <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
                 <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
-                <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
-                <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
-                <MenuItem Header="_Cloud Processor (Remove Floor)" IsCheckable="False" Click="CloudProcessorGreg_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
-            </MenuItem>
-        <MenuItem Header="_Help">
+                <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
+                </MenuItem>
+     <MenuItem Header="Capture">
+                    <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
+                    <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
+     </MenuItem>
+     <MenuItem Header="_Help">
 
-        </MenuItem>
-        </Menu>
+     </MenuItem>
+    </Menu>
 
         <!--Central Textblock -->
         <Canvas Name="optioncv" Margin="363,220,375,182" Grid.Row="1">

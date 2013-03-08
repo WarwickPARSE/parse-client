@@ -45,9 +45,6 @@ namespace PARSE
         private const int cx = 640 / 2;
         private const int cy = 480 / 2;
 
-        //boolean to determine if floor has been rmoved
-        private Boolean floorHasBeenRemoved = false;
-
         //fiddle values (they make it work but I don't know why!)
         private const double fxinv = 1.0 / 476;
         private const double fyinv = 1.0 / 476;
@@ -497,46 +494,42 @@ namespace PARSE
 
         public void deleteFloor()
         {
-            if (!floorHasBeenRemoved)
+            double[] pointMin = { minx, miny, minz };
+            double[] pointMax = { maxx, miny + ((maxy - miny) / (VolumeCalculator.number)), maxz };
+
+            Object[] temp = points.range(pointMin, pointMax);
+
+            for (int i = 0; i < temp.Length; i++)
             {
-                double[] pointMin = { minx, miny, minz };
-                double[] pointMax = { maxx, miny + ((maxy - miny) / (VolumeCalculator.number)), maxz };
-
-                Object[] temp = points.range(pointMin, pointMax);
-
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    Point3D tempPoint = ((PointRGB)temp[i]).point;
-                    double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
-                    this.points.delete(tempArray);
-                }
-
-                floorHasBeenRemoved = true;
-
-                //re calc minx, miny, minz
-                double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
-                double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
-                Object[] points3d = points.range(minPoint,maxPoint);
-
-                minx = double.MaxValue;
-                miny = double.MaxValue;
-                minz = double.MaxValue;
-
-                maxx = double.MinValue;
-                maxy = double.MinValue;
-                maxz = double.MinValue;
-
-                for (int i = 0; i < points3d.Length; i++)
-                {
-                    Point3D oldPoint = ((PointRGB)(points3d[i])).point;
-                    if (oldPoint.X < minx) { minx = oldPoint.X; }
-                    if (oldPoint.Y < miny) { miny = oldPoint.Y; }
-                    if (oldPoint.Z < minz) { minz = oldPoint.Z; }
-                    if (oldPoint.X > maxx) { maxx = oldPoint.X; }
-                    if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
-                    if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
-                }
+                Point3D tempPoint = ((PointRGB)temp[i]).point;
+                double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
+                this.points.delete(tempArray);
             }
-        }
+
+                        //re calc minx, miny, minz
+            double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
+            double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
+            Object[] points3d = points.range(minPoint,maxPoint);
+
+            minx = double.MaxValue;
+            miny = double.MaxValue;
+            minz = double.MaxValue;
+
+            maxx = double.MinValue;
+            maxy = double.MinValue;
+            maxz = double.MinValue;
+
+            for (int i = 0; i < points3d.Length; i++)
+            {
+                Point3D oldPoint = ((PointRGB)(points3d[i])).point;
+                if (oldPoint.X < minx) { minx = oldPoint.X; }
+                if (oldPoint.Y < miny) { miny = oldPoint.Y; }
+                if (oldPoint.Z < minz) { minz = oldPoint.Z; }
+                if (oldPoint.X > maxx) { maxx = oldPoint.X; }
+                if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
+                if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
+            }
+    }
     }
 }
+
