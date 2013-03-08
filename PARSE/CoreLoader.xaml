@@ -68,13 +68,13 @@
         </TextBlock>
         <TextBlock Margin="455,434,667,286" Grid.Row="1" Canvas.Left="-353" Canvas.Top="-227">   
              <Image Name="load" Source="Resources/open.png" Width="15" Height="15" VerticalAlignment="Center"/>
-            <Hyperlink NavigateUri="http://www.google.com">
+            <Hyperlink Click="LoadScan_Click">
                     Load Existing Patient
             </Hyperlink>
         </TextBlock>
         <TextBlock Margin="455,466,597,255" Grid.Row="1" Canvas.Left="-353" Canvas.Top="-227">
              <Image Name="person" Source="Resources/person.png" Width="15" Height="15" VerticalAlignment="Center"/>
-            <Hyperlink NavigateUri="http://www.google.com">
+            <Hyperlink Click="NewScan_Click">
                     Start Volume Scanning Procedure
             </Hyperlink>
         </TextBlock>
