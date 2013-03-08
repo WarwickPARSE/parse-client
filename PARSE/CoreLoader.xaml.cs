@@ -219,12 +219,11 @@ namespace PARSE
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
             if (this.kinectInterp.kinectReady)
             {
                 this.kinectInterp.kinectSensor.Stop();
             }
-
+            Environment.Exit(0);
         }
 
         private void NewScan_Click(object sender, RoutedEventArgs e)
