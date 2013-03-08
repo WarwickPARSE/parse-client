@@ -20,6 +20,10 @@
         <Button Name="cancel_scan" Content="Cancel Scan Process" Width="120" Height="25" Margin="293,242,165,94" Click="cancel_scan_Click" />
         <Canvas Name="skeloutline" />
         <TextBlock Height="93" HorizontalAlignment="Left" TextWrapping="Wrap" TextAlignment="Center" Margin="62,108,0,0" Name="instructionblock" Text="Please prepare patient for scanning " VerticalAlignment="Top" FontSize="32" Width="451" />
-
+        <StatusBar Name="scannerStatus" VerticalAlignment="Bottom">
+            <StatusBarItem Name="viewertext">
+                <TextBlock>Scan Modeller Active</TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

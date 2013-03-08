@@ -431,7 +431,11 @@ namespace PARSE
 
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
+            windowViewer.Close();
             windowScanner.Show();
+            List<double> areaList = AreaCalculator.getAllAreas(planes);
+
+            windowRuntime.areaList = areaList;
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
@@ -475,6 +479,8 @@ namespace PARSE
             //kinectInterp.kinectSensor.Stop();
             Environment.Exit(0);
         }
+        
+        
        
     }
 }

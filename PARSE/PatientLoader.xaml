@@ -17,7 +17,7 @@
                         <TextBlock Text="Patient Data" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Grid Margin="0" Height="Auto" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Grid Margin="5" Height="Auto" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.2*"></ColumnDefinition>
                         <ColumnDefinition Width="0.6*"></ColumnDefinition>
@@ -128,12 +128,13 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition />
+                        <RowDefinition Height="*"/>
+                        <RowDefinition MaxHeight="80"/>
                     </Grid.RowDefinitions>
 
-                    <Image Grid.Column="1" Height="Auto" HorizontalAlignment="Stretch" Name="image1" Stretch="Uniform" VerticalAlignment="Stretch" Width="Auto" Grid.ColumnSpan="1" Grid.Row="0" Grid.RowSpan="1" Source="/PARSE;component/Tracking/human_skeleton.gif" StretchDirection="Both" />
+                    <Image Grid.Column="1" Height="Auto" HorizontalAlignment="Stretch" Name="image1" Stretch="Uniform" VerticalAlignment="Stretch" Width="Auto" Grid.ColumnSpan="1" Grid.Row="0" Grid.RowSpan="2" Source="/PARSE;component/Tracking/human_skeleton.gif" StretchDirection="Both"/>
 
-                    <ListBox Width="Auto" Height="Auto">
+                    <ListBox Width="Auto" Height="Auto" Grid.Column="0" Grid.Row="0">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -146,6 +147,19 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
+                    <Grid Grid.Column="0" Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"></RowDefinition>
+                            <RowDefinition Height="20"></RowDefinition>
+                            <RowDefinition Height="20"></RowDefinition>
+                            <RowDefinition Height="20"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Button Name="NewScanButton" Content="New Scan" Click="NewScan_Click" Grid.Row="0"></Button>
+                        <Button Name="RemoveScanButton" Content="Remove Scan" Click="RemoveScan_Click" Grid.Row="1"></Button>
+                        <Button Name="RescanAll" Content="Scan all" Click="ScanAll_Click" Grid.Row="2"></Button>
+                        <Button Name="RescanSelected" Content="Scan selected" Click="ScanSelected_Click" Grid.Row="3"></Button>
+                    </Grid>
+                    
                 </Grid>
             </TabItem>
             

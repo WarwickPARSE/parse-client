@@ -203,6 +203,7 @@ namespace PARSE
             var meshBuilder = new MeshBuilder(false, false);
             meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
             meshBuilder.AddBox(new Rect3D(0, 0, 1.2, 0.5, 1, 0.4));
+            
 
             // Create a mesh from the builder (and freeze it)
             var mesh = meshBuilder.ToMesh(true);
@@ -230,7 +231,50 @@ namespace PARSE
             {
                 //AddCubeToMesh(pointCloudMesh, points[i], 0.005);
                 addCubeToMesh(this.mesh, points[i], 0.002);
+                //createAlternativeMesh();
             }
+        }
+
+        public MeshGeometry3D createAlternativeMesh()
+        {
+
+            //this.mesh is the relevant mesh that we are setting.
+
+            //Define list of triangle indices over the whole model.
+            var triangleIndices = new List<int>();
+
+            //Define Vector3D normals.
+            Vector3DCollection myNormalCollection = new Vector3DCollection();
+            myNormalCollection.Add(new Vector3D(0, 0, 1));
+            myNormalCollection.Add(new Vector3D(0, 1, 1));
+            myNormalCollection.Add(new Vector3D(1, 1, 1));
+
+            //iterate over each 3 points and create a triangle with the relevant indices.
+            for (int i = 0; i < this.cloudList[0].Count-3; i+=3)
+            {
+                this.mesh.Positions.Add(this.cloudList[0][i]);
+                this.mesh.Positions.Add(this.cloudList[0][i + 1]);
+                this.mesh.Positions.Add(this.cloudList[0][i + 2]);
+
+                //set triangle normals on the mesh.
+                triangleIndices.Add(0);
+                triangleIndices.Add(1);
+                triangleIndices.Add(2);
+            }
+
+            return new MeshGeometry3D()
+            {
+                Positions = new Point3DCollection(this.cloudList[0]),
+                //TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
+                TriangleIndices = new Int32Collection(triangleIndices),
+                Normals = myNormalCollection
+            };
+
+        }
+
+        private void updateCloudPositions(TranslateTransform3D t1, int modelRef)
+        {
+            //apply transformation vector  
         }
 
         /// <summary>

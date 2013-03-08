@@ -21,7 +21,7 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="voloutput" Height="20" Content="m3" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="heightoutput" Height="20" Content="m" Margin="325,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="heightlabel" Height="20" Content="Calculated Height" Margin="325,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="voLconclabel" Height="20" Content="Most Significant Plane" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="voLconclabel" Height="20" Content="Plane Details" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="otherlabel" Height="20" Content="Scan Details" Margin="325,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
                     <Border BorderThickness="0.25" Name="viewborder" HorizontalAlignment="Right" Width="482" Height="224" BorderBrush="DarkGray" Margin="440,0,33,16"></Border>
                     <TextBlock Text="Plane Outline: " Margin="775,2,340,216" Name="planeNo" FontFamily="Arial" FontSize="14" FontWeight="Bold" Foreground="Red"></TextBlock>
@@ -39,9 +39,9 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="Voxel Count:" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
 
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea" Height="20" Content="Plane (x): name" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea" Height="20" Content="Plane {x}: {region}" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
 
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalarea" Height="20" Content="Total Area: " Margin="8,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalarea" Height="20" Content="Plane Area: " Margin="8,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalperimiter" Height="20" Content="Circumference:" Margin="8,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     
                     <h:HelixViewport3D HorizontalAlignment="Right" Name="hvpcanvas" Width="482" Height="224" Margin="440,2,28,14">
