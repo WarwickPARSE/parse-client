@@ -234,6 +234,10 @@ namespace PARSE
         {
             try
             {
+                if (windowViewer != null)
+                {
+                    windowViewer.Close();
+                } 
                 windowScanner = new ScanLoader();
                 windowScanner.Owner = this;
                 windowScanner.Show();
