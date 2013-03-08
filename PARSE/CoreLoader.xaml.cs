@@ -61,8 +61,8 @@ namespace PARSE
         private int                         countdown;
 
         //point cloud lists for visualisation
-        private List<PointCloud>            fincloud;
         private List<PointCloud>            pcdl;
+        private PointCloud                  pcd;
 
         //a stitcher
         private Stitcher                    stitcher; 
@@ -278,12 +278,12 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 this.DataContext = ScanSerializer.deserialize(filename);
-                fincloud = ScanSerializer.depthPc;
+                pcdl = ScanSerializer.depthPc;
             }
 
             try
             {
-                windowScanner = new ScanLoader(fincloud);
+                windowScanner = new ScanLoader(pcdl);
                 windowScanner.Owner = this;
                 windowScanner.Closed += new EventHandler(windowScanner_Closed);
                 windowScanner.Show();
@@ -394,7 +394,7 @@ namespace PARSE
 
         private void RemoveFeet_Click(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < fincloud.Count; i++)
+            for (int i = 0; i < pcdl.Count; i++)
                 {
                     pcdl[i].deleteFloor();
                 }
@@ -424,19 +424,16 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 this.DataContext = ScanSerializer.deserialize(filename);
-                fincloud = ScanSerializer.depthPc;
+                pcdl = ScanSerializer.depthPc;
             }
 
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
 
-     /*2)*/ PointCloud pcd = new PointCloud();
-            pcdl = new List<PointCloud>();
-
-            //instantiate the stitcher 
+     /*2)*/ //instantiate the stitcher 
             stitcher = new BoundingBox();
 
             //jam points into stitcher
-            stitcher.add(fincloud);
+            stitcher.add(pcdl);
             stitcher.stitch();
 
             pcd = stitcher.getResult();
