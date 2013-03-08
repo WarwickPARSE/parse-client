@@ -193,7 +193,7 @@ namespace PARSE
         private void planeChooser_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             visualisePlanes(storedPlanes, e.NewValue);
-            this.totalarea.Content = "Total Area: " + areaList[(int)e.NewValue];
+            this.totalarea.Content = "Total Area: " + areaList[(int)e.NewValue] + "m\u00B2";
             this.maxarea.Content = "Plane " + (int) e.NewValue;
         }
     }
