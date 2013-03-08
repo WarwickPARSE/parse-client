@@ -1,0 +1,95 @@
+﻿<Window x:Class="PARSE.HistoryLoader"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        xmlns:DV="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+        xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+        Title="History Viewer" Height="300" Width="{x:Static SystemParameters.PrimaryScreenWidth}" Loaded="Window_Loaded">
+    <Grid>
+        <TabControl Margin="0,-5,0,5" Name="runtimeTab">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Resources/op1.png" />
+                        <TextBlock Text="Output" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <RichTextBox Height="223" Name="textBox1" Width="268" />
+            </TabItem>
+            <TabItem Name="results" HorizontalContentAlignment="Right">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Resources/op2.png" />
+                        <TextBlock Text="Results" Name="resultstxt" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Width="{x:Static SystemParameters.PrimaryScreenWidth}" Height="240">
+                    <!--"Headline" Labels-->
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="vollabel" Height="20" Content="Calculated Volume" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="voloutput" Height="20" Content="m3" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="heightoutput" Height="20" Content="m" Margin="325,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="heightlabel" Height="20" Content="Calculated Height" Margin="325,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="voLconclabel" Height="20" Content="Most Significant Plane" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="otherlabel" Height="20" Content="Scan Details" Margin="325,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <Border BorderThickness="0.25" Name="viewborder" HorizontalAlignment="Right" Width="482" Height="224" BorderBrush="DarkGray" Margin="440,0,33,16"></Border>
+                    <TextBlock Text="Plane Outline: " Margin="775,2,340,216" Name="planeNo" FontFamily="Arial" FontSize="14" FontWeight="Bold" Foreground="Red"></TextBlock>
+                    <Slider Name="planeChooser" Orientation="Vertical" Width="21" Minimum="0" Maximum="60" TickPlacement="Both" TickFrequency="1" IsDirectionReversed="True" HorizontalAlignment="Center" ValueChanged="planeChooser_ValueChanged" Margin="750,4,516,31" />
+                    <Image Source="Resources/hb.png" Margin="600,2,534,21" Name="bodyimg"/>
+                    <TextBlock Text="Results will appear here after loading a scan " HorizontalAlignment="Center" VerticalAlignment="Center" Name="noresults" TextAlignment="Center" FontFamily="Arial" FontSize="28" FontWeight="Bold" Foreground="LightGray" Height="36"  Width="905"></TextBlock>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="546,130,534,90" Width="200" Height="20" Name="newscan" TextAlignment="Center">
+                    <Hyperlink NavigateUri="http://www.google.com" >
+                        Click here to initiate a new scan
+                    </Hyperlink>
+                    </TextBlock>
+                    <!--Secondary "headline" labels-->
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime" Height="20" Content="Scan Time" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="Voxel Count:" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea" Height="20" Content="Plane (x): name" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalarea" Height="20" Content="Total Area: " Margin="8,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalperimiter" Height="20" Content="Circumference:" Margin="8,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    
+                    <h:HelixViewport3D HorizontalAlignment="Right" Name="hvpcanvas" Width="482" Height="224" Margin="440,2,28,14">
+                        <h:HelixViewport3D.Camera>
+                            <PerspectiveCamera Position="0,-3.8, 1" LookDirection="0,1,0" UpDirection="0,-2,0.1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="77" />
+                        </h:HelixViewport3D.Camera>
+                        <h:SunLight />
+                        <ModelVisual3D x:Name="planePlot" Content="{Binding Model}" />
+                        <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
+                    </h:HelixViewport3D>
+                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="430,195,0,0" Name="btnresults" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,195,0,0" Name="btnrescan" VerticalAlignment="Top" Width="75" />
+                </Grid>
+                <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
+                    <Canvas.RenderTransform>
+                        <ScaleTransform x:Name="st"/>
+                    </Canvas.RenderTransform>
+                </Canvas>-->
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Resources/op3.png" />
+                        <TextBlock Text="History" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Width="{x:Static SystemParameters.PrimaryScreenWidth}" Height="240">
+                    <!--"Headline" Labels-->
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchange" Height="20" Content="Change in Volume:" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchangeoutput" Height="20" Content="100%" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <DVC:Chart Canvas.Top="80" Canvas.Left="10" Name="volchart" Width="400" Height="250" Background="LightSteelBlue">
+                        <DVC:Chart.Series>
+                            <DVC:LineSeries Title="Fat Man Volume" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+                            </DVC:LineSeries>
+                        </DVC:Chart.Series>
+                    </DVC:Chart>
+
+                </Grid>
+            </TabItem>
+        </TabControl>
+        </Grid>
+</Window>
