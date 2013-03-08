@@ -220,17 +220,6 @@ namespace KdTree
         }
 
 
-        /** 
-         * Range search in a KD-tree.  Uses algorithm translated from
-         * 352.range.c of Gonnet & Baeza-Yates.
-         *
-         * @param lowk lower-bounds for key
-         * @param uppk upper-bounds for key
-         *
-         * @return array of Objects whose keys fall in range [lowk,uppk]
-         *
-         * @throws KeySizeException on mismatch among lowk.length, uppk.length, or K
-         */
         public List<Point3D> getAllPointsAt(double i, double r, double[] limits)
         {
             double[] pointMin = { limits[0], i - r, limits[1]};
@@ -242,14 +231,20 @@ namespace KdTree
             {
                 output.Add(((PointRGB)temp[j]).point);
             }
-            if (output.Count == 0)
-            {
-                Console.WriteLine("OH GOD MY EYES! IT BURNS!");
-                //Environment.Exit(-1);
-            }
             return output;
         }
-        
+
+        /** 
+         * Range search in a KD-tree.  Uses algorithm translated from
+         * 352.range.c of Gonnet & Baeza-Yates.
+         *
+         * @param lowk lower-bounds for key
+         * @param uppk upper-bounds for key
+         *
+         * @return array of Objects whose keys fall in range [lowk,uppk]
+         *
+         * @throws KeySizeException on mismatch among lowk.length, uppk.length, or K
+         */
         public Object[] range(double[] lowk, double[] uppk)
         {
 

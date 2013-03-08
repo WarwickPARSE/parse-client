@@ -71,10 +71,29 @@ namespace PARSE
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
 
+            GroupVisualiser gv = new GroupVisualiser(fcloud);
+
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
+
+            //Threading of data context population to speed up model generation.
+            System.Diagnostics.Debug.WriteLine("Loading model");
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                gv.preprocess();
+            }));
+
+            //Assigned threaded object result to the data context.
+            this.DataContext = gv;
+            //gCloud = fcloud;
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            System.Diagnostics.Debug.WriteLine("Model loaded");
+
+            //Old visualisation method.
+
+            /*this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.DataContext = new CloudVisualisation(fcloud, false);
             fincloud = fcloud;
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);*/
         }
 
         public ScanLoader(PointCloud gcloud)
@@ -133,19 +152,19 @@ namespace PARSE
             }
             
             //init kinect
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.isDepthEnabled())
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
 
-            if (!this.kinectInterp.IsSkelStreamUpdating)
+            if (!this.kinectInterp.isSkeletonEnabled())
             {
                 this.kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.isColorEnabled())
             {
                 this.kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
@@ -194,34 +213,35 @@ namespace PARSE
         {
             if (countdown == 3)
             {
-                //enable update of skelL, skelR, skelDepth
-                this.kinectInterp.enableUpdateSkelVars();
-
                 //get current skeleton tracking state
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
                 jointDepths  = enumerateSkeletonDepths(skeleton);
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                frontCloud.deleteFloor();
                 fincloud.Add(frontCloud);
+                ss.Speak("Scan Added.");
 
                 //freeze skelL skelDepth and skelR
-                this.kinectInterp.disableUpdateSkelVars();
+                this.kinectInterp.kinectSensor.SkeletonStream.Disable();
 
                 tmpCanvas = skeloutline;
+                skeloutline = tmpCanvas;
+                skeloutline.Visibility = Visibility.Hidden;
 
-                ss.Speak("Turn left");
+                ss.Speak("Please turn left.");
                 this.instructionblock.Text = "Please turn left";
                 countdown--;
             }
             else if (countdown == 2)
             {
-
                 //PointCloud structure methods
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                rightCloud.deleteFloor();
                 fincloud.Add(rightCloud);
-
-                ss.Speak("Turn left with your back to the camera");
+                ss.Speak("Scan Added.");
+                ss.Speak("Please turn left with your back to the camera.");
                 this.instructionblock.Text = "Turn left with your back to the camera";
                 countdown--;
             }
@@ -230,31 +250,34 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                backCloud.deleteFloor();
                 fincloud.Add(backCloud);
-
-                ss.Speak("Turn left once more");
-                this.instructionblock.Text = "Please turn left once more";
+                ss.Speak("Scan Added.");
+                ss.Speak("Please turn left once more.");
+                this.instructionblock.Text = "Please turn left once more.";
                 countdown--;
             }
             else if (countdown == 0)
             {
-
                 //PointCloud structure methods
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
+
+                ss.Speak("Scan Added.");
+                ss.Speak("Thank you for your time, you have now been captured.");
+
+                //stop streams
+                kinectInterp.stopStreams();
 
                 //Visualisation instantiation based on int array clouds
                 cloudvis = new CloudVisualisation(fincloud, false);
                 this.DataContext = cloudvis;
 
-                //stop streams
-                kinectInterp.stopStreams();
-                skeloutline = tmpCanvas;
-                skeloutline.Visibility = Visibility.Hidden;
-
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
+                ss.Speak("FUCKING GIT");
                 pcTimer.Stop();
             }
         }
@@ -349,13 +372,14 @@ namespace PARSE
 
         ModelVisual3D GetHitTestResult(Point location)
         {
-            HitTestResult result = VisualTreeHelper.HitTest(hvpcanvas, location);
+           /* RayHitTestResult result = (RayHitTestResult) VisualTreeHelper.HitTest(hvpcanvas, location);
             if (result != null && result.VisualHit is ModelVisual3D)
             {
                 ModelVisual3D visual = (ModelVisual3D)result.VisualHit;
+                System.Diagnostics.Debug.WriteLine("We hit point (" + result.PointHit.X + ", " + result.PointHit.Y + ", " + result.PointHit.Z + ")");
                 return visual;
             }
-
+            */
             return null;
         }
 

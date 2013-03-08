@@ -7,29 +7,13 @@ namespace PARSE
 {
     class UnitConvertor
     {
-        private const double pctorwtransform = 0.818816522;//to be determined experimentally for 3 dimensional content such as volume.
-        
-        public static double convertPC3DMeasurement(double PCM)
+        private const double pctorwtransform = 0.829104109;//to be determined experimentally
+
+        public static double convertPCM(double PCM, int dimension)
         {
             double output = -1;
-            output = PCM * Math.Pow(pctorwtransform, 3);
-            return output;
-
-        }
-
-        public static double convertPC1DMeasurement(double PCM)
-        {
-            double output = -1;
-            output = PCM * pctorwtransform;
+            output = PCM * Math.Pow(pctorwtransform, dimension);
             return output;
         }
-
-        public static double convertPC2DMeasurement(double PCM)
-        {
-            double output = -1;
-            output = PCM * Math.Pow(pctorwtransform, 2);
-            return output;
-        }
-
     }
 }

@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
+using PARSE.ICP;
 
 using HelixToolkit.Wpf;
 using KdTree;
@@ -43,6 +44,9 @@ namespace PARSE
         //centre points (these will need changing at some point)
         private const int cx = 640 / 2;
         private const int cy = 480 / 2;
+
+        //boolean to determine if floor has been rmoved
+        private Boolean floorHasBeenRemoved = false;
 
         //fiddle values (they make it work but I don't know why!)
         private const double fxinv = 1.0 / 476;
@@ -178,6 +182,61 @@ namespace PARSE
 
             //now call the overloaded method 
             setPoints(rawDepth, r, g, b);
+        }
+
+        public void setPoints(int[] rawDepth, int r, int g, int b)
+        {
+            for (int iy = 0; iy < 480; iy++)
+            {
+                for (int ix = 0; ix < 640; ix++)
+                {
+                    int i = (iy * 640) + ix;
+
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
+                    {
+                        rawDepth[i] = -1;
+
+                        //at the moment we seem to be deleting points that are too far away, this will need changing at some point
+                        //this.depthFramePoints[i] = new Point3D();
+                    }
+                    else
+                    {
+                        double zz = rawDepth[i] * scale;
+                        double x = (cx - ix) * zz * fxinv;
+                        double y = (cy - iy) * zz * fyinv;
+                        double z = zz;
+
+                        /*
+                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
+                         */
+
+
+                        //check min values
+                        if (x < minx) { minx = x; }
+                        if (y < miny) { miny = y; }
+                        if (z < minz) { minz = z; }
+
+                        //check max values
+                        if (x > maxx) { maxx = x; }
+                        if (y > maxy) { maxy = y; }
+                        if (z > maxz) { maxz = z; }
+
+                        //create a new point key
+                        double[] pointKey = new double[3];
+
+                        //set key
+                        pointKey[0] = x;
+                        pointKey[1] = y;
+                        pointKey[2] = z;
+
+                        Point3D poLoc = new Point3D(x, y, z);
+                        PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r, g, b);
+
+                        this.points.insert(pointKey, po);
+                    }
+                }
+            }
+
         }
 
         //this is not fully implemented as I don't know how colours are represented!
@@ -393,7 +452,7 @@ namespace PARSE
                     if (newPoint.Y > maxy) { maxy = newPoint.Y; }
                     if (newPoint.Z > maxz) { maxz = newPoint.Z; }  
 
-                    //jam into the tree 
+                    //jam into the tree hole
                     double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
                     newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
                 }
@@ -404,6 +463,20 @@ namespace PARSE
             else{
                 //throw an exception and annoy Bernie in the process ;)
             }
+        }
+
+        /// <summary>
+        /// Colours all the points in the point cloud based on specified RGB. Sets overall texture colour.
+        /// </summary>
+        /// <param name="r">r value</param>
+        /// <param name="g">g value</param>
+        /// <param name="g">b value</param>
+        /// 
+        public PointCloud setColour(PointCloud pc, int r, int g, int b)
+        {
+            pc.setPoints(pc.rawDepth, r, g, b);
+
+            return pc;
         }
 
         /// <summary>
@@ -421,6 +494,49 @@ namespace PARSE
         public double getxMin() { return minx; }
         public double getyMin() { return miny; }
         public double getzMin() { return minz; }
-    
+
+        public void deleteFloor()
+        {
+            if (!floorHasBeenRemoved)
+            {
+                double[] pointMin = { minx, miny, minz };
+                double[] pointMax = { maxx, miny + ((maxy - miny) / (VolumeCalculator.number)), maxz };
+
+                Object[] temp = points.range(pointMin, pointMax);
+
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    Point3D tempPoint = ((PointRGB)temp[i]).point;
+                    double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
+                    this.points.delete(tempArray);
+                }
+
+                floorHasBeenRemoved = true;
+
+                //re calc minx, miny, minz
+                double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
+                double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
+                Object[] points3d = points.range(minPoint,maxPoint);
+
+                minx = double.MaxValue;
+                miny = double.MaxValue;
+                minz = double.MaxValue;
+
+                maxx = double.MinValue;
+                maxy = double.MinValue;
+                maxz = double.MinValue;
+
+                for (int i = 0; i < points3d.Length; i++)
+                {
+                    Point3D oldPoint = ((PointRGB)(points3d[i])).point;
+                    if (oldPoint.X < minx) { minx = oldPoint.X; }
+                    if (oldPoint.Y < miny) { miny = oldPoint.Y; }
+                    if (oldPoint.Z < minz) { minz = oldPoint.Z; }
+                    if (oldPoint.X > maxx) { maxx = oldPoint.X; }
+                    if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
+                    if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
+                }
+            }
+        }
     }
 }
