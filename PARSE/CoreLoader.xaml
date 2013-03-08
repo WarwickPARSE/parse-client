@@ -49,12 +49,12 @@
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
                 <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
                 </MenuItem>
-     <MenuItem Header="Capture">
-                    <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                    <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
+     <MenuItem Header="Calculate">
+                    <MenuItem Header="Volume" Click="VolumeOption_Click"/>
+                    <MenuItem Header="Limb Circumference" Click="LimbOption_Click"/>
      </MenuItem>
      <MenuItem Header="_Help">
-
+                <MenuItem Header="Debug Console" Click="OpenDebug_Click"/> 
      </MenuItem>
     </Menu>
 
@@ -68,13 +68,13 @@
         </TextBlock>
         <TextBlock Margin="455,434,667,286" Grid.Row="1" Canvas.Left="-353" Canvas.Top="-227">   
              <Image Name="load" Source="Resources/open.png" Width="15" Height="15" VerticalAlignment="Center"/>
-            <Hyperlink NavigateUri="http://www.google.com">
+            <Hyperlink Click="LoadScan_Click">
                     Load Existing Patient
             </Hyperlink>
         </TextBlock>
         <TextBlock Margin="455,466,597,255" Grid.Row="1" Canvas.Left="-353" Canvas.Top="-227">
              <Image Name="person" Source="Resources/person.png" Width="15" Height="15" VerticalAlignment="Center"/>
-            <Hyperlink NavigateUri="http://www.google.com">
+            <Hyperlink Click="NewScan_Click">
                     Start Volume Scanning Procedure
             </Hyperlink>
         </TextBlock>

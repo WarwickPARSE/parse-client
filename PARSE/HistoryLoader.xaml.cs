@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Threading;
-using System.Diagnostics;
 using System.Windows.Media.Media3D;
 using System.IO;
 
@@ -24,7 +23,7 @@ namespace PARSE
     /// </summary>
     /// 
 
-    public partial class RuntimeLoader : Window
+    public partial class HistoryLoader : Window
     {
 
         //persistently store our list of planes
@@ -32,31 +31,23 @@ namespace PARSE
 
         //publicly accessible area list from previous calculations
         public List<double> areaList;
-
-        public RuntimeLoader()
+        
+        public HistoryLoader()
         {
             InitializeComponent();
             storedPlanes = new List<List<Point3D>>();
-            this.Loaded += new RoutedEventHandler(RuntimeLoader_Loaded);
+            this.Loaded += new RoutedEventHandler(HistoryLoader_Loaded);
         }
 
-        private void RuntimeLoader_Loaded(object Sender, RoutedEventArgs e)
+        private void HistoryLoader_Loaded(object Sender, RoutedEventArgs e)
         {
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
             this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
-            this.Height = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - (this.Owner.OwnedWindows[0].Width/1.25);
+            this.Height = this.Owner.Width * 0.2;
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
-            this.textBox1.Width = this.Width - 20;
-            this.textBox1.Height = this.Height - 75;
-
-            //set console out to this control
-            TraceListener debugListener = new MyTraceListener(textBox1);
-            Debug.Listeners.Add(debugListener);
-            //Trace.Listeners.Add(debugListener);
 
             //check if a scan event is in place
-
             if (storedPlanes.Count == 0)
             {
                 //in the case when we have no planes to show, modify the ui.
@@ -87,23 +78,6 @@ namespace PARSE
 
         }
 
-        public void sendMessageToOutput(String type, String message) {
-
-            try
-            {
-                String curtime = "[" + DateTime.Now.ToString("T") + "]";
-
-                //case statements for different types of messages to go here.
-                textBox1.AcceptsReturn = true;
-                textBox1.AppendText(curtime + "[" + type + "]: " + message+"\u2028");
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine("[CRITICAL]: Output window failed to update");
-                System.Diagnostics.Debug.WriteLine(e);
-            }
-        }
-
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
             //Set relevant UI components to visisble
@@ -132,8 +106,8 @@ namespace PARSE
             noresults.Visibility = Visibility.Collapsed;
             newscan.Visibility = Visibility.Collapsed;
 
-            planeNo.Text = "Plane Outline: " + (int) planeIndex;
-            
+            planeNo.Text = "Plane Outline: " + (int)planeIndex;
+
             System.Diagnostics.Debug.WriteLine("Number of caught planes: " + planes.Count);
 
             if (storedPlanes.Count == 0)
@@ -154,55 +128,56 @@ namespace PARSE
             double[] x = new double[storedPlanes[i].Count];
             double[] z = new double[storedPlanes[i].Count];
 
-                for (int j = 0; j < storedPlanes[i].Count; j++) {
+            for (int j = 0; j < storedPlanes[i].Count; j++)
+            {
 
-                        //Boundary check of points.
-                        if (storedPlanes[i][j].X > xmax)
-                        {
-                            xmax = storedPlanes[i][j].X;
-                        }
-
-                        if (storedPlanes[i][j].Z > zmax)
-                        {
-                            zmax = storedPlanes[i][j].Z;
-                        }
-
-                        if (storedPlanes[i][0].X < xmin)
-                        {
-                            xmin = storedPlanes[i][0].X;
-                        }
-                        if (storedPlanes[i][j].X < xmin)
-                        {
-                            xmin = storedPlanes[i][j].X;
-                        }
-
-                        if (storedPlanes[i][0].Z < zmin)
-                        {
-                            zmin = storedPlanes[i][0].Z;
-                        }
-                        if (storedPlanes[i][j].Z < zmin)
-                        {
-                            zmin = storedPlanes[i][j].Z;
-                        }
-
-                        //assign to arrays
-                        x[j] = storedPlanes[i][j].X;
-                        z[j] = storedPlanes[i][j].Z;
-
+                //Boundary check of points.
+                if (storedPlanes[i][j].X > xmax)
+                {
+                    xmax = storedPlanes[i][j].X;
                 }
 
-                //write points to plane renderer class for visualisation.
-                this.DataContext = new PlaneVisualisation(x,z);
+                if (storedPlanes[i][j].Z > zmax)
+                {
+                    zmax = storedPlanes[i][j].Z;
+                }
 
-                System.Diagnostics.Debug.WriteLine("Planes visualised");
-                System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
-                System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
-                System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
-                System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
+                if (storedPlanes[i][0].X < xmin)
+                {
+                    xmin = storedPlanes[i][0].X;
+                }
+                if (storedPlanes[i][j].X < xmin)
+                {
+                    xmin = storedPlanes[i][j].X;
+                }
 
-                //setData
-                ((LineSeries)(volchart.Series[0])).ItemsSource =
-                    new KeyValuePair<DateTime,int>[]{
+                if (storedPlanes[i][0].Z < zmin)
+                {
+                    zmin = storedPlanes[i][0].Z;
+                }
+                if (storedPlanes[i][j].Z < zmin)
+                {
+                    zmin = storedPlanes[i][j].Z;
+                }
+
+                //assign to arrays
+                x[j] = storedPlanes[i][j].X;
+                z[j] = storedPlanes[i][j].Z;
+
+            }
+
+            //write points to plane renderer class for visualisation.
+            this.DataContext = new PlaneVisualisation(x, z);
+
+            System.Diagnostics.Debug.WriteLine("Planes visualised");
+            System.Diagnostics.Debug.WriteLine("xmin: " + xmin);
+            System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
+            System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
+            System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
+
+            //setData
+            ((LineSeries)(volchart.Series[0])).ItemsSource =
+                new KeyValuePair<DateTime, int>[]{
                     new KeyValuePair<DateTime,int>(DateTime.Now, 100),
                     new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(1), 130),
                     new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
@@ -222,43 +197,4 @@ namespace PARSE
             this.maxarea.Content = "Plane " + (int) e.NewValue;
         }
     }
-
-    public class MyTraceListener : TraceListener
-    {
-        private System.Windows.Controls.RichTextBox output;
-
-        public MyTraceListener(System.Windows.Controls.RichTextBox output)
-        {
-            this.Name = "Trace";
-            this.output = output;
-        }
-
-
-        public override void Write(string message)
-        {
-
-            Action append = delegate()
-            {
-                output.AppendText(string.Format("[{0}] ", DateTime.Now.ToString("T")));
-                output.AppendText(message);
-                output.ScrollToEnd();
-            };
-            if (output.Dispatcher.CheckAccess())
-            {
-                output.Dispatcher.Invoke(
-                    System.Windows.Threading.DispatcherPriority.Normal, append);
-            }
-            else
-            {
-                append();
-            }
-
-        }
-
-        public override void WriteLine(string message)
-        {
-            Write("[Debug]: " + message + "\u2028");
-        }
-    }
-
-    }
+}

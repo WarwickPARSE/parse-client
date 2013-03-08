@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Animation;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+using System.ComponentModel;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -42,8 +43,9 @@ namespace PARSE
         public ViewLoader                  windowViewer;
         public ScanLoader                  windowScanner;
         public Window                      windowPatient;
-        public RuntimeLoader               windowRuntime;
+        public HistoryLoader               windowHistory;
         public MeasurementLoader           windowMeasurement;
+        public DebugLoader                 windowDebug;
 
         //Modelling specific definitions
         private GeometryModel3D             Model;
@@ -103,46 +105,26 @@ namespace PARSE
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event identifier</param>
-
+        
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //Open child windows
-            try
-            {
-                //open Patient Details
-                //TODO: need to abstract this for when we add a new patient.
-                windowPatient = new PatientLoader(true);
-                windowPatient.Owner = this;
-                windowPatient.Show();
+            //define debug window
+            windowDebug = new DebugLoader();
+            windowDebug.Owner = this;
+            
+            windowDebug.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
+            windowDebug.sendMessageToOutput("Status", "Initializing Kinect Device");
 
-                //open Runtime viewer (aka results,history,output)
-                windowRuntime = new RuntimeLoader();
-                windowRuntime.Owner = this;
-                windowRuntime.Show();
-
-                windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
-                windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
-
-
-                if (KinectSensor.KinectSensors.Count>0)
+            if (KinectSensor.KinectSensors.Count>0)
                 {
-                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+                    windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 }
                 else
                 {
-                    windowRuntime.sendMessageToOutput("Warning", "No Kinect Found");
+                    windowDebug.sendMessageToOutput("Warning", "No Kinect Found");
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
-
-                //initialize scanner detail viewer
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }
         }
 
         private void shutAnyWindows()
@@ -154,6 +136,10 @@ namespace PARSE
             if (windowScanner != null)
             {
                 windowScanner.Close();
+            }
+            if (windowHistory != null)
+            {
+                windowHistory.Close();
             }
         }
         
@@ -225,18 +211,16 @@ namespace PARSE
                 this.kinectInterp.stopStreams();
                 this.kinectInterp.kinectSensor.Stop();
             }
-            Environment.Exit(0);
             Console.WriteLine("Main Window Closed - Exiting (0)");
             Environment.Exit(0);
         }
 
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
-            this.shutAnyWindows(); 
+            this.shutAnyWindows();
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
-            
         }
 
         /* This will eventually form the recogniser *mechanism* for what ever
@@ -272,20 +256,27 @@ namespace PARSE
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
+            //define
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
+
             //Static call to volume calculation method, pass persistent point cloud object
             PointCloud pc = pcd;
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
             double height = HeightCalculator.getHeight(pc);
-            windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes, 1);
-            windowRuntime.voloutput.Content = volume + "m^3";
-            windowRuntime.heightoutput.Content = height + "m";
+            windowHistory.runtimeTab.SelectedIndex = 0;
+            windowHistory.visualisePlanes(planes, 1);
+            windowHistory.voloutput.Content = volume + "m^3";
+            windowHistory.heightoutput.Content = height + "m";
 
-            //introduction of planes with their respective areas
             List<double> areaList = AreaCalculator.getAllAreas(planes);
-            windowRuntime.areaList = areaList;
+
+            windowHistory.areaList = areaList;
+
+            //open Runtime viewer (aka results,history,output)
+            windowHistory.Show();
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
@@ -395,19 +386,23 @@ namespace PARSE
                 {
                     pcdl[i].deleteFloor();
                 }
-            
-            
-            windowScanner.Close();
-            //windowViewer.Close();
+
+
+            this.shutAnyWindows();
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Show();
         }
 
+        private void OpenDebug_Click(object sender, RoutedEventArgs e)
+        {
+            this.windowDebug.Show();
+        }
+
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
-             * 0) closes any viewer
+             * 0) closes any viewer, opens runtime
              * 1) adds selected point cloud to visualiser
              * 2) groups it
              */
@@ -465,7 +460,7 @@ namespace PARSE
         {
             //open patient detail viewer
             this.shutAnyWindows();
-            windowPatient = new PatientLoader(false);
+            windowPatient = new PatientLoader(true);
             windowPatient.Owner = this;
             windowPatient.Show();
         }
@@ -477,7 +472,6 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
             }
         }
-
 
         void MenuItem_Exit(object sender, RoutedEventArgs e)
         {
