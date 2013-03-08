@@ -107,19 +107,11 @@ namespace PARSE
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //Open child windows
-            try
-            {
-                //open Patient Details
-                //TODO: need to abstract this for when we add a new patient.
-                windowPatient = new PatientLoader(true);
-                windowPatient.Owner = this;
-                windowPatient.Show();
-
                 //open Runtime viewer (aka results,history,output)
                 windowRuntime = new RuntimeLoader();
                 windowRuntime.Owner = this;
-                windowRuntime.Show();
-
+                //windowRuntime.Show();
+                
                 windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
                 windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
 
@@ -134,15 +126,6 @@ namespace PARSE
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
-
-                //initialize scanner detail viewer
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }
         }
 
         private void shutAnyWindows()
@@ -225,18 +208,16 @@ namespace PARSE
                 this.kinectInterp.stopStreams();
                 this.kinectInterp.kinectSensor.Stop();
             }
-            Environment.Exit(0);
             Console.WriteLine("Main Window Closed - Exiting (0)");
             Environment.Exit(0);
         }
 
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
-            this.shutAnyWindows(); 
+            this.shutAnyWindows();
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
-            
         }
 
         /* This will eventually form the recogniser *mechanism* for what ever
@@ -403,7 +384,7 @@ namespace PARSE
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
-             * 0) closes any viewer
+             * 0) closes any viewer, opens runtime
              * 1) adds selected point cloud to visualiser
              * 2) groups it
              */
@@ -461,7 +442,7 @@ namespace PARSE
         {
             //open patient detail viewer
             this.shutAnyWindows();
-            windowPatient = new PatientLoader(false);
+            windowPatient = new PatientLoader(true);
             windowPatient.Owner = this;
             windowPatient.Show();
         }
