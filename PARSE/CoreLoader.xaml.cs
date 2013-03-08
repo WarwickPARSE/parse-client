@@ -140,7 +140,6 @@ namespace PARSE
                 //initialize scanner detail viewer
                 windowScanner = new ScanLoader();
                 windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
             }
             catch (Exception err)
             {
@@ -243,7 +242,6 @@ namespace PARSE
             {
                 windowScanner = new ScanLoader();
                 windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
                 windowScanner.Show();
                 windowViewer.Close();
             }
@@ -252,14 +250,6 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine(err);
             }  
         }
-
-        void windowScanner_Closed(object sender, EventArgs e)
-        {
-            windowViewer = new ViewLoader();
-            windowViewer.Owner = this;
-            windowViewer.Show();
-        }
-
 
         /* This will eventually form the recogniser *mechanism* for what ever
          * recognition will occur in the system. */
@@ -313,9 +303,6 @@ namespace PARSE
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
-            //open windowviewer with isolation method.
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
-            
             /*Requires generated model, raw depth array and previous*/
             //windowViewer.setLimbVisualisation();
             LimbCalculator.calculate(windowScanner.getYourMum(), windowScanner.getJointMeasurements());
@@ -346,7 +333,6 @@ namespace PARSE
             {
                 windowScanner = new ScanLoader(pcdl);
                 windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
                 windowScanner.Show();
                 windowViewer.Close();
             }
@@ -444,11 +430,9 @@ namespace PARSE
             
             pcd = stitcher.getResult(); 
             
-            //windowScanner.Close();
             windowViewer.Close();
             windowScanner = new ScanLoader(pcd);
             windowScanner.Owner = this;
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
 
         }
@@ -465,7 +449,6 @@ namespace PARSE
             windowViewer.Close();
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
         }
 
@@ -500,11 +483,8 @@ namespace PARSE
             pcd = stitcher.getResult();
             pcdl = stitcher.getResultList();
 
-            //windowScanner.Close();
-            windowViewer.Close();
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
-            windowScanner.Closed += new EventHandler(windowScanner_Closed);
             windowScanner.Show();
         }
 
@@ -531,10 +511,10 @@ namespace PARSE
         {
             try
             {
-                //open default window viewer
+                /*//open default window viewer
                 windowViewer = new ViewLoader();
                 windowViewer.Owner = this;
-                windowViewer.Show();
+                windowViewer.Show();*/
 
                 //open patient detail viewer
                 windowPatient = new PatientLoader(false);
@@ -562,7 +542,6 @@ namespace PARSE
                 //initialize scanner detail viewer
                 windowScanner = new ScanLoader();
                 windowScanner.Owner = this;
-                windowScanner.Closed += new EventHandler(windowScanner_Closed);
 
             }
             catch (Exception err)
