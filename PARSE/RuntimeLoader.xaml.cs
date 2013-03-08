@@ -42,7 +42,7 @@ namespace PARSE
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
             this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
-            this.Height = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - (this.Owner.OwnedWindows[0].Width/1.25);
+            this.Height = this.Owner.Width * 0.2;
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
             this.textBox1.Width = this.Width - 20;
             this.textBox1.Height = this.Height - 75;
