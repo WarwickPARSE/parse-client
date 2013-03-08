@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Windows.Threading;
+using System.ComponentModel;
 
 namespace PARSE
 {
@@ -23,13 +25,14 @@ namespace PARSE
         {
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(DebugLoader_Loaded);
+            this.Closing += new CancelEventHandler(Window_Closing);
         }
 
         private void DebugLoader_Loaded(object Sender, RoutedEventArgs e)
         {
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
-            this.Top = this.Owner.Top - 20;
+            this.Top = this.Owner.Top + 20;
             this.debugBox.Width = this.Width - 20;
             this.debugBox.Height = this.Height - 75;
 
@@ -55,6 +58,12 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("[CRITICAL]: Output window failed to update");
                 System.Diagnostics.Debug.WriteLine(e);
             }
+        }
+
+        public void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true; 
+            this.Hide();
         }
 
     }

@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Animation;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+using System.ComponentModel;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -104,15 +105,13 @@ namespace PARSE
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event identifier</param>
-
+        
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //Open child windows
-
             //define debug window
             windowDebug = new DebugLoader();
             windowDebug.Owner = this;
-
+            
             windowDebug.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
             windowDebug.sendMessageToOutput("Status", "Initializing Kinect Device");
 
@@ -389,6 +388,11 @@ namespace PARSE
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Show();
+        }
+
+        private void OpenDebug_Click(object sender, RoutedEventArgs e)
+        {
+            this.windowDebug.Show();
         }
 
         private void LoadScan_Click(object sender, RoutedEventArgs e)
