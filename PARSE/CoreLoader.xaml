@@ -30,35 +30,32 @@
             <Separator/>
             <MenuItem Header="Exit" IsCheckable="true"/>
         </MenuItem>
-        <MenuItem Header="_Edit">
-
-        </MenuItem>
-            <MenuItem Header="_Control">
-                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
-                <Separator/>
-                <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
-                <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
-            </MenuItem>
-        <MenuItem Header="Patient">
-            <MenuItem Header="Capture">
-                <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
-                <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
-            </MenuItem>
-            <MenuItem Header="_Details" IsCheckable="False"/>
+        <MenuItem Header="_Control">
+            <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
             <Separator/>
-                <MenuItem Header="_New Scan..." IsCheckable="False" Click="NewScan_Click" />
-                <MenuItem Header="_Import Scan" IsCheckable="False" Click="ImportScan_Click"/>
-                <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
-                <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
-                <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
-                <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
-                <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
-            </MenuItem>
-        <MenuItem Header="_Help">
-
+            <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
+            <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
         </MenuItem>
-        </Menu>
+    <MenuItem Header="Patient">
+        <MenuItem Header="Capture">
+            <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
+            <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
+            <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
+        </MenuItem>
+        <MenuItem Header="_Details" IsCheckable="False"/>
+        <Separator/>
+            <MenuItem Header="_New Scan..." IsCheckable="False" Click="NewScan_Click" />
+            <MenuItem Header="_Import Scan" IsCheckable="False" Click="ImportScan_Click"/>
+            <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
+            <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
+            <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
+            <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
+            <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
+        </MenuItem>
+    <MenuItem Header="_Help">
+
+    </MenuItem>
+    </Menu>
 
         <!--Central Textblock -->
         <Canvas Name="optioncv" Margin="363,220,375,182" Grid.Row="1">
