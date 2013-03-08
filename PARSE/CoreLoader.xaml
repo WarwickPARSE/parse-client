@@ -42,20 +42,18 @@
             <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
         </MenuItem>
     <MenuItem Header="Patient">
-        <MenuItem Header="Capture">
-            <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-            <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
-            <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
-        </MenuItem>
-        <MenuItem Header="_Details" IsCheckable="False"/>
-        <Separator/>
-            <MenuItem Header="_New Scan..." IsCheckable="False" Click="NewScan_Click" />
-            <MenuItem Header="_Import Scan" IsCheckable="False" Click="ImportScan_Click"/>
-            <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
-            <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
-            <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
-            <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
-            <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
+                <MenuItem Header="New Scan" IsCheckable="False" Click="NewScan_Click" />
+                <MenuItem Header="View Previous Scan" IsCheckable="False" Click="OldScan_Click"/>
+                <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
+                <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
+                <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
+                <Separator/>
+                <MenuItem Header="Capture">
+                    <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
+                    <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
+                    <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Details" IsCheckable="False"/>
         </MenuItem>
     <MenuItem Header="_Help">
 

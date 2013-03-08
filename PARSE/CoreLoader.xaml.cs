@@ -145,12 +145,21 @@ namespace PARSE
             }
         }
 
-        private void RGB_Click(object sender, RoutedEventArgs e)
+        private void shutAnyWindows()
         {
             if (windowViewer != null)
             {
                 windowViewer.Close();
             }
+            if (windowScanner != null)
+            {
+                windowScanner.Close();
+            }
+        }
+        
+        private void RGB_Click(object sender, RoutedEventArgs e)
+        {
+            this.shutAnyWindows();
             windowViewer = new ViewLoader("RGB");
             windowViewer.Owner = this;
             windowViewer.Show();
@@ -158,10 +167,7 @@ namespace PARSE
 
         private void Depth_Click(object sender, RoutedEventArgs e)
         {
-            if (windowViewer != null)
-            {
-                windowViewer.Close();
-            } 
+            this.shutAnyWindows(); 
             windowViewer = new ViewLoader("Depth");
             windowViewer.Owner = this;
             windowViewer.Show();
@@ -169,10 +175,7 @@ namespace PARSE
 
         private void Skeleton_Click(object sender, RoutedEventArgs e)
         {
-            if (windowViewer != null)
-            {
-                windowViewer.Close();
-            } 
+            this.shutAnyWindows();
             windowViewer = new ViewLoader("Skeleton");
             windowViewer.Owner = this;
             windowViewer.Show();
@@ -180,10 +183,7 @@ namespace PARSE
 
         private void DepthIso_Click(object sender, RoutedEventArgs e)
         {
-            if (windowViewer != null)
-            {
-                windowViewer.Close();
-            }
+            this.shutAnyWindows();
             windowViewer = new ViewLoader("Depth Isolation");
             windowViewer.Owner = this;
             windowViewer.Show();
@@ -191,10 +191,7 @@ namespace PARSE
 
         private void RGBIso_Click(object sender, RoutedEventArgs e)
         {
-            if (windowViewer != null)
-            {
-                windowViewer.Close();
-            }
+            this.shutAnyWindows();
             windowViewer = new ViewLoader("RGB Isolation");
             windowViewer.Owner = this;
             windowViewer.Show();
@@ -232,26 +229,15 @@ namespace PARSE
 
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (windowViewer != null)
-                {
-                    windowViewer.Close();
-                } 
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-                windowScanner.Show();
-                windowViewer.Close();
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }  
+            this.shutAnyWindows(); 
+            windowScanner = new ScanLoader();
+            windowScanner.Owner = this;
+            windowScanner.Show();
+            
         }
 
         /* This will eventually form the recogniser *mechanism* for what ever
          * recognition will occur in the system. */
-
         private void surfTimer_tick(Object sender, EventArgs e)
         {
 
@@ -284,10 +270,6 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-
-
-            /*3)*/
-            //Static call to volume calculation method, pass persistent point cloud object
             PointCloud pc = pcd;
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
             List<List<Point3D>> planes = T.Item2;
@@ -304,41 +286,6 @@ namespace PARSE
             /*Requires generated model, raw depth array and previous*/
             //windowViewer.setLimbVisualisation();
             LimbCalculator.calculate(windowScanner.getYourMum(), windowScanner.getJointMeasurements());
-
-        }
-
-        private void ImportScan_Click(object sender, RoutedEventArgs e)
-        {
-
-            /*Import scan currently imports files based on the assumption that they
-             * have been serialized as a visualisation object. Once the point cloud 
-             * class has been been implemented, it will assume that it is dealing
-             * with point cloud objects which will then be passed to the visualisation
-             * method as appropriate */
-
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".PARSE";
-            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
-
-            if (dlg.ShowDialog() == true)
-            {
-                String filename = dlg.FileName;
-                this.DataContext = ScanSerializer.deserialize(filename);
-                pcdl = ScanSerializer.depthPc;
-            }
-
-            try
-            {
-                windowScanner = new ScanLoader(pcdl);
-                windowScanner.Owner = this;
-                windowScanner.Show();
-                windowViewer.Close();
-            }
-
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err);
-            }  
 
         }
 
@@ -450,13 +397,16 @@ namespace PARSE
             windowScanner.Show();
         }
 
-        private void CloudProcessor_Click(object sender, RoutedEventArgs e)
+        private void OldScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
+             * 0) closes any viewer
              * 1) adds selected point cloud to visualiser
              * 2) groups it
-             * 3) peforms volume processing*/
+             */
 
+            /*0)*/
+            this.shutAnyWindows();
 
      /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".PARSE";
