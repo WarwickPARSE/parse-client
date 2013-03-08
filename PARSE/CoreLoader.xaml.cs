@@ -221,8 +221,12 @@ namespace PARSE
         {
             if (this.kinectInterp.kinectReady)
             {
+                Console.WriteLine("Stopping Kinect");
+                this.kinectInterp.stopStreams();
                 this.kinectInterp.kinectSensor.Stop();
             }
+            Environment.Exit(0);
+            Console.WriteLine("Main Window Closed - Exiting (0)");
             Environment.Exit(0);
         }
 
@@ -468,6 +472,14 @@ namespace PARSE
             {
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
             }
+        }
+
+
+        void MenuItem_Exit(object sender, RoutedEventArgs e)
+        {
+            //kinectInterp.stopStreams();
+            //kinectInterp.kinectSensor.Stop();
+            Environment.Exit(0);
         }
        
     }

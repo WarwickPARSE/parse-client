@@ -13,23 +13,8 @@ namespace PARSE
     /// </summary>
     public partial class MeasurementLoader : Window
     {
-        
-        private System.Windows.Forms.Timer pcTimer;
-        private int countdown;
-
-        //Kinect instance
-        private KinectInterpreter kinectInterp;
-
-        // Skeleton
-        private Dictionary<JointType, double[]> jointDepths;
-
-        // speech synthesizer instances
-        private SpeechSynthesizer ss;
-
-        private Canvas tmpCanvas;
-
+        // Reference to the tracking class.
         SensorTracker tracker;
-
 
         public MeasurementLoader()
         {
@@ -47,9 +32,6 @@ namespace PARSE
             this.Top = this.Owner.Top + 70;
             this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width -20;
 
-            //start scanning procedure
-            //kinectInterp = new KinectInterpreter(skeloutline);
-            //kinectInterp.stopStreams();
             if (KinectSensor.KinectSensors.Count > 0)
                 System.Diagnostics.Debug.WriteLine("Measurement Window Ready");
             else
@@ -59,8 +41,14 @@ namespace PARSE
         private void cancel_scan_Click(object sender, RoutedEventArgs e)
         {
             if (tracker != null)
-                tracker.Stop();
-            this.Close();
+                tracker.stop();
+
+            start_scan.Visibility = Visibility.Visible;
+            Visualisation.Visibility = Visibility.Collapsed;
+            instructionblock.Text = "Measurement Cancelled\nClick below to try again";
+            instructionblock2.Visibility = Visibility.Collapsed;
+            instructionblock2.FontSize = 26;
+            //this.Close();
         }
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
@@ -68,56 +56,25 @@ namespace PARSE
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
-            //instructionblock.Visibility = Visibility.Collapsed;
-            instructionblock.Text = "-";
-            // show image
+                        
+            // show image & instructions
             Visualisation.Visibility = Visibility.Visible;
-
-            System.Diagnostics.Debug.WriteLine("Starting measurement visualisation");
+            instructionblock.Visibility = Visibility.Collapsed;
+            instructionblock2.Text = "Loading...";
+            instructionblock2.Visibility = Visibility.Visible;
+            
+            System.Diagnostics.Debug.WriteLine("Starting measurement window...");
 
             // Start tracking
-            tracker = new SensorTracker(Visualisation, this, true, instructionblock);
+            tracker = new SensorTracker(Visualisation, this, true, instructionblock2);
             tracker.captureNewLocation();
             //tracker.captureAtLocation();
-        }
-
-        /*Publicly accessible methods*/
-
-        public Dictionary<JointType, double[]> enumerateSkeletonDepths(Skeleton sk)
-        {
-            //Store double
-            Dictionary<JointType, double[]> jointDepths = new Dictionary<JointType, double[]>();
-
-            //Get depths and x,y locations at joints.
-            foreach (Joint j in sk.Joints)
-            {
-                double[] positions = { j.Position.Z, j.Position.X, j.Position.Y };
-                jointDepths.Add(j.JointType, positions);
-            }
-
-            return jointDepths;
-        }
-
-        public Dictionary<JointType, double[]> getJointMeasurements()
-        {
-            return jointDepths;
-        }
-
-        /* Setters */
-        public void setLimbCues(bool measureMode)
-        {
-            if (measureMode)
-            {
-                this.instructionblock.Visibility = Visibility.Visible;
-                skeloutline.Visibility = Visibility.Visible;
-                this.instructionblock.Text = "Click on an area of the body";
-            }
         }
 
         internal void capture(int x, int y, double angleXY, double angleZ)
         {
             System.Diagnostics.Debug.WriteLine("Scan captured! END");
-            tracker.Stop();
+            tracker.stop();
             this.Close();
         }
 
@@ -125,15 +82,9 @@ namespace PARSE
         {
             if (tracker != null)
             {
-                tracker.Stop();
+                tracker.stop();
                 tracker.close();
             }
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            System.Diagnostics.Process myProcess = System.Diagnostics.Process.GetCurrentProcess();
-            myProcess.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
         }
     }
 }

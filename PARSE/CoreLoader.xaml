@@ -24,11 +24,11 @@
         <Menu>
         <!--Menu definition-->
         <MenuItem Header="_File">
-            <MenuItem Header="_New Patient" IsCheckable="true"/>
-            <MenuItem Header="_Open Patient" IsCheckable="true"/>
-            <MenuItem Header="_Save Patient" IsCheckable="true"/>
+            <MenuItem Header="_New Patient" IsCheckable="false"/>
+            <MenuItem Header="_Open Patient" />
+            <MenuItem Header="_Save Patient" />
             <Separator/>
-            <MenuItem Header="Exit" IsCheckable="true"/>
+            <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
         <MenuItem Header="Kinect">
                 <MenuItem Header="View Feed">
