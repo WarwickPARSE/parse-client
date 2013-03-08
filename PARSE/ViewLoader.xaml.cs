@@ -23,11 +23,6 @@ namespace PARSE
 
         private KinectInterpreter kinectInterp;
 
-        public ViewLoader()
-        {
-
-        }
-
         public ViewLoader(String tmp)
         {
             InitializeComponent();
