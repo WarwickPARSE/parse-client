@@ -38,8 +38,8 @@
                     <MenuItem Header="RGB Isolation" Click="RGBIso_Click"/>
                     <MenuItem Header="Depth Isolation" Click="DepthIso_Click"/>
                 </MenuItem>
-              <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
-            <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
+                <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
+                <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
         </MenuItem>
     <MenuItem Header="Patient">
                 <MenuItem Header="New Scan" IsCheckable="False" Click="NewScan_Click" />
@@ -47,17 +47,15 @@
                 <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
                 <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
-                <Separator/>
-                <MenuItem Header="Capture">
+                <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
+                </MenuItem>
+     <MenuItem Header="Capture">
                     <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
                     <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
-                    <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Details" IsCheckable="False"/>
-        </MenuItem>
-    <MenuItem Header="_Help">
+     </MenuItem>
+     <MenuItem Header="_Help">
 
-    </MenuItem>
+     </MenuItem>
     </Menu>
 
         <!--Central Textblock -->
