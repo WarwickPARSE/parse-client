@@ -219,7 +219,7 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-                frontCloud.deleteFloor();
+                //frontCloud.deleteFloor();
                 fincloud.Add(frontCloud);
                 ss.Speak("Scan Added.");
 
@@ -238,7 +238,7 @@ namespace PARSE
             {
                 //PointCloud structure methods
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-                rightCloud.deleteFloor();
+                //rightCloud.deleteFloor();
                 fincloud.Add(rightCloud);
                 ss.Speak("Scan Added.");
                 ss.Speak("Please turn left with your back to the camera.");
@@ -250,7 +250,7 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-                backCloud.deleteFloor();
+                //backCloud.deleteFloor();
                 fincloud.Add(backCloud);
                 ss.Speak("Scan Added.");
                 ss.Speak("Please turn left once more.");
@@ -261,7 +261,7 @@ namespace PARSE
             {
                 //PointCloud structure methods
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
-                leftCloud.deleteFloor();
+                //leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
 
                 ss.Speak("Scan Added.");
