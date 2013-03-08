@@ -42,12 +42,6 @@ namespace PARSE
                 kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
             }
-            else if (tmp == "RGB-D")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            }
             else if (tmp == "RGB Isolation")
             {
                 kinectInterp.stopStreams();
@@ -78,7 +72,8 @@ namespace PARSE
             }
             else
             {
-                Environment.Exit(-9000);
+                //not sure if this will break
+                this.Close();
             }
         }
 
