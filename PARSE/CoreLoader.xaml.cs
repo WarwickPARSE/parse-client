@@ -282,6 +282,10 @@ namespace PARSE
             windowRuntime.visualisePlanes(planes, 1);
             windowRuntime.voloutput.Content = volume + "m^3";
             windowRuntime.heightoutput.Content = height + "m";
+
+            //introduction of planes with their respective areas
+            List<double> areaList = AreaCalculator.getAllAreas(planes);
+            windowRuntime.areaList = areaList;
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
@@ -394,7 +398,7 @@ namespace PARSE
             
             
             windowScanner.Close();
-            windowViewer.Close();
+            //windowViewer.Close();
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Show();
@@ -436,11 +440,7 @@ namespace PARSE
 
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
-            windowViewer.Close();
             windowScanner.Show();
-            List<double> areaList = AreaCalculator.getAllAreas(planes);
-
-            windowRuntime.areaList = areaList;
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
