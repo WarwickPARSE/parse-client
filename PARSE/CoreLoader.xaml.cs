@@ -106,10 +106,10 @@ namespace PARSE
             //Open child windows
             try
             {
-                //open Visualiser
+                /*//open Visualiser
                 windowViewer = new ViewLoader();
                 windowViewer.Owner = this;
-                windowViewer.Show();
+                windowViewer.Show();*/
                 
                 //open Patient Details
                 //TODO: need to abstract this for when we add a new patient.
@@ -148,6 +148,13 @@ namespace PARSE
             }
         }
 
+        private void RGB_Click(object sender, RoutedEventArgs e)
+        {
+            windowViewer = new ViewLoader("RGB");
+            windowViewer.Owner = this;
+            windowViewer.Show();
+        }
+        
         //TODO: prevent the following two methods from crashing if called in quick succession
         private void btnCalibrate_Click(object sender, RoutedEventArgs e)
         {

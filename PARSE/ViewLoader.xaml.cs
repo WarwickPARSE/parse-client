@@ -25,43 +25,16 @@ namespace PARSE
 
         public ViewLoader()
         {
+
+        }
+
+        public ViewLoader(String tmp)
+        {
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(ViewLoader_Loaded);
-        }
 
-        private void ViewLoader_Loaded(object Sender, RoutedEventArgs e) {
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width - 20;
             //start kinectinterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
-        }
-
-        protected override void OnInitialized(EventArgs e)
-        {
- 	        base.OnInitialized(e);
-        }
-
-        public void setLimbVisualisation()
-        {
-            //Streams for visualisation.
-            kinectInterp.stopStreams();
-            kinectInterp.startRGBStream();
-            kinectInterp.startDepthStream();
-            kinectInterp.startSkeletonStream();
-            this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
-
-            //set skeletal cues.
-            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-
-            //track waist cue.
-
-
-        }
-
-        private void feed_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            string tmp = (selection.SelectedValue as ComboBoxItem).Content.ToString();
 
             if (tmp == "RGB")
             {
@@ -105,9 +78,34 @@ namespace PARSE
             }
             else
             {
-                //Console.WriteLine("PISS and SHIT");
                 Environment.Exit(-9000);
             }
+        }
+
+        private void ViewLoader_Loaded(object Sender, RoutedEventArgs e) {
+            //place relative to coreloader
+            this.Top = this.Owner.Top + 70;
+            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width - 20;
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+ 	        base.OnInitialized(e);
+        }
+
+        public void setLimbVisualisation()
+        {
+            //Streams for visualisation.
+            kinectInterp.stopStreams();
+            kinectInterp.startRGBStream();
+            kinectInterp.startDepthStream();
+            kinectInterp.startSkeletonStream();
+            this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+
+            //set skeletal cues.
+            this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+
+            //track waist cue.
         }
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
