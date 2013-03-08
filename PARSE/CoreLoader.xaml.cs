@@ -42,7 +42,7 @@ namespace PARSE
         public ViewLoader                  windowViewer;
         public ScanLoader                  windowScanner;
         public Window                      windowPatient;
-        public RuntimeLoader               windowRuntime;
+        public HistoryLoader               windowHistory;
         public MeasurementLoader           windowMeasurement;
 
         //Modelling specific definitions
@@ -108,21 +108,21 @@ namespace PARSE
         {
             //Open child windows
                 //open Runtime viewer (aka results,history,output)
-                windowRuntime = new RuntimeLoader();
-                windowRuntime.Owner = this;
-                windowRuntime.Show();
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+                windowHistory.Show();
                 
-                windowRuntime.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
-                windowRuntime.sendMessageToOutput("Status", "Initializing Kinect Device");
+                windowHistory.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
+                windowHistory.sendMessageToOutput("Status", "Initializing Kinect Device");
 
 
                 if (KinectSensor.KinectSensors.Count>0)
                 {
-                    windowRuntime.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+                    windowHistory.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 }
                 else
                 {
-                    windowRuntime.sendMessageToOutput("Warning", "No Kinect Found");
+                    windowHistory.sendMessageToOutput("Warning", "No Kinect Found");
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
@@ -259,10 +259,10 @@ namespace PARSE
             List<List<Point3D>> planes = T.Item2;
             double volume = T.Item1;
             double height = HeightCalculator.getHeight(pc);
-            windowRuntime.runtimeTab.SelectedIndex = 1;
-            windowRuntime.visualisePlanes(planes, 1);
-            windowRuntime.voloutput.Content = volume + "m^3";
-            windowRuntime.heightoutput.Content = height + "m";
+            windowHistory.runtimeTab.SelectedIndex = 1;
+            windowHistory.visualisePlanes(planes, 1);
+            windowHistory.voloutput.Content = volume + "m^3";
+            windowHistory.heightoutput.Content = height + "m";
         }
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
