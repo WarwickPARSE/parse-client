@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="PARSE.Tracking.MeasurementRecord"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" d:DesignHeight="132" d:DesignWidth="198" Width="198">
+    
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Take New Measurement" Click="ContextMenu_NewMeasurement" />
+            <MenuItem Header="Measurement History" Click="ContextMenu_ShowHistory" />
+            <MenuItem Header="Remove Measurement Location" Click="ContextMenu_RemoveMeasurementLocation" />
+        </ContextMenu>
+    </UserControl.ContextMenu>
+    
+    <Grid Background="WhiteSmoke">
+        <Label Content="Location: " Height="28" HorizontalAlignment="Left" Margin="12,8,0,0" Name="label_Location" VerticalAlignment="Top" Width="174" FontWeight="Bold" VerticalContentAlignment="Center" Padding="3" />
+        <Label Content="First Captured:" Height="28" HorizontalAlignment="Left" Margin="20,36,0,0" Name="label_First" VerticalAlignment="Top" Width="174" VerticalContentAlignment="Center" Padding="3" />
+        <Label Content="Last Captured:" Height="28" HorizontalAlignment="Left" Margin="20,64,0,0" Name="label_Recent" VerticalAlignment="Top" Width="174" VerticalContentAlignment="Center" Padding="3" />
+        <Label Content="Last Value:" Height="28" HorizontalAlignment="Left" Margin="20,92,0,0" Name="label_Value" VerticalAlignment="Top" Width="174" VerticalContentAlignment="Center" Padding="3" />
+        
+        
+    </Grid>
+</UserControl>

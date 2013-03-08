@@ -153,7 +153,7 @@ namespace PARSE
         private void btnCalibrate_Click(object sender, RoutedEventArgs e)
         {
             ss.Speak("this button should really set the calibrate angle, this is the last thing greg will do, please remind him.");
-            ss.Speak("This was a triumph. I'm making a note here: HUGE SUCCESS. It's hard to overstate my satisfaction. Aperture Science, We do what we must because we can. For the good of all of us. Except the ones who are dead. But there's no sense crying over every mistake. You just keep on trying till you run out of cake. And the Science gets done. And you make a neat gun. For the people who are still alive. I'm not even angry. I'm being so sincere right now. Even though you broke my heart. And killed me. And tore me to pieces. And threw every piece into a fire. As they burned it hurt because I was so happy for you! Now these points of data make a beautiful line. And we're out of beta. We're releasing on time. So I'm GLaD.  I got burned. Think of all the things we learned for the people who are still alive. Go ahead and leave me. I think I prefer to stay inside. Maybe you'll find someone else to help you. Maybe Black Mesa. THAT WAS A JOKE. HAHA.  FAT CHANCE. Anyway, this cake is great. It's so delicious and moist. Look at me still talking when there's Science to do. When I look out there, it makes me GLaD I'm not you. I've experiments to run. There is research to be done. On the people who are still alive. And believe me I am still alive. I'm doing Science and I'm still alive. I feel FANTASTIC and I'm still alive. While you're dying I'll be still alive. And when you're dead I will be still alive. STILL ALIVE. STILL ALIVE. ");
+            //ss.Speak("This was a triumph. I'm making a note here: HUGE SUCCESS. It's hard to overstate my satisfaction. Aperture Science, We do what we must because we can. For the good of all of us. Except the ones who are dead. But there's no sense crying over every mistake. You just keep on trying till you run out of cake. And the Science gets done. And you make a neat gun. For the people who are still alive. I'm not even angry. I'm being so sincere right now. Even though you broke my heart. And killed me. And tore me to pieces. And threw every piece into a fire. As they burned it hurt because I was so happy for you! Now these points of data make a beautiful line. And we're out of beta. We're releasing on time. So I'm GLaD.  I got burned. Think of all the things we learned for the people who are still alive. Go ahead and leave me. I think I prefer to stay inside. Maybe you'll find someone else to help you. Maybe Black Mesa. THAT WAS A JOKE. HAHA.  FAT CHANCE. Anyway, this cake is great. It's so delicious and moist. Look at me still talking when there's Science to do. When I look out there, it makes me GLaD I'm not you. I've experiments to run. There is research to be done. On the people who are still alive. And believe me I am still alive. I'm doing Science and I'm still alive. I feel FANTASTIC and I'm still alive. While you're dying I'll be still alive. And when you're dead I will be still alive. STILL ALIVE. STILL ALIVE. ");
             this.kinectInterp.kinectSensor.ElevationAngle = KinectInterpreter.oneParseRadian;
             //KinectInterpreter.oneParseRadian;
         }
@@ -176,12 +176,15 @@ namespace PARSE
 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
             if (this.kinectInterp.kinectReady)
             {
+                Console.WriteLine("Stopping Kinect");
+                this.kinectInterp.stopStreams();
                 this.kinectInterp.kinectSensor.Stop();
             }
 
+            Console.WriteLine("Main Window Closed - Exiting (0)");
+            Environment.Exit(0);
         }
 
         private void NewScan_Click(object sender, RoutedEventArgs e)
@@ -471,6 +474,14 @@ namespace PARSE
             }
         }
 
+        private void MeasurementHub_Click(object sender, RoutedEventArgs e)
+        {
+            
+            
+            PARSE.Tracking.MeasurementHub hub = new PARSE.Tracking.MeasurementHub();
+            hub.Show();
+        }
+
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -521,6 +532,14 @@ namespace PARSE
             {
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
             }
+        }
+
+
+        void MenuItem_Exit(object sender, RoutedEventArgs e)
+        {
+            //kinectInterp.stopStreams();
+            //kinectInterp.kinectSensor.Stop();
+            Environment.Exit(0);
         }
        
     }

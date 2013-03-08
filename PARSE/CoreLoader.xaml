@@ -24,11 +24,11 @@
         <Menu>
         <!--Menu definition-->
         <MenuItem Header="_File">
-            <MenuItem Header="_New Patient" IsCheckable="true"/>
-            <MenuItem Header="_Open Patient" IsCheckable="true"/>
-            <MenuItem Header="_Save Patient" IsCheckable="true"/>
+            <MenuItem Header="_New Patient" IsCheckable="false"/>
+            <MenuItem Header="_Open Patient" />
+            <MenuItem Header="_Save Patient" />
             <Separator/>
-            <MenuItem Header="Exit" IsCheckable="true"/>
+            <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
         <MenuItem Header="_Edit">
 
@@ -53,6 +53,7 @@
                 <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
                 <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
+                <MenuItem Header="Measurement Hub" Click="MeasurementHub_Click" />
             </MenuItem>
         <MenuItem Header="_Help">
 

@@ -135,7 +135,8 @@ namespace PARSE.Tracking
                 }
             }
 
-            if (featurePixelCount > 0)
+            // New >10 threshold in place, to help prevent noise.
+            if (featurePixelCount > 10)
             {
                 //centroidX = featureX / featurePixelCount;
                 xList.ForEach(delegate(int element)
@@ -151,21 +152,8 @@ namespace PARSE.Tracking
                 centroidY = centroidY / featurePixelCount;
                 this.y = centroidY;
 
-                // Don't need to draw the sensor here - this bitmap won't be shown
-                /*
-                for (int row = centroidY - 4; row < centroidY + 4; row++)
-                    for (int col = centroidX - 4; col < centroidX + 4; col++)
-                    {
-                        if (row > 0 & col > 0 & row < 480 & col < 640)
-                        {
-                            int index = rowHeaders[row] + col * 4;
-                            featureMap[index] = 0;
-                            featureMap[index + 1] = 255;
-                            featureMap[index + 2] = 0;
-                            featureMap[index + 3] = 0;
-                        }
-                    }
-                */
+
+
                 Matrix inertiaMatrix = new Matrix();
 
                 IEnumerator<int> xListEnumerator = xList.GetEnumerator();
@@ -250,7 +238,7 @@ namespace PARSE.Tracking
                     )
                 {
                     // Left vector is the larger
-                    // Angle = tan^-1 y/x
+                    // Angle = tan^-1 y/x + correction
                     angle = Math.Atan(eigenMatrix.value[0, 0] / eigenMatrix.value[1, 0]);
                     if (angle < 0)
                         angle += Math.PI / 2;
@@ -264,7 +252,12 @@ namespace PARSE.Tracking
                     angle = Math.Atan(eigenMatrix.value[0, 1] / eigenMatrix.value[1, 1]);
                 }
             }
-
+            else
+            {
+                this.x = 0;
+                this.y = 0;
+                this.angle = 0;
+            }
             return featureMap;
         }
 
