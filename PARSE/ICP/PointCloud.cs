@@ -494,6 +494,12 @@ namespace PARSE
 
         public void deleteFloor()
         {
+            //Console.WriteLine("Before");
+            //Console.WriteLine("YMAX =" + maxy);
+            //Console.WriteLine("YMIN =" + miny);
+            //Console.WriteLine("Height = " + (maxy - miny));
+            //Console.WriteLine("Number =" + points.numberOfNodes());
+
             double[] pointMin = { minx, miny, minz };
             double[] pointMax = { maxx, miny + ((maxy - miny) / (VolumeCalculator.number)), maxz };
 
@@ -506,7 +512,8 @@ namespace PARSE
                 this.points.delete(tempArray);
             }
 
-                        //re calc minx, miny, minz
+            //re calc minx, miny, minz
+            //this does not work, i dont know why. if someone wants to try feel free
             double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
             double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
             Object[] points3d = points.range(minPoint,maxPoint);
@@ -529,6 +536,12 @@ namespace PARSE
                 if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
                 if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
             }
+
+            /*Console.WriteLine("After!!!");
+            Console.WriteLine("YMAX =" + maxy);
+            Console.WriteLine("YMIN =" + miny);
+            Console.WriteLine("Height = " + (maxy - miny));
+            */
     }
     }
 }
