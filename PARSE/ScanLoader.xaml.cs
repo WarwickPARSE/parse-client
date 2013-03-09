@@ -34,6 +34,7 @@ namespace PARSE
         //point cloud lists for visualisation
         private List<PointCloud> fincloud;
         private PointCloud gCloud;
+        private PointCloud limbCloud;
         private System.Windows.Forms.Timer pcTimer;
         private CloudVisualisation cloudvis;
         private Dictionary<JointType, double[]> jointDepths;
@@ -309,6 +310,7 @@ namespace PARSE
             BoundingBox fineStitcher = new BoundingBox();
             TranslateTransform3D translationVector = new TranslateTransform3D();
 
+            //do manual alignment step 1
             if (hitState == 1)
             {
                 ModelVisual3D result = GetHitTestResult(location);
@@ -321,6 +323,9 @@ namespace PARSE
             }
             else if (hitState == 2)
             {
+
+            //do manual alignment step 2
+
                 ModelVisual3D result = GetHitTestResult(location);
                 point2 = rayResult.PointHit;
                 model2 = rayResult.ModelHit;
@@ -331,8 +336,21 @@ namespace PARSE
 
                 translationVector = fineStitcher.refine(model1,model2,point1,point2);
 
-                hitState = 3;
+                hitState = 4;
             }
+            else if (hitState == 3)
+            {
+                //perform limb circumference height selection.
+                //LimbCalculator.calculate(limbCloud, 1);
+                
+            }
+        }
+
+        public void determineLimbPlane(PointCloud pcd)
+        {
+            this.viewertext.Content = "Select area of body for limb circumference measurement";
+            limbCloud = pcd;
+            hitState = 3;
 
         }
 

@@ -282,7 +282,7 @@ namespace PARSE
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
             /*Requires generated model, raw depth array and previous*/
-            //windowViewer.setLimbVisualisation();
+            windowScanner.determineLimbPlane(pcd);
             LimbCalculator.calculate(windowScanner.getYourMum(), windowScanner.getJointMeasurements());
 
         }
