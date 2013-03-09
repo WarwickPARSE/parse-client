@@ -9,7 +9,7 @@ namespace PARSE
     static class PlanePuller
     {
         public const int number = 60;
-        
+
         public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc)
         {
             double xmin = pc.getxMin();
