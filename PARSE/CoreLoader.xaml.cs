@@ -137,10 +137,6 @@ namespace PARSE
             {
                 windowScanner.Close();
             }
-            if (windowHistory != null)
-            {
-                windowHistory.Close();
-            }
         }
         
         private void RGB_Click(object sender, RoutedEventArgs e)
@@ -256,29 +252,21 @@ namespace PARSE
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
-            //define
-            windowHistory = new HistoryLoader();
-            windowHistory.Owner = this;
-
             //Static call to volume calculation method, pass persistent point cloud object
-            PointCloud pc = pcd;
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pc);
+            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pcd);
             List<List<Point3D>> planes = T.Item2;
-            double volume = T.Item1;
+            double volume = Math.Round(T.Item1,4);
+
+            ss.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
             
-            ss.Speak("Your Volume is "+Math.Round(volume/0.058,2)+" Bernards!");
-            
-            double height = HeightCalculator.getHeight(pc);
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
-            windowHistory.voloutput.Content = volume + "m^3";
-            windowHistory.heightoutput.Content = height + "m";
-
+            windowHistory.voloutput.Content = volume + "m\u00B3";
+            
             List<double> areaList = AreaCalculator.getAllAreas(planes);
-
             windowHistory.areaList = areaList;
 
-            //open Runtime viewer (aka results,history,output)
+            //show Runtime viewer (aka results,history,output)
             windowHistory.Show();
         }
 
@@ -408,6 +396,7 @@ namespace PARSE
              * 0) closes any viewer, opens runtime
              * 1) adds selected point cloud to visualiser
              * 2) groups it
+             * 3) calcs height
              */
 
             /*0)*/
@@ -435,6 +424,13 @@ namespace PARSE
 
             pcd = stitcher.getResult();
             pcdl = stitcher.getResultList();
+
+            //define
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
+
+            double height = Math.Round(HeightCalculator.getHeight(pcd),3);
+            windowHistory.heightoutput.Content = height + "m";
 
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
