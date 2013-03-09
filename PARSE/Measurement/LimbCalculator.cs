@@ -11,64 +11,24 @@ namespace PARSE
     {
 
         //provide depth z at a given joint co-ordinate and a pointcloud with that particular information.
-        public static double calculate(PointCloud pc, Dictionary <JointType, double[]> jointDepths)
+        public static double calculate(List<List<Point3D>> planes, int planeNo)
         {
+            double circum = 0;
 
-            //TODO: Refine this method based on user selection.
-            foreach (KeyValuePair<JointType, double[]> points in jointDepths)
+            for (int j = 0; j < planes[planeNo].Count - 1; j++)
             {
-
-                //xmin,xmax,ymin,ymax values
-                double xmin = pc.getxMin();
-                double xmax = pc.getxMax();
-                double zmin = pc.getzMin();
-                double zmax = pc.getzMax();
-
-                //depth (with default)
-                double depth = (pc.getyMax() - pc.getyMin()) / 2;
-
-                //output
-                String output = "";
-
-                if (points.Key == JointType.ElbowLeft)
-                {
-                    xmin = jointDepths[JointType.ShoulderLeft][1];
-                    xmax = jointDepths[JointType.ElbowLeft][1];
-                    zmin = jointDepths[JointType.ElbowLeft][2];
-                    zmax = jointDepths[JointType.ShoulderLeft][2];
-                    depth = jointDepths[JointType.ElbowLeft][0];
-
-                    System.Diagnostics.Debug.WriteLine("Measuring the upper left arm...");
-                }
-
-                double[] limits = { Math.Abs(xmin), Math.Abs(zmin), Math.Abs(xmax), Math.Abs(zmax) };
-
-                System.Diagnostics.Debug.WriteLine(xmin + "*" + xmax + "*" + zmin + "*" + zmax);
-
-                List<Point3D> plane = pc.getKDTree().getAllPointsAt(depth, 0.2, limits);//0.05 might need changing
-                if (plane.Count != 0)
-                {
-                    plane = PointSorter.rotSort(plane);
-                    plane.Add(plane[0]); //a list eating its own head, steve matthews would be proud
-
-                    double circum = 0;
-
-                    for (int j = 0; j < plane.Count - 1; j++)
-                    {
-                        circum = circum + Math.Sqrt(Math.Pow((plane[j + 1].X - plane[j].X), 2) + Math.Pow((plane[j + 1].Y - plane[j].Y), 2));
-                    }
-
-                    Console.WriteLine("Circum Pre Multi: " + circum);
-                    circum = UnitConvertor.convertPCM(circum,2);
-                    Console.WriteLine("Circum: " + circum);
-                    return circum;
-                }
-                else
-                {
-                    Console.WriteLine("FIBRE'S ARE FUSSED TO THE HEAD!!!");
-                }
+                circum = circum + Math.Sqrt(Math.Pow((planes[planeNo][j + 1].X - planes[planeNo][j].X), 2) + Math.Pow((planes[planeNo][j + 1].Y - planes[planeNo][j].Y), 2));
             }
-            return -1;
+
+            Console.WriteLine("Circum Pre Multi: " + circum);
+            circum = UnitConvertor.convertPCM(circum,2);
+            Console.WriteLine("Circum: " + circum);
+            return circum;
+
+        //TO DO FOR GREG DONT YOU DARE TRY AND AVOID IT YOU FUCKER
+            //segmenting the plane into desired areas for circumference
+            //sounds hard ;)
+
         }
     }
 }

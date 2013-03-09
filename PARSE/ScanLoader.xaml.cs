@@ -34,7 +34,7 @@ namespace PARSE
         //point cloud lists for visualisation
         private List<PointCloud> fincloud;
         private PointCloud gCloud;
-        private PointCloud limbCloud;
+        private List<List<Point3D>> limbCloud;
         private System.Windows.Forms.Timer pcTimer;
         private CloudVisualisation cloudvis;
         private Dictionary<JointType, double[]> jointDepths;
@@ -340,13 +340,15 @@ namespace PARSE
             }
             else if (hitState == 3)
             {
+
+                System.Diagnostics.Debug.WriteLine(location.ToString());
                 //perform limb circumference height selection.
                 //LimbCalculator.calculate(limbCloud, 1);
-                
+
             }
         }
 
-        public void determineLimbPlane(PointCloud pcd)
+        public void determineLimbPlane(List<List<Point3D>> pcd)
         {
             this.viewertext.Content = "Select area of body for limb circumference measurement";
             limbCloud = pcd;

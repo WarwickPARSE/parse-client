@@ -256,6 +256,7 @@ namespace PARSE
             Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pcd);
             List<List<Point3D>> planes = T.Item2;
             double volume = Math.Round(T.Item1,4);
+            double circum = LimbCalculator.calculate(planes, 1);
 
             ss.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
             
@@ -272,9 +273,13 @@ namespace PARSE
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
+
+            /*gets all the planes by calling volume calculator*/
+            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pcd);
+            List<List<Point3D>> planes = T.Item2;
+
             /*Requires generated model, raw depth array and previous*/
-            windowScanner.determineLimbPlane(pcd);
-            LimbCalculator.calculate(windowScanner.getYourMum(), windowScanner.getJointMeasurements());
+            windowScanner.determineLimbPlane(planes);
 
         }
 
