@@ -12,7 +12,24 @@ namespace PARSE
     {
         public static List<Point3D> findHull(List<Point3D> plane3D)
         {
-            return null;
+            PointF[] planeF = new PointF[plane3D.Count];
+
+            for (int i = 0; i < plane3D.Count; i++)
+            {
+                planeF[i] = new PointF((float)plane3D[i].X, (float)plane3D[i].Z);
+            }
+
+            MemStorage storage = new MemStorage();
+            
+            planeF = PointCollection.ConvexHull(planeF, storage, Emgu.CV.CvEnum.ORIENTATION.CV_CLOCKWISE).ToArray();
+
+            plane3D = new List<Point3D>();
+            for (int i = 0; i < planeF.Length; i++)
+            {
+                plane3D.Add(new Point3D(planeF[i].X, 0, planeF[i].Y));
+            }
+
+            return plane3D;
         }
     }
 }
