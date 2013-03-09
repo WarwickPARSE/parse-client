@@ -30,18 +30,7 @@
             <Separator/>
             <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
-        <MenuItem Header="Kinect">
-                <MenuItem Header="View Feed">
-                    <MenuItem Header="RGB" Click="RGB_Click"/>
-                    <MenuItem Header="Depth" Click="Depth_Click"/>
-                    <MenuItem Header="Skeleton" Click="Skeleton_Click"/>
-                    <MenuItem Header="RGB Isolation" Click="RGBIso_Click"/>
-                    <MenuItem Header="Depth Isolation" Click="DepthIso_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
-                <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
-        </MenuItem>
-    <MenuItem Header="Patient">
+        <MenuItem Header="Patient">
                 <MenuItem Header="New Scan" IsCheckable="False" Click="NewScan_Click" />
                 <MenuItem Header="View Previous Scan" IsCheckable="False" Click="LoadScan_Click"/>
                 <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
@@ -53,7 +42,18 @@
                     <MenuItem Header="Volume" Click="VolumeOption_Click"/>
                     <MenuItem Header="Limb Circumference" Click="LimbOption_Click"/>
      </MenuItem>
-     <MenuItem Header="_Help">
+            <MenuItem Header="Kinect">
+                <MenuItem Header="View Feed">
+                    <MenuItem Header="RGB" Click="RGB_Click"/>
+                    <MenuItem Header="Depth" Click="Depth_Click"/>
+                    <MenuItem Header="Skeleton" Click="Skeleton_Click"/>
+                    <MenuItem Header="RGB Isolation" Click="RGBIso_Click"/>
+                    <MenuItem Header="Depth Isolation" Click="DepthIso_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
+                <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
                 <MenuItem Header="Debug Console" Click="OpenDebug_Click"/> 
      </MenuItem>
     </Menu>
