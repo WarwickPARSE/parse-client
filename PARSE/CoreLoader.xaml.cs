@@ -219,37 +219,6 @@ namespace PARSE
             windowScanner.Show();
         }
 
-        /* This will eventually form the recogniser *mechanism* for what ever
-         * recognition will occur in the system. */
-        private void surfTimer_tick(Object sender, EventArgs e)
-        {
-
-            if ((countdown > 0) && (!capturedModel))
-            {
-                countdown--;
-            }
-            else if ((countdown == 0) && (!capturedModel))
-            {
-                capturedModel = true;
-                modelimage = kinectInterp.getRGBTexture();
-                countdown = 10;
-            }
-            else if ((countdown > 0) && (capturedModel))
-            {
-                countdown--;
-            }
-            else if ((countdown == 0) && (capturedModel))
-            {
-                capturedObject = true;
-                objectimage = kinectInterp.getRGBTexture();
-            }
-            else if ((capturedModel) && (capturedObject))
-            {
-                //surfTimer.Stop();
-            }
-
-        }
-
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
@@ -284,7 +253,7 @@ namespace PARSE
             List<List<Point3D>> planes = T.Item1;
 
             /*Requires generated model, raw depth array and previous*/
-            windowScanner.determineLimbPlane(planes);
+            windowScanner.determineLimb(pcd);
 
         }
 

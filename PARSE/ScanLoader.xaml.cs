@@ -352,15 +352,16 @@ namespace PARSE
             }
         }
 
-        public void determineLimbPlane(List<List<Point3D>> pcd)
+        public void determineLimb(PointCloud pcd)
         {
-            this.viewertext.Content = "Select area of body for limb circumference measurement";
-            
+         
+            //let's just say left arm for now
+            LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
+
             //change colour of point cloud for limb selection mode
             gv.setMaterial();
             this.DataContext = gv;
 
-            limbCloud = pcd;
             hitState = 3;
 
         }

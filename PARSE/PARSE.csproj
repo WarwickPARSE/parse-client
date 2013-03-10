@@ -130,6 +130,7 @@
     <Compile Include="ICP\VoxelGrid.cs" />
     <Compile Include="Library\Visualisation\GroupVisualiser.cs" />
     <Compile Include="Library\Visualisation\PlaneVisualisation.cs" />
+    <Compile Include="LimbCalculator.cs" />
     <Compile Include="Measurement\AreaCalculator.cs" />
     <Compile Include="Measurement\GiftWrapper.cs" />
     <Compile Include="Measurement\ConvexHullFinder.cs" />
