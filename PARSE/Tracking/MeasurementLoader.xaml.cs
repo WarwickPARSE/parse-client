@@ -114,7 +114,7 @@ namespace PARSE
             }
         }
 
-        internal void capture(double x, double y, double angleXY, double angleZ)
+        internal void capture(int x, int y, double angleXY, double angleZ)
         {
             System.Diagnostics.Debug.WriteLine("Scan captured! END");
             tracker.Stop();
