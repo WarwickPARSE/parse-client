@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 using Microsoft.Kinect;
 
@@ -17,6 +18,7 @@ namespace PARSE
         private static double xmax;
         private static double ymax;
         private static double zmax;
+        private static PointCloud segmentedPointcloud;
 
         public static void calculateLimbBounds(PointCloud pc, Dictionary<JointType, double[]> jointDepths, String limb) {
 
@@ -56,6 +58,12 @@ namespace PARSE
                 
                 default: break;
             }
+
+            segmentedPointcloud = pc.getSubRegion(bounds);
+
+            Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(segmentedPointcloud);
+
+            System.Diagnostics.Debug.WriteLine("Your arm is " + CircumferenceCalculator.calculate(T.Item1, 30) + "m");
 
         }
 
