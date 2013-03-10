@@ -27,8 +27,8 @@ namespace PARSE
             for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
-                plane = SubSampler.subSample(plane,100);
-                plane = SubSampler.averageSample(plane,1);
+                plane = SubSampler.subSample(plane,50);
+                plane = SubSampler.averageSample(plane,2);
                 output.Add(plane);
             }
 
