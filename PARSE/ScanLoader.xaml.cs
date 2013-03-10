@@ -39,6 +39,7 @@ namespace PARSE
         private CloudVisualisation cloudvis;
         private Dictionary<JointType, double[]> jointDepths;
         private RayHitTestResult rayResult;
+        private GroupVisualiser gv;
         private Point3D point1;
         private Point3D point2;
         private Model3D model1;
@@ -76,7 +77,7 @@ namespace PARSE
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
 
-            GroupVisualiser gv = new GroupVisualiser(fcloud);
+            gv = new GroupVisualiser(fcloud);
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
 
@@ -103,7 +104,7 @@ namespace PARSE
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
-            GroupVisualiser gv = new GroupVisualiser(gcloud);
+            gv = new GroupVisualiser(gcloud);
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
 
@@ -305,10 +306,13 @@ namespace PARSE
         void hvpcanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
 
-            //TODO: Comment this to explain what is actually being performed here.
+            //TODO: This performs the limb segmentation procedure.
+
             Point location = e.GetPosition(hvpcanvas);
             BoundingBox fineStitcher = new BoundingBox();
             TranslateTransform3D translationVector = new TranslateTransform3D();
+
+            hitState = 1;
 
             //do manual alignment step 1
             if (hitState == 1)
@@ -317,9 +321,9 @@ namespace PARSE
                 point1 = rayResult.PointHit;
                 model1 = rayResult.ModelHit;
 
-                System.Diagnostics.Debug.WriteLine(point1.X);
+                System.Diagnostics.Debug.WriteLine(point1.X + ", " + point1.Y + ", " + point1.Z);
 
-                hitState = 2;
+                //.hitStathitState = 2;
             }
             else if (hitState == 2)
             {
@@ -351,6 +355,11 @@ namespace PARSE
         public void determineLimbPlane(List<List<Point3D>> pcd)
         {
             this.viewertext.Content = "Select area of body for limb circumference measurement";
+            
+            //change colour of point cloud for limb selection mode
+            gv.setMaterial();
+            this.DataContext = gv;
+
             limbCloud = pcd;
             hitState = 3;
 

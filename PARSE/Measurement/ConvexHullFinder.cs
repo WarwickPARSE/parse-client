@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
-using Emgu.CV;
+//using Emgu.CV;
 using System.Drawing;
 
 namespace PARSE
@@ -13,7 +13,7 @@ namespace PARSE
     {
         public static List<Point3D> findHull(List<Point3D> plane3D)
         {
-            PointF[] planeF = new PointF[plane3D.Count];
+            /*PointF[] planeF = new PointF[plane3D.Count];
 
             for (int i = 0; i < plane3D.Count; i++)
             {
@@ -29,8 +29,8 @@ namespace PARSE
             {
                 plane3D.Add(new Point3D(planeF[i].X, 0, planeF[i].Y));
             }
-
-            return plane3D;
+            */
+            return new List<Point3D>();
         }
     }
 }
