@@ -5,6 +5,8 @@ using System.Text;
 using System.Windows.Media.Media3D;
 using Microsoft.Kinect;
 using Emgu.CV;
+using Emgu.Util;
+using Emgu.CV.Structure;
 using System.Drawing;
 
 namespace PARSE
@@ -24,6 +26,8 @@ namespace PARSE
             {
                 planeF[i] = new PointF((float) plane3D[i].X,(float) plane3D[i].Z);
             }
+
+            System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
 
             MemStorage storage = new MemStorage();
             planeF = PointCollection.ConvexHull(planeF, storage, Emgu.CV.CvEnum.ORIENTATION.CV_CLOCKWISE).ToArray();
