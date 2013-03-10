@@ -18,6 +18,8 @@ namespace PARSE
             double circum = 0;
 
             List<Point3D> plane3D = planes[planeNo];
+
+            //plane3D = GiftWrapper.wrap(plane3D);
             
             for (int j = 0; j < plane3D.Count - 1; j++)
             {
