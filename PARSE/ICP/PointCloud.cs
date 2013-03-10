@@ -99,13 +99,64 @@ namespace PARSE
             //parameterless constructor needed for serialization
             //this.points = new KdTree.KDTree(3);
         }
-     
+
+        public PointCloud(List<Point3D> input)
+        {
+            this.points = new KdTree.KDTree(3);
+            
+            for (int i = 0; i < input.Count; i++)
+            {
+                Point3D poLoc = input[i];
+                //check min values
+                if (poLoc.X < minx) { minx = poLoc.X; }
+                if (poLoc.Y < miny) { miny = poLoc.Y; }
+                if (poLoc.Z < minz) { minz = poLoc.Z; }
+
+                //check max values
+                if (poLoc.X > maxx) { maxx = poLoc.X; }
+                if (poLoc.Y > maxy) { maxy = poLoc.Y; }
+                if (poLoc.Z > maxz) { maxz = poLoc.Z; }
+
+                //this is a very dark kd hole
+                PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, 0, 0, 0);
+
+                double[] key = { poLoc.X, poLoc.Y, poLoc.Z };
+
+                this.points.insert(key, po);
+            }
+        }
+
+        //method for bernard
+        public PointCloud getSubRegion(double[] points)
+        {
+            double[] pointMin = { points[0], points[1], points[2] };
+            double[] pointMax = { points[3], points[4], points[5] };
+
+            Object[] temp = this.points.range(pointMin, pointMax);
+
+            List<Point3D> output = new List<Point3D>();
+            for (int i = 0; i < temp.Length; i++)
+            {
+                output.Add(((PointRGB)(temp[i])).point);
+            }
+
+            PointCloud pc = new PointCloud(output);
+
+            return pc;
+        }
+
+        public int size()
+        {
+            return this.points.numberOfNodes();
+        }
+        
         /// <summary>
         /// Converts a bitmap stream into a bitmap image 
         /// </summary>
         /// <param name="bs">A bitmap stream</param>
         /// <returns></returns>
-        public Bitmap convertToBitmap(BitmapSource bs) {
+        public Bitmap convertToBitmap(BitmapSource bs)
+        {
             //Convert bitmap source to image
             MemoryStream outStream = new MemoryStream();
             BitmapEncoder enc = new BmpBitmapEncoder();
