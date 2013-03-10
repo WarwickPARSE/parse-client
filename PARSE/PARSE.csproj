@@ -143,6 +143,7 @@
     <Compile Include="Measurement\ConvexHullFinder.cs" />
     <Compile Include="Measurement\HeightCalculator.cs" />
     <Compile Include="Measurement\PlanePuller.cs" />
+    <Compile Include="Measurement\SubSampler.cs" />
     <Compile Include="Measurement\UnitConvertor.cs" />
     <Compile Include="Measurement\PointSorter.cs" />
     <Compile Include="Measurement\LimbCalculator.cs" />
