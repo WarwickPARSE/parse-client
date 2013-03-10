@@ -81,6 +81,14 @@ namespace PARSE
             Bones.Clear();
         }
 
+        public void setColor(Brush c)
+        {
+            this.color = c;
+            this.Erase();
+            InitJoints(color);
+            InitBones(color);
+        }
+        
         public void Update(JointType jointType, Point point, float distance = 2.0f)
         {
             instruction = "Move your arms into a horizontal position";
