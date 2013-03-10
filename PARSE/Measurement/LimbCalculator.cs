@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 using Microsoft.Kinect;
-using Emgu.CV;
-using Emgu.Util;
-using Emgu.CV.Structure;
 using System.Drawing;
 
 namespace PARSE
