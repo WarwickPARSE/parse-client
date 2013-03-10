@@ -27,11 +27,11 @@ namespace PARSE
             for (double i = ymin + (increment / 2); i <= ymax - (increment / 2); i = i + increment)
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
-                plane = SubSampler.subSample(plane,5);
-                plane = SubSampler.averageSample(plane,5);
+
+                plane = SubSampler.averageSubSample(plane, 5);
                 output.Add(plane);
             }
-
+            
             return Tuple.Create(output,increment);
         }
     }
