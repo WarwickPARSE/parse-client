@@ -11,6 +11,13 @@ namespace PARSE.Measurement
         static List<Point3D> subSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
+            for (int i = 0; i < input.Count; i++)
+            {
+                if (i % factor == 0)
+                {
+                    output.Add(input[i]);
+                }
+            }
             return output;
         }
     }
