@@ -100,6 +100,8 @@ namespace PARSE
 
             this.export1.IsEnabled = false;
             this.export2.IsEnabled = false;
+            this.measurement.IsEnabled = false;
+            this.removefloor.IsEnabled = false;
 
         }
 
