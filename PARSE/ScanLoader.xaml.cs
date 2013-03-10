@@ -44,6 +44,7 @@ namespace PARSE
         private Point3D point2;
         private Model3D model1;
         private Model3D model2;
+        private PointCloud pcd;
 
         //Coreloader modifiable hit state
         public int hitState;
@@ -272,9 +273,20 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                //Visualisation instantiation based on int array clouds
-                cloudvis = new CloudVisualisation(fincloud, false);
-                this.DataContext = cloudvis;
+                //stitch me
+                //instantiate the stitcher 
+                BoundingBox stitcher = new BoundingBox();
+
+                //jam points into stitcher
+                stitcher.add(fincloud);
+                stitcher.stitch();
+
+                pcd = stitcher.getResult();
+                fincloud = stitcher.getResultList();
+
+                GroupVisualiser gg = new GroupVisualiser(fincloud);
+                gg.preprocess();
+                this.DataContext = gg;
 
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
@@ -317,11 +329,11 @@ namespace PARSE
             //do manual alignment step 1
             if (hitState == 1)
             {
-                ModelVisual3D result = GetHitTestResult(location);
-                point1 = rayResult.PointHit;
-                model1 = rayResult.ModelHit;
+                //ModelVisual3D result = GetHitTestResult(location);
+                //point1 = rayResult.PointHit;
+                //model1 = rayResult.ModelHit;
 
-                System.Diagnostics.Debug.WriteLine(point1.X + ", " + point1.Y + ", " + point1.Z);
+                //System.Diagnostics.Debug.WriteLine(point1.X + ", " + point1.Y + ", " + point1.Z);
 
                 //.hitStathitState = 2;
             }
@@ -352,11 +364,18 @@ namespace PARSE
             }
         }
 
-        public void determineLimb(PointCloud pcd)
+        public void determineLimb(PointCloud pcdexisting)
         {
          
             //let's just say left arm for now
-            LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
+            if (pcdexisting!=null)
+            {
+                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "WAIST");
+            }
+            else
+            {
+                LimbCalculator.calculateLimbBounds(pcd, jointDepths, "WAIST");
+            }
 
             //change colour of point cloud for limb selection mode
             gv.setMaterial();

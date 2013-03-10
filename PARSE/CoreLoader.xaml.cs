@@ -98,6 +98,11 @@ namespace PARSE
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
+            //this.export1.IsEnabled = false;
+            //this.export2.IsEnabled = false;
+            //this.measurement.IsEnabled = false;
+            //this.removefloor.IsEnabled = false;
+
         }
 
         /// <summary>
@@ -249,8 +254,11 @@ namespace PARSE
         {
 
             /*gets all the planes by calling volume calculator*/
-            Tuple<List<List<Point3D>>,double> T = PlanePuller.pullAll(pcd);
-            List<List<Point3D>> planes = T.Item1;
+            if (pcd!=null)
+            {
+                Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
+                List<List<Point3D>> planes = T.Item1;
+            }
 
             /*Requires generated model, raw depth array and previous*/
             windowScanner.determineLimb(pcd);
