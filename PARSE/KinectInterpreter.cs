@@ -84,6 +84,10 @@ namespace PARSE
         public const double oneParseUnitDelta = 7.5;
         public const int oneParseRadian = 0;
 
+        private System.Windows.Media.Brush red = System.Windows.Media.Brushes.Red;
+        private System.Windows.Media.Brush green = System.Windows.Media.Brushes.Green;
+        private System.Windows.Media.Brush color = System.Windows.Media.Brushes.Red;
+
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
@@ -367,11 +371,12 @@ namespace PARSE
                     foreach (Skeleton trackedSkeleton in trackedSkeletons)
                     {
                         SkeletonFigure skeletonFigure;
+
                         // Checks if the tracked skeleton is already drawn.
                         if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
                         {
                             // If not, create a new drawing on our canvas
-                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
+                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas, this.color);
                             try
                             {
                                 skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
@@ -395,13 +400,30 @@ namespace PARSE
 
                             skelDepth = skelDepth * 1000;
                             skelDepthPublic = skelDepth;
+                            skeletonFigure.setDepth(skelDepthPublic);
                             skelL = (320 * (1 + skelL)) * 4;
                             skelR = (320 * (1 + skelR)) * 4;
                             //skelB = 480 * (1-((1+skelB)/2));
                         }
                         // Update the drawing
+
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
+
+                        System.Windows.Media.Brush prevColor = this.color;
+
+                        if (skelDepthPublic < 2000)
+                        {
+                            this.color = red;
+                        }
+                        else
+                        {
+                            this.color = green;
+                        }
+                        if (!(this.color.Equals(prevColor)))
+                        {
+                            //skeletonFigure.Status = ActivityState.Inactive;
+                        }
                     }
 
                     foreach (SkeletonFigure skeleton in skeletons.Values)
