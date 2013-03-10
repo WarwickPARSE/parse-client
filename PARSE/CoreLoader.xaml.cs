@@ -99,6 +99,7 @@ namespace PARSE
             BaseModel = new GeometryModel3D();
 
             this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
 
         }
 
