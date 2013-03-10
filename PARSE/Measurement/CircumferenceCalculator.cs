@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace PARSE
 {
-    public class LimbCalculator
+    public class CircumferenceCalculator
     {
 
         //provide depth z at a given joint co-ordinate and a pointcloud with that particular information.
