@@ -16,14 +16,8 @@ namespace PARSE
 
         public DatabaseEngine()
         {
-            dbOpen();
-
             insertQueries = new Insertion(this.con);
             selectQueries = new Selection(this.con);
-
-            //Object[] patients = getAllPatients();
-
-            //dbClose();
         }
 
         private void dbOpen()
@@ -49,33 +43,94 @@ namespace PARSE
             Console.WriteLine("closed");
         }
 
-        public Object[] getAllPatients()
-        {
-            Object[] patients = selectQueries.SelectAllPatients();
+        //Insert methods for all tables
 
-            return patients;
+        //Type 1 = tables that need a specialised query
+        public void insertPatientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        {
+            dbOpen();
+
+            insertQueries.patientInformation(patientID, name, dateOfBirth, nationality, nhsNo, address);
+
+            dbClose();
         }
 
-        public Object[] getAllConditions()
+        public void insertScanLocations(int scanLocID, String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, double jointsDist, DateTime timestamp)
         {
-            Object[] conditions = selectQueries.SelectAllConditions();
+            dbOpen();
 
-            return conditions;
+            insertQueries.scanLocations(scanLocID, boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+
+            dbClose();
         }
 
-        public Object[] getPatientInformation(int patientID)
+        public void insertScans(int scanID, String pointCloudFileReference, DateTime timestamp)
         {
-            object[] patientInfo = selectQueries.SelectPatientInformation(patientID);
+            dbOpen();
 
-            return patientInfo;
+            insertQueries.scans(scanID, pointCloudFileReference, timestamp);
+
+            dbClose();
         }
 
-        public String[] getPatientCondition(int patientID)
+        public void insertRecords(int recordID, int scanID, int scanTypeID, double value)
         {
-            int conditionID = selectQueries.SelectID("conditionID", "PatientCondition", "patientID", patientID);
-            String[] conditionInfo = selectQueries.SelectStringTableData("Conditions", "conditionID", conditionID);
+            dbOpen();
 
-            return conditionInfo;
+            insertQueries.records(recordID, scanID, scanTypeID, value);
+
+            dbClose();
+        }
+
+        //Type 2 = tables containing 1 identifier and 2 text fields
+
+        //contains the different types of conditions
+        public void insertConditions(int conditionID, String condition, String description)
+        {
+            dbOpen();
+
+            insertQueries.type2("Conditions", "conditionID", "condition", "description", conditionID, condition, description);
+
+            dbClose();
+        }
+
+        //contains the different types of scans
+        public void insertScanTypes(int scanTypeID, String scanType, String description)
+        {
+            dbOpen();
+
+            insertQueries.type2("ScanTypes", "scanTypeID", "scanType", "description", scanTypeID, scanType, description);
+
+            dbClose();
+        }
+
+        //Type 3 = tables containing 3 identifiers
+
+        public void insertPatientCondition(int patientConditionID, int patientID, int conditionID)
+        {
+            dbOpen();
+
+            insertQueries.type3("PatientCondition", "patientConditionID", "patientID", "conditionID", patientConditionID, patientID, conditionID);
+
+            dbClose();
+        }
+
+        public void insertPatientScans(int patientScanID, int patientID, int scanTypeID)
+        {
+            dbOpen();
+
+            insertQueries.type3("PatientScans", "patientScanID", "patientID", "scanTypeID", patientScanID, patientID, scanTypeID);
+
+            dbClose();
+        }
+
+        public void insertPointRecognitionScans(int pointRecognitionScanID, int patientID, int scanLocID)
+        {
+            dbOpen();
+
+            insertQueries.type3("PointRecognitionScans", "pointRecognitionScanID", "patientID", "scanLocID", pointRecognitionScanID, patientID, scanLocID);
+
+            dbClose();
         }
     }
 
@@ -89,7 +144,9 @@ namespace PARSE
             con = connection;
         }
 
-        public void InsertPatientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        //Insertion Queries for Type 1 tables
+
+        public void patientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
         {
             //check what number is the previous patientID and increment by 1?
 
@@ -106,35 +163,81 @@ namespace PARSE
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void InsertPatientCondition(int patientConditionID, int patientID, int conditionID, String condition)
+        public void scanLocations(int scanLocID, String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, double jointsDist, DateTime timestamp)
         {
-            //should have already incremented latest patientConditionID by 1
-            //patientID is the ID of the patient currently on the form
-            //condition should have been selected from a dropdown list - this here should happen when clicking on Save Changes
-
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientCondition (patientConditionID, patientID, conditionID, condition) VALUES (PatientConditionID, PatientID, ConditionID, Condition)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations ((scanLocID, boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@ScanLocID, @BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@PatientConditionID", patientConditionID);
-            insertQuery.Parameters.Add("@PatientID", patientID);
-            insertQuery.Parameters.Add("@ConditionID", conditionID);
-            insertQuery.Parameters.Add("@Condition", condition);
+            insertQuery.Parameters.Add("@ScanLocID", scanLocID);
+            insertQuery.Parameters.Add("@BoneName", boneName);
+            insertQuery.Parameters.Add("@JointName1", jointName1);
+            insertQuery.Parameters.Add("@JointName2", jointName2);
+            insertQuery.Parameters.Add("@DistJoint1", distJoint1);
+            insertQuery.Parameters.Add("@DistJoint2", distJoint2);
+            insertQuery.Parameters.Add("@JointsDist", jointsDist);
+            insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void InsertCondition(int conditionID, String condition, string description)
+        public void scans(int scanID, String pointCloudFileReference, DateTime timestamp)
         {
-            //should have already incremented latest conditionID by 1
-            //this is for the insertion of known conditions (in general - not related to a patient)
-
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientCondition (conditionID, condition, description) VALUES (ConditionID, Condition, Description)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations ((scanID, pointCloudFileReference, timestamp) VALUES (@ScanID, @pointCloudFileReference, @Timestamp)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@ConditionID", conditionID);
-            insertQuery.Parameters.Add("@Condition", condition);
-            insertQuery.Parameters.Add("@Condition", description);
+            insertQuery.Parameters.Add("@ScanID", scanID);
+            insertQuery.Parameters.Add("@PointCloudFileReference", pointCloudFileReference);
+            insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+            rowsAffected = insertQuery.ExecuteNonQuery();
+        }
+
+        public void records(int recordID, int scanID, int scanTypeID, double value)
+        {
+            int rowsAffected = 0;
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO Records (recordID, scanID, scanTypeID, value) VALUES (@RecordID, @ScanID, @ScanTypeID, @Value)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@RecordID", recordID);
+            insertQuery.Parameters.Add("@ScanID", scanID);
+            insertQuery.Parameters.Add("@ScanTypeID", scanTypeID);
+            insertQuery.Parameters.Add("@Value", value);
+            rowsAffected = insertQuery.ExecuteNonQuery();
+        }
+
+        //Insertion Query for Type 2 tables
+
+        public void type2(String tableName, String idCol, String textCol1, String textCol2, int id, String text1, String text2)
+        {
+            int rowsAffected = 0;
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO @TableName (@IdCol, @TextCol1, @TextCol2) VALUES (@Id, @Text1, @Text2)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@TableName", tableName);
+            insertQuery.Parameters.Add("@IdCol", idCol);
+            insertQuery.Parameters.Add("@TextCol1", textCol1);
+            insertQuery.Parameters.Add("@TextCol2", textCol2);
+            insertQuery.Parameters.Add("@Id", id);
+            insertQuery.Parameters.Add("@Text1", text1);
+            insertQuery.Parameters.Add("@Text2", text2);
+            rowsAffected = insertQuery.ExecuteNonQuery();
+        }
+
+        //Insertion Query for Type 3 tables
+
+        public void type3(String tableName, String idCol1, String idCol2, String idCol3, int id1, int id2, int id3)
+        {
+            int rowsAffected = 0;
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO @TableName (@IdCol1, @IdCol2, @IdCol3) VALUES (@Id1, @Id2, @Id3)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@TableName", tableName);
+            insertQuery.Parameters.Add("@IdCol1", idCol1);
+            insertQuery.Parameters.Add("@IdCol2", idCol2);
+            insertQuery.Parameters.Add("@IdCol3", idCol3);
+            insertQuery.Parameters.Add("@Id1", id1);
+            insertQuery.Parameters.Add("@Id2", id2);
+            insertQuery.Parameters.Add("@Id3", id3);
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
     }
