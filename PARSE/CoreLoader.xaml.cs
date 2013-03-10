@@ -98,6 +98,8 @@ namespace PARSE
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
+            this.export1.IsEnabled = false;
+
         }
 
         /// <summary>
