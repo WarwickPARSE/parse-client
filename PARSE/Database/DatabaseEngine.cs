@@ -140,15 +140,15 @@ namespace PARSE
         // 1) select all patients (patientID and name)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>> getAllPatients()
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>> patients = selectQueries.SelectAllPatients();
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>> patients = selectQueries.AllPatients();
 
             return patients;
         }
 
         // 2) select patient information
-        public Tuple<int, String, DateTime, String, int, String> getPatientInformation(int patientID)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<int>, LinkedList<String>> getPatientInformation(int patientID)
         {
-            Tuple<int, String, DateTime, String, int, String> patientInfo = selectQueries.SelectPatientInformation(patientID);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<int>, LinkedList<String>> patientInfo = selectQueries.PatientInformation("patientID", patientID.ToString());
 
             return patientInfo;
         }
@@ -156,16 +156,33 @@ namespace PARSE
         // 3) select all conditions
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllConditions()
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> conditions = selectQueries.SelectAllConditions();
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> conditions = selectQueries.AllConditions();
 
             return conditions;
         }
 
         // 4) select patient condition (and information about it)
+        public LinkedList<Tuple<int, String, String>> getPatientConditionInformation(int patientID)
+        {
+            LinkedList<int> conditionID = selectQueries.selectID("conditionID", "PatientCondition", "patientID", patientID.ToString());
+
+            LinkedList<Tuple<int, String, String>> patientConditions = new LinkedList<Tuple<int, String, String>>();
+            while (conditionID.Count > 0)
+            {
+                patientConditions.AddLast(selectQueries.selectType2("Conditions", "conditionID", conditionID.First().ToString()));
+                conditionID.RemoveFirst();
+            }
+
+            return patientConditions;
+        }
 
         // 5) select condition information
 
         // 6) select all scan types for patient
+        public void getPatientScanTypes(int patientID)
+        {
+            
+        }
 
         // 7) select all timestamps for patient scan type
 
@@ -437,7 +454,7 @@ namespace PARSE
         }
 
         //records
-        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<int>, LinkedList<double>> Scans(String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<int>, LinkedList<double>> Records(String colName, String criterion)
         {
             LinkedList<int> recordID = new LinkedList<int>();
             LinkedList<int> scanID = new LinkedList<int>();
@@ -466,7 +483,7 @@ namespace PARSE
         //table type 2 queries
 
         //conditions, scanTypes
-        public Tuple<int, String, String> Scans(String tableName, String colName, String criterion)
+        public Tuple<int, String, String> selectType2(String tableName, String colName, String criterion)
         {
             int id = 0;
             String text1 = "default";
@@ -494,7 +511,7 @@ namespace PARSE
         //table type 3 queries
 
         //patientCondition, patientScans, pointRecognitionScans
-        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<int>> Scans(String tableName, String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<int>> selectType3(String tableName, String colName, String criterion)
         {
             LinkedList<int> id1 = new LinkedList<int>();
             LinkedList<int> id2 = new LinkedList<int>();
@@ -519,17 +536,17 @@ namespace PARSE
         }
 
         //generalised method for getting one id
-        public LinkedList<int> SelectID(String columnNeeded, String tableName, String column, int value)
+        public LinkedList<int> selectID(String columnNeeded, String tableName, String column, String criterion)
         {
             LinkedList<int> id = new LinkedList<int>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT @ColumnNeeded FROM @TableName WHERE @Column LIKE @Value";
+            selectQuery.CommandText = "SELECT @ColumnNeeded FROM @TableName WHERE @Column LIKE @Criterion";
             selectQuery.Parameters.Clear();
             selectQuery.Parameters.Add("@ColumnNeeded", columnNeeded);
             selectQuery.Parameters.Add("@TableName", tableName);
             selectQuery.Parameters.Add("@Column", column);
-            selectQuery.Parameters.Add("@Value", value);
+            selectQuery.Parameters.Add("@Criterion", criterion);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
