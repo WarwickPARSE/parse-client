@@ -102,6 +102,8 @@ namespace PARSE
 
         public PointCloud(List<Point3D> input)
         {
+            this.points = new KdTree.KDTree(3);
+            
             for (int i = 0; i < input.Count; i++)
             {
                 Point3D poLoc = input[i];
@@ -115,7 +117,7 @@ namespace PARSE
                 if (poLoc.Y > maxy) { maxy = poLoc.Y; }
                 if (poLoc.Z > maxz) { maxz = poLoc.Z; }
 
-                //This is a very dark kd hole
+                //this is a very dark kd hole
                 PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, 0, 0, 0);
 
                 double[] key = { poLoc.X, poLoc.Y, poLoc.Z };
@@ -129,15 +131,25 @@ namespace PARSE
         {
             double[] pointMin = { points[0], points[1], points[2] };
             double[] pointMax = { points[3], points[4], points[5] };
+
             Object[] temp = this.points.range(pointMin, pointMax);
+
             List<Point3D> output = new List<Point3D>();
             for (int i = 0; i < temp.Length; i++)
             {
                 output.Add(((PointRGB)(temp[i])).point);
             }
-            return new PointCloud(output);
+
+            PointCloud pc = new PointCloud(output);
+
+            return pc;
         }
 
+        public int size()
+        {
+            return this.points.numberOfNodes();
+        }
+        
         /// <summary>
         /// Converts a bitmap stream into a bitmap image 
         /// </summary>
