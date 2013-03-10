@@ -240,7 +240,6 @@ namespace PARSE
             if (this.kinectSensor.SkeletonStream.IsEnabled)
             {
                 this.kinectSensor.SkeletonStream.Disable();
-                Console.WriteLine("DISABLED");
             }
             if (this.kinectSensor.DepthStream.IsEnabled)
             {

@@ -204,14 +204,38 @@ namespace PARSE
 
         private Ellipse GenerateEllipse(int size = JOINT_WIDTH)
         {
-            var ellipse = new Ellipse() { Width = size, Height = size, Fill = Brushes.LightBlue };
+            Brush red = Brushes.Red;
+            Brush green = Brushes.Green;
+            Brush color;
+
+            if (true)
+            {
+                color = red;
+            }
+            //else
+            //{
+            //    color = green;
+            //}
+            var ellipse = new Ellipse() { Width = size, Height = size, Fill = color };
             canvas.Children.Add(ellipse);
             return ellipse;
         }
 
         private Line GenerateLine()
         {
-            var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = Brushes.Blue, Stroke = Brushes.Blue };
+            Brush red = Brushes.Red;
+            Brush green = Brushes.Green;
+            Brush color;
+
+            if (true)
+            {
+                color = red;
+            }
+            //else
+            //{
+            //    color = green;
+            //}
+            var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = color, Stroke = color };
             canvas.Children.Add(line);
             return line;
         }
