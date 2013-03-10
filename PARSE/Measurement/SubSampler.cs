@@ -8,7 +8,17 @@ namespace PARSE
 {
     static class SubSampler
     {
-        public static List<Point3D> subSample(List<Point3D> input, int factor)
+        public static List<Point3D> averageSubSample(List<Point3D> input, int subSampleFactor, int averageFactor)
+        {
+            return SubSampler.averageSample(SubSampler.subSample(input, subSampleFactor), averageFactor);
+        }
+
+        public static List<Point3D> averageSubSample(List<Point3D> input, int factor)
+        {
+            return SubSampler.averageSample(SubSampler.subSample(input, factor), factor);
+        }
+        
+        private static List<Point3D> subSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
             for (int i = 0; i < input.Count; i++)
@@ -21,7 +31,7 @@ namespace PARSE
             return output;
         }
 
-        public static List<Point3D> averageSample(List<Point3D> input, int factor)
+        private static List<Point3D> averageSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
             for (int i = 0; i < input.Count; i++)
