@@ -33,8 +33,8 @@
         <MenuItem Header="Patient">
                 <MenuItem Header="New Scan" IsCheckable="False" Click="NewScan_Click" />
                 <MenuItem Header="View Previous Scan" IsCheckable="False" Click="LoadScan_Click"/>
-                <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
-                <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
+                <MenuItem Header="Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
+                <MenuItem Header="Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
                 <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
                 <MenuItem Header="Remove Their Feet" IsCheckable="False" Click="RemoveFeet_Click"/>
                 </MenuItem>

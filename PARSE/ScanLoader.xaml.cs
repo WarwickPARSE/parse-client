@@ -49,7 +49,7 @@ namespace PARSE
         public int hitState;
 
         //speech synthesizer instances
-        private SpeechSynthesizer ss;
+        private SpeechSynthesizer sandra;
         private int countdown;
 
         //Kinect instance
@@ -145,12 +145,12 @@ namespace PARSE
         {
 
 
-            if (ss == null)
+            if (sandra == null)
             {
                 //initalize speech sythesizer
-                ss = new SpeechSynthesizer();
-                ss.Rate = 1;
-                ss.Volume = 100;
+                sandra = new SpeechSynthesizer();
+                sandra.Rate = 1;
+                sandra.Volume = 100;
             }
             
             //init kinect
@@ -176,17 +176,17 @@ namespace PARSE
 
             if (kinectInterp.tooFarForward())
             {
-                ss.Speak("Step Backward");
+                sandra.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
             }
             else if (kinectInterp.tooFarBack())
             {
-                ss.Speak("Step Forward");
+                sandra.Speak("Step Forward");
                 Console.Write("Step Forward");
             }
             else
             {
-                ss.Speak("Your positioning is optimal.");
+                sandra.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
 
@@ -201,7 +201,7 @@ namespace PARSE
                 pcTimer = new System.Windows.Forms.Timer();
                 pcTimer.Tick += new EventHandler(pcTimer_tick);
                 
-                ss.Speak("Please face the camera.");
+                sandra.Speak("Please face the camera.");
                 this.instructionblock.Text = "Please face the camera";
 
                 //Initialize and start timerr
@@ -223,7 +223,7 @@ namespace PARSE
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 //frontCloud.deleteFloor();
                 fincloud.Add(frontCloud);
-                ss.Speak("Scan Added.");
+                sandra.Speak("Scan Added.");
 
                 //freeze skelL skelDepth and skelR
                 this.kinectInterp.kinectSensor.SkeletonStream.Disable();
@@ -232,7 +232,7 @@ namespace PARSE
                 skeloutline = tmpCanvas;
                 skeloutline.Visibility = Visibility.Collapsed;
 
-                ss.Speak("Please turn left.");
+                sandra.Speak("Please turn left.");
                 this.instructionblock.Text = "Please turn left";
                 countdown--;
             }
@@ -242,8 +242,8 @@ namespace PARSE
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 //rightCloud.deleteFloor();
                 fincloud.Add(rightCloud);
-                ss.Speak("Scan Added.");
-                ss.Speak("Please turn left with your back to the camera.");
+                sandra.Speak("Scan Added.");
+                sandra.Speak("Please turn left with your back to the camera.");
                 this.instructionblock.Text = "Turn left with your back to the camera";
                 countdown--;
             }
@@ -254,8 +254,8 @@ namespace PARSE
                 PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 //backCloud.deleteFloor();
                 fincloud.Add(backCloud);
-                ss.Speak("Scan Added.");
-                ss.Speak("Please turn left once more.");
+                sandra.Speak("Scan Added.");
+                sandra.Speak("Please turn left once more.");
                 this.instructionblock.Text = "Please turn left once more.";
                 countdown--;
             }
@@ -266,8 +266,8 @@ namespace PARSE
                 //leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
 
-                ss.Speak("Scan Added.");
-                ss.Speak("Thank you for your time, you have now been captured.");
+                sandra.Speak("Scan Added.");
+                sandra.Speak("Thank you for your time, you have now been captured.");
 
                 //stop streams
                 kinectInterp.stopStreams();

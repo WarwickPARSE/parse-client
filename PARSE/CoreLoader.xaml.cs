@@ -70,7 +70,7 @@ namespace PARSE
         private Stitcher                    stitcher; 
 
         //speech synthesizer instances
-        private SpeechSynthesizer           ss;
+        private SpeechSynthesizer           sandra;
 
         //prevents crashing on adjustment
         private Boolean kinectMovingLock = false;
@@ -92,7 +92,7 @@ namespace PARSE
 
             //ui initialization
             this.WindowState = WindowState.Maximized;
-            ss = new SpeechSynthesizer();
+            sandra = new SpeechSynthesizer();
 
             //Miscellaneous modelling definitions
             Model = new GeometryModel3D();
@@ -260,7 +260,7 @@ namespace PARSE
             
             double volume = VolumeCalculator.volume1stApprox(planes,increment);
             volume = Math.Round(volume,4);
-            ss.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
+            sandra.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
 
             List<double> areaList = AreaCalculator.getAllAreas(planes);
             windowHistory.areaList = areaList;

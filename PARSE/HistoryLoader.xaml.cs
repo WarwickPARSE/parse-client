@@ -13,7 +13,6 @@ using System.Windows.Shapes;
 using System.Threading;
 using System.Windows.Media.Media3D;
 using System.IO;
-
 using System.Windows.Controls.DataVisualization.Charting;
 
 namespace PARSE
@@ -196,8 +195,7 @@ namespace PARSE
         private void planeChooser_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             visualisePlanes(storedPlanes, e.NewValue);
-
-            double circum = LimbCalculator.calculate(storedPlanes, (int) e.NewValue);
+            double circum = CircumferenceCalculator.calculate(storedPlanes, (int) e.NewValue);
             this.totalarea.Content = "Total Area: " + Math.Round(areaList[(int)e.NewValue],4) + "m\u00B2";
             this.maxarea.Content = "Plane " + (int) e.NewValue;
             this.totalperimiter.Content = "Circumference: " + circum + "m";
