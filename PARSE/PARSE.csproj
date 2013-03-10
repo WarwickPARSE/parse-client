@@ -146,7 +146,7 @@
     <Compile Include="Measurement\SubSampler.cs" />
     <Compile Include="Measurement\UnitConvertor.cs" />
     <Compile Include="Measurement\PointSorter.cs" />
-    <Compile Include="Measurement\LimbCalculator.cs" />
+    <Compile Include="Measurement\CircumferenceCalculator.cs" />
     <Compile Include="Measurement\VolumeCalculator.cs" />
     <Compile Include="ICP\PointRGB.cs" />
     <Compile Include="ICP\ICP3D.cs" />
