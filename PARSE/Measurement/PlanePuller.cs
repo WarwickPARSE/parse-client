@@ -8,7 +8,8 @@ namespace PARSE
 {
     static class PlanePuller
     {
-        public const int number = 60;
+        public const int planeNumber = 60;
+        public const int sampleNumber = 5;
 
         public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc)
         {
@@ -20,7 +21,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = (ymax - ymin) / number;
+            double increment = (ymax - ymin) / planeNumber;
 
             List<List<Point3D>> output = new List<List<Point3D>>();
 
@@ -28,7 +29,7 @@ namespace PARSE
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
 
-                plane = SubSampler.averageSubSample(plane, 5);
+                plane = SubSampler.averageSubSample(plane, sampleNumber);
                 output.Add(plane);
             }
             
