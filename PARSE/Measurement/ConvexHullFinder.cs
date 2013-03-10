@@ -8,6 +8,7 @@ using System.Drawing;
 
 namespace PARSE
 {
+    [Obsolete]
     static class ConvexHullFinder
     {
         public static List<Point3D> findHull(List<Point3D> plane3D)
