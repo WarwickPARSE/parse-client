@@ -253,20 +253,25 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pcd);
-            List<List<Point3D>> planes = T.Item2;
-            double volume = Math.Round(T.Item1,4);
-            double circum = LimbCalculator.calculate(planes, 1);
-
-            ss.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
+            Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
             
+            List<List<Point3D>> planes = T.Item1;
+            double increment = T.Item2;
+            
+            double volume = VolumeCalculator.volume1stApprox(planes,increment);
+            volume = Math.Round(volume,4);
+            ss.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
+
+            List<double> areaList = AreaCalculator.getAllAreas(planes);
+            windowHistory.areaList = areaList;
+            
+            //why is this here Bernard?
+            //double circum = LimbCalculator.calculate(planes, 1);
+
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m\u00B3";
             
-            List<double> areaList = AreaCalculator.getAllAreas(planes);
-            windowHistory.areaList = areaList;
-
             //show Runtime viewer (aka results,history,output)
             windowHistory.Show();
         }
@@ -275,8 +280,8 @@ namespace PARSE
         {
 
             /*gets all the planes by calling volume calculator*/
-            Tuple<double, List<List<Point3D>>> T = VolumeCalculator.volume1stApprox(pcd);
-            List<List<Point3D>> planes = T.Item2;
+            Tuple<List<List<Point3D>>,double> T = PlanePuller.pullAll(pcd);
+            List<List<Point3D>> planes = T.Item1;
 
             /*Requires generated model, raw depth array and previous*/
             windowScanner.determineLimbPlane(planes);
@@ -398,7 +403,7 @@ namespace PARSE
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
-             * 0) closes any viewer, opens runtime
+             * 0) closes any viewer
              * 1) adds selected point cloud to visualiser
              * 2) groups it
              * 3) calcs height

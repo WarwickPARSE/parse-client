@@ -501,7 +501,7 @@ namespace PARSE
             //Console.WriteLine("Number =" + points.numberOfNodes());
 
             double[] pointMin = { minx, miny, minz };
-            double[] pointMax = { maxx, miny + ((maxy - miny) / (VolumeCalculator.number)), maxz };
+            double[] pointMax = { maxx, miny + ((maxy - miny) / (PlanePuller.number)), maxz };
 
             Object[] temp = points.range(pointMin, pointMax);
 
