@@ -75,6 +75,9 @@ namespace PARSE
 
             }
 
+            this.scanvoxel.Content = "VH Ratio: " + ((Convert.ToDouble(this.voloutput.Content) / Convert.ToDouble(this.heightoutput.Content)));
+            this.scanfileref.Content = "BMI Measure: " + (66 / (Convert.ToDouble(this.heightoutput.Content)));
+
         }
 
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
@@ -196,6 +199,7 @@ namespace PARSE
             this.totalarea.Content = "Total Area: " + Math.Round(areaList[(int)e.NewValue],4) + "m\u00B2";
             this.maxarea.Content = "Plane " + (int) e.NewValue;
             this.totalperimiter.Content = "Circumference: " + circum + "m";
+
         }
     }
 }

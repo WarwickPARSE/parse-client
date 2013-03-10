@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Media3D;
 using Microsoft.Kinect;
-using Emgu.CV;
 using System.Drawing;
 
 namespace PARSE
@@ -18,6 +17,8 @@ namespace PARSE
             double circum = 0;
 
             List<Point3D> plane3D = planes[planeNo];
+
+            System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
 
             //plane3D = GiftWrapper.wrap(plane3D);
             

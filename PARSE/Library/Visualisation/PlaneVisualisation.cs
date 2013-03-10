@@ -41,7 +41,7 @@ namespace PARSE
 
             for (int i = 0; i < x.Length; i++)
             {
-                pointCoordinates.Add(new Point3D(x[i]+1, z[i]-2, -1));
+                pointCoordinates.Add(new Point3D(x[i]+1, z[i]-2.75, -1));
             }
 
             //create point cloud with the relevant co-ordinates

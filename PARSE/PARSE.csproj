@@ -77,14 +77,6 @@
     <Reference Include="Accessibility">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Emgu.CV, Version=2.4.0.1717, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Emgu.CV.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.Util, Version=2.4.0.1717, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Emgu.Util.dll</HintPath>
-    </Reference>
     <Reference Include="HelixToolkit.Wpf, Version=2012.4.14.1, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\HelixToolkit.2012.4.14.1\lib\NET40\HelixToolkit.Wpf.dll</HintPath>
@@ -138,6 +130,7 @@
     <Compile Include="ICP\VoxelGrid.cs" />
     <Compile Include="Library\Visualisation\GroupVisualiser.cs" />
     <Compile Include="Library\Visualisation\PlaneVisualisation.cs" />
+    <Compile Include="LimbCalculator.cs" />
     <Compile Include="Measurement\AreaCalculator.cs" />
     <Compile Include="Measurement\GiftWrapper.cs" />
     <Compile Include="Measurement\ConvexHullFinder.cs" />
@@ -343,7 +336,6 @@
     <Resource Include="Recognition\Classifiers\cascade.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="opencv_core240.dll" />
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
