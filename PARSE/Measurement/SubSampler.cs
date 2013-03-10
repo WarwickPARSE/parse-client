@@ -27,7 +27,7 @@ namespace PARSE
             for (int i = 0; i < input.Count; i++)
             {
                 List<Point3D> sample = new List<Point3D>();
-                while (i % factor != factor - 1)
+                while ((i < input.Count) && (i % factor != factor - 1))
                 {
                     sample.Add(input[i]);
                     i++;
