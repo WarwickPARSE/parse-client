@@ -35,7 +35,7 @@ namespace PARSE
                 }
 
                 vPointOnHull = vEndpoint;
-            } while (vEndpoint != hull[0]);
+            } while (vEndpoint != output[0]);
 
             return output;
         }
@@ -54,5 +54,3 @@ namespace PARSE
         }
     }
 }
-
-/*
