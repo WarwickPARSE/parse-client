@@ -376,6 +376,7 @@ namespace PARSE
         {
             for (int i = 0; i < pcdl.Count; i++)
                 {
+                    sandra.Speak("Removing your feet");
                     pcdl[i].deleteFloor();
                 }
             this.calculate.IsEnabled = true;
