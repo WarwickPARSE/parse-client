@@ -8,6 +8,22 @@ namespace PARSE
 {
     static class SubSampler
     {
+        public static List<Point3D> removeOutliers(List<Point3D> input, double factor)
+        {
+            double averageDist = CircumferenceCalculator.calculate(input) / input.Count;
+
+            for (int i = 0; i < input.Count-1; i++)
+            {
+                if (CircumferenceCalculator.distance(input[i], input[i + 1]) > averageDist)
+                {
+                    input.RemoveAt(i);
+                    continue;
+                }
+            }
+
+            return input;
+        }
+        
         public static List<Point3D> averageSubSample(List<Point3D> input, int subSampleFactor, int averageFactor)
         {
             return SubSampler.averageSample(SubSampler.subSample(input, subSampleFactor), averageFactor);
