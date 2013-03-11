@@ -98,10 +98,7 @@ namespace PARSE
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
-            this.export1.IsEnabled = false;
-            this.export2.IsEnabled = false;
-            this.measurement.IsEnabled = false;
-            this.removefloor.IsEnabled = false;
+            this.resetButtons();
 
         }
 
@@ -216,15 +213,27 @@ namespace PARSE
             Environment.Exit(0);
         }
 
+        private void resetButtons()
+        {
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.measurement.IsEnabled = false;
+            this.removefloor.IsEnabled = false;
+            this.calculate.IsEnabled = false;
+        }
+        
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
             this.shutAnyWindows();
+
+            this.resetButtons();
+            
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
+            
             this.export1.IsEnabled = true;
             this.export2.IsEnabled = true;
-            this.measurement.IsEnabled = true;
             this.removefloor.IsEnabled = true;
 
         }
@@ -288,6 +297,8 @@ namespace PARSE
                 ScanSerializer.serialize(filename, windowScanner.getPointClouds());
             }
 
+            this.export1.IsEnabled = false;
+
         }
 
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
@@ -338,6 +349,7 @@ namespace PARSE
                 }
 
                 tw.Close();
+                this.export2.IsEnabled = false;
             }
 
         }
@@ -369,6 +381,8 @@ namespace PARSE
                 {
                     pcdl[i].deleteFloor();
                 }
+            this.calculate.IsEnabled = true;
+            this.measurement.IsEnabled = true;
 
             this.shutAnyWindows();
             windowScanner = new ScanLoader(pcdl);
@@ -384,7 +398,7 @@ namespace PARSE
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
-             * 0) closes any viewer
+             * 0) closes any viewer, resets buttons
              * 1) adds selected point cloud to visualiser
              * 2) groups it
              * 3) calcs height
@@ -392,6 +406,7 @@ namespace PARSE
 
             /*0)*/
             this.shutAnyWindows();
+            this.resetButtons();
 
      /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".PARSE";
@@ -409,7 +424,6 @@ namespace PARSE
             this.export1.IsEnabled = false;
             this.export2.IsEnabled = false;
             this.removefloor.IsEnabled = true;
-            this.measurement.IsEnabled = true;
 
      /*2)*/ //instantiate the stitcher 
             stitcher = new BoundingBox();
