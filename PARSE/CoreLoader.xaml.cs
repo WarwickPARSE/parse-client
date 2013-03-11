@@ -452,6 +452,8 @@ namespace PARSE
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Show();
+
+            this.kinectInterp.stopStreams();
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
