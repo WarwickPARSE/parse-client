@@ -283,12 +283,16 @@ namespace PARSE
                 //instantiate the stitcher 
                 BoundingBox stitcher = new BoundingBox();
 
+                sandra.Speak("Stitching scan's together, please wait.");
+                
                 //jam points into stitcher
                 stitcher.add(fincloud);
                 stitcher.stitch();
 
                 pcd = stitcher.getResult();
                 fincloud = stitcher.getResultList();
+
+                sandra.Speak("Visualizing scan, please wait.");
 
                 GroupVisualiser gg = new GroupVisualiser(fincloud);
                 gg.preprocess();
