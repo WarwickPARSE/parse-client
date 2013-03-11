@@ -20,6 +20,17 @@ namespace PARSE.ICP
         private double _r, _g, _b;
         private Point3D _point; 
 
+        public static PointRGB operator+(PointRGB p1, PointRGB p2){
+            Point3D point = new Point3D(p1.point.X + p2.point.X, p1.point.Y + p2.point.Y, p1.point.Z + p2.point.Z);
+            return new PointRGB(point, p2.r, p2.g, p2.b); 
+        }
+
+        public static PointRGB operator -(PointRGB p1, PointRGB p2)
+        {
+            Point3D point = new Point3D(p1.point.X - p2.point.X, p1.point.Y - p2.point.Y, p1.point.Z - p2.point.Z);
+            return new PointRGB(point, p2.r, p2.g, p2.b);
+        }
+
         //todo: make the properties immutable 
         public double r {
             get { return _r; }
