@@ -55,6 +55,7 @@ namespace PARSE
 
         //Kinect instance
         private KinectInterpreter kinectInterp;
+        private Boolean wantKinect;
 
         //Captured canvas
         private Canvas tmpCanvas;
@@ -62,6 +63,7 @@ namespace PARSE
         public ScanLoader()
         {
             InitializeComponent();
+            wantKinect = true;
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             hitState = 0;
@@ -72,6 +74,8 @@ namespace PARSE
         public ScanLoader(List<PointCloud> fcloud)
         {
             InitializeComponent();
+            wantKinect = false;
+
 
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
@@ -101,6 +105,7 @@ namespace PARSE
         public ScanLoader(PointCloud gcloud)
         {
             InitializeComponent();
+            wantKinect = false;
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
@@ -134,10 +139,14 @@ namespace PARSE
             //start scanning procedure
             kinectInterp = new KinectInterpreter(skeloutline);
 
-            if (!this.kinectInterp.isSkeletonEnabled())
+            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
             {
                 this.kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
+            if (!wantKinect)
+            {
+                kinectInterp.stopStreams();
             }
           
         }
