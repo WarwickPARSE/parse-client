@@ -98,10 +98,10 @@ namespace PARSE
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
-            //this.export1.IsEnabled = false;
-            //this.export2.IsEnabled = false;
-            //this.measurement.IsEnabled = false;
-            //this.removefloor.IsEnabled = false;
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.measurement.IsEnabled = false;
+            this.removefloor.IsEnabled = false;
 
         }
 
@@ -222,6 +222,11 @@ namespace PARSE
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
+            this.export1.IsEnabled = true;
+            this.export2.IsEnabled = true;
+            this.measurement.IsEnabled = true;
+            this.removefloor.IsEnabled = true;
+
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
@@ -365,7 +370,6 @@ namespace PARSE
                     pcdl[i].deleteFloor();
                 }
 
-
             this.shutAnyWindows();
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
@@ -401,6 +405,11 @@ namespace PARSE
             }
 
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
+
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.removefloor.IsEnabled = true;
+            this.measurement.IsEnabled = true;
 
      /*2)*/ //instantiate the stitcher 
             stitcher = new BoundingBox();
