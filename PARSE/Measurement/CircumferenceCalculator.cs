@@ -11,6 +11,20 @@ namespace PARSE
     public class CircumferenceCalculator
     {
 
+        public static double calculate(List<Point3D> input)
+        {
+            //plane3D = GiftWrapper.wrap(plane3D);
+
+            double circum = 0;
+
+            for (int j = 0; j < input.Count - 1; j++)
+            {
+                circum = circum + CircumferenceCalculator.distance(input[j], input[j + 1]);
+            }
+
+            return circum;
+        }
+
         //provide depth z at a given joint co-ordinate and a pointcloud with that particular information.
         public static double calculate(List<List<Point3D>> planes, int planeNo)
         {
@@ -20,12 +34,7 @@ namespace PARSE
 
             System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
 
-            //plane3D = GiftWrapper.wrap(plane3D);
-            
-            for (int j = 0; j < plane3D.Count - 1; j++)
-            {
-                circum = circum + CircumferenceCalculator.distance(plane3D[j], plane3D[j + 1]);
-            }
+            circum = CircumferenceCalculator.calculate(plane3D);
 
             Console.WriteLine("Circum Pre Multi: " + circum);
             circum = UnitConvertor.convertPCM(circum,2);
