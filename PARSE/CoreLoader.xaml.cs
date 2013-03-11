@@ -292,10 +292,8 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 ScanSerializer.serialize(filename, windowScanner.getPointClouds());
+                this.export1.IsEnabled = false;
             }
-
-            this.export1.IsEnabled = false;
-
         }
 
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
@@ -311,7 +309,8 @@ namespace PARSE
 
             if (dlg.ShowDialog() == true)
             {
-                filename = dlg.FileName;   
+                filename = dlg.FileName;
+                this.export2.IsEnabled = false;
             }
 
             for (int j = 0; j < pcdl.Count; j++)
@@ -346,7 +345,6 @@ namespace PARSE
                 }
 
                 tw.Close();
-                this.export2.IsEnabled = false;
             }
 
         }
