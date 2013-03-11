@@ -418,6 +418,7 @@ namespace PARSE
 
             if ((filename == null) || (dlg.FileName.Length == 0))
             {
+
                 return;
             }
 
