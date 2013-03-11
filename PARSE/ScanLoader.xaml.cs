@@ -125,7 +125,6 @@ namespace PARSE
             hitState = 0;
         }
 
-
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {
             //place relative to coreloader
