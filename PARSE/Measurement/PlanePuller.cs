@@ -29,8 +29,8 @@ namespace PARSE
             {
                 List<Point3D> plane = pc.getKDTree().getAllPointsAt(i, increment / 2, limits);
 
-                //plane = SubSampler.averageSubSample(plane, sampleNumber);
-                plane = GiftWrapper.wrap(plane);
+                plane = SubSampler.averageSubSample(plane, sampleNumber);
+                
                 output.Add(plane);
             }
             
