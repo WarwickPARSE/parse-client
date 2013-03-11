@@ -134,6 +134,12 @@ namespace PARSE
 
             //start scanning procedure
             kinectInterp = new KinectInterpreter(skeloutline);
+
+            if (!this.kinectInterp.isSkeletonEnabled())
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
           
         }
 
@@ -159,12 +165,6 @@ namespace PARSE
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            }
-
-            if (!this.kinectInterp.isSkeletonEnabled())
-            {
-                this.kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
             if (!this.kinectInterp.isColorEnabled())
