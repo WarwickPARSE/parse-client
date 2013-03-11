@@ -86,12 +86,13 @@ namespace PARSE
 
         private System.Windows.Media.Brush red = System.Windows.Media.Brushes.Red;
         private System.Windows.Media.Brush green = System.Windows.Media.Brushes.Green;
+        private System.Windows.Media.Brush blue = System.Windows.Media.Brushes.Blue;
         private System.Windows.Media.Brush color;
 
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
-            color = red;
+            color = blue;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -171,7 +172,7 @@ namespace PARSE
 
         public Boolean goldilocks()
         {
-            return (tooFarBack() || tooFarForward());
+            return (!(tooFarBack() || tooFarForward()));
         }
         
         public Boolean tooFarBack()
@@ -413,7 +414,11 @@ namespace PARSE
 
                         System.Windows.Media.Brush prevColor = this.color;
 
-                        if (goldilocks())
+                        if (tooFarForward())
+                        {
+                            this.color = blue;
+                        }
+                        else if (tooFarBack())
                         {
                             this.color = red;
                         }
