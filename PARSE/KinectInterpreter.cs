@@ -240,7 +240,6 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
-
         //Disable all streams on changeover
         public void stopStreams()
         {
@@ -355,13 +354,10 @@ namespace PARSE
 
         public void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
-
                 if (skeletonFrame != null)
                 {
-
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state
@@ -406,9 +402,7 @@ namespace PARSE
                         skelL = (320 * (1 + skelL)) * 4;
                         skelR = (320 * (1 + skelR)) * 4;
                             
-                        
                         // Update the drawing
-
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
 
