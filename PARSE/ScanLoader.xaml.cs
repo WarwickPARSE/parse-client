@@ -150,8 +150,6 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
-
-
             if (sandra == null)
             {
                 //initalize speech sythesizer
