@@ -260,7 +260,7 @@ namespace PARSE
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m\u00B3";
             
-            //show Runtime viewer (aka results,history,output)
+            //show Runtime viewer (aka results,history)
             windowHistory.Show();
         }
 
