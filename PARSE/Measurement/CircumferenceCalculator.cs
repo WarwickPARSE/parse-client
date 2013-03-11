@@ -24,18 +24,18 @@ namespace PARSE
             
             for (int j = 0; j < plane3D.Count - 1; j++)
             {
-                circum = circum + Math.Sqrt(Math.Pow((plane3D[j + 1].X - plane3D[j].X), 2) + Math.Pow((plane3D[j + 1].Y - plane3D[j].Y), 2));
+                circum = circum + CircumferenceCalculator.distance(plane3D[j], plane3D[j + 1]);
             }
 
             Console.WriteLine("Circum Pre Multi: " + circum);
             circum = UnitConvertor.convertPCM(circum,2);
             Console.WriteLine("Circum: " + circum);
             return circum;
+        }
 
-        //TO DO FOR GREG DONT YOU DARE TRY AND AVOID IT YOU FUCKER
-            //segmenting the plane into desired areas for circumference
-            //sounds hard ;)
-
+        public static double distance(Point3D a, Point3D b)
+        {
+            return Math.Sqrt(Math.Pow((b.X - a.X), 2) + Math.Pow((b.Y - a.Y), 2)); ;
         }
     }
 }
