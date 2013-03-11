@@ -253,9 +253,6 @@ namespace PARSE
             List<double> areaList = AreaCalculator.getAllAreas(planes);
             windowHistory.areaList = areaList;
             
-            //why is this here Bernard?
-            //double circum = LimbCalculator.calculate(planes, 1);
-
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m\u00B3";
@@ -412,12 +409,20 @@ namespace PARSE
             dlg.DefaultExt = ".PARSE";
             dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
 
+            String filename = "";
+
             if (dlg.ShowDialog() == true)
             {
-                String filename = dlg.FileName;
-                this.DataContext = ScanSerializer.deserialize(filename);
-                pcdl = ScanSerializer.depthPc;
+                filename = dlg.FileName;
             }
+
+            if ((filename == null) || (dlg.FileName.Length == 0))
+            {
+                return;
+            }
+
+            this.DataContext = ScanSerializer.deserialize(filename);
+            pcdl = ScanSerializer.depthPc;
 
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
 
