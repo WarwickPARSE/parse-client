@@ -395,13 +395,14 @@ namespace PARSE
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
-             * 0) closes any viewer, resets buttons
+             * 0) kills kinect, closes any viewer, resets buttons
              * 1) adds selected point cloud to visualiser
              * 2) groups it
              * 3) calcs height
              */
 
             /*0)*/
+            this.kinectInterp.stopStreams();
             this.shutAnyWindows();
             this.resetButtons();
 
