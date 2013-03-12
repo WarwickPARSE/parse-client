@@ -38,8 +38,8 @@ namespace PARSE
         private const double scale = 0.001;             //for rendering 
 
         //dimension constants 
-        private int depthFrameWidth = 640;
-        private int depthFrameHeight = 480;
+        private const int depthFrameWidth = 640;
+        private const int depthFrameHeight = 480;
 
         //centre points (these will need changing at some point)
         private const int cx = 640 / 2;
