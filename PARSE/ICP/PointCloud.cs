@@ -60,10 +60,13 @@ namespace PARSE
         double minz = double.MaxValue;
 
 
-        //geometry, accessible for visualisation.
+        //geometry, accessible for serialisation.
         public int[] rawDepth;
         Point3D[] depthFramePoints;
         System.Windows.Point[] textureCoordinates;
+
+        //matrix representation of point cloud 
+        Matrix m; 
 
         //percentage of opacity that we want the colour to be 
         private const int opacity = 100;
@@ -83,13 +86,11 @@ namespace PARSE
             this.points = new KdTree.KDTree(3);
 
             //convert bitmap stream into a format that is supported by the kd-tree method
-            if (bs != null)
-            {
+            if (bs != null) {
                 Bitmap b = convertToBitmap(bs);
                 setPoints(rawDepth, b);
             }
-            else
-            {
+            else {
                 setPoints(rawDepth);
             }
         }
@@ -100,6 +101,10 @@ namespace PARSE
             //this.points = new KdTree.KDTree(3);
         }
 
+        /// <summary>
+        /// Suboptimal constructor, used for list of 3d points 
+        /// </summary>
+        /// <param name="input"></param>
         public PointCloud(List<Point3D> input)
         {
             this.points = new KdTree.KDTree(3);
@@ -107,6 +112,7 @@ namespace PARSE
             for (int i = 0; i < input.Count; i++)
             {
                 Point3D poLoc = input[i];
+
                 //check min values
                 if (poLoc.X < minx) { minx = poLoc.X; }
                 if (poLoc.Y < miny) { miny = poLoc.Y; }
