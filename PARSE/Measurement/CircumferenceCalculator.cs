@@ -37,7 +37,7 @@ namespace PARSE
             circum = CircumferenceCalculator.calculate(plane3D);
 
             Console.WriteLine("Circum Pre Multi: " + circum);
-            circum = UnitConvertor.convertPCM(circum,2);
+            circum = UnitConvertor.convertPCM(circum,1);
             Console.WriteLine("Circum: " + circum);
             return circum;
         }
