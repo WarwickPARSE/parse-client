@@ -36,25 +36,21 @@ namespace PARSE
             List<Point3D> output = new List<Point3D>();
             for (int i = 0; i < input.Count; i++)
             {
-                List<Point3D> sample = new List<Point3D>();
-                while ((i < input.Count) && (i % factor != factor - 1))
-                {
-                    sample.Add(input[i]);
-                    i++;
-                }
-                
                 double aX = 0;
                 double aY = 0;
                 double aZ = 0;
-                for (int j = 0; j < sample.Count; j++)
+                
+                while ((i < input.Count) && (i % factor != factor - 1))
                 {
-                    aX = aX + sample[j].X;
-                    aY = aY + sample[j].Y;
-                    aZ = aZ + sample[j].Z;
+                    aX = aX + input[i].X;
+                    aY = aY + input[i].Y;
+                    aZ = aZ + input[i].Z;
+                    i++;
                 }
-                aX = aX / sample.Count;
-                aY = aY / sample.Count;
-                aZ = aZ / sample.Count;
+                
+                aX = aX / factor;
+                aY = aY / factor;
+                aZ = aZ / factor;
 
                 Point3D average = new Point3D(aX,aY,aZ);
                 output.Add(average);
