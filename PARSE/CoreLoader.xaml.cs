@@ -129,6 +129,12 @@ namespace PARSE
                 }
         }
 
+        public void setPC(PointCloud pc, List<PointCloud> pcl)
+        {
+            this.pcd = pc;
+            this.pcdl = pcl;
+        }
+
         private void shutAnyWindows()
         {
             if (windowViewer != null)
@@ -231,11 +237,9 @@ namespace PARSE
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
-            
-            this.export1.IsEnabled = true;
-            this.export2.IsEnabled = true;
-            this.removefloor.IsEnabled = true;
 
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
@@ -351,8 +355,8 @@ namespace PARSE
 
         private void SimpleStitchTest_Click(object sender, RoutedEventArgs e)
         {
-            List<PointCloud> pc = windowScanner.getPointClouds();
-            PointCloud pcd= new PointCloud();
+            List<PointCloud> pc = pcdl;
+            pcd = new PointCloud();
 
             //instantiate the stitcher 
             stitcher = new BoundingBox();

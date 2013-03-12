@@ -292,6 +292,8 @@ namespace PARSE
                 pcd = stitcher.getResult();
                 fincloud = stitcher.getResultList();
 
+                ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
+
                 sandra.Speak("Visualizing scan, please wait.");
 
                 GroupVisualiser gg = new GroupVisualiser(fincloud);
@@ -301,6 +303,11 @@ namespace PARSE
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
+
+                ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
+                ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
+                ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
+
                 pcTimer.Stop();
             }
         }
