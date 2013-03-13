@@ -7,7 +7,7 @@ namespace PARSE
 {
     class UnitConvertor
     {
-        private const double pctorwtransform = 0.815365917;//to be determined experimentally
+        private const double pctorwtransform = 0.809961686;//to be determined experimentally
 
         public static double convertPCM(double PCM, int dimension)
         {
