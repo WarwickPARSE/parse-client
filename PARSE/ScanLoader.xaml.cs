@@ -55,6 +55,7 @@ namespace PARSE
 
         //Kinect instance
         private KinectInterpreter kinectInterp;
+        private Boolean wantKinect;
 
         //Captured canvas
         private Canvas tmpCanvas;
@@ -62,6 +63,7 @@ namespace PARSE
         public ScanLoader()
         {
             InitializeComponent();
+            wantKinect = true;
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             hitState = 0;
@@ -72,6 +74,8 @@ namespace PARSE
         public ScanLoader(List<PointCloud> fcloud)
         {
             InitializeComponent();
+            wantKinect = false;
+
 
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
@@ -101,6 +105,7 @@ namespace PARSE
         public ScanLoader(PointCloud gcloud)
         {
             InitializeComponent();
+            wantKinect = false;
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
@@ -125,7 +130,6 @@ namespace PARSE
             hitState = 0;
         }
 
-
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {
             //place relative to coreloader
@@ -134,6 +138,16 @@ namespace PARSE
 
             //start scanning procedure
             kinectInterp = new KinectInterpreter(skeloutline);
+
+            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
+            if (!wantKinect)
+            {
+                kinectInterp.stopStreams();
+            }
           
         }
 
@@ -144,8 +158,6 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
-
-
             if (sandra == null)
             {
                 //initalize speech sythesizer
@@ -159,12 +171,6 @@ namespace PARSE
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            }
-
-            if (!this.kinectInterp.isSkeletonEnabled())
-            {
-                this.kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             }
 
             if (!this.kinectInterp.isColorEnabled())
@@ -277,12 +283,18 @@ namespace PARSE
                 //instantiate the stitcher 
                 BoundingBox stitcher = new BoundingBox();
 
+                sandra.Speak("Stitching scan's together, please wait.");
+                
                 //jam points into stitcher
                 stitcher.add(fincloud);
                 stitcher.stitch();
 
                 pcd = stitcher.getResult();
                 fincloud = stitcher.getResultList();
+
+                ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
+
+                sandra.Speak("Visualizing scan, please wait.");
 
                 GroupVisualiser gg = new GroupVisualiser(fincloud);
                 gg.preprocess();
@@ -291,6 +303,11 @@ namespace PARSE
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
+
+                ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
+                ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
+                ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
+
                 pcTimer.Stop();
             }
         }

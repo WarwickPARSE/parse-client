@@ -84,9 +84,15 @@ namespace PARSE
         public const double oneParseUnitDelta = 7.5;
         public const int oneParseRadian = 0;
 
+        private System.Windows.Media.Brush red = System.Windows.Media.Brushes.Red;
+        private System.Windows.Media.Brush green = System.Windows.Media.Brushes.Green;
+        private System.Windows.Media.Brush blue = System.Windows.Media.Brushes.Blue;
+        private System.Windows.Media.Brush color;
+
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
+            color = blue;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -164,6 +170,11 @@ namespace PARSE
             this.kinectSensor.SkeletonStream.Enable();
         }
 
+        public Boolean goldilocks()
+        {
+            return (!(tooFarBack() || tooFarForward()));
+        }
+        
         public Boolean tooFarBack()
         {
             return (skelDepthPublic > (oneParseUnit + oneParseUnitDelta));
@@ -229,7 +240,6 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
-
         //Disable all streams on changeover
         public void stopStreams()
         {
@@ -279,9 +289,7 @@ namespace PARSE
             }
         
         }
-
-        int count = 10;
-
+        
         public WriteableBitmap DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
 
@@ -346,13 +354,10 @@ namespace PARSE
 
         public void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
-
                 if (skeletonFrame != null)
                 {
-
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state
@@ -367,11 +372,12 @@ namespace PARSE
                     foreach (Skeleton trackedSkeleton in trackedSkeletons)
                     {
                         SkeletonFigure skeletonFigure;
+
                         // Checks if the tracked skeleton is already drawn.
                         if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
                         {
                             // If not, create a new drawing on our canvas
-                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
+                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas, this.color);
                             try
                             {
                                 skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
@@ -385,23 +391,39 @@ namespace PARSE
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        if (this.kinectSensor.SkeletonStream.IsEnabled)
-                        {
-                            //update the depth of the tracked skeleton
-                            skelDepth = trackedSkeleton.Position.Z;
-                            skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
-                            skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
-                            //skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
-
-                            skelDepth = skelDepth * 1000;
-                            skelDepthPublic = skelDepth;
-                            skelL = (320 * (1 + skelL)) * 4;
-                            skelR = (320 * (1 + skelR)) * 4;
-                            //skelB = 480 * (1-((1+skelB)/2));
-                        }
+                        //update the depth of the tracked skeleton
+                        skelDepth = trackedSkeleton.Position.Z;
+                        skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
+                        skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+                            
+                        skelDepth = skelDepth * 1000;
+                        skelDepthPublic = skelDepth;
+                        skeletonFigure.setDepth(skelDepthPublic);
+                        skelL = (320 * (1 + skelL)) * 4;
+                        skelR = (320 * (1 + skelR)) * 4;
+                            
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
+
+                        System.Windows.Media.Brush prevColor = this.color;
+
+                        if (tooFarForward())
+                        {
+                            this.color = blue;
+                        }
+                        else if (tooFarBack())
+                        {
+                            this.color = red;
+                        }
+                        else
+                        {
+                            this.color = green;
+                        }
+                        if (!(this.color.Equals(prevColor)))
+                        {
+                            skeletonFigure.setColor(this.color);
+                        }
                     }
 
                     foreach (SkeletonFigure skeleton in skeletons.Values)

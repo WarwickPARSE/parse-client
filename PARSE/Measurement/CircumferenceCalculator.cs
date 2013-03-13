@@ -11,6 +11,20 @@ namespace PARSE
     public class CircumferenceCalculator
     {
 
+        public static double calculate(List<Point3D> input)
+        {
+            input = GiftWrapper.wrap(input);
+
+            double circum = 0;
+
+            for (int j = 0; j < input.Count - 1; j++)
+            {
+                circum = circum + CircumferenceCalculator.distance(input[j], input[j + 1]);
+            }
+
+            return circum;
+        }
+
         //provide depth z at a given joint co-ordinate and a pointcloud with that particular information.
         public static double calculate(List<List<Point3D>> planes, int planeNo)
         {
@@ -20,22 +34,17 @@ namespace PARSE
 
             System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
 
-            //plane3D = GiftWrapper.wrap(plane3D);
-            
-            for (int j = 0; j < plane3D.Count - 1; j++)
-            {
-                circum = circum + Math.Sqrt(Math.Pow((plane3D[j + 1].X - plane3D[j].X), 2) + Math.Pow((plane3D[j + 1].Y - plane3D[j].Y), 2));
-            }
+            circum = CircumferenceCalculator.calculate(plane3D);
 
             Console.WriteLine("Circum Pre Multi: " + circum);
-            circum = UnitConvertor.convertPCM(circum,2);
+            circum = UnitConvertor.convertPCM(circum,1);
             Console.WriteLine("Circum: " + circum);
             return circum;
+        }
 
-        //TO DO FOR GREG DONT YOU DARE TRY AND AVOID IT YOU FUCKER
-            //segmenting the plane into desired areas for circumference
-            //sounds hard ;)
-
+        public static double distance(Point3D a, Point3D b)
+        {
+            return Math.Sqrt(Math.Pow((b.X - a.X), 2) + Math.Pow((b.Y - a.Y), 2)); ;
         }
     }
 }
