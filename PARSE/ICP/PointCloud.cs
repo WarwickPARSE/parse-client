@@ -260,11 +260,7 @@ namespace PARSE
                         double y = (cy - iy) * zz * fyinv;
                         double z = zz;
 
-                        /*
-                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
-                         */
-
-
+                        //TODO: this can probably be made more efficient at a later date, perhaps through threading... 
                         //check min values
                         if (x < minx) { minx = x; }
                         if (y < miny) { miny = y; }
