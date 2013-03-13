@@ -13,7 +13,7 @@ namespace PARSE
 
         public static double calculate(List<Point3D> input)
         {
-            //plane3D = GiftWrapper.wrap(plane3D);
+            input = GiftWrapper.wrap(input);
 
             double circum = 0;
 
