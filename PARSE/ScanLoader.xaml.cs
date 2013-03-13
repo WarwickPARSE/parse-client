@@ -218,7 +218,7 @@ namespace PARSE
             {
                 //get current skeleton tracking state
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
-                jointDepths  = enumerateSkeletonDepths(skeleton);
+                jointDepths = enumerateSkeletonDepths(skeleton);
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
@@ -370,11 +370,11 @@ namespace PARSE
             //let's just say left arm for now
             if (pcdexisting!=null)
             {
-                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "WAIST");
+                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
             else
             {
-                LimbCalculator.calculateLimbBounds(pcd, jointDepths, "WAIST");
+                LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
             }
 
             //change colour of point cloud for limb selection mode
@@ -464,6 +464,7 @@ namespace PARSE
             foreach (Joint j in sk.Joints)
             {
                 double[] positions = { j.Position.Z, j.Position.X, j.Position.Y };
+                System.Diagnostics.Debug.WriteLine(j.Position.X);
                 jointDepths.Add(j.JointType, positions);
             }
 

@@ -39,6 +39,8 @@ namespace PARSE
 
                 bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
 
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
                 break;
                 
                 case "WAIST":
