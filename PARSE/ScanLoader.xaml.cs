@@ -307,7 +307,6 @@ namespace PARSE
                 ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
-
                 pcTimer.Stop();
             }
         }
