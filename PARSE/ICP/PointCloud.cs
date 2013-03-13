@@ -545,16 +545,12 @@ namespace PARSE
 
         public void deleteFloor()
         {
-            //Console.WriteLine("Before");
-            //Console.WriteLine("YMAX =" + maxy);
-            //Console.WriteLine("YMIN =" + miny);
-            //Console.WriteLine("Height = " + (maxy - miny));
-            //Console.WriteLine("Number =" + points.numberOfNodes());
-
             double[] pointMin = { minx, miny, minz };
             double[] pointMax = { maxx, miny + ((maxy - miny) / (PlanePuller.planeNumber)), maxz };
-
+            
+            //list of supposed floor points
             Object[] temp = points.range(pointMin, pointMax);
+
 
             for (int i = 0; i < temp.Length; i++)
             {
@@ -567,16 +563,19 @@ namespace PARSE
             //this does not work, i dont know why. if someone wants to try feel free
             double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
             double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
+
+            //pull all points from the kd-tree
             Object[] points3d = points.range(minPoint,maxPoint);
 
-            minx = double.MaxValue;
-            miny = double.MaxValue;
-            minz = double.MaxValue;
+            minx = double.MinValue;
+            miny = double.MinValue;
+            minz = double.MinValue;
 
-            maxx = double.MinValue;
-            maxy = double.MinValue;
-            maxz = double.MinValue;
+            maxx = double.MaxValue;
+            maxy = double.MaxValue;
+            maxz = double.MaxValue;
 
+            //check each point for minimal-ness
             for (int i = 0; i < points3d.Length; i++)
             {
                 Point3D oldPoint = ((PointRGB)(points3d[i])).point;
@@ -587,13 +586,7 @@ namespace PARSE
                 if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
                 if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
             }
-
-            /*Console.WriteLine("After!!!");
-            Console.WriteLine("YMAX =" + maxy);
-            Console.WriteLine("YMIN =" + miny);
-            Console.WriteLine("Height = " + (maxy - miny));
-            */
-    }
+        }
     }
 }
 
