@@ -567,13 +567,13 @@ namespace PARSE
             //pull all points from the kd-tree
             Object[] points3d = points.range(minPoint,maxPoint);
 
-            minx = double.MinValue;
-            miny = double.MinValue;
-            minz = double.MinValue;
-
-            maxx = double.MaxValue;
-            maxy = double.MaxValue;
-            maxz = double.MaxValue;
+            //start with min and max values defined in terms of their opposites
+            minx = double.MaxValue;
+            miny = double.MaxValue;
+            minz = double.MaxValue;
+            maxx = double.MinValue;
+            maxy = double.MinValue;
+            maxz = double.MinValue;
 
             //check each point for minimal-ness
             for (int i = 0; i < points3d.Length; i++)
