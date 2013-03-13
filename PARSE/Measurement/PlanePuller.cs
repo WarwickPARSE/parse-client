@@ -9,7 +9,7 @@ namespace PARSE
     static class PlanePuller
     {
         public const int planeNumber = 60;
-        public const int sampleNumber = 5;
+        public const int sampleNumber = 7;
 
         public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc)
         {
