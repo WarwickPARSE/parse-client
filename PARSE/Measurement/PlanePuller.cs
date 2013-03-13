@@ -11,7 +11,12 @@ namespace PARSE
         public const int planeNumber = 60;
         public const int sampleNumber = 7;
 
-        public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc)
+        public static Tuple<List<List<Point3D>>, double> pullAll(PointCloud pc)
+        {
+            return PlanePuller.pullAll(pc, planeNumber);
+        }
+
+        public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc, int arbNumber)
         {
             double xmin = pc.getxMin();
             double xmax = pc.getxMax();
@@ -21,7 +26,7 @@ namespace PARSE
 
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
-            double increment = (ymax - ymin) / planeNumber;
+            double increment = (ymax - ymin) / arbNumber;
 
             List<List<Point3D>> output = new List<List<Point3D>>();
 
