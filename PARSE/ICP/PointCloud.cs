@@ -1,4 +1,8 @@
-﻿using System;
+﻿using HelixToolkit.Wpf;
+using KdTree;
+using MathNet.Numerics.LinearAlgebra.Double;
+using PARSE.ICP;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -13,10 +17,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
-using PARSE.ICP;
-
-using HelixToolkit.Wpf;
-using KdTree;
 
 namespace PARSE
 {
