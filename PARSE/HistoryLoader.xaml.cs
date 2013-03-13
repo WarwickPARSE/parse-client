@@ -126,8 +126,6 @@ namespace PARSE
 
             int i = (int)planeIndex;
 
-            PointSorter.rotSort(storedPlanes[i]);
-
             double[] x = new double[storedPlanes[i].Count];
             double[] z = new double[storedPlanes[i].Count];
 
