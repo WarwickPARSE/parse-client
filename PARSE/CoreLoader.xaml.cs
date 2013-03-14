@@ -149,6 +149,10 @@ namespace PARSE
         
         private void RGB_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("RGB");
             windowViewer.Owner = this;
@@ -157,6 +161,10 @@ namespace PARSE
 
         private void Depth_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             this.shutAnyWindows(); 
             windowViewer = new ViewLoader("Depth");
             windowViewer.Owner = this;
@@ -165,6 +173,10 @@ namespace PARSE
 
         private void Skeleton_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("Skeleton");
             windowViewer.Owner = this;
@@ -173,6 +185,10 @@ namespace PARSE
 
         private void DepthIso_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("Depth Isolation");
             windowViewer.Owner = this;
@@ -181,6 +197,10 @@ namespace PARSE
 
         private void RGBIso_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("RGB Isolation");
             windowViewer.Owner = this;
@@ -189,6 +209,10 @@ namespace PARSE
 
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle + 5 <= this.kinectInterp.kinectSensor.MaxElevationAngle))
             {
                 kinectMovingLock = true;
@@ -199,6 +223,10 @@ namespace PARSE
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle - 5) >= (this.kinectInterp.kinectSensor.MinElevationAngle))
             {
                 kinectMovingLock = true;
