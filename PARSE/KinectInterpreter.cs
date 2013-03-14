@@ -247,6 +247,10 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
+            if (this.kinectSensor == null)
+            {
+                return;
+            }
             if (this.kinectSensor.SkeletonStream.IsEnabled)
             {
                 this.kinectSensor.SkeletonStream.Disable();
