@@ -59,7 +59,6 @@ namespace PARSE
         double miny = double.MaxValue;
         double minz = double.MaxValue;
 
-
         //geometry, accessible for serialisation.
         public int[] rawDepth;
         Point3D[] depthFramePoints;
@@ -279,20 +278,30 @@ namespace PARSE
                         pointKey[1] = y;
                         pointKey[2] = z;
 
+                        //shove point into the kd-tree
                         Point3D poLoc = new Point3D(x, y, z);
                         PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r, g, b);
-
                         this.points.insert(pointKey, po);
+
+                        //calculate the matrix row
+                        int row = height * iy + ix;
+
+                        //dump the data into the row
+                        m.At(row, 1, x);
+                        m.At(row, 2, y);
+                        m.At(row, 3, z);
                     }
                 }
             }
-
         }
 
         //this is not fully implemented as I don't know how colours are represented!
         //TODO: throw an exception if the rawdepth is not the same length as rgb
         public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) 
         {
+            //instantiate the matrix object, now that we have the data points
+            m = new DenseMatrix(width * height, 3);
+
             for (int iy = 0; iy < 480; iy++)
             {
                 for (int ix = 0; ix < 640; ix++)
@@ -312,11 +321,6 @@ namespace PARSE
                         double x = (cx - ix) * zz * fxinv;
                         double y = (cy - iy) * zz * fyinv;
                         double z = zz;
-
-                        /*
-                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
-                         */
-                     
                         
                         //check min values
                         if (x < minx) { minx = x; }
