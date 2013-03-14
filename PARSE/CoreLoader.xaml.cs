@@ -143,6 +143,7 @@ namespace PARSE
             {
                 this.kinectmenu.IsEnabled = false;
                 this.newscan.IsEnabled = false;
+                kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 return true;
             }
             return false;
