@@ -74,8 +74,7 @@ namespace PARSE
         //sensor_orientation
         //sensor_origin
 
-        public PointCloud(BitmapSource bs, int[] rawDepth) 
-        {
+        public PointCloud(BitmapSource bs, int[] rawDepth) {
             this.bs = bs;
             this.rawDepth = rawDepth;
 
@@ -94,8 +93,7 @@ namespace PARSE
             }
         }
 
-        public PointCloud()
-        {
+        public PointCloud() {
             //parameterless constructor needed for serialization
             //this.points = new KdTree.KDTree(3);
         }
@@ -104,12 +102,10 @@ namespace PARSE
         /// Suboptimal constructor, used for list of 3d points 
         /// </summary>
         /// <param name="input"></param>
-        public PointCloud(List<Point3D> input)
-        {
+        public PointCloud(List<Point3D> input) {
             this.points = new KdTree.KDTree(3);
             
-            for (int i = 0; i < input.Count; i++)
-            {
+            for (int i = 0; i < input.Count; i++) { 
                 Point3D poLoc = input[i];
 
                 //check min values
@@ -132,16 +128,14 @@ namespace PARSE
         }
 
         //method for bernard
-        public PointCloud getSubRegion(double[] points)
-        {
+        public PointCloud getSubRegion(double[] points) {
             double[] pointMin = { points[0], points[1], points[2] };
             double[] pointMax = { points[3], points[4], points[5] };
 
             Object[] temp = this.points.range(pointMin, pointMax);
 
             List<Point3D> output = new List<Point3D>();
-            for (int i = 0; i < temp.Length; i++)
-            {
+            for (int i = 0; i < temp.Length; i++) {
                 output.Add(((PointRGB)(temp[i])).point);
             }
 
@@ -150,8 +144,7 @@ namespace PARSE
             return pc;
         }
 
-        public int size()
-        {
+        public int size() {
             return this.points.numberOfNodes();
         }
         
@@ -160,8 +153,7 @@ namespace PARSE
         /// </summary>
         /// <param name="bs">A bitmap stream</param>
         /// <returns></returns>
-        public Bitmap convertToBitmap(BitmapSource bs)
-        {
+        public Bitmap convertToBitmap(BitmapSource bs) {
             //Convert bitmap source to image
             MemoryStream outStream = new MemoryStream();
             BitmapEncoder enc = new BmpBitmapEncoder();
@@ -179,15 +171,13 @@ namespace PARSE
         /// Generates a point cloud with no colours
         /// </summary>
         /// <param name="rawDepth"></param>
-        public void setPoints(int[] rawDepth) 
-        {
+        public void setPoints(int[] rawDepth) {
             int[] r= new int [rawDepth.Length];
             int[] g = new int[rawDepth.Length];
             int[] b = new int[rawDepth.Length];
 
             //fill each colour element with an empty color
-            for (int i=0; i<rawDepth.Length; i++) 
-            {
+            for (int i=0; i<rawDepth.Length; i++) {
                 r[i] = 0;
                 g[i] = 0;
                 b[i] = 0;
@@ -198,8 +188,7 @@ namespace PARSE
         }
 
         //this may cause runtime errors - due to the implicit typecasting from byte to int, will need to test this further
-        public void setPoints(int[] rawDepth, Bitmap image)
-        {
+        public void setPoints(int[] rawDepth, Bitmap image) {
             Rectangle rec = new Rectangle(0, 0, image.Width, image.Height);
             BitmapData imageData = image.LockBits(rec, ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
@@ -222,10 +211,8 @@ namespace PARSE
             int stride = imageData.Stride;
 
             //shove the image data into its place 
-            for (int col = 0; col < imageData.Height; col++)
-            {
-                for (int row = 0; row < imageData.Width; row++) 
-                {
+            for (int col = 0; col < imageData.Height; col++) {
+                for (int row = 0; row < imageData.Width; row++) {
                     b[i] = (rgbData[(col * stride) + (row * 3)]); 
                     g[i] = (rgbData[(col * stride) + (row * 3) + 1]);
                     r[i] = (rgbData[(col * stride) + (row * 3) + 2]);
@@ -237,23 +224,18 @@ namespace PARSE
             setPoints(rawDepth, r, g, b);
         }
 
-        public void setPoints(int[] rawDepth, int r, int g, int b)
-        {
-            for (int iy = 0; iy < 480; iy++)
-            {
-                for (int ix = 0; ix < 640; ix++)
-                {
+        public void setPoints(int[] rawDepth, int r, int g, int b) {
+            for (int iy = 0; iy < 480; iy++) {
+                for (int ix = 0; ix < 640; ix++) {
                     int i = (iy * 640) + ix;
 
-                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth)
-                    {
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth) {
                         rawDepth[i] = -1;
 
                         //at the moment we seem to be deleting points that are too far away, this will need changing at some point
                         //this.depthFramePoints[i] = new Point3D();
                     }
-                    else
-                    {
+                    else {
                         double zz = rawDepth[i] * scale;
                         double x = (cx - ix) * zz * fxinv;
                         double y = (cy - iy) * zz * fyinv;
@@ -297,8 +279,7 @@ namespace PARSE
 
         //this is not fully implemented as I don't know how colours are represented!
         //TODO: throw an exception if the rawdepth is not the same length as rgb
-        public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) 
-        {
+        public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) {
             //instantiate the matrix object, now that we have the data points
             m = new DenseMatrix(width * height, 3);
 
@@ -415,8 +396,7 @@ namespace PARSE
         /// Translate the point cloud by a given value
         /// </summary>
         /// <param name="tx">Up to three co-ords</param>
-        public void translate(double[] tx) 
-        {
+        public void translate(double[] tx) {
             if (tx.Length == 3) {
                 //turn the transformation vector into and object
                 Console.WriteLine("Translating");
@@ -472,8 +452,7 @@ namespace PARSE
         /// </summary>
         /// <param name="axis">The axis of rotation</param>
         /// <param name="angle">The angle to which te point cloud is to be rotated</param>
-        public void rotate(double[] axis, double angle) 
-        {
+        public void rotate(double[] axis, double angle) {
             if (!(axis.Length != 3)) {
                 //centre of rotation 
                 Point3D centre = new Point3D(axis[0], axis[1], axis[2]);
@@ -526,8 +505,7 @@ namespace PARSE
         /// <param name="g">g value</param>
         /// <param name="g">b value</param>
         /// 
-        public PointCloud setColour(PointCloud pc, int r, int g, int b)
-        {
+        public PointCloud setColour(PointCloud pc, int r, int g, int b) {
             pc.setPoints(pc.rawDepth, r, g, b);
 
             return pc;
