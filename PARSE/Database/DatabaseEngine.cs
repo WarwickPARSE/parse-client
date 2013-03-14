@@ -46,38 +46,38 @@ namespace PARSE
         //Insert methods for all tables
 
         //Type 1 = tables that need a specialised query
-        public void insertPatientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void insertPatientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address)
         {
             dbOpen();
 
-            insertQueries.patientInformation(patientID, name, dateOfBirth, nationality, nhsNo, address);
+            insertQueries.patientInformation(name, dateOfBirth, nationality, nhsNo, address);
 
             dbClose();
         }
 
-        public void insertScanLocations(int scanLocID, String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, double jointsDist, DateTime timestamp)
+        public void insertScanLocations(String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, double jointsDist, DateTime timestamp)
         {
             dbOpen();
 
-            insertQueries.scanLocations(scanLocID, boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+            insertQueries.scanLocations(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
 
             dbClose();
         }
 
-        public void insertScans(int scanID, int scanTypeID, String pointCloudFileReference, DateTime timestamp)
+        public void insertScans(int scanTypeID, String pointCloudFileReference, DateTime timestamp)
         {
             dbOpen();
 
-            insertQueries.scans(scanID, scanTypeID, pointCloudFileReference, timestamp);
+            insertQueries.scans(scanTypeID, pointCloudFileReference, timestamp);
 
             dbClose();
         }
 
-        public void insertRecords(int recordID, int scanID, int scanTypeID, double value)
+        public void insertRecords(int scanID, int scanTypeID, double value)
         {
             dbOpen();
 
-            insertQueries.records(recordID, scanID, scanTypeID, value);
+            insertQueries.records(scanID, scanTypeID, value);
 
             dbClose();
         }
@@ -85,50 +85,50 @@ namespace PARSE
         //Type 2 = tables containing 1 identifier and 2 text fields
 
         //contains the different types of conditions
-        public void insertConditions(int conditionID, String condition, String description)
+        public void insertConditions(String condition, String description)
         {
             dbOpen();
 
-            insertQueries.type2("Conditions", "conditionID", "condition", "description", conditionID, condition, description);
+            insertQueries.type2("Conditions", "condition", "description", condition, description);
 
             dbClose();
         }
 
         //contains the different types of scans
-        public void insertScanTypes(int scanTypeID, String scanType, String description)
+        public void insertScanTypes(String scanType, String description)
         {
             dbOpen();
 
-            insertQueries.type2("ScanTypes", "scanTypeID", "scanType", "description", scanTypeID, scanType, description);
+            insertQueries.type2("ScanTypes", "scanType", "description", scanType, description);
 
             dbClose();
         }
 
         //Type 3 = tables containing 3 identifiers
 
-        public void insertPatientCondition(int patientConditionID, int patientID, int conditionID)
+        public void insertPatientCondition(int patientID, int conditionID)
         {
             dbOpen();
 
-            insertQueries.type3("PatientCondition", "patientConditionID", "patientID", "conditionID", patientConditionID, patientID, conditionID);
+            insertQueries.type3("PatientCondition", "patientID", "conditionID", patientID, conditionID);
 
             dbClose();
         }
 
-        public void insertPatientScans(int patientScanID, int patientID, int scanID)
+        public void insertPatientScans(int patientID, int scanID)
         {
             dbOpen();
 
-            insertQueries.type3("PatientScans", "patientScanID", "patientID", "scanID", patientScanID, patientID, scanID);
+            insertQueries.type3("PatientScans", "patientID", "scanID", patientID, scanID);
 
             dbClose();
         }
 
-        public void insertPointRecognitionScans(int pointRecognitionScanID, int patientID, int scanLocID)
+        public void insertPointRecognitionScans(int patientID, int scanLocID)
         {
             dbOpen();
 
-            insertQueries.type3("PointRecognitionScans", "pointRecognitionScanID", "patientID", "scanLocID", pointRecognitionScanID, patientID, scanLocID);
+            insertQueries.type3("PointRecognitionScans", "patientID", "scanLocID", patientID, scanLocID);
 
             dbClose();
         }
@@ -167,7 +167,7 @@ namespace PARSE
             LinkedList<int> conditionID = selectQueries.selectID("conditionID", "PatientCondition", "patientID", patientID.ToString());
 
             LinkedList<Tuple<int, String, String>> patientConditions = new LinkedList<Tuple<int, String, String>>();
-            while (conditionID.Count > 0)
+            while (conditionID.Count() > 0)
             {
                 patientConditions.AddLast(selectQueries.selectType2("Conditions", "conditionID", conditionID.First().ToString()));
                 conditionID.RemoveFirst();
@@ -179,12 +179,31 @@ namespace PARSE
         // 5) select condition information
 
         // 6) select all scan types for patient
-        public void getPatientScanTypes(int patientID)
+        public LinkedList<Tuple<int, String, String>> getPatientScanTypes(int patientID)
         {
+            LinkedList<int> scanID = selectQueries.selectID("scanID", "PatientScans", "patientID", patientID.ToString());
+
+            LinkedList<int> scanTypeID = new LinkedList<int>();
+            while (scanID.Count() > 0)
+            {
+                scanTypeID.AddLast(selectQueries.selectID("scanTypeID", "Scans", "scanID", scanID.First().ToString()).First());
+                scanID.RemoveFirst();
+            }
+
+            LinkedList<Tuple<int, String, String>> patientScanTypes = new LinkedList<Tuple<int, String, String>>();
+            while (scanTypeID.Count() > 0)
+            {
+                patientScanTypes.AddLast(selectQueries.selectType2("ScanTypes", "scanTypeID", scanTypeID.First().ToString()));
+                scanTypeID.RemoveFirst();
+            }
+
+            return patientScanTypes;
+
             
         }
 
         // 7) select all timestamps for patient scan type
+
 
         // 8) select patient scans (and value)
 
@@ -205,15 +224,14 @@ namespace PARSE
 
         //Insertion Queries for Type 1 tables
 
-        public void patientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void patientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address)
         {
             //check what number is the previous patientID and increment by 1?
 
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientInformation (patientID, name, dateofbirth, nationality, nhsNo, address) VALUES (@PatientID, @Name, @DateOfBirth, @Nationality, @NhsNo, @Address)";
+            insertQuery.CommandText = "INSERT INTO PatientInformation (name, dateofbirth, nationality, nhsNo, address) VALUES (@Name, @DateOfBirth, @Nationality, @NhsNo, @Address)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@PatientID", patientID);
             insertQuery.Parameters.Add("@Name", name);
             insertQuery.Parameters.Add("@DateOfBirth", dateOfBirth);
             insertQuery.Parameters.Add("@Nationality", nationality);
@@ -222,13 +240,12 @@ namespace PARSE
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void scanLocations(int scanLocID, String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, double jointsDist, DateTime timestamp)
+        public void scanLocations(String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, double jointsDist, DateTime timestamp)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO ScanLocations ((scanLocID, boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@ScanLocID, @BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations ((boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@ScanLocID", scanLocID);
             insertQuery.Parameters.Add("@BoneName", boneName);
             insertQuery.Parameters.Add("@JointName1", jointName1);
             insertQuery.Parameters.Add("@JointName2", jointName2);
@@ -239,26 +256,24 @@ namespace PARSE
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void scans(int scanID, int scanTypeID, String pointCloudFileReference, DateTime timestamp)
+        public void scans(int scanTypeID, String pointCloudFileReference, DateTime timestamp)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO ScanLocations ((scanID, scanTypeID, pointCloudFileReference, timestamp) VALUES (@ScanID, @ScanTypeID, @pointCloudFileReference, @Timestamp)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations ((scanTypeID, pointCloudFileReference, timestamp) VALUES (@ScanTypeID, @pointCloudFileReference, @Timestamp)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@ScanID", scanID);
             insertQuery.Parameters.Add("@ScanTypeID", scanTypeID);
             insertQuery.Parameters.Add("@PointCloudFileReference", pointCloudFileReference);
             insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void records(int recordID, int scanID, int scanTypeID, double value)
+        public void records(int scanID, int scanTypeID, double value)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO Records (recordID, scanID, scanTypeID, value) VALUES (@RecordID, @ScanID, @ScanTypeID, @Value)";
+            insertQuery.CommandText = "INSERT INTO Records (scanID, scanTypeID, value) VALUES (@ScanID, @ScanTypeID, @Value)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@RecordID", recordID);
             insertQuery.Parameters.Add("@ScanID", scanID);
             insertQuery.Parameters.Add("@ScanTypeID", scanTypeID);
             insertQuery.Parameters.Add("@Value", value);
@@ -267,17 +282,15 @@ namespace PARSE
 
         //Insertion Query for Type 2 tables
 
-        public void type2(String tableName, String idCol, String textCol1, String textCol2, int id, String text1, String text2)
+        public void type2(String tableName, String textCol1, String textCol2, String text1, String text2)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO @TableName (@IdCol, @TextCol1, @TextCol2) VALUES (@Id, @Text1, @Text2)";
+            insertQuery.CommandText = "INSERT INTO @TableName (@TextCol1, @TextCol2) VALUES (@Text1, @Text2)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@TableName", tableName);
-            insertQuery.Parameters.Add("@IdCol", idCol);
             insertQuery.Parameters.Add("@TextCol1", textCol1);
             insertQuery.Parameters.Add("@TextCol2", textCol2);
-            insertQuery.Parameters.Add("@Id", id);
             insertQuery.Parameters.Add("@Text1", text1);
             insertQuery.Parameters.Add("@Text2", text2);
             rowsAffected = insertQuery.ExecuteNonQuery();
@@ -285,19 +298,17 @@ namespace PARSE
 
         //Insertion Query for Type 3 tables
 
-        public void type3(String tableName, String idCol1, String idCol2, String idCol3, int id1, int id2, int id3)
+        public void type3(String tableName, String idCol1, String idCol2, int id1, int id2)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO @TableName (@IdCol1, @IdCol2, @IdCol3) VALUES (@Id1, @Id2, @Id3)";
+            insertQuery.CommandText = "INSERT INTO @TableName (@IdCol1, @IdCol2) VALUES (@Id1, @Id2)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@TableName", tableName);
             insertQuery.Parameters.Add("@IdCol1", idCol1);
             insertQuery.Parameters.Add("@IdCol2", idCol2);
-            insertQuery.Parameters.Add("@IdCol3", idCol3);
             insertQuery.Parameters.Add("@Id1", id1);
             insertQuery.Parameters.Add("@Id2", id2);
-            insertQuery.Parameters.Add("@Id3", id3);
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
     }
