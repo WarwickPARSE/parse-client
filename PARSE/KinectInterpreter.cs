@@ -240,6 +240,11 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        public void setSensor(KinectSensor c)
+        {
+            this.kinectSensor = c;
+        }
+
         public Boolean noKinect()
         {
             return (this.kinectSensor == null);
