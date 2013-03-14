@@ -22,7 +22,7 @@ namespace PARSE
             return 0;
         }
 
-        public static List<Point3D> rotSort(List<Point3D> input)
+        public static List<Point3D> clockSort(List<Point3D> input)
         {
             double xmax = double.MinValue;
             double xmin = double.MaxValue;

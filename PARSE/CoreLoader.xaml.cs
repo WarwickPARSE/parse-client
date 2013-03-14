@@ -98,10 +98,7 @@ namespace PARSE
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
-            //this.export1.IsEnabled = false;
-            //this.export2.IsEnabled = false;
-            //this.measurement.IsEnabled = false;
-            //this.removefloor.IsEnabled = false;
+            this.resetButtons();
 
         }
 
@@ -130,6 +127,12 @@ namespace PARSE
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
+        }
+
+        public void setPC(PointCloud pc, List<PointCloud> pcl)
+        {
+            this.pcd = pc;
+            this.pcdl = pcl;
         }
 
         private void shutAnyWindows()
@@ -216,12 +219,27 @@ namespace PARSE
             Environment.Exit(0);
         }
 
+        private void resetButtons()
+        {
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.measurement.IsEnabled = false;
+            this.removefloor.IsEnabled = false;
+            this.calculate.IsEnabled = false;
+        }
+        
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
             this.shutAnyWindows();
+
+            this.resetButtons();
+            
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
+
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
         }
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
@@ -239,14 +257,11 @@ namespace PARSE
             List<double> areaList = AreaCalculator.getAllAreas(planes);
             windowHistory.areaList = areaList;
             
-            //why is this here Bernard?
-            //double circum = LimbCalculator.calculate(planes, 1);
-
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m\u00B3";
             
-            //show Runtime viewer (aka results,history,output)
+            //show Runtime viewer (aka results,history)
             windowHistory.Show();
         }
 
@@ -281,8 +296,8 @@ namespace PARSE
             {
                 String filename = dlg.FileName;
                 ScanSerializer.serialize(filename, windowScanner.getPointClouds());
+                this.export1.IsEnabled = false;
             }
-
         }
 
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
@@ -298,7 +313,8 @@ namespace PARSE
 
             if (dlg.ShowDialog() == true)
             {
-                filename = dlg.FileName;   
+                filename = dlg.FileName;
+                this.export2.IsEnabled = false;
             }
 
             for (int j = 0; j < pcdl.Count; j++)
@@ -339,8 +355,8 @@ namespace PARSE
 
         private void SimpleStitchTest_Click(object sender, RoutedEventArgs e)
         {
-            List<PointCloud> pc = windowScanner.getPointClouds();
-            PointCloud pcd= new PointCloud();
+            List<PointCloud> pc = pcdl;
+            pcd = new PointCloud();
 
             //instantiate the stitcher 
             stitcher = new BoundingBox();
@@ -364,7 +380,8 @@ namespace PARSE
                 {
                     pcdl[i].deleteFloor();
                 }
-
+            this.calculate.IsEnabled = true;
+            this.measurement.IsEnabled = true;
 
             this.shutAnyWindows();
             windowScanner = new ScanLoader(pcdl);
@@ -380,27 +397,42 @@ namespace PARSE
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
             /*Automates the following procedure:
-             * 0) closes any viewer
+             * 0) kills kinect, closes any viewer, resets buttons
              * 1) adds selected point cloud to visualiser
              * 2) groups it
              * 3) calcs height
              */
 
             /*0)*/
+            this.kinectInterp.stopStreams();
             this.shutAnyWindows();
+            this.resetButtons();
 
      /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".PARSE";
             dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
 
+            String filename = "";
+
             if (dlg.ShowDialog() == true)
             {
-                String filename = dlg.FileName;
-                this.DataContext = ScanSerializer.deserialize(filename);
-                pcdl = ScanSerializer.depthPc;
+                filename = dlg.FileName;
             }
 
+            if ((filename == null) || (dlg.FileName.Length == 0))
+            {
+
+                return;
+            }
+
+            this.DataContext = ScanSerializer.deserialize(filename);
+            pcdl = ScanSerializer.depthPc;
+
             System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
+
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.removefloor.IsEnabled = true;
 
      /*2)*/ //instantiate the stitcher 
             stitcher = new BoundingBox();
@@ -422,6 +454,8 @@ namespace PARSE
             windowScanner = new ScanLoader(pcdl);
             windowScanner.Owner = this;
             windowScanner.Show();
+
+            this.kinectInterp.stopStreams();
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)

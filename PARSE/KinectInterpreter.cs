@@ -86,12 +86,13 @@ namespace PARSE
 
         private System.Windows.Media.Brush red = System.Windows.Media.Brushes.Red;
         private System.Windows.Media.Brush green = System.Windows.Media.Brushes.Green;
+        private System.Windows.Media.Brush blue = System.Windows.Media.Brushes.Blue;
         private System.Windows.Media.Brush color;
 
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
-            color = red;
+            color = blue;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -171,7 +172,7 @@ namespace PARSE
 
         public Boolean goldilocks()
         {
-            return (tooFarBack() || tooFarForward());
+            return (!(tooFarBack() || tooFarForward()));
         }
         
         public Boolean tooFarBack()
@@ -239,7 +240,6 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
-
         //Disable all streams on changeover
         public void stopStreams()
         {
@@ -247,6 +247,10 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
+            if (this.kinectSensor == null)
+            {
+                return;
+            }
             if (this.kinectSensor.SkeletonStream.IsEnabled)
             {
                 this.kinectSensor.SkeletonStream.Disable();
@@ -354,13 +358,10 @@ namespace PARSE
 
         public void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
-
                 if (skeletonFrame != null)
                 {
-
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state
@@ -405,15 +406,17 @@ namespace PARSE
                         skelL = (320 * (1 + skelL)) * 4;
                         skelR = (320 * (1 + skelR)) * 4;
                             
-                        
                         // Update the drawing
-
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
 
                         System.Windows.Media.Brush prevColor = this.color;
 
-                        if (goldilocks())
+                        if (tooFarForward())
+                        {
+                            this.color = blue;
+                        }
+                        else if (tooFarBack())
                         {
                             this.color = red;
                         }
