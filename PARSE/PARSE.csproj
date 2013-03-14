@@ -135,6 +135,7 @@
       <DependentUpon>DebugLoader.xaml</DependentUpon>
     </Compile>
     <Compile Include="ICP\Downsampler.cs" />
+    <Compile Include="ICP\Stitchers\AffineICP.cs" />
     <Compile Include="ICP\Stitchers\BoundingBox.cs" />
     <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
