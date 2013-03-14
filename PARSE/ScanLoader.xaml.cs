@@ -365,7 +365,7 @@ namespace PARSE
 
                 this.viewertext.Content = "Select corresponding point on 2nd point cloud (pairwise)";
 
-                translationVector = fineStitcher.refine(model1,model2,point1,point2);
+                //translationVector = fineStitcher.refine(model1,model2,point1,point2);
 
                 hitState = 4;
             }
