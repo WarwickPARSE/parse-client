@@ -324,11 +324,11 @@ namespace PARSE
         }
 
         //selecting all patients
-        public Tuple<LinkedList<int>,LinkedList<String>,LinkedList<int>> AllPatients()
+        public Tuple<LinkedList<int>,LinkedList<String>,LinkedList<String>> AllPatients()
         {
             LinkedList<int> ids = new LinkedList<int>();
             LinkedList<String> names = new LinkedList<String>();
-            LinkedList<int> nhsNos = new LinkedList<int>();
+            LinkedList<String> nhsNos = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT patientID, name, nhsNo FROM PatientInformation";
@@ -337,10 +337,9 @@ namespace PARSE
 
             while (reader.Read())
             {
-                //pSize = pSize + 1;
                 ids.AddLast(reader.GetInt32(0));
                 names.AddLast(reader.GetString(1));
-                nhsNos.AddLast(reader.GetInt32(2));
+                nhsNos.AddLast(reader.GetString(2));
             }
             reader.Close();
 
@@ -374,13 +373,13 @@ namespace PARSE
         //table type 1 queries
 
         //patient information
-        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<int>, LinkedList<String>> PatientInformation(String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> PatientInformation(String colName, String criterion)
         {
             LinkedList<int> patientID = new LinkedList<int>();
             LinkedList<String> name = new LinkedList<String>();
             LinkedList<DateTime> dob = new LinkedList<DateTime>();
             LinkedList<String> nationality = new LinkedList<string>();
-            LinkedList<int> nhsNo = new LinkedList<int>();
+            LinkedList<String> nhsNo = new LinkedList<String>();
             LinkedList<String> address = new LinkedList<string>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
@@ -395,7 +394,7 @@ namespace PARSE
                 name.AddLast(reader.GetString(1));
                 dob.AddLast(Convert.ToDateTime(reader.GetDateTime(2).ToString()));
                 nationality.AddLast(reader.GetString(3));
-                nhsNo.AddLast(reader.GetInt32(4));
+                nhsNo.AddLast(reader.GetString(4));
                 address.AddLast(reader.GetString(5));
             }
             reader.Close();
@@ -424,26 +423,43 @@ namespace PARSE
             while (reader.Read())
             {
                 scanLocID.AddLast(reader.GetInt32(0));
-                boneName.AddLast(reader.GetString(1));
+                String b;
+                try
+                {
+                    b = reader.GetString(1);
+                } catch(Exception e) {
+                    b = "null";
+                }
+                boneName.AddLast(b);
                 jointName1.AddLast(reader.GetString(2));
                 jointName2.AddLast(reader.GetString(3));
                 distJoint1.AddLast(reader.GetDouble(4));
                 distJoint2.AddLast(reader.GetDouble(5));
-                jointsDist.AddLast(reader.GetDouble(6));
+                double d;
+                try
+                {
+                    d = reader.GetDouble(6);
+                }
+                catch (Exception e)
+                {
+                    d = 0;
+                }
+                jointsDist.AddLast(d);
                 timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(7).ToString()));
             }
             reader.Close();
 
-            //scanLocID not returned (to keep it under 8)
+            //scanLocID not returned (to keep it under 8) !!!
             return Tuple.Create(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
         }
 
         //scans
-        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<DateTime>> Scans(String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> Scans(String colName, String criterion)
         {
             LinkedList<int> scanID = new LinkedList<int>();
             LinkedList<int> scanTypeID = new LinkedList<int>();
             LinkedList<String> pointCloudFileReference = new LinkedList<String>();
+            LinkedList<String> description = new LinkedList<string>();
             LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
@@ -457,17 +473,17 @@ namespace PARSE
                 scanID.AddLast(reader.GetInt32(0));
                 scanTypeID.AddLast(reader.GetInt32(1));
                 pointCloudFileReference.AddLast(reader.GetString(2));
-                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(3).ToString()));
+                description.AddLast(reader.GetString(3));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(4).ToString()));
             }
             reader.Close();
 
-            return Tuple.Create(scanID, scanTypeID, pointCloudFileReference, timestamp);
+            return Tuple.Create(scanID, scanTypeID, pointCloudFileReference, description, timestamp);
         }
 
         //records
-        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<int>, LinkedList<double>> Records(String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<double>> Records(String colName, String criterion)
         {
-            LinkedList<int> recordID = new LinkedList<int>();
             LinkedList<int> scanID = new LinkedList<int>();
             LinkedList<int> scanTypeID = new LinkedList<int>();
             LinkedList<double> value = new LinkedList<double>();
@@ -480,14 +496,13 @@ namespace PARSE
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
-                recordID.AddLast(reader.GetInt32(0));
-                scanID.AddLast(reader.GetInt32(1));
-                scanTypeID.AddLast(reader.GetInt32(2));
-                value.AddLast(reader.GetDouble(3));
+                scanID.AddLast(reader.GetInt32(0));
+                scanTypeID.AddLast(reader.GetInt32(1));
+                value.AddLast(reader.GetDouble(2));
             }
             reader.Close();
 
-            return Tuple.Create(recordID, scanID, scanTypeID, value);
+            return Tuple.Create(scanID, scanTypeID, value);
         }
 
 
@@ -522,11 +537,10 @@ namespace PARSE
         //table type 3 queries
 
         //patientCondition, patientScans, pointRecognitionScans
-        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<int>> selectType3(String tableName, String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<int>> selectType3(String tableName, String colName, String criterion)
         {
             LinkedList<int> id1 = new LinkedList<int>();
             LinkedList<int> id2 = new LinkedList<int>();
-            LinkedList<int> id3 = new LinkedList<int>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT * FROM @TableName WHERE @ColName LIKE @Criterion";
@@ -539,11 +553,10 @@ namespace PARSE
             {
                 id1.AddLast(reader.GetInt32(0));
                 id2.AddLast(reader.GetInt32(1));
-                id3.AddLast(reader.GetInt32(2));
             }
             reader.Close();
 
-            return Tuple.Create(id1, id2, id3);
+            return Tuple.Create(id1, id2);
         }
 
         //generalised method for getting one id
