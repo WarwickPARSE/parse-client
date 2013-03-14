@@ -537,9 +537,16 @@ namespace PARSE
         /// returns kd-tree representation of point cloud
         /// </summary>
         /// <param name="points"></param>
-        public KdTree.KDTree getKDTree()
-        {
+        public KdTree.KDTree getKDTree() {
             return this.points;
+        }
+
+        /// <summary>
+        /// returns a matrix representation of the point cloud 
+        /// </summary>
+        /// <returns></returns>
+        public DenseMatrix getMatrix() {
+            return this.m; 
         }
 
         public double getxMax() { return maxx; }
