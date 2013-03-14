@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace PARSE.ICP.Stitchers
 {
@@ -40,9 +41,45 @@ namespace PARSE.ICP.Stitchers
             Console.WriteLine("There are " + pcs.Count);
         }
 
-        public override void stitch() { 
-        
+        public override void stitch() {
+            //todo: some form of datastructure to hold the transformation matrices
+
+            /*
+            //perform registration on each pair of clouds 
+            for (int i = 0; i > pointClouds.Count -1; i++) { 
+            
+                //add this transform matrix to the previous one so that transformation is complete 
+            }*/
+        } 
+
+        public void ICPStep() {
+            double[] s = { 1, 1, 1, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };                 //scale
+            double[] p = { 0, 0, 0, 0, 0, 0, 100, 100, 100 };                           //parameters
+
+            //jam the values into vectors so that we can multiply them and shiz
+            DenseVector scale = new DenseVector(s);
+            DenseVector parameters = new DenseVector(p);
+
+            //distance error in final iteration 
+            double fval_old = double.MaxValue;
+
+            //change in distance error between two iterations 
+            double fval_percep = 0;
+
+            //todo: some array to contain the transformed points 
+
+            //number of iterations 
+            int itt = 0;
+
+            //get the max and min points of the static points 
+            double maxP = this.maxP();
+            double minP = this.minP();
+
+            double tolX = (maxP - minP) / 1000;
+
+
         }
+ 
 
         /// <summary>
         /// Return the result of the stitching
@@ -56,6 +93,14 @@ namespace PARSE.ICP.Stitchers
         public override List<PointCloud> getResultList()
         {
             return txpointClouds;
+        }
+
+        public double maxP() {
+            return 0;
+        }
+
+        public double minP() {
+            return 0; 
         }
     }
 }
