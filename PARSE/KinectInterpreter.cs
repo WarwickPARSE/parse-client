@@ -240,16 +240,17 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        public Boolean noKinect()
+        {
+            return (this.kinectSensor == null);
+        }
+
+        //called when you plug a kinect in to a running PARSE
         public void setSensor(KinectSensor c)
         {
             this.kinectSensor = c;
         }
 
-        public Boolean noKinect()
-        {
-            return (this.kinectSensor == null);
-        }
-        
         //Disable all streams on changeover
         public void stopStreams()
         {
