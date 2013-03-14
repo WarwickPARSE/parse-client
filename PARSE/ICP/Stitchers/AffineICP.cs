@@ -52,7 +52,7 @@ namespace PARSE.ICP.Stitchers
             }*/
         } 
 
-        public void ICPStep() {
+        public void ICPStep(DenseMatrix m1, DenseMatrix m2) {
             double[] s = { 1, 1, 1, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };                 //scale
             double[] p = { 0, 0, 0, 0, 0, 0, 100, 100, 100 };                           //parameters
 
@@ -77,9 +77,46 @@ namespace PARSE.ICP.Stitchers
 
             double tolX = (maxP - minP) / 1000;
 
+            double spacing = (m1.ColumnCount ^ (1/6)) * Math.Sqrt(3);
 
         }
- 
+        
+
+        //todo: should probably document this a bit... 
+        private DenseMatrix mat_siz_3d(double[] s)
+        {
+            double[,] m = new double[,] {
+                {s[0], 0,    0,    0},
+                {0,    s[1], 0,    0},
+                {0,    0,    s[2], 0},
+                {0,    0,    0,    1}
+            };
+
+            return new DenseMatrix(m);
+        }
+
+        private DenseMatrix mat_shear_3d(double[] h)
+        {
+            double[,] m = new double[,] {
+                {1,    h[0], h[1], 0},
+                {h[2], 1,    h[3], 0},
+                {h[4], h[5], 1,    0},
+                {0,    0,    0,    1}
+            };
+
+            return new DenseMatrix(m);
+        }
+
+        private DenseMatrix mat_tra_3d(double[] t) {
+            double[,] m = new double[,] {
+                {1,    0,    0,    t[0]},
+                {0,    1,    0,    t[1]},
+                {0,    0,    1,    t[2]},
+                {0,    0,    0,    1}
+            };
+
+            return new DenseMatrix(m);
+        } 
 
         /// <summary>
         /// Return the result of the stitching
@@ -95,6 +132,8 @@ namespace PARSE.ICP.Stitchers
             return txpointClouds;
         }
 
+
+        //todo: implement these methods 
         public double maxP() {
             return 0;
         }
