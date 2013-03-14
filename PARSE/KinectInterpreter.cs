@@ -240,6 +240,11 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        public Boolean noKinect()
+        {
+            return (this.kinectSensor == null);
+        }
+        
         //Disable all streams on changeover
         public void stopStreams()
         {
@@ -247,7 +252,7 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
-            if (this.kinectSensor == null)
+            if (this.noKinect())
             {
                 return;
             }
