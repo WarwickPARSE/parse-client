@@ -66,7 +66,7 @@ namespace PARSE
         System.Windows.Point[] textureCoordinates;
 
         //matrix representation of point cloud 
-        Matrix m; 
+        DenseMatrix m; 
 
         //percentage of opacity that we want the colour to be 
         private const int opacity = 100;
