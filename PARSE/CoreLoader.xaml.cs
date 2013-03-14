@@ -137,6 +137,18 @@ namespace PARSE
             this.pcdl = pcl;
         }
 
+        private Boolean noSensor()
+        {
+            if (this.kinectInterp.noKinect())
+            {
+                this.kinectmenu.IsEnabled = false;
+                this.newscan.IsEnabled = false;
+                return true;
+            }
+            return false;
+            
+        }
+        
         private void shutAnyWindows()
         {
             if (windowViewer != null)
@@ -151,7 +163,7 @@ namespace PARSE
         
         private void RGB_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.noKinect())
+            if (this.noSensor())
             {
                 return;
             }
@@ -163,7 +175,7 @@ namespace PARSE
 
         private void Depth_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.noKinect())
+            if (this.noSensor())
             {
                 return;
             }
@@ -175,7 +187,7 @@ namespace PARSE
 
         private void Skeleton_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.noKinect())
+            if (this.noSensor())
             {
                 return;
             }
@@ -199,7 +211,7 @@ namespace PARSE
 
         private void RGBIso_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.noKinect())
+            if (this.noSensor())
             {
                 return;
             }
@@ -211,7 +223,7 @@ namespace PARSE
 
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.noKinect())
+            if (this.noSensor())
             {
                 return;
             }
@@ -225,7 +237,7 @@ namespace PARSE
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
         {
-            if (this.kinectInterp.noKinect())
+            if (this.noSensor())
             {
                 return;
             }
@@ -518,17 +530,22 @@ namespace PARSE
         private void checkKinectConnection(object state)
         {
             Action method = () => this.hasKinectBeenAdded();
-            this.Dispatcher.Invoke(method);   
+            this.Dispatcher.Invoke(method);  
         }
 
-        private void hasKinectBeenAdded()
+        private Boolean hasKinectBeenAdded()
         {
             if (KinectSensor.KinectSensors.Count > 0)
             {
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                 this.kinectInterp.setSensor(KinectSensor.KinectSensors[0]);
                 this.kinectmenu.IsEnabled = true;
+                this.newscan.IsEnabled = true;
+                kinectCheck.Dispose();
+                return true;
+
             }
+            return false;
         }
 
         void MenuItem_Exit(object sender, RoutedEventArgs e)
