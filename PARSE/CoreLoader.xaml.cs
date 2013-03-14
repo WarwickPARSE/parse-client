@@ -122,7 +122,7 @@ namespace PARSE
             if (KinectSensor.KinectSensors.Count>0)
                 {
                     windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
-                    this.kinectmenu.IsEnabled = true;
+                    this.newscan.IsEnabled = true;
                     this.kinectmenu.IsEnabled = true;
                 }
                 else
@@ -276,6 +276,11 @@ namespace PARSE
         
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
+            
             this.shutAnyWindows();
 
             this.resetButtons();
