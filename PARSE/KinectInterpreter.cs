@@ -242,6 +242,11 @@ namespace PARSE
 
         public Boolean noKinect()
         {
+            if (KinectSensor.KinectSensors.Count == 0)
+            {
+                this.kinectSensor = null;
+                return true;
+            }
             return (this.kinectSensor == null);
         }
 
@@ -721,6 +726,5 @@ namespace PARSE
                 return null;
             }
         }
-
     }
 }
