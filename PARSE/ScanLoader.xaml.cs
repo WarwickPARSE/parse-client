@@ -291,6 +291,9 @@ namespace PARSE
                 fincloud = stitcher.getResultList();
 
                 ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
+                
+                double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
+                ((CoreLoader)(this.Owner)).windowHistory.heightoutput.Content = height + "m";
 
                 GroupVisualiser gg = new GroupVisualiser(fincloud);
                 gg.preprocess();
