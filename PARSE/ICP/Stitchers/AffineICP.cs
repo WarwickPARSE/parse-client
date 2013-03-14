@@ -83,6 +83,44 @@ namespace PARSE.ICP.Stitchers
         
 
         //todo: should probably document this a bit... 
+        private DenseMatrix mat_rot_3d(DenseVector r) {
+            //convert to radians
+            r = r * (Math.PI / 180);
+
+            //these are defined because of my perceived speedup 
+            //todo: this may be zero indexed, and therefore may need changing... 
+            double sinr1 = Math.Sin(r[1]);
+            double cosr1 = Math.Cos(r[1]);
+            double sinr2 = Math.Sin(r[2]);
+            double cosr2 = Math.Cos(r[2]);
+            double sinr3 = Math.Sin(r[3]);
+            double cosr3 = Math.Cos(r[3]);
+
+            double[,] Rx = new double[,] {
+                {1, 0,     0,        0},
+                {0, cosr1, -(sinr1), 0},
+                {0, sinr1, cosr1,    0},
+                {0, 0,     0,        1}
+            }; 
+
+            double[,] Ry = new double[,] {
+                {cosr2,    0, sinr2, 0},
+                {0,        1, 0,     0},
+                {-(sinr2), 0, cosr2, 0},
+                {0,        0, 0,     1}
+            };
+
+            double[,] Rz = new double[,] {
+                {cosr3, -(sinr3), 0, 0},
+                {sinr3, cosr3,    0, 0},
+                {0,     0,        1, 0},
+                {0,     0,        0, 1}
+            };
+
+            //return the multiplication of these matrices 
+            return new DenseMatrix(Rx) * new DenseMatrix(Ry) * new DenseMatrix(Rz); 
+        }
+
         private DenseMatrix mat_siz_3d(double[] s)
         {
             double[,] m = new double[,] {
