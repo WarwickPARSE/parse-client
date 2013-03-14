@@ -403,59 +403,69 @@ namespace PARSE
              * 3) calcs height
              */
 
-            /*0)*/
-            this.kinectInterp.stopStreams();
-            this.shutAnyWindows();
-            this.resetButtons();
-
-     /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".PARSE";
-            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
-
-            String filename = "";
-
-            if (dlg.ShowDialog() == true)
+            try
             {
-                filename = dlg.FileName;
+                /*0)*/
+                //this.kinectInterp.stopStreams();
+                this.shutAnyWindows();
+                this.resetButtons();
+
+                /*1)*/
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                dlg.DefaultExt = ".PARSE";
+                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+                String filename = "";
+
+                if (dlg.ShowDialog() == true)
+                {
+                    filename = dlg.FileName;
+                }
+
+                if ((filename == null) || (dlg.FileName.Length == 0))
+                {
+
+                    return;
+                }
+
+                this.DataContext = ScanSerializer.deserialize(filename);
+                pcdl = ScanSerializer.depthPc;
+
+                System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
+
+                this.export1.IsEnabled = false;
+                this.export2.IsEnabled = false;
+                this.removefloor.IsEnabled = true;
+
+                /*2)*/
+                //instantiate the stitcher 
+                stitcher = new BoundingBox();
+
+                //jam points into stitcher
+                stitcher.add(pcdl);
+                stitcher.stitch();
+
+                pcd = stitcher.getResult();
+                pcdl = stitcher.getResultList();
+
+                //define
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+
+                double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
+                windowHistory.heightoutput.Content = height + "m";
+
+                windowScanner = new ScanLoader(pcdl);
+                windowScanner.Owner = this;
+                windowScanner.Show();
+
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.ToString());
             }
 
-            if ((filename == null) || (dlg.FileName.Length == 0))
-            {
-
-                return;
-            }
-
-            this.DataContext = ScanSerializer.deserialize(filename);
-            pcdl = ScanSerializer.depthPc;
-
-            System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
-
-            this.export1.IsEnabled = false;
-            this.export2.IsEnabled = false;
-            this.removefloor.IsEnabled = true;
-
-     /*2)*/ //instantiate the stitcher 
-            stitcher = new BoundingBox();
-
-            //jam points into stitcher
-            stitcher.add(pcdl);
-            stitcher.stitch();
-
-            pcd = stitcher.getResult();
-            pcdl = stitcher.getResultList();
-
-            //define
-            windowHistory = new HistoryLoader();
-            windowHistory.Owner = this;
-
-            double height = Math.Round(HeightCalculator.getHeight(pcd),3);
-            windowHistory.heightoutput.Content = height + "m";
-
-            windowScanner = new ScanLoader(pcdl);
-            windowScanner.Owner = this;
-            windowScanner.Show();
-
-            this.kinectInterp.stopStreams();
+            //this.kinectInterp.stopStreams();
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)

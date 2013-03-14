@@ -76,7 +76,6 @@ namespace PARSE
             InitializeComponent();
             wantKinect = false;
 
-
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
@@ -225,6 +224,10 @@ namespace PARSE
                 //get current skeleton tracking state
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
                 jointDepths = enumerateSkeletonDepths(skeleton);
+
+                //write jointdepths to file as they seemed to be preserved here.
+                
+                System.Diagnostics.Debug.WriteLine(jointDepths[JointType.KneeRight][0]);
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
