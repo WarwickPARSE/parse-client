@@ -22,9 +22,9 @@ namespace PARSE
 {
     public class PointCloud
     {
-        //dodgy global variables (to be changed)
-        //private int width;
-        //private int height;
+        //todo: make these into variables at some point... 
+        private const int width = 640;
+        private const int height = 480;
 
         //tree of points
         private KdTree.KDTree points;
