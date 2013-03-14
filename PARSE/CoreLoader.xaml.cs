@@ -90,6 +90,7 @@ namespace PARSE
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
             this.kinectmenu.IsEnabled = false;
+            this.newscan.IsEnabled = false;
 
             //ui initialization
             this.WindowState = WindowState.Maximized;
@@ -122,6 +123,7 @@ namespace PARSE
                 {
                     windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
                     this.kinectmenu.IsEnabled = true;
+                    this.kinectmenu.IsEnabled = true;
                 }
                 else
                 {
@@ -141,6 +143,7 @@ namespace PARSE
         {
             if (this.kinectInterp.noKinect())
             {
+                sandra.Speak("No Kinect Detected");
                 this.kinectmenu.IsEnabled = false;
                 this.newscan.IsEnabled = false;
                 kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
@@ -542,6 +545,7 @@ namespace PARSE
                 this.kinectInterp.setSensor(KinectSensor.KinectSensors[0]);
                 this.kinectmenu.IsEnabled = true;
                 this.newscan.IsEnabled = true;
+                sandra.Speak("Kinect Detected");
                 kinectCheck.Dispose();
                 return true;
 
