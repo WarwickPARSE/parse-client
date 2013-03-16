@@ -18,6 +18,9 @@ using System.IO;
 using System.Windows.Media.Media3D;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
+using System.Data.SqlServerCe;
+using System.Text.RegularExpressions;
 
 using Microsoft.Kinect;
 using HelixToolkit.Wpf;
@@ -32,19 +35,15 @@ namespace PARSE
     public partial class ScanLoader : Window
     {
         //point cloud lists for visualisation
-        private List<PointCloud> fincloud;
-        private PointCloud gCloud;
-        private List<List<Point3D>> limbCloud;
-        private System.Windows.Forms.Timer pcTimer;
-        private CloudVisualisation cloudvis;
+        private List<PointCloud>                fincloud;
+        private PointCloud                      gCloud;
+        private System.Windows.Forms.Timer      pcTimer;
         private Dictionary<JointType, double[]> jointDepths;
-        private RayHitTestResult rayResult;
-        private GroupVisualiser gv;
-        private Point3D point1;
-        private Point3D point2;
-        private Model3D model1;
-        private Model3D model2;
-        private PointCloud pcd;
+        private RayHitTestResult                rayResult;
+        private GroupVisualiser                 gv;
+        private Point3D                         point2;
+        private Model3D                         model2;
+        private PointCloud                      pcd;
 
         //Coreloader modifiable hit state
         public int hitState;
@@ -60,12 +59,16 @@ namespace PARSE
         //Captured canvas
         private Canvas tmpCanvas;
 
+        //Database object
+        DatabaseEngine db;
+
         public ScanLoader()
         {
             InitializeComponent();
             wantKinect = true;
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            db = new DatabaseEngine();
             hitState = 0;
         }
 
@@ -97,6 +100,8 @@ namespace PARSE
             //gCloud = fcloud;
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             System.Diagnostics.Debug.WriteLine("Model loaded");
+
+            db = new DatabaseEngine();
 
             hitState = 0;
         }
@@ -225,10 +230,6 @@ namespace PARSE
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
                 jointDepths = enumerateSkeletonDepths(skeleton);
 
-                //write jointdepths to file as they seemed to be preserved here.
-                
-                System.Diagnostics.Debug.WriteLine(jointDepths[JointType.KneeRight][0]);
-
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
                 //frontCloud.deleteFloor();
@@ -311,6 +312,8 @@ namespace PARSE
                 ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
                 pcTimer.Stop();
+
+                //TODO: write all these results to the database; sql insertion clauses.
             }
         }
 
@@ -369,8 +372,6 @@ namespace PARSE
 
                 this.viewertext.Content = "Select corresponding point on 2nd point cloud (pairwise)";
 
-                translationVector = fineStitcher.refine(model1,model2,point1,point2);
-
                 hitState = 4;
             }
             else if (hitState == 3)
@@ -386,14 +387,44 @@ namespace PARSE
         public void determineLimb(PointCloud pcdexisting)
         {
          
-            //let's just say left arm for now
-            if (pcdexisting!=null)
+            //pull in skeleton measures from a temporary file for corbett.parse for now.
+
+            if (true)
             {
-                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
+                Dictionary<String, double[]> jointDepths = new Dictionary<String, double[]>();
+                StreamReader sr = new StreamReader("SKEL.ptemp");
+                String line;
+
+                while ((line=sr.ReadLine())!=null)
+                {
+                    String[] joint = Regex.Split(line,":");
+                    String[] positions = Regex.Split(joint[1], ",");
+
+                    double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2],"\n")[0]) };
+                    jointDepths.Add(joint[0], jointPos);
+                }
+
+                foreach (var item in jointDepths.Keys)
+                {
+                    System.Diagnostics.Debug.WriteLine(item);
+                }
+
+                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "WAIST");
             }
             else
             {
-                LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
+
+                //if we have passed an existing pointcloud from coreloader
+                if (pcdexisting != null)
+                {
+                   // LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
+                }
+                else
+                //otherwise if we have passed a new scan from coreloader
+                {
+                   // LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
+                }
+
             }
 
             //change colour of point cloud for limb selection mode
@@ -483,7 +514,6 @@ namespace PARSE
             foreach (Joint j in sk.Joints)
             {
                 double[] positions = { j.Position.Z, j.Position.X, j.Position.Y };
-                System.Diagnostics.Debug.WriteLine(j.Position.X);
                 jointDepths.Add(j.JointType, positions);
             }
 
