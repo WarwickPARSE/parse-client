@@ -431,6 +431,7 @@ namespace PARSE
                 {
                     pcdl[i].deleteFloor();
                 }
+
             this.calculate.IsEnabled = true;
             this.measurement.IsEnabled = true;
 
