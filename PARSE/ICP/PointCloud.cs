@@ -129,6 +129,33 @@ namespace PARSE
 
         //method for bernard
         public PointCloud getSubRegion(double[] points) {
+
+            //check subregion is actually a sub region
+            if (points[0] < this.minx)
+            {
+                throw new SubRegionOutOfBoundsException("xmin");
+            }
+            if (points[1] < this.miny)
+            {
+                throw new SubRegionOutOfBoundsException("ymin");
+            }
+            if (points[2] < this.minz)
+            {
+                throw new SubRegionOutOfBoundsException("zmin");
+            }
+            if (points[3] > this.maxx)
+            {
+                throw new SubRegionOutOfBoundsException("xmax");
+            }
+            if (points[4] > this.maxy)
+            {
+                throw new SubRegionOutOfBoundsException("ymax");
+            }
+            if (points[5] > this.maxz)
+            {
+                throw new SubRegionOutOfBoundsException("zmax");
+            }
+            
             double[] pointMin = { points[0], points[1], points[2] };
             double[] pointMax = { points[3], points[4], points[5] };
 
