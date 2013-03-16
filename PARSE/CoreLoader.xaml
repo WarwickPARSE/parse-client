@@ -42,7 +42,7 @@
                     <MenuItem Header="Volume" Click="VolumeOption_Click"/>
                     <MenuItem Header="Limb Circumference" Click="LimbOption_Click"/>
      </MenuItem>
-            <MenuItem Header="Kinect">
+            <MenuItem Header="Kinect" Name="kinectmenu">
                 <MenuItem Header="View Feed">
                     <MenuItem Header="RGB" Click="RGB_Click"/>
                     <MenuItem Header="Depth" Click="Depth_Click"/>

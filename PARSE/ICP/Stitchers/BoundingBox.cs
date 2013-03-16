@@ -149,25 +149,6 @@ namespace PARSE.ICP.Stitchers
         }
 
         /// <summary>
-        /// refine the aligment of the point clouds pairwise
-        /// </summary>
-        public override TranslateTransform3D refine(Model3D pc1, Model3D pc2, Point3D p1, Point3D p2)
-        {
-
-            //calculate distance between two selected points
-            double dx = p2.X - p1.X;
-            double dy = p2.Y - p1.Y;
-            double dz = p2.Z - p2.Z;
-            double distance = Math.Sqrt(dx * dx + dy * dy + dz * dz);
-
-            System.Diagnostics.Debug.WriteLine("Distance between points: " + distance);
-
-            //calculate and form a translation vector
-
-            return new TranslateTransform3D();
-        }
-
-        /// <summary>
         /// Return the result of the stitching
         /// </summary>
         /// <returns>The result of the stitching</returns>

@@ -278,7 +278,7 @@ namespace PARSE
                 fincloud.Add(leftCloud);
 
                 sandra.Speak("Scan Added.");
-                sandra.Speak("Thank you for your time, you have now been captured.");
+                sandra.Speak("You have now been captured. Thank you for your time.");
 
                 //stop streams
                 kinectInterp.stopStreams();
@@ -287,8 +287,6 @@ namespace PARSE
                 //instantiate the stitcher 
                 BoundingBox stitcher = new BoundingBox();
 
-                sandra.Speak("Stitching scan's together, please wait.");
-                
                 //jam points into stitcher
                 stitcher.add(fincloud);
                 stitcher.stitch();
@@ -297,8 +295,9 @@ namespace PARSE
                 fincloud = stitcher.getResultList();
 
                 ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
-
-                sandra.Speak("Visualizing scan, please wait.");
+                
+                double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
+                ((CoreLoader)(this.Owner)).windowHistory.heightoutput.Content = height + "m";
 
                 GroupVisualiser gg = new GroupVisualiser(fincloud);
                 gg.preprocess();
