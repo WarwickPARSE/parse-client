@@ -20,6 +20,7 @@ using System.Windows.Forms;
 using System.Speech.Synthesis;
 using System.Windows.Interop;
 using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows.Media.Animation;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
@@ -54,13 +55,6 @@ namespace PARSE
         //New KinectInterpreter Class
         private KinectInterpreter           kinectInterp;
         private System.Threading.Timer      kinectCheck;
-
-        //Image recognition specific definitions
-        private bool                        capturedModel;
-        private BitmapSource                modelimage;
-        private bool                        capturedObject;
-        private BitmapSource                objectimage;
-        private int                         countdown;
 
         //point cloud lists for visualisation
         private List<PointCloud>            pcdl;
@@ -131,6 +125,13 @@ namespace PARSE
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+
+            verno.Content = "Version no: " + version;
+
         }
 
         public void setPC(PointCloud pc, List<PointCloud> pcl)
@@ -271,7 +272,7 @@ namespace PARSE
             this.export2.IsEnabled = false;
             this.measurement.IsEnabled = false;
             this.removefloor.IsEnabled = false;
-            this.calculate.IsEnabled = false;
+            //this.calculate.IsEnabled = false;
         }
         
         private void NewScan_Click(object sender, RoutedEventArgs e)
@@ -320,14 +321,19 @@ namespace PARSE
         {
 
             /*gets all the planes by calling volume calculator*/
-            if (pcd!=null)
+            if (pcd != null)
             {
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
+                /*Requires generated model, raw depth array and previous*/
+                windowScanner.determineLimb(pcd);
             }
-
-            /*Requires generated model, raw depth array and previous*/
-            windowScanner.determineLimb(pcd);
+            else
+            {
+                HistoryLoader windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+                windowHistory.Show();
+            }
 
         }
 
@@ -542,9 +548,11 @@ namespace PARSE
         {
             //open patient detail viewer
             this.shutAnyWindows();
-            windowPatient = new PatientLoader(true);
+            windowPatient = new PatientLoader(false);
             windowPatient.Owner = this;
             windowPatient.Show();
+            ApplyBlur(this);
+            windowPatient.Closed += new EventHandler(RemoveBlur_Closed);
         }
 
         private void checkKinectConnection(object state)
@@ -567,6 +575,23 @@ namespace PARSE
 
             }
             return false;
+        }
+
+        private void ApplyBlur(Window window)
+        {
+            //applies blur to windows not in the foreground as and when appropriate.
+
+            System.Windows.Media.Effects.BlurEffect windowBlur = new System.Windows.Media.Effects.BlurEffect();
+            windowBlur.Radius = 4;
+            window.Effect = windowBlur;
+
+        }
+
+        private void RemoveBlur_Closed(object sender, EventArgs e)
+        {
+
+            this.Effect = null;
+
         }
 
         void MenuItem_Exit(object sender, RoutedEventArgs e)

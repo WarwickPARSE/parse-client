@@ -43,13 +43,14 @@ namespace PARSE
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
             this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
-            this.Height = this.Owner.Width * 0.2;
+            this.Height = this.Owner.Width * 0.225;
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
 
             //check if a scan event is in place
             if (storedPlanes.Count == 0)
             {
                 //in the case when we have no planes to show, modify the ui.
+                //Volume Label Setting
                 bodyimg.Visibility = Visibility.Collapsed;
                 planeNo.Visibility = Visibility.Collapsed;
                 viewborder.Visibility = Visibility.Collapsed;
@@ -72,6 +73,29 @@ namespace PARSE
                 totalperimiter.Visibility = Visibility.Collapsed;
                 btnresults.Visibility = Visibility.Collapsed;
                 btnrescan.Visibility = Visibility.Collapsed;
+
+                //Circumference Label Setting
+                circumlabel.Visibility = Visibility.Collapsed;
+                circumoutput.Visibility = Visibility.Collapsed;
+                limbselect.Visibility = Visibility.Collapsed;
+                limbselecthdr.Visibility = Visibility.Hidden;
+                planelabel.Visibility = Visibility.Collapsed;
+                scanlabel.Visibility = Visibility.Collapsed;
+                viewborder2.Visibility = Visibility.Collapsed;
+
+                planeChooser2.Visibility = Visibility.Collapsed;
+                limbimg.Visibility = Visibility.Collapsed;
+                limbrender.Visibility = Visibility.Collapsed;
+
+                scanno2.Visibility = Visibility.Collapsed;
+                scantime2.Visibility = Visibility.Collapsed;
+                scanfileref2.Visibility = Visibility.Collapsed;
+                scanvoxel2.Visibility = Visibility.Collapsed;
+                maxarea2.Visibility = Visibility.Collapsed;
+                totalarea2.Visibility = Visibility.Collapsed;
+                totalperimiter2.Visibility = Visibility.Collapsed;
+                btnresults2.Visibility = Visibility.Collapsed;
+                btnrescan2.Visibility = Visibility.Collapsed;
 
             }
 

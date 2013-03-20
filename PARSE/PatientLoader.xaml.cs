@@ -37,11 +37,6 @@ namespace PARSE
 
         private void PatientLoader_Loaded(object Sender, RoutedEventArgs e)
         {
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = this.Owner.Left + 20;
-            this.Width = this.Owner.OwnedWindows[0].Width + 20;
-            this.Height = this.Owner.OwnedWindows[0].Height;
 
             //hide existing patient labels
             this.patientIDExisting.Visibility = Visibility.Collapsed;
@@ -50,11 +45,19 @@ namespace PARSE
             this.patientDOBExisting.Visibility = Visibility.Collapsed;
             this.patientNationalityExisting.Visibility = Visibility.Collapsed;
             this.patientAddressExisting.Visibility = Visibility.Collapsed;
+
+            //hide irrelevant tabs
+            this.recordedscans.Visibility = Visibility.Collapsed;
+            this.conditiondetail.Visibility = Visibility.Collapsed;
         }
 
         private void PatientLoaderExisting_Loaded(object Sender, RoutedEventArgs e)
         {
             //TODO: This will eventually be given the relevant select query from the database call.
+
+            //place relative to coreloader
+            this.Top = this.Owner.Top + 70;
+            this.Left = this.Owner.Left + 20;
 
             //initialize database with selection connection object
             Selection select = new Selection(db.con);
@@ -118,6 +121,24 @@ namespace PARSE
         void ScanSelected_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void proceedCon_Click(object sender, RoutedEventArgs e)
+        {
+            this.conditiondetail.Visibility = Visibility.Visible;
+            this.patientEntry.SelectedIndex = 1;
+        }
+
+        private void proceedSave_Click(object sender, RoutedEventArgs e)
+        {
+            //save patient data to database
+
+            //load windows for basic volume scanning procedure
+
+            OptionLoader windowOption = new OptionLoader();
+            windowOption.Show();
+
+            this.Close();
         }
     }
 }
