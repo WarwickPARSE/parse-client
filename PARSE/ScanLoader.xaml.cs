@@ -408,7 +408,7 @@ namespace PARSE
                     System.Diagnostics.Debug.WriteLine(item);
                 }
 
-                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "WAIST");
+                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
             else
             {
