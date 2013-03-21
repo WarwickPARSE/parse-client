@@ -90,6 +90,8 @@ namespace PARSE
 
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
+            this.kinectmenu.IsEnabled = false;
+            this.newscan.IsEnabled = false;
 
             //ui initialization
             this.WindowState = WindowState.Maximized;
@@ -117,10 +119,12 @@ namespace PARSE
             
             windowDebug.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
             windowDebug.sendMessageToOutput("Status", "Initializing Kinect Device");
-
+            
             if (KinectSensor.KinectSensors.Count>0)
                 {
                     windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+                    this.newscan.IsEnabled = true;
+                    this.kinectmenu.IsEnabled = true;
                 }
                 else
                 {
@@ -136,6 +140,20 @@ namespace PARSE
             this.pcdl = pcl;
         }
 
+        private Boolean noSensor()
+        {
+            if (this.kinectInterp.noKinect())
+            {
+                sandra.Speak("No Kinect Detected");
+                this.kinectmenu.IsEnabled = false;
+                this.newscan.IsEnabled = false;
+                kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+                return true;
+            }
+            return false;
+            
+        }
+        
         private void shutAnyWindows()
         {
             if (windowViewer != null)
@@ -150,6 +168,10 @@ namespace PARSE
         
         private void RGB_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("RGB");
             windowViewer.Owner = this;
@@ -158,6 +180,10 @@ namespace PARSE
 
         private void Depth_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
             this.shutAnyWindows(); 
             windowViewer = new ViewLoader("Depth");
             windowViewer.Owner = this;
@@ -166,6 +192,10 @@ namespace PARSE
 
         private void Skeleton_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("Skeleton");
             windowViewer.Owner = this;
@@ -174,6 +204,10 @@ namespace PARSE
 
         private void DepthIso_Click(object sender, RoutedEventArgs e)
         {
+            if (this.kinectInterp.noKinect())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("Depth Isolation");
             windowViewer.Owner = this;
@@ -182,6 +216,10 @@ namespace PARSE
 
         private void RGBIso_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
             this.shutAnyWindows();
             windowViewer = new ViewLoader("RGB Isolation");
             windowViewer.Owner = this;
@@ -190,6 +228,10 @@ namespace PARSE
 
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
             if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle + 5 <= this.kinectInterp.kinectSensor.MaxElevationAngle))
             {
                 kinectMovingLock = true;
@@ -200,6 +242,10 @@ namespace PARSE
 
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
             if ((!kinectMovingLock) && (this.kinectInterp.kinectSensor.ElevationAngle - 5) >= (this.kinectInterp.kinectSensor.MinElevationAngle))
             {
                 kinectMovingLock = true;
@@ -231,6 +277,11 @@ namespace PARSE
         
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
+            if (this.noSensor())
+            {
+                return;
+            }
+            
             this.shutAnyWindows();
 
             this.resetButtons();
@@ -381,6 +432,7 @@ namespace PARSE
                 {
                     pcdl[i].deleteFloor();
                 }
+
             this.calculate.IsEnabled = true;
             this.measurement.IsEnabled = true;
 
@@ -404,27 +456,30 @@ namespace PARSE
              * 3) calcs height
              */
 
+            try
+            {
       /*0)*/
-            this.kinectInterp.stopStreams();
-            this.shutAnyWindows();
-            this.resetButtons();
+                //this.kinectInterp.stopStreams();
+                this.shutAnyWindows();
+                this.resetButtons();
 
-     /*1)*/ Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".PARSE";
-            dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+                /*1)*/
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                dlg.DefaultExt = ".PARSE";
+                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
 
-            //String filename = "";
+            String filename = "";
 
-            if (dlg.ShowDialog() == true)
-            {
-                filename = dlg.FileName;
-            }
+                if (dlg.ShowDialog() == true)
+                {
+                    filename = dlg.FileName;
+                }
 
-            if ((filename == null) || (dlg.FileName.Length == 0))
-            {
+                if ((filename == null) || (dlg.FileName.Length == 0))
+                {
 
-                return;
-            }
+                    return;
+                }
 
             // Show the window first - keep UI speedy!
             System.Diagnostics.Debug.WriteLine("Showing window");
@@ -432,9 +487,9 @@ namespace PARSE
             windowScanner.Owner = this;
 
             // Do UI stuff on UI thread
-            this.export1.IsEnabled = false;
-            this.export2.IsEnabled = false;
-            this.removefloor.IsEnabled = true;
+                this.export1.IsEnabled = false;
+                this.export2.IsEnabled = false;
+                this.removefloor.IsEnabled = true;
 
             //define
             windowHistory = new HistoryLoader();
@@ -482,24 +537,30 @@ namespace PARSE
 
             /*2)*/
             //instantiate the stitcher 
-            stitcher = new BoundingBox();
+                stitcher = new BoundingBox();
             B.ReportProgress(1);
 
-            //jam points into stitcher
-            stitcher.add(pcdl);
+                //jam points into stitcher
+                stitcher.add(pcdl);
             B.ReportProgress(1);
             
-            stitcher.stitch();
+                stitcher.stitch();
             B.ReportProgress(5);
             
-            pcd = stitcher.getResult();
-            pcdl = stitcher.getResultList();
+                pcd = stitcher.getResult();
+                pcdl = stitcher.getResultList();
             B.ReportProgress(1, "Point Cloud Stitched");
 
             // Get the height
             double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
             Dispatcher.BeginInvoke((Action)(() => { windowHistory.heightoutput.Content = height + "m"; }));
             B.ReportProgress(1);
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.ToString());
+            }
+
+            //this.kinectInterp.stopStreams();
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
@@ -531,10 +592,24 @@ namespace PARSE
 
         private void checkKinectConnection(object state)
         {
+            Action method = () => this.hasKinectBeenAdded();
+            this.Dispatcher.Invoke(method);  
+        }
+
+        private Boolean hasKinectBeenAdded()
+        {
             if (KinectSensor.KinectSensors.Count > 0)
             {
                 System.Diagnostics.Debug.WriteLine("Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
+                this.kinectInterp.setSensor(KinectSensor.KinectSensors[0]);
+                this.kinectmenu.IsEnabled = true;
+                this.newscan.IsEnabled = true;
+                sandra.Speak("Kinect Detected");
+                kinectCheck.Dispose();
+                return true;
+
             }
+            return false;
         }
 
         void MenuItem_Exit(object sender, RoutedEventArgs e)

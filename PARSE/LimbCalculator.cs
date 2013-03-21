@@ -20,7 +20,7 @@ namespace PARSE
         private static double zmax;
         private static PointCloud segmentedPointcloud;
 
-        public static void calculateLimbBounds(PointCloud pc, Dictionary<JointType, double[]> jointDepths, String limb) {
+        public static void calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, String limb) {
 
             //Calculate limb bounds based on limb choice
 
@@ -28,31 +28,35 @@ namespace PARSE
             {
                 case "ARM_LEFT": 
                 
-                xmin = jointDepths[JointType.ShoulderLeft][1];
-                xmax = jointDepths[JointType.HandLeft][1];
+                xmin = jointDepths["ShoulderLeft"][1];
+                xmax = jointDepths["HandLeft"][1];
 
-                ymax = jointDepths[JointType.ShoulderLeft][2];
-                ymin = jointDepths[JointType.HandLeft][2];
+                ymax = jointDepths["ShoulderLeft"][2];
+                ymin = jointDepths["HandLeft"][2];
                                 
                 zmin = pc.getzMin();
                 zmax = pc.getzMax();
 
                 bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
 
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
                 break;
                 
                 case "WAIST":
 
-                xmin = jointDepths[JointType.HipRight][1];
-                xmax = jointDepths[JointType.HipLeft][1];
+                xmin = jointDepths["HipRight"][1];
+                xmax = jointDepths["HipLeft"][1];
 
-                ymax = jointDepths[JointType.HipCenter][2];
-                ymin = jointDepths[JointType.HipLeft][2];
+                ymax = jointDepths["HipCenter"][2];
+                ymin = jointDepths["HipLeft"][2];
 
                 zmin = pc.getzMin();
                 zmax = pc.getzMax();
 
                 bounds = new double[] {xmin, ymin, zmin, xmax, ymax, zmax};
+
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
                 break;
                 

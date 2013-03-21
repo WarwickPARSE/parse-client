@@ -12,7 +12,7 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Height="18" Source="Resources/op2.png" />
-                        <TextBlock Text="Results" Name="resultstxt" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Volume" Name="resultstxt" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
                 <Grid Width="{x:Static SystemParameters.PrimaryScreenWidth}" Height="240">
@@ -54,6 +54,55 @@
                     </h:HelixViewport3D>
                     <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="430,195,0,0" Name="btnresults" VerticalAlignment="Top" Width="75" />
                     <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,195,0,0" Name="btnrescan" VerticalAlignment="Top" Width="75" />
+                </Grid>
+                <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
+                    <Canvas.RenderTransform>
+                        <ScaleTransform x:Name="st"/>
+                    </Canvas.RenderTransform>
+                </Canvas>-->
+            </TabItem>
+            <TabItem Name="limbcircum" HorizontalContentAlignment="Right">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Resources/op2.png" />
+                        <TextBlock Text="Limb Circumference" Name="limbtxt" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Width="{x:Static SystemParameters.PrimaryScreenWidth}" Height="240">
+                    <!--"Headline" Labels-->
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumlabel" Height="20" Content="Calculated Circumference" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumoutput" Height="20" Content="cm" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselect" Height="20" Content="m" Margin="325,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselecthdr" Height="20" Content="Limb Selection" Margin="325,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="planelabel" Height="20" Content="Plane Details" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanlabel" Height="20" Content="Scan Details" Margin="325,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <Border BorderThickness="0.25" Name="viewborder2" HorizontalAlignment="Right" Width="482" Height="224" BorderBrush="DarkGray" Margin="440,0,33,16"></Border>
+                    <Slider Name="planeChooser2" Orientation="Vertical" Width="21" Minimum="0" Maximum="60" TickPlacement="Both" TickFrequency="1" IsDirectionReversed="True" HorizontalAlignment="Center" ValueChanged="planeChooser_ValueChanged" Margin="750,4,516,31" />
+                    <Image Source="Resources/hb.png" Margin="600,2,534,21" Name="limbimg"/>
+                    <TextBlock Text="Results will appear here after loading a scan " HorizontalAlignment="Center" VerticalAlignment="Center" Name="noresults2" TextAlignment="Center" FontFamily="Arial" FontSize="28" FontWeight="Bold" Foreground="LightGray" Height="36"  Width="905"></TextBlock>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="546,130,534,90" Width="200" Height="20" Name="newscan2" TextAlignment="Center">
+                    <Hyperlink NavigateUri="http://www.google.com" >
+                        Click here to initiate a new scan
+                    </Hyperlink>
+                    </TextBlock>
+                    <!--Secondary "headline" labels-->
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno2" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime2" Height="20" Content="Scan Time" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref2" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel2" Height="20" Content="VH Ratio:" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea2" Height="20" Content="Plane {x}: {region}" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalarea2" Height="20" Content="Plane Area: " Margin="8,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalperimiter2" Height="20" Content="Circumference:" Margin="8,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+
+                    <Canvas Width="382" Height="244" Margin="670,0,33,16">
+                        <Rectangle Canvas.Left="40" Canvas.Top="31" Width="63" Height="41" Fill="Blue"  />
+                        <Ellipse Canvas.Left="130" Canvas.Top="79" Width="58" Height="58" Fill="Blue"  />
+                        <Path Canvas.Left="61" Canvas.Top="28" Width="133" Height="98" Fill="Blue" Stretch="Fill" Data="M61,125 L193,28"/>
+                    </Canvas>
+                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="520,165,0,0" Name="btnresults2" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,195,0,0" Name="btnrescan2" VerticalAlignment="Top" Width="75" />
                 </Grid>
                 <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
                     <Canvas.RenderTransform>

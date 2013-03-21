@@ -240,6 +240,22 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        public Boolean noKinect()
+        {
+            if (KinectSensor.KinectSensors.Count == 0)
+            {
+                this.kinectSensor = null;
+                return true;
+            }
+            return (this.kinectSensor == null);
+        }
+
+        //called when you plug a kinect in to a running PARSE
+        public void setSensor(KinectSensor c)
+        {
+            this.kinectSensor = c;
+        }
+
         //Disable all streams on changeover
         public void stopStreams()
         {
@@ -247,7 +263,7 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
-            if (this.kinectSensor == null)
+            if (this.noKinect())
             {
                 return;
             }
@@ -710,6 +726,5 @@ namespace PARSE
                 return null;
             }
         }
-
     }
 }

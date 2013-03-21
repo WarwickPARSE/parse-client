@@ -31,8 +31,6 @@ namespace PARSE.ICP
             return this.processComplete; 
         }
 
-        public abstract TranslateTransform3D refine(Model3D pc1, Model3D pc2, Point3D p1, Point3D p2);
-
         //returns the result of the stitching (PointCloud)
         public abstract PointCloud getResult();
 
