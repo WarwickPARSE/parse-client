@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +25,7 @@ namespace PARSE.Tracking
         bool tracking = false;                          // Should the system be tracking?
     
         // Tracking & frame processing
-        private int gapBetweenFrames = 10;              // How many frames to skip between processed frames?
+        private int gapBetweenFrames = 8;              // How many frames to skip between processed frames?
         private volatile int frameCounter = 0;          // frameCounter % gapbetweenframes ==0  -> process frame
                                                         // TODO Use this to cancel frame processing if getting behind.
         RGBTracker tracker;                             // Reference to RGBTracker
@@ -51,6 +52,7 @@ namespace PARSE.Tracking
         private System.Windows.Controls.Image Visualisation; // Write visualisation stuff into here
         private static readonly int Bgr32BytesPerPixel = 
             (PixelFormats.Bgr32.BitsPerPixel + 7) / 8; // Need for image properties.
+        private int[] rowHeaders;                       // 'Pointers' to rows in the image byte array
 
         // Skeletons
         private bool skeletonsIdentified = false;       // Have the doctor/patient been identified?
@@ -125,6 +127,13 @@ namespace PARSE.Tracking
 
             // Prepare visualisation
             Visualisation = visualisation;
+
+            // Get row pointers, to have as reference rather than calculating every time (used by Highlight)
+            rowHeaders = new int[480];
+            for (int row = 0; row < 480; row++)
+            {
+                rowHeaders[row] = row * 640 * 4;
+            }
         }
 
         private void prepare()
@@ -164,7 +173,7 @@ namespace PARSE.Tracking
         #endregion
 
         /*
-         * Called whenever the frames are ready. When processed, calls frameReady for post-frame work
+         * Called whenever the frames are ready. When processed, calls frameReady for post-frame work & visualisation
          */
         private void handleNewFrame(object sender, AllFramesReadyEventArgs frames)
         {
@@ -216,7 +225,8 @@ namespace PARSE.Tracking
                         return;
                     }
 
-                    //Console.WriteLine("Do stuff");
+                    // Now the frame data has been captured, process it!
+                    
                     // Need to use local copies to maintain volatility of actual variables
                     int tempX = 0;
                     int tempY = 0;
@@ -224,7 +234,10 @@ namespace PARSE.Tracking
 
                     // Get the values
                     byte[] colorFrame2 = (byte[])thisColorFrame.Clone();
+
                     tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle);
+
+                    Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
                     lock (this)
                     {
@@ -259,6 +272,8 @@ namespace PARSE.Tracking
                         frames.OpenColorImageFrame().CopyPixelDataTo(colorFrame);
 
                 }
+
+                updateVisualisation();
             }
         }
 
@@ -383,7 +398,7 @@ namespace PARSE.Tracking
 
         private void identifySkeletons()
         {
-            System.Diagnostics.Debug.Write("Identifying skeletons...");
+            System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
 
             if (skeletonFrame != null & activeSkeletons == 2)
             {
@@ -438,6 +453,7 @@ namespace PARSE.Tracking
                     if (patientID != -1)
                     {
                         skeletonsIdentified = true;
+                        this.displayText.Text = "Doctor and patient identified!";
                         System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID + ", and patient as ID: " + patientID);
                     }
                 }
@@ -446,56 +462,59 @@ namespace PARSE.Tracking
                     System.Diagnostics.Debug.WriteLine("Sensor tracker could not identify the doctor");
                     if (x == 0 || y == 0)
                     {
+                        this.displayText.Text = "The sensor tracker is looking for the sensor...";
                         System.Diagnostics.Debug.WriteLine("This could be because the sensor has not yet been located");
                     }
                 }
                 else if (distance >= 30)
+                {
+                    this.displayText.Text = "Sensor found, but not close enough to a hand";
                     System.Diagnostics.Debug.WriteLine("Sensor found, but not close enough to a hand");
-
+                }
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Skeleton Identification not run. There are not 2 skeletons in the frame.");
+                this.displayText.Text = "There are not 2 skeletons in the frame";
+                System.Diagnostics.Debug.WriteLine("There are not 2 skeletons in the frame.");
                 return;
             }
         }
 
         private void highlightSensor(int posX, int posY)
         {
-            // Get row pointers
-            int[] rowHeaders = new int[480];
-            for (int row = 0; row < 480; row++)
+            // No position? Don't highlight!
+            if (posX != 0 & posY != 0)
             {
-                rowHeaders[row] = row * 640 * 4;
-            }
-
-            // Choose a depth-dependant highlight size
-            short depth = depthFrame[ 640*posY + posX ];
-            int size = 3;
-            if (depth < 9500)
-                size = 8;
-            else if (depth > 30000)
-                size = 3;
-            else
-            {
-                size = (int)(16 - (4 * (depth / 10000)));
-                size = Math.Max(size, 3);
-                size = Math.Min(size, 10);
-            }
-
-            // Place the highlight
-            for (int row = posY - size; row < posY + size; row++)
-                for (int col = posX - size; col < posX + size; col++)
+                // Choose a depth-dependant highlight size
+                short depth = depthFrame[640 * posY + posX];
+                int size = 3;
+                if (depth < 9500)
+                    size = 8;
+                else if (depth > 30000)
+                    size = 3;
+                else
                 {
-                    if (row > 0 & col > 0 & row < 480 & col < 640)
+                    size = (int)(16 - (4 * (depth / 10000)));
+                    size = Math.Max(size, 3);
+                    size = Math.Min(size, 10);
+                }
+
+                // Place the highlight
+                for (int row = posY - size; row < posY + size; row++)
+                {
+                    for (int col = posX - size; col < posX + size; col++)
                     {
-                        int index = rowHeaders[row] + col * 4;
-                        colorFrame[index] = 0;
-                        colorFrame[index + 1] = 255;
-                        colorFrame[index + 2] = 0;
-                        colorFrame[index + 3] = 0;
+                        if (row > 0 & col > 0 & row < 480 & col < 640)
+                        {
+                            int index = rowHeaders[row] + col * 4;
+                            colorFrame[index] = 0;
+                            colorFrame[index + 1] = 255;
+                            colorFrame[index + 2] = 0;
+                            colorFrame[index + 3] = 0;
+                        }
                     }
                 }
+            }
         }
 
         /*

@@ -78,7 +78,6 @@ namespace PARSE
         private const double oneParseUnitDelta = 7.5;
         //optimum distance for scanner
 
-        private string filename;
 
         public CoreLoader()
         {
@@ -270,7 +269,7 @@ namespace PARSE
         {
             this.export1.IsEnabled = false;
             this.export2.IsEnabled = false;
-            this.measurement.IsEnabled = false;
+            this.measurement.IsEnabled = true;
             this.removefloor.IsEnabled = false;
             this.calculate.IsEnabled = false;
         }
@@ -289,7 +288,7 @@ namespace PARSE
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
-            windowScanner.ScanLoaderReady();
+            windowScanner.ScanLoaderReady(1); // 1 = new scan (show the buttons)
 
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
@@ -605,6 +604,7 @@ namespace PARSE
                 this.kinectInterp.setSensor(KinectSensor.KinectSensors[0]);
                 this.kinectmenu.IsEnabled = true;
                 this.newscan.IsEnabled = true;
+                this.measurement.IsEnabled = true;
                 sandra.Speak("Kinect Detected");
                 kinectCheck.Dispose();
                 return true;

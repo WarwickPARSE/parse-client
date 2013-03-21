@@ -88,6 +88,7 @@ namespace PARSE
                 output.AppendText(message);
                 output.ScrollToEnd();
             };
+
             if (output.Dispatcher.CheckAccess())
             {
                 output.Dispatcher.Invoke(

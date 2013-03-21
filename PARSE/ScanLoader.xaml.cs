@@ -119,7 +119,7 @@ namespace PARSE
             loadingwidgetcontrol.UpdateProgressBy(1);
 
             this.hitState = 0;
-            this.ScanLoaderReady();
+            this.ScanLoaderReady(0);
         }
 
         public ScanLoader(PointCloud gcloud)
@@ -150,10 +150,21 @@ namespace PARSE
             hitState = 0;
         }
 
-        public void ScanLoaderReady()
+        public void ScanLoaderReady(int mode)
         {
             this.hvpcanvas.Visibility = Visibility.Visible;
             this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+
+            if (mode == 1)
+            {
+                this.start_scan.Visibility = Visibility.Visible;
+                this.cancel_scan.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.start_scan.Visibility = Visibility.Collapsed;
+                this.cancel_scan.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
