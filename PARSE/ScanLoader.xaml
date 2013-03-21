@@ -2,9 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        Title="Scan Viewer" Height="400" Width="600" Name="scanloader">
+        Title="Scan Viewer" Height="400" Width="600" Name="scanloader"
+        xmlns:local="clr-namespace:PARSE">
     <Grid>
-        <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas">
+        <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas" Visibility="Collapsed">
             <h:HelixViewport3D.Camera>
                 <PerspectiveCamera Position="-1,-3,1" LookDirection="0,6,0" UpDirection="0,0,1" NearPlaneDistance="0.01" FarPlaneDistance="1000" FieldOfView="57" />
             </h:HelixViewport3D.Camera>
@@ -25,5 +26,6 @@
                 <TextBlock>Scan Modeller Active</TextBlock>
             </StatusBarItem>
         </StatusBar>
+        <local:LoadingWidget x:Name="loadingwidgetcontrol" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
     </Grid>
 </Window>

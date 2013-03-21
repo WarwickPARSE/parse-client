@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
 using System.Windows.Media;
@@ -40,6 +41,9 @@ namespace PARSE
         Point3DCollection pcc;
         List<Point3DCollection> cloudList;
 
+        // TODO remove?
+        //BackgroundWorker progressMonitor;
+
         public GroupVisualiser()
         {
             //parameterless
@@ -76,7 +80,7 @@ namespace PARSE
 
         /*POINT CLOUD RENDERING*/
 
-        public void preprocess()
+        public void preprocess(LoadingWidget progressMonitor)
         {
             if (this.clouds == null)
             {
@@ -91,21 +95,25 @@ namespace PARSE
 
                 createPointCloud(pcc);
 
-                render();
+                render(progressMonitor);
             }
             else
             {
-                //preprocess condition for when we have multiple point clouds to convert into point 3ds
+                if (progressMonitor != null)
+                    progressMonitor.ReportProgress(1, "starting preprocess");
 
                 cloudList = new List<Point3DCollection>();
 
                 //create a list of point 3d collections
                 for (int i = 0; i < this.clouds.Count; i++)
                 {
-                    //iterate over each scan and grab points
                     Point3DCollection pcc = new Point3DCollection();
                     depthFramePoints = new Point3D[this.clouds[i].getAllPoints().Length];
+                    
                     ICP.PointRGB[] tmp = clouds[i].getAllPoints();
+
+                    int progressPerCloud = (int)Math.Round((30 / (decimal)this.clouds.Count), 0);
+                    double progressPerPoint = progressPerCloud / (this.clouds[i].getAllPoints().Length);
 
                     //jam into point cloud collection.
                     for (int j = 0; j < depthFramePoints.Length; j++)
@@ -113,17 +121,23 @@ namespace PARSE
                         pcc.Add(tmp[j].point);
                     }
 
-                    System.Diagnostics.Debug.WriteLine("creating new pc's " + pcc.Count);
-
                     cloudList.Add(pcc);
+
+                    if (progressMonitor != null)
+                        progressMonitor.ReportProgress((int)(progressPerCloud), "Created point cloud " + (i + 1) + " of " + this.clouds.Count);
                 }
 
-                render();
 
+                // Render the model!
+                if (progressMonitor != null)
+                {
+                    progressMonitor.ReportProgress(10, "Rendering");
+                }            
+                render(progressMonitor);
             }
         }
 
-        public void render()
+        public void render(LoadingWidget progressMonitor)
         {
 
             if (this.cloudList == null)
@@ -145,13 +159,14 @@ namespace PARSE
             }
             else
             {
+                int progressPerCloud = (int)Math.Round((30 / (decimal)this.cloudList.Count), 0);
 
                 runDemoModel();
 
                 for (int i = 0; i < this.cloudList.Count; i++)
                 {
-
-                    System.Diagnostics.Debug.WriteLine("Producing model " + i);
+                    if (progressMonitor != null)
+                        progressMonitor.ReportProgress(progressPerCloud, "Rendering model " + i + " of " + this.cloudList.Count);
 
                     switch (i)
                     {
@@ -161,8 +176,6 @@ namespace PARSE
                             this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
                             this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
                             this.armLabel.Geometry = createTextLabel("THIS IS AN ARM");
-
-
                             break;
                         case 1:
                             mesh = new MeshGeometry3D();
@@ -185,9 +198,8 @@ namespace PARSE
                             this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
                             this.Model4.Transform = new TranslateTransform3D(-1, -2, 1);
                             break;
-                    } 
+                    }
                 }
-            
             }
         }
 
@@ -201,7 +213,7 @@ namespace PARSE
 
         public MeshGeometry3D createMesh()
         {
-            if (this.mesh == null) { System.Diagnostics.Debug.WriteLine("null"); }
+            if (this.mesh == null) { Console.WriteLine("GroupVisualiser: Tried to create mesh - but was null"); }
             return this.mesh;
         }
 
@@ -451,5 +463,17 @@ namespace PARSE
         public GeometryModel3D waistLabel { get; set; }
         public GeometryModel3D headLabel { get; set; }
 
+        // TODO Can this work?
+        /*
+        internal void attachProgressMonitor(BackgroundWorker B)
+        {
+            this.progressMonitor = B;
+        }
+        
+        internal void removeProgressMonitor()
+        {
+            this.progressMonitor = null;
+        }
+        */
     }
 }
