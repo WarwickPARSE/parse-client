@@ -30,6 +30,7 @@
                         <RowDefinition Height="30"></RowDefinition>
                         <RowDefinition Height="30"></RowDefinition>
                         <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
                         <RowDefinition Height="90"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
@@ -47,8 +48,10 @@
                            Grid.Column="0" Grid.Row="4"  />
                     <Label Content="NHS Number" Margin="0" Name="nhsNoLabel" Width="75"  VerticalAlignment="Center"
                            Grid.Column="0" Grid.Row="5" />
-                    <Label Content="Address" Margin="0" Name="addressLabel" Width="75"  VerticalAlignment="Center"
+                    <Label Content="Weight (kg)" Margin="0" Name="weightLabel" Width="75"  VerticalAlignment="Center"
                            Grid.Column="0" Grid.Row="6" />
+                    <Label Content="Address" Margin="0" Name="addressLabel" Width="75"  VerticalAlignment="Center"
+                           Grid.Column="0" Grid.Row="7" />
                    
                     <!-- Text boxes -->
                     <TextBox HorizontalAlignment="Left" Margin="0" Name="patientIDText" Width="299" VerticalAlignment="Center"
@@ -61,8 +64,10 @@
                              Grid.Column="1" Grid.Row="4" />
                     <TextBox HorizontalAlignment="Left" Margin="0" Name="nhsNoText" Width="299"  VerticalAlignment="Center"
                              Grid.Column="1" Grid.Row="5" />
+                    <TextBox HorizontalAlignment="Left" Margin="0" Name="weightText" Width="299"  VerticalAlignment="Center"
+                             Grid.Column="1" Grid.Row="6" />
                     <RichTextBox Height="77" AcceptsReturn="True" HorizontalAlignment="Left" Margin="0" Name="addressText" Width="299" VerticalAlignment="Center" 
-                                 Grid.Column="1" Grid.Row="6" />
+                                 Grid.Column="1" Grid.Row="7" />
                     
                     <!-- Waiting texts (Necessary?) -->
                     <Label Content="Loading..." HorizontalAlignment="Left" Margin="0" Name="patientIDExisting" FontFamily="Arial" FontSize="16" VerticalAlignment="Center"
@@ -75,8 +80,10 @@
                            Grid.Column="1" Grid.Row="4" />
                     <Label Content="Loading..." HorizontalAlignment="Left" Margin="0" Name="patientNhsNoExisting" FontFamily="Arial" FontSize="16" VerticalAlignment="Center"
                            Grid.Column="1" Grid.Row="5" />
+                    <Label Content="Loading..." HorizontalAlignment="Left" Margin="0" Name="patientweightExisting" FontFamily="Arial" FontSize="16" VerticalAlignment="Center"
+                           Grid.Column="1" Grid.Row="6" />
                     <TextBlock Text="Loading..." TextWrapping="Wrap" HorizontalAlignment="Left" Margin="0" Name="patientAddressExisting" FontFamily="Arial" FontSize="12" VerticalAlignment="Center"
-                               Grid.Column="1" Grid.Row="6" />
+                               Grid.Column="1" Grid.Row="7" />
 
                     <!-- Buttons -->
                     <Button Content="Proceed -->" Click="proceedCon_Click" Height="23" HorizontalAlignment="Left" Margin="0" Name="proceedCon" VerticalAlignment="Top" Width="100"  Grid.Column="2" Grid.Row="7" />

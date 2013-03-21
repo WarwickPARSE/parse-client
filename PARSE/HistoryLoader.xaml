@@ -37,7 +37,7 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime" Height="20" Content="Scan Time" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="VH Ratio:" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="Siri (%BF):" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
 
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea" Height="20" Content="Plane {x}: {region}" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
 

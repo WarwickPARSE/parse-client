@@ -25,6 +25,7 @@ using System.Windows.Shapes;
 using System.Reflection;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+
 //Kinect imports
 using Microsoft.Kinect;
 using PARSE.ICP;
@@ -68,11 +69,11 @@ namespace PARSE
         //prevents crashing on adjustment
         private Boolean kinectMovingLock = false;
 
+        //database engine
+        DatabaseEngine db;
+
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
-        //optimum distance for scanner
-
-        private string filename;
 
         public CoreLoader()
         {
@@ -80,7 +81,7 @@ namespace PARSE
             InitializeComponent();
 
             //Initialize Database
-            DatabaseEngine db = new DatabaseEngine();
+            db = new DatabaseEngine();
 
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
@@ -100,7 +101,7 @@ namespace PARSE
         }
 
         /// <summary>
-        /// WPF Form Methods
+        /// window_loaded
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event identifier</param>
@@ -111,9 +112,11 @@ namespace PARSE
             windowDebug = new DebugLoader();
             windowDebug.Owner = this;
             
+            //output to debug window
             windowDebug.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
             windowDebug.sendMessageToOutput("Status", "Initializing Kinect Device");
             
+            //check kinect sensors
             if (KinectSensor.KinectSensors.Count>0)
                 {
                     windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
@@ -127,11 +130,14 @@ namespace PARSE
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
 
+            //get version number
             Assembly assembly = Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             string version = fvi.FileVersion;
 
             verno.Content = "Version no: " + version;
+
+            db.con.Close();
 
         }
 
@@ -464,7 +470,7 @@ namespace PARSE
 
             try
             {
-      /*0)*/
+                /*0)*/
                 //this.kinectInterp.stopStreams();
                 this.shutAnyWindows();
                 this.resetButtons();
@@ -474,7 +480,7 @@ namespace PARSE
                 dlg.DefaultExt = ".PARSE";
                 dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
 
-            String filename = "";
+                String filename = "";
 
                 if (dlg.ShowDialog() == true)
                 {
@@ -487,47 +493,54 @@ namespace PARSE
                     return;
                 }
 
-            // Show the window first - keep UI speedy!
-            System.Diagnostics.Debug.WriteLine("Showing window");
-            windowScanner = new ScanLoader();
-            windowScanner.Owner = this;
+                // Show the window first - keep UI speedy!
+                System.Diagnostics.Debug.WriteLine("Showing window");
+                windowScanner = new ScanLoader();
+                windowScanner.Owner = this;
 
-            // Do UI stuff on UI thread
+                // Do UI stuff on UI thread
                 this.export1.IsEnabled = false;
                 this.export2.IsEnabled = false;
                 this.removefloor.IsEnabled = true;
 
-            //define
-            windowHistory = new HistoryLoader();
-            windowHistory.Owner = this;
+                //define
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
 
-            // Background thread to get all the heavy computation off of the UI thread
-            BackgroundWorker B = new BackgroundWorker();
-            B.DoWork += new DoWorkEventHandler(loadScanThread);
+                // Background thread to get all the heavy computation off of the UI thread
+                BackgroundWorker B = new BackgroundWorker();
+                B.DoWork += new DoWorkEventHandler(loadScanThread);
 
-            // Catch the progress update events
-            B.WorkerReportsProgress = true;
-            B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
-                {
-                    windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
-                    if (args.UserState != null)
+                // Catch the progress update events
+                B.WorkerReportsProgress = true;
+                B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
                     {
-                        if (args.UserState is string)
+                        windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
+                        if (args.UserState != null)
                         {
-                        System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                            if (args.UserState is string)
+                            {
+                                System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                            }
+                            else if (args.UserState is Action)
+                            {
+                                ((Action)args.UserState)();
+                            }
                         }
-                        else if (args.UserState is Action)
-                        {
-                            ((Action)args.UserState)();
-                        }
-                    }
-                } );
-            B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) => {
-                windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
-            }); 
+                    });
+                B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
+                {
+                    windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+                });
 
-            // GOOO!!! Pass the file name so it can be loaded
-            B.RunWorkerAsync(filename);
+                // GOOO!!! Pass the file name so it can be loaded
+                B.RunWorkerAsync(filename);
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.ToString());
+            }
+
         }
 
         private void loadScanThread(Object sender, DoWorkEventArgs e)
@@ -561,10 +574,6 @@ namespace PARSE
             double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
             Dispatcher.BeginInvoke((Action)(() => { windowHistory.heightoutput.Content = height + "m"; }));
             B.ReportProgress(1);
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err.ToString());
-            }
 
             //this.kinectInterp.stopStreams();
         }

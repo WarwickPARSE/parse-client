@@ -11,19 +11,18 @@ namespace PARSE
     {
         public SqlCeConnection con;
 
-        Insertion insertQueries;
-        Selection selectQueries;
+        public Insertion insertQueries;
+        public Selection selectQueries;
 
         public DatabaseEngine()
         {
             dbOpen();
 
-            insertQueries = new Insertion(this.con);
-            selectQueries = new Selection(this.con);
+            this.insertQueries = new Insertion(this.con);
+            this.selectQueries = new Selection(this.con);
 
             //Object[] patients = getAllPatients();
 
-            //dbClose();
         }
 
         private void dbOpen()
@@ -89,21 +88,24 @@ namespace PARSE
             con = connection;
         }
 
-        public void InsertPatientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void InsertPatientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
         {
             //check what number is the previous patientID and increment by 1?
 
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientInformation (patientID, name, dateofbirth, nationality, nhsNo, address) VALUES (@PatientID, @Name, @DateOfBirth, @Nationality, @NhsNo, @Address)";
+            insertQuery.CommandText = "INSERT INTO PatientInformation (name, dateofbirth, nationality, nhsNo, address, weight) VALUES (@Name, @DateOfBirth, @Nationality, @NhsNo, @Address, @Weight)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@PatientID", patientID);
             insertQuery.Parameters.Add("@Name", name);
-            insertQuery.Parameters.Add("@DateOfBirth", dateOfBirth);
+            insertQuery.Parameters.Add("@DateOfBirth", Convert.ToDateTime(dateOfBirth));
             insertQuery.Parameters.Add("@Nationality", nationality);
             insertQuery.Parameters.Add("@NhsNo", nhsNo);
             insertQuery.Parameters.Add("@Address", address);
+            insertQuery.Parameters.Add("@Weight", weight);
             rowsAffected = insertQuery.ExecuteNonQuery();
+
+            System.Diagnostics.Debug.WriteLine("Rows affected: " + rowsAffected);
+
         }
 
         public void InsertPatientCondition(int patientConditionID, int patientID, int conditionID, String condition)
@@ -154,9 +156,6 @@ namespace PARSE
         {
             int lastID = 0;
 
-            int pSize = 0;
-            int[] ids = new int[pSize];
-
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT patientID FROM PatientInformation";
             selectQuery.Parameters.Clear();
@@ -164,12 +163,9 @@ namespace PARSE
 
             while (reader.Read())
             {
-                pSize = pSize + 1;
-                ids[pSize] = reader.GetInt32(0);
+                lastID = reader.GetInt32(0);
             }
             reader.Close();
-
-            lastID = ids[pSize - 1];
 
             return lastID;
         }
@@ -247,9 +243,9 @@ namespace PARSE
             {
                 patient[0] = reader.GetInt32(0);
                 patient[1] = reader.GetString(1);
-                patient[2] = reader.GetString(2);
+                patient[2] = reader.GetDateTime(2);
                 patient[3] = reader.GetString(3);
-                patient[4] = reader.GetInt32(4);
+                patient[4] = reader.GetString(4);
                 patient[5] = reader.GetString(5);
             }
             reader.Close();

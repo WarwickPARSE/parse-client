@@ -171,6 +171,9 @@
     <Compile Include="Library\Visualisation\CloudVisualisation.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
+    <Compile Include="MetaLoader.xaml.cs">
+      <DependentUpon>MetaLoader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OptionLoader.xaml.cs">
       <DependentUpon>OptionLoader.xaml</DependentUpon>
     </Compile>
@@ -247,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="HistoryLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MetaLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
