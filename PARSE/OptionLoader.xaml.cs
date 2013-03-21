@@ -39,6 +39,9 @@ namespace PARSE
         {
             PatientLoader newScanWindow = new PatientLoader(true);
             newScanWindow.Show();
+            newScanWindow.recordedscans.Visibility = Visibility.Visible;
+            newScanWindow.patientEntry.SelectedIndex = 2;
+            newScanWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
         }
     }

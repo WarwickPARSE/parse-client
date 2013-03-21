@@ -54,17 +54,10 @@ namespace PARSE
         private void PatientLoaderExisting_Loaded(object Sender, RoutedEventArgs e)
         {
             //TODO: This will eventually be given the relevant select query from the database call.
-
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = this.Owner.Left + 20;
+            this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
             //initialize database with selection connection object
             Selection select = new Selection(db.con);
-
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = this.Owner.Left + 20;
             this.Width = this.Owner.OwnedWindows[0].Width + 20;
             this.Height = this.Owner.OwnedWindows[0].Height;
 
