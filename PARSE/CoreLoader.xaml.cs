@@ -1,35 +1,34 @@
 ﻿//System imports
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Threading;
-using System.Text;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Speech.Synthesis;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Forms;
-using System.Speech.Synthesis;
-using System.Windows.Interop;
-using System.Threading.Tasks;
-using System.Windows.Media.Animation;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
-using System.ComponentModel;
-
 //Kinect imports
 using Microsoft.Kinect;
-using PARSE.Recognition;
 using PARSE.ICP;
 using PARSE.ICP.Stitchers;
+using PARSE.Recognition;
 
 namespace PARSE
 {
@@ -78,6 +77,8 @@ namespace PARSE
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
         //optimum distance for scanner
+
+        private string filename;
 
         public CoreLoader()
         {
@@ -403,7 +404,7 @@ namespace PARSE
              * 3) calcs height
              */
 
-            /*0)*/
+      /*0)*/
             this.kinectInterp.stopStreams();
             this.shutAnyWindows();
             this.resetButtons();
@@ -412,7 +413,7 @@ namespace PARSE
             dlg.DefaultExt = ".PARSE";
             dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
 
-            String filename = "";
+            //String filename = "";
 
             if (dlg.ShowDialog() == true)
             {
@@ -425,37 +426,80 @@ namespace PARSE
                 return;
             }
 
-            this.DataContext = ScanSerializer.deserialize(filename);
-            pcdl = ScanSerializer.depthPc;
+            // Show the window first - keep UI speedy!
+            System.Diagnostics.Debug.WriteLine("Showing window");
+            windowScanner = new ScanLoader();
+            windowScanner.Owner = this;
 
-            System.Diagnostics.Debug.WriteLine("Performing end to end cloud processing...please wait.");
-
+            // Do UI stuff on UI thread
             this.export1.IsEnabled = false;
             this.export2.IsEnabled = false;
             this.removefloor.IsEnabled = true;
-
-     /*2)*/ //instantiate the stitcher 
-            stitcher = new BoundingBox();
-
-            //jam points into stitcher
-            stitcher.add(pcdl);
-            stitcher.stitch();
-
-            pcd = stitcher.getResult();
-            pcdl = stitcher.getResultList();
 
             //define
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
 
-            double height = Math.Round(HeightCalculator.getHeight(pcd),3);
-            windowHistory.heightoutput.Content = height + "m";
+            // Background thread to get all the heavy computation off of the UI thread
+            BackgroundWorker B = new BackgroundWorker();
+            B.DoWork += new DoWorkEventHandler(loadScanThread);
 
-            windowScanner = new ScanLoader(pcdl);
-            windowScanner.Owner = this;
-            windowScanner.Show();
+            // Catch the progress update events
+            B.WorkerReportsProgress = true;
+            B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
+                {
+                    windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
+                    if (args.UserState != null)
+                    {
+                        if (args.UserState is string)
+                        {
+                        System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                        }
+                        else if (args.UserState is Action)
+                        {
+                            ((Action)args.UserState)();
+                        }
+                    }
+                } );
+            B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) => {
+                windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+            }); 
 
-            this.kinectInterp.stopStreams();
+            // GOOO!!! Pass the file name so it can be loaded
+            B.RunWorkerAsync(filename);
+        }
+
+        private void loadScanThread(Object sender, DoWorkEventArgs e)
+        {
+            // Cast object back into BackgroundWorker
+            BackgroundWorker B = (BackgroundWorker)sender;
+            B.ReportProgress(1, "Background worker running");
+
+            ScanSerializer.deserialize((string)e.Argument);
+            B.ReportProgress(8, "Model deserialised");
+            pcdl = ScanSerializer.depthPc;
+            B.ReportProgress(2, "Model loaded");
+
+            /*2)*/
+            //instantiate the stitcher 
+            stitcher = new BoundingBox();
+            B.ReportProgress(1);
+
+            //jam points into stitcher
+            stitcher.add(pcdl);
+            B.ReportProgress(1);
+            
+            stitcher.stitch();
+            B.ReportProgress(5);
+            
+            pcd = stitcher.getResult();
+            pcdl = stitcher.getResultList();
+            B.ReportProgress(1, "Point Cloud Stitched");
+
+            // Get the height
+            double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
+            Dispatcher.BeginInvoke((Action)(() => { windowHistory.heightoutput.Content = height + "m"; }));
+            B.ReportProgress(1);
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)

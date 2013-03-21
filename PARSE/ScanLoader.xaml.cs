@@ -1,27 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.Concurrent;
-using System.Windows.Interop;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Speech.Synthesis;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Threading;
-using System.Speech.Synthesis;
-using System.IO;
 using System.Windows.Media.Media3D;
-using System.Diagnostics;
-using System.Threading.Tasks;
-
-using Microsoft.Kinect;
+using System.Windows.Shapes;
 using HelixToolkit.Wpf;
-
+using Microsoft.Kinect;
 using PARSE.ICP.Stitchers;
 
 namespace PARSE
@@ -39,12 +39,14 @@ namespace PARSE
         private CloudVisualisation cloudvis;
         private Dictionary<JointType, double[]> jointDepths;
         private RayHitTestResult rayResult;
-        private GroupVisualiser gv;
+        private volatile GroupVisualiser gv;
         private Point3D point1;
         private Point3D point2;
         private Model3D model1;
         private Model3D model2;
         private PointCloud pcd;
+
+        private delegate void OneArgDelegate(GroupVisualiser gv);
 
         //Coreloader modifiable hit state
         public int hitState;
@@ -63,43 +65,62 @@ namespace PARSE
         public ScanLoader()
         {
             InitializeComponent();
-            wantKinect = true;
+
+            //hide buttons from form
+            cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
+            this.instructionblock.Visibility = Visibility.Collapsed;
+            this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+
+            this.Show();
+
+            //wantKinect = true; // Nathan changed this
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             hitState = 0;
+
+            
         }
 
         //Event handlers for viewport interaction
 
         public ScanLoader(List<PointCloud> fcloud)
         {
-            InitializeComponent();
+            
+        }
+
+        public void processCloudList(List<PointCloud> fcloud, LoadingWidget loadingControl)
+        {
             wantKinect = false;
 
+            System.Diagnostics.Debug.WriteLine("Number of items in fcloud list: " + fcloud.Count);
 
-            //hide buttons from form
-            cancel_scan.Visibility = Visibility.Collapsed;
-            start_scan.Visibility = Visibility.Collapsed;
-            this.instructionblock.Visibility = Visibility.Collapsed;
+            this.gv = new GroupVisualiser(fcloud);
+            this.hvpcanvas.Visibility = Visibility.Visible;
+            loadingwidgetcontrol.UpdateProgressBy(2);
+            
+            // Run this as separate 'job' on UI thread
+            this.Dispatcher.Invoke(
+                System.Windows.Threading.DispatcherPriority.Normal,
+                (Action)(() => { 
+                    this.gv = new GroupVisualiser(fcloud);
+                }));
+            loadingwidgetcontrol.UpdateProgressBy(5);
 
-            gv = new GroupVisualiser(fcloud);
+            // Run this as lower priority 'job' (on UI thread),
+            // with hope that UI remains a bit responsive
+            this.Dispatcher.Invoke(
+                System.Windows.Threading.DispatcherPriority.Input,
+                (Action)(() => { 
+                    this.gv.preprocess(loadingwidgetcontrol);
+                }));
+            loadingwidgetcontrol.UpdateProgressBy(5);
+            
+            this.hvpcanvas.DataContext = this.gv;
+            loadingwidgetcontrol.UpdateProgressBy(1);
 
-            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
-
-            //Threading of data context population to speed up model generation.
-            System.Diagnostics.Debug.WriteLine("Loading model");
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                gv.preprocess();
-            }));
-
-            //Assigned threaded object result to the data context.
-            this.DataContext = gv;
-            //gCloud = fcloud;
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
-            System.Diagnostics.Debug.WriteLine("Model loaded");
-
-            hitState = 0;
+            this.hitState = 0;
+            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
         }
 
         public ScanLoader(PointCloud gcloud)
@@ -118,7 +139,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Loading model");
             this.Dispatcher.Invoke((Action)(() =>
             {
-                gv.preprocess();
+                gv.preprocess(null);
             }));
 
             //Assigned threaded object result to the data context.
@@ -297,7 +318,7 @@ namespace PARSE
                 sandra.Speak("Visualizing scan, please wait.");
 
                 GroupVisualiser gg = new GroupVisualiser(fincloud);
-                gg.preprocess();
+                gg.preprocess(null);
                 this.DataContext = gg;
 
                 //Visualisation instantiation based on KDTree array clouds
