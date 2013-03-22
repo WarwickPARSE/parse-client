@@ -277,7 +277,7 @@ namespace PARSE
         {
             this.export1.IsEnabled = false;
             this.export2.IsEnabled = false;
-            this.measurement.IsEnabled = false;
+            this.measurement.IsEnabled = true;
             this.removefloor.IsEnabled = false;
             //this.calculate.IsEnabled = false;
         }
@@ -296,6 +296,7 @@ namespace PARSE
             windowScanner = new ScanLoader();
             windowScanner.Owner = this;
             windowScanner.Show();
+            windowScanner.ScanLoaderReady(1); // 1 = new scan (show the buttons)
 
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
@@ -562,26 +563,24 @@ namespace PARSE
 
             /*2)*/
             //instantiate the stitcher 
-                stitcher = new BoundingBox();
+            stitcher = new BoundingBox();
             B.ReportProgress(1);
 
-                //jam points into stitcher
-                stitcher.add(pcdl);
+            //jam points into stitcher
+            stitcher.add(pcdl);
             B.ReportProgress(1);
             
-                stitcher.stitch();
+            stitcher.stitch();
             B.ReportProgress(5);
             
-                pcd = stitcher.getResult();
-                pcdl = stitcher.getResultList();
+            pcd = stitcher.getResult();
+            pcdl = stitcher.getResultList();
             B.ReportProgress(1, "Point Cloud Stitched");
 
             // Get the height
             double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
             Dispatcher.BeginInvoke((Action)(() => { windowHistory.heightoutput.Content = height + "m"; }));
             B.ReportProgress(1);
-
-            //this.kinectInterp.stopStreams();
         }
 
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
@@ -627,6 +626,7 @@ namespace PARSE
                 this.kinectInterp.setSensor(KinectSensor.KinectSensors[0]);
                 this.kinectmenu.IsEnabled = true;
                 this.newscan.IsEnabled = true;
+                this.measurement.IsEnabled = true;
                 sandra.Speak("Kinect Detected");
                 kinectCheck.Dispose();
                 return true;

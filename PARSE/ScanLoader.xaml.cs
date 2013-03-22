@@ -81,8 +81,6 @@ namespace PARSE
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             db = new DatabaseEngine();
             hitState = 0;
-
-            
         }
 
         //Event handlers for viewport interaction
@@ -98,7 +96,6 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Number of items in fcloud list: " + fcloud.Count);
 
             this.gv = new GroupVisualiser(fcloud);
-            this.hvpcanvas.Visibility = Visibility.Visible;
             loadingwidgetcontrol.UpdateProgressBy(2);
             
             // Run this as separate 'job' on UI thread
@@ -122,7 +119,7 @@ namespace PARSE
             loadingwidgetcontrol.UpdateProgressBy(1);
 
             this.hitState = 0;
-            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+            this.ScanLoaderReady(0);
         }
 
         public ScanLoader(PointCloud gcloud)
@@ -151,6 +148,23 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Model loaded");
 
             hitState = 0;
+        }
+
+        public void ScanLoaderReady(int mode)
+        {
+            this.hvpcanvas.Visibility = Visibility.Visible;
+            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+
+            if (mode == 1)
+            {
+                this.start_scan.Visibility = Visibility.Visible;
+                this.cancel_scan.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.start_scan.Visibility = Visibility.Collapsed;
+                this.cancel_scan.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
