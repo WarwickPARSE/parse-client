@@ -214,7 +214,7 @@
     <Compile Include="PatientLoader.xaml.cs">
       <DependentUpon>PatientLoader.xaml</DependentUpon>
     </Compile>
-    <None Include="app.config" />
+    <None Include="Resources\app.config" />
     <None Include="packages.config" />
     <None Include="Patients.xsc">
       <DependentUpon>Patients.xsd</DependentUpon>

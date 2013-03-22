@@ -7,8 +7,8 @@
         
         <Button Name="start_scan" Content="Start Scan Process" Width="120" Height="25" Margin="-130,150,0,0" HorizontalAlignment="Center" Click="start_scan_Click" VerticalAlignment="Center" />
         <Button Name="cancel_scan" Content="Cancel Scan Process" Width="120" Height="25" Margin="130,150,0,0" Click="cancel_scan_Click" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <TextBlock Text="Instruction Text 2" Height="45" Name="instructionblock2" Width="450" 
-                   HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="Black" FontSize="24" Visibility="Hidden" 
+        <TextBlock Text="Instruction Text 2" Height="45" Name="instructionblock2" 
+                   HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="White" Foreground="Black" FontSize="24" Visibility="Hidden" 
                    TextAlignment="Center" TextWrapping="WrapWithOverflow" />
         <TextBlock Height="93" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Name="instructionblock" 
                    Text="Please prepare patient for scanning " VerticalAlignment="Center" FontSize="32" Width="451" Foreground="Black" />

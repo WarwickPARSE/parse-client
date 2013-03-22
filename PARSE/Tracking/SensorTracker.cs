@@ -172,9 +172,14 @@ namespace PARSE.Tracking
 
         #endregion
 
-        /*
-         * Called whenever the frames are ready. When processed, calls frameReady for post-frame work & visualisation
-         */
+        
+        /// <summary>
+        /// Called whenever the frames are ready.
+        /// Processes the incoming frames using the RGBTracker.
+        /// When processed, calls frameReady for post-frame work & visualisation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="frames"></param>
         private void handleNewFrame(object sender, AllFramesReadyEventArgs frames)
         {
             //Console.WriteLine("Frame!");
@@ -235,7 +240,9 @@ namespace PARSE.Tracking
                     // Get the values
                     byte[] colorFrame2 = (byte[])thisColorFrame.Clone();
 
-                    tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle);
+                    new Thread(() =>
+                        tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle)
+                    ).Start();
 
                     Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
@@ -277,6 +284,9 @@ namespace PARSE.Tracking
             }
         }
 
+        /// <summary>
+        /// Called at the end of handleNewFrame if frames have been processed, to coordinate all post-processing activity (timers, visualisations, etc.)
+        /// </summary>
         private void frameReady()
         {
             //Console.WriteLine("Frame ready running");
@@ -297,6 +307,9 @@ namespace PARSE.Tracking
                 
         }
 
+        /// <summary>
+        /// Call the highlighter, choose what text to display, and convert the byte[] image to a bitmap for display
+        /// </summary>
         private void updateVisualisation()
         {
             //Console.WriteLine("Updating visualisation!");
@@ -319,7 +332,8 @@ namespace PARSE.Tracking
             // If not enough skeletons, not enough people. Wait for them!
             if (activeSkeletons < 2)
             {
-                this.displayText.Text = "Waiting for doctor and patient";
+                if (!this.displayText.Text.Contains("Waiting for doctor and patient"))
+                    this.displayText.Text = "Waiting for doctor and patient";
             }
             // If enough people (exactly)...
             else if (activeSkeletons == 2)
@@ -334,12 +348,12 @@ namespace PARSE.Tracking
                 {
                     if ((capture_timer_length - captureTimer) < 11)
                     {
-                        this.displayText.FontSize = Math.Max(4 * captureTimer, this.displayText.FontSize);
+                        //this.displayText.FontSize = Math.Max(4 * captureTimer, this.displayText.FontSize);
                         this.displayText.Text = (capture_timer_length - captureTimer).ToString();
                     }
                     else
                     {
-                        this.displayText.FontSize = 16;
+                        //this.displayText.FontSize = 16;
                         this.displayText.Text = "Waiting...";
                     }
                 }
@@ -359,6 +373,9 @@ namespace PARSE.Tracking
             Visualisation.Source = VisualisationOutput;
         }
 
+        /// <summary>
+        /// Update the timer, which counts down to the capture event
+        /// </summary>
         private void updateCaptureTimer()
         {
             // If mode is new scan
@@ -373,13 +390,20 @@ namespace PARSE.Tracking
                 // If the scanner hasn't moved too much, and there are still two skeletons in the frame!
                 if ((this.dx < 10 & this.dy < 10 & this.x != 0 & this.y != 0)
                     &&
-                    //(skeletonFrame != null)
-                    //&&
                      (temp_activeSkeletons == 2)
                     )
+                {
                     this.captureTimer++;
+                    int remaining = this.capture_timer_length - this.captureTimer;
+                    if (remaining < 10)
+                        this.displayText.Text = "Capture in: " + remaining;
+                    else
+                        this.displayText.Text = "Hold sensor still to capture";
+                }
                 else
+                {
                     this.captureTimer = 0;
+                }
 
             }
             else
@@ -395,7 +419,10 @@ namespace PARSE.Tracking
             }
 
         }
-
+        
+        /// <summary>
+        /// Identify the skeletons in the image as patient & doctor, by finding the sensor
+        /// </summary>
         private void identifySkeletons()
         {
             System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
@@ -452,9 +479,15 @@ namespace PARSE.Tracking
                     // If we find a patient, set skeletonsIdentified
                     if (patientID != -1)
                     {
-                        skeletonsIdentified = true;
-                        this.displayText.Text = "Doctor and patient identified!";
-                        System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID + ", and patient as ID: " + patientID);
+                        lock (this)
+                        {
+                            skeletonsIdentified = true;
+                            this.displayText.Text = "Doctor and patient identified!";
+                            System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID + ", and patient as ID: " + patientID);
+
+                            doctorSkeletonID = (byte)doctorID;
+                            patientSkeletonID = (byte)patientID;
+                        }
                     }
                 }
                 else if (doctorID == -1)
@@ -462,24 +495,29 @@ namespace PARSE.Tracking
                     System.Diagnostics.Debug.WriteLine("Sensor tracker could not identify the doctor");
                     if (x == 0 || y == 0)
                     {
-                        this.displayText.Text = "The sensor tracker is looking for the sensor...";
+                        //this.displayText.Text = "The sensor tracker is looking for the sensor...";
                         System.Diagnostics.Debug.WriteLine("This could be because the sensor has not yet been located");
                     }
                 }
                 else if (distance >= 30)
                 {
-                    this.displayText.Text = "Sensor found, but not close enough to a hand";
+                    //this.displayText.Text = "Sensor found, but not close enough to a hand";
                     System.Diagnostics.Debug.WriteLine("Sensor found, but not close enough to a hand");
                 }
             }
             else
             {
-                this.displayText.Text = "There are not 2 skeletons in the frame";
+                this.displayText.Text = "Waiting for doctor and patient - there are not 2 people in the frame";
                 System.Diagnostics.Debug.WriteLine("There are not 2 skeletons in the frame.");
                 return;
             }
         }
 
+        /// <summary>
+        /// Highlight the sensor in the visualisation, if it has been found
+        /// </summary>
+        /// <param name="posX"></param>
+        /// <param name="posY"></param>
         private void highlightSensor(int posX, int posY)
         {
             // No position? Don't highlight!
@@ -517,14 +555,17 @@ namespace PARSE.Tracking
             }
         }
 
-        /*
-         * Take the x, y, z, angles, depthframe & skeletonframe and convert to a skeleton-relative position.
-         */
+        /// <summary>
+        /// Take the x, y, z, angles, depthframe & skeletonframe and convert to a skeleton-relative position.
+        /// </summary>
         private void capturePosition()
         {
             Console.WriteLine("Capture position!!!");
         }
 
+        /// <summary>
+        /// Call whatever is supposed to happen on the capture event
+        /// </summary>
         private void capture()
         {
             capturePosition();
