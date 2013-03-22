@@ -59,6 +59,7 @@ namespace PARSE
         //point cloud lists for visualisation
         private List<PointCloud>            pcdl;
         private PointCloud                  pcd;
+        private String                      filename;
 
         //a stitcher
         private Stitcher                    stitcher; 
@@ -448,9 +449,48 @@ namespace PARSE
             this.measurement.IsEnabled = true;
 
             this.shutAnyWindows();
-            windowScanner = new ScanLoader(pcdl);
+
+            windowScanner = new ScanLoader();
             windowScanner.Owner = this;
-            windowScanner.Show();
+
+            // Do UI stuff on UI thread
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.removefloor.IsEnabled = true;
+
+            //define
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
+
+            // Background thread to get all the heavy computation off of the UI thread
+            BackgroundWorker B = new BackgroundWorker();
+            B.DoWork += new DoWorkEventHandler(loadScanThread);
+
+            // Catch the progress update events
+            B.WorkerReportsProgress = true;
+            B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
+            {
+                windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
+                if (args.UserState != null)
+                {
+                    if (args.UserState is string)
+                    {
+                        System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                    }
+                    else if (args.UserState is Action)
+                    {
+                        ((Action)args.UserState)();
+                    }
+                }
+            });
+            B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
+            {
+                windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+            });
+
+            // GOOO!!! Pass the file name so it can be loaded
+            B.RunWorkerAsync(filename);
+
         }
 
         private void OpenDebug_Click(object sender, RoutedEventArgs e)
@@ -478,12 +518,20 @@ namespace PARSE
         private void loadScanThread(Object sender, DoWorkEventArgs e)
         {
             // Cast object back into BackgroundWorker
+
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
             ScanSerializer.deserialize((string)e.Argument);
+
+            System.Diagnostics.Debug.WriteLine(e.Argument);
+
             B.ReportProgress(8, "Model deserialised");
+
             pcdl = ScanSerializer.depthPc;
+
+            System.Diagnostics.Debug.WriteLine(pcdl.Count);
+
             B.ReportProgress(2, "Model loaded");
 
             /*2)*/
@@ -605,7 +653,7 @@ namespace PARSE
                 dlg.DefaultExt = ".PARSE";
                 dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
 
-                String filename = "";
+                filename = "";
 
                 if (dlg.ShowDialog() == true)
                 {
@@ -666,8 +714,7 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine(err.ToString());
             }
         }
-        
-        
+       
        
     }
 }
