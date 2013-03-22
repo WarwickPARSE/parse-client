@@ -25,7 +25,7 @@
         <!--Menu definition-->
         <MenuItem Header="_File">
             <MenuItem Header="_New Patient" IsCheckable="false"/>
-            <MenuItem Header="_Open Patient" />
+            <MenuItem Header="_Open Patient (Greg ;))" Click="OpenPatient_Click" />
             <MenuItem Header="_Save Patient" />
             <Separator/>
             <MenuItem Header="Exit" Click="MenuItem_Exit"/>

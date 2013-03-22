@@ -58,7 +58,7 @@ namespace PARSE
 
             //enable/disable appropriate controls
             this.patientIDText.IsEnabled = false;
-            this.patientIDText.Text = (getID.getLastPatientID()+1).ToString();
+            //this.patientIDText.Text = (getID.getLastPatientID()+1).ToString();
         }
 
         private void PatientLoaderExisting_Loaded(object Sender, RoutedEventArgs e)
@@ -66,7 +66,7 @@ namespace PARSE
             //TODO: This will eventually be given the relevant select query from the database call.
             this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             Selection select = db.selectQueries;
-            currentID = select.getLastPatientID();
+            //currentID = select.getLastPatientID();
 
             //hide existing patient labels
             this.patientIDExisting.Visibility = Visibility.Visible;
@@ -89,35 +89,28 @@ namespace PARSE
             this.proceedCon.Content = "Edit Details";
 
             //Select patient information provided by id (to be added)
-            try
+
+            select = db.selectQueries;
+
+            //dbReceiver = select.SelectPatientInformation(currentID);
+            this.label1.Content = dbReceiver[1];
+            this.patientEntryStatus.Text = "Patients database: " + db.con.ConnectionString;
+
+            for (int item = 0; item < dbReceiver.Length; item++)
             {
-
-                select = db.selectQueries;
-
-                dbReceiver = select.SelectPatientInformation(currentID);
-                this.label1.Content = dbReceiver[1];
-                this.patientEntryStatus.Text = "Patients database: " + db.con.ConnectionString;
-
-                for (int item = 0; item < dbReceiver.Length; item++)
+                switch (item)
                 {
-                    switch (item)
-                    {
-                        case 0: this.patientIDExisting.Content = dbReceiver[item]; break;
-                        case 1: this.patientNameExisting.Content = dbReceiver[item]; break;
-                        case 2: this.patientDOBExisting.Content = Convert.ToString(dbReceiver[item]); break;
-                        case 3: this.patientNationalityExisting.Content = dbReceiver[item]; break;
-                        case 4: this.patientNhsNoExisting.Content = dbReceiver[item]; break;
-                        case 5: this.patientAddressExisting.Text = dbReceiver[item].ToString(); break;
-                        case 6: this.patientweightExisting.Content = dbReceiver[item]; break;
-                    }
+                    case 0: this.patientIDExisting.Content = dbReceiver[item]; break;
+                    case 1: this.patientNameExisting.Content = dbReceiver[item]; break;
+                    case 2: this.patientDOBExisting.Content = Convert.ToString(dbReceiver[item]); break;
+                    case 3: this.patientNationalityExisting.Content = dbReceiver[item]; break;
+                    case 4: this.patientNhsNoExisting.Content = dbReceiver[item]; break;
+                    case 5: this.patientAddressExisting.Text = dbReceiver[item].ToString(); break;
+                    case 6: this.patientweightExisting.Content = dbReceiver[item]; break;
                 }
-
-            catch (Exception err)
-            {
-
-                System.Diagnostics.Debug.WriteLine(err.ToString());
-
             }
+
+
         }
 
         void NewScan_Click(Object sender, RoutedEventArgs e)
@@ -190,10 +183,10 @@ namespace PARSE
                 this.addressText.Document.ContentEnd
             );
 
-            insertPatient.InsertPatientInformation(0, this.nameText.Text, this.dobText.Text, this.nationalityText.Text, Convert.ToInt32(this.nhsNoText.Text), textRange.Text, this.weightText.Text);
+            //insertPatient.InsertPatientInformation(0, this.nameText.Text, this.dobText.Text, this.nationalityText.Text, Convert.ToInt32(this.nhsNoText.Text), textRange.Text, this.weightText.Text);
 
             //We then need to get back the id of the recorded inserted so it can be stored on a volatile basis.
-            currentID = getID.getLastPatientID();
+            //currentID = getID.getLastPatientID();
 
             db.con.Close();
 

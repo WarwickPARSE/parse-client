@@ -37,9 +37,9 @@ namespace PARSE
 
             Selection patients = db.selectQueries;
 
-            patientslist = patients.SelectAllPatients();
+            //patientslist = patients.SelectAllPatients();
             
-            System.Diagnostics.Debug.WriteLine(patientslist[0]);
+            //System.Diagnostics.Debug.WriteLine(patientslist[0]);
 
         }
     }

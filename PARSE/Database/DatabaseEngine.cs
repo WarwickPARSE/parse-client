@@ -46,11 +46,11 @@ namespace PARSE
         //Insert methods for all tables
 
         //Type 1 = tables that need a specialised query
-        public void insertPatientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void insertPatientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
         {
             dbOpen();
 
-            insertQueries.patientInformation(name, dateOfBirth, nationality, nhsNo, address);
+            insertQueries.patientInformation(name, dateOfBirth, nationality, nhsNo, address, weight);
 
             dbClose();
         }
@@ -241,7 +241,7 @@ namespace PARSE
 
         //Insertion Queries for Type 1 tables
 
-        public void patientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void patientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();

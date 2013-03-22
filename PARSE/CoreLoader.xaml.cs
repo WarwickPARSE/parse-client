@@ -137,8 +137,6 @@ namespace PARSE
 
             verno.Content = "Version no: " + version;
 
-            db.con.Close();
-
         }
 
         public void setPC(PointCloud pc, List<PointCloud> pcl)
@@ -475,79 +473,6 @@ namespace PARSE
             windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             windowMeta.Show();
 
-            try
-            {
-                /*0)*/
-                //this.kinectInterp.stopStreams();
-                this.shutAnyWindows();
-                this.resetButtons();
-
-                /*1)*/
-                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-                dlg.DefaultExt = ".PARSE";
-                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
-
-                String filename = "";
-
-                if (dlg.ShowDialog() == true)
-                {
-                    filename = dlg.FileName;
-                }
-
-                if ((filename == null) || (dlg.FileName.Length == 0))
-                {
-
-                    return;
-                }
-
-                // Show the window first - keep UI speedy!
-                System.Diagnostics.Debug.WriteLine("Showing window");
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-
-                // Do UI stuff on UI thread
-                this.export1.IsEnabled = false;
-                this.export2.IsEnabled = false;
-                this.removefloor.IsEnabled = true;
-
-                //define
-                windowHistory = new HistoryLoader();
-                windowHistory.Owner = this;
-
-                // Background thread to get all the heavy computation off of the UI thread
-                BackgroundWorker B = new BackgroundWorker();
-                B.DoWork += new DoWorkEventHandler(loadScanThread);
-
-                // Catch the progress update events
-                B.WorkerReportsProgress = true;
-                B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
-                    {
-                        windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
-                        if (args.UserState != null)
-                        {
-                            if (args.UserState is string)
-                            {
-                                System.Diagnostics.Debug.WriteLine((string)args.UserState);
-                            }
-                            else if (args.UserState is Action)
-                            {
-                                ((Action)args.UserState)();
-                            }
-                        }
-                    });
-                B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
-                {
-                    windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
-                });
-
-                // GOOO!!! Pass the file name so it can be loaded
-                B.RunWorkerAsync(filename);
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err.ToString());
-            }
-
         }
 
         private void loadScanThread(Object sender, DoWorkEventArgs e)
@@ -657,6 +582,89 @@ namespace PARSE
             //kinectInterp.stopStreams();
             //kinectInterp.kinectSensor.Stop();
             Environment.Exit(0);
+        }
+
+        private void OpenPatient_Click(object sender, RoutedEventArgs e)
+        {
+            /*Automates the following procedure:
+                * 0) kills kinect, closes any viewer, resets buttons
+                * 1) adds selected point cloud to visualiser
+                * 2) groups it
+                * 3) calcs height
+                */
+
+            try
+            {
+                /*0)*/
+                //this.kinectInterp.stopStreams();
+                this.shutAnyWindows();
+                this.resetButtons();
+
+                /*1)*/
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                dlg.DefaultExt = ".PARSE";
+                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+                String filename = "";
+
+                if (dlg.ShowDialog() == true)
+                {
+                    filename = dlg.FileName;
+                }
+
+                if ((filename == null) || (dlg.FileName.Length == 0))
+                {
+
+                    return;
+                }
+
+                // Show the window first - keep UI speedy!
+                System.Diagnostics.Debug.WriteLine("Showing window");
+                windowScanner = new ScanLoader();
+                windowScanner.Owner = this;
+
+                // Do UI stuff on UI thread
+                this.export1.IsEnabled = false;
+                this.export2.IsEnabled = false;
+                this.removefloor.IsEnabled = true;
+
+                //define
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+
+                // Background thread to get all the heavy computation off of the UI thread
+                BackgroundWorker B = new BackgroundWorker();
+                B.DoWork += new DoWorkEventHandler(loadScanThread);
+
+                // Catch the progress update events
+                B.WorkerReportsProgress = true;
+                B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
+                {
+                    windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
+                    if (args.UserState != null)
+                    {
+                        if (args.UserState is string)
+                        {
+                            System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                        }
+                        else if (args.UserState is Action)
+                        {
+                            ((Action)args.UserState)();
+                        }
+                    }
+                });
+                B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
+                {
+                    windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+                });
+
+                // GOOO!!! Pass the file name so it can be loaded
+                B.RunWorkerAsync(filename);
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.ToString());
+            }
         }
         
         
