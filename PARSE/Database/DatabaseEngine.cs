@@ -20,7 +20,7 @@ namespace PARSE
             this.selectQueries = new Selection(this.con);
         }
 
-        private void dbOpen()
+        public void dbOpen()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace PARSE
             }
         }
 
-        private void dbClose()
+        public void dbClose()
         {
             con.Close();
 
@@ -50,7 +50,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.patientInformation(name, dateOfBirth, nationality, nhsNo, address, weight);
+            Insertion ins = new Insertion(con);
+
+            ins.patientInformation(name, dateOfBirth, nationality, nhsNo, address, weight);
 
             dbClose();
         }
@@ -149,15 +151,28 @@ namespace PARSE
         // 1) select all patients (patientID and name)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllPatients()
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patients = selectQueries.AllPatients();
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patients = null;
+            Selection sr = new Selection(con);
+
+            try
+            {
+                patients = sr.AllPatients();
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine("Error is occuring here");
+            }
 
             return patients;
         }
 
         // 2) select patient information
-        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> patientInfo = selectQueries.PatientInformation("patientID", patientID.ToString());
+
+            Selection sr = new Selection(con);
+
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> patientInfo = sr.PatientInformation("patientID", patientID.ToString());
 
             return patientInfo;
         }
@@ -366,6 +381,7 @@ namespace PARSE
         //selecting all patients
         public Tuple<LinkedList<int>,LinkedList<String>,LinkedList<String>> AllPatients()
         {
+
             LinkedList<int> ids = new LinkedList<int>();
             LinkedList<String> names = new LinkedList<String>();
             LinkedList<String> nhsNos = new LinkedList<String>();
@@ -413,7 +429,7 @@ namespace PARSE
         //table type 1 queries
 
         //patient information
-        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> PatientInformation(String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> PatientInformation(String colName, String criterion)
         {
             LinkedList<int> patientID = new LinkedList<int>();
             LinkedList<String> name = new LinkedList<String>();
@@ -421,12 +437,11 @@ namespace PARSE
             LinkedList<String> nationality = new LinkedList<String>();
             LinkedList<String> nhsNo = new LinkedList<String>();
             LinkedList<String> address = new LinkedList<String>();
+            LinkedList<String> weight = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT * FROM PatientInformation WHERE @ColName LIKE @Criterion";
+            selectQuery.CommandText = "SELECT * FROM PatientInformation WHERE patientID = " + criterion;
             selectQuery.Parameters.Clear();
-            selectQuery.Parameters.Add("@ColName", colName);
-            selectQuery.Parameters.Add("@Criterion", criterion);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
@@ -436,10 +451,11 @@ namespace PARSE
                 nationality.AddLast(reader.GetString(3));
                 nhsNo.AddLast(reader.GetString(4));
                 address.AddLast(reader.GetString(5));
+                weight.AddLast(reader.GetString(6));
             }
             reader.Close();
 
-            return Tuple.Create(patientID, name, dob, nationality, nhsNo, address);
+            return Tuple.Create(patientID, name, dob, nationality, nhsNo, address, weight);
         }
 
         //scan location
