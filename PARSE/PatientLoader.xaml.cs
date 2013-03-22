@@ -82,7 +82,7 @@ namespace PARSE
             this.patientNationalityExisting.Visibility = Visibility.Visible;
             this.patientAddressExisting.Visibility = Visibility.Visible;
 
-            dbReceiver = select.SelectPatientInformation(1);
+            /*dbReceiver = select.SelectPatientInformation(1);
             this.label1.Content = dbReceiver[1];
             this.patientEntryStatus.Text = "Patients database: " + db.con.ConnectionString;
 
@@ -96,7 +96,7 @@ namespace PARSE
                     case 4: this.patientNhsNoExisting.Content = dbReceiver[item]; break;
                     case 5: this.patientAddressExisting.Text = dbReceiver[item].ToString(); break;
                 }
-            }
+            }*/
 
         }
 
