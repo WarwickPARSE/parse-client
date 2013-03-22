@@ -35,11 +35,29 @@ namespace PARSE
             /// Calls patient information records from the database
             /// </summary>
 
-            Selection patients = db.selectQueries;
+            db.dbOpen();
 
-            //patientslist = patients.SelectAllPatients();
-            
-            //System.Diagnostics.Debug.WriteLine(patientslist[0]);
+            //access all patients from database.
+            Tuple<LinkedList<int>,LinkedList<String>,LinkedList<string>> patientsList = db.getAllPatients();
+
+            LinkedListNode<int> nodeID = patientsList.Item1.First;
+            LinkedListNode<String> nodeName = patientsList.Item2.First;
+            LinkedListNode<String> nodeNHSNo = patientsList.Item3.First;
+
+            //populate datagrid
+
+            while (nodeID != null)
+            {
+                var nextID = nodeID.Next;
+                var nextName = nodeName.Next;
+                var nextNHSNo = nodeNHSNo.Next;
+
+                listBox1.Items.Add(new { Id = patientsList.Item1.Remove(nodeID), Patientname = patientsList.Item2.Remove(nodeName), Patientnhsno = patientsList.Item3.Remove(nodeNHSNo) } );
+
+                nodeID = nextID;
+                nodeName = nextName;
+                nodeNHSNo = nextNHSNo;
+            }
 
         }
     }
