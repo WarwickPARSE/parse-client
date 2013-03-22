@@ -71,13 +71,14 @@ namespace PARSE
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
-            this.instructionblock.Visibility = Visibility.Collapsed;
-            this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+            this.instructionblock.Visibility = Visibility.Visible;
+            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
 
             this.Show();
 
             //wantKinect = true; // Nathan changed this
-            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
+            
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             db = new DatabaseEngine();
             hitState = 0;
@@ -185,6 +186,8 @@ namespace PARSE
             {
                 kinectInterp.stopStreams();
             }
+
+            System.Diagnostics.Debug.WriteLine("Scan loader loading complete");
           
         }
 
@@ -204,6 +207,20 @@ namespace PARSE
             }
             
             //init kinect
+
+            //start scanning procedure
+            kinectInterp = new KinectInterpreter(skeloutline);
+
+            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
+            if (!wantKinect)
+            {
+                kinectInterp.stopStreams();
+            }
+
             if (!this.kinectInterp.isDepthEnabled())
             {
                 this.kinectInterp.startDepthStream();
