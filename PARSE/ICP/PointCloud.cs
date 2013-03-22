@@ -159,6 +159,11 @@ namespace PARSE
             double[] pointMin = { points[0], points[1], points[2] };
             double[] pointMax = { points[3], points[4], points[5] };
 
+            System.Diagnostics.Debug.WriteLine("Limb Min: " + points[0] + " " + points[1] + " " + points[2]);
+            System.Diagnostics.Debug.WriteLine("PC Min: " + this.minx + " " + this.miny + " " + this.minz);
+            System.Diagnostics.Debug.WriteLine("Limb Max: " + points[3] + " " + points[4] + " " + points[5]);
+            System.Diagnostics.Debug.WriteLine("PC Max: " + this.maxx + " " + this.maxy + " " + this.maxz);
+
             Object[] temp = this.points.range(pointMin, pointMax);
 
             List<Point3D> output = new List<Point3D>();
@@ -167,6 +172,8 @@ namespace PARSE
             }
 
             PointCloud pc = new PointCloud(output);
+
+            System.Diagnostics.Debug.WriteLine(pc.getAllPoints().Length);
 
             return pc;
         }

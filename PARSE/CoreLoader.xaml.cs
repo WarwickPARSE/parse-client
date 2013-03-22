@@ -22,8 +22,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Reflection;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+
 //Kinect imports
 using Microsoft.Kinect;
 using PARSE.ICP;
@@ -54,16 +56,10 @@ namespace PARSE
         private KinectInterpreter           kinectInterp;
         private System.Threading.Timer      kinectCheck;
 
-        //Image recognition specific definitions
-        private bool                        capturedModel;
-        private BitmapSource                modelimage;
-        private bool                        capturedObject;
-        private BitmapSource                objectimage;
-        private int                         countdown;
-
         //point cloud lists for visualisation
         private List<PointCloud>            pcdl;
         private PointCloud                  pcd;
+        private String                      filename;
 
         //a stitcher
         private Stitcher                    stitcher; 
@@ -74,10 +70,11 @@ namespace PARSE
         //prevents crashing on adjustment
         private Boolean kinectMovingLock = false;
 
+        //database engine
+        DatabaseEngine db;
+
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
-        //optimum distance for scanner
-
 
         public CoreLoader()
         {
@@ -85,7 +82,7 @@ namespace PARSE
             InitializeComponent();
 
             //Initialize Database
-            DatabaseEngine db = new DatabaseEngine();
+            db = new DatabaseEngine();
 
             //Initialize KinectInterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
@@ -105,7 +102,7 @@ namespace PARSE
         }
 
         /// <summary>
-        /// WPF Form Methods
+        /// window_loaded
         /// </summary>
         /// <param name="sender">originator of event</param>
         /// <param name="e">event identifier</param>
@@ -116,9 +113,11 @@ namespace PARSE
             windowDebug = new DebugLoader();
             windowDebug.Owner = this;
             
+            //output to debug window
             windowDebug.sendMessageToOutput("Status", "Welcome to the PARSE Toolkit");
             windowDebug.sendMessageToOutput("Status", "Initializing Kinect Device");
             
+            //check kinect sensors
             if (KinectSensor.KinectSensors.Count>0)
                 {
                     windowDebug.sendMessageToOutput("Status", "Kinect found and online - " + KinectSensor.KinectSensors[0].DeviceConnectionId);
@@ -131,6 +130,14 @@ namespace PARSE
                     //Check for kinect connection periodically
                     kinectCheck = new System.Threading.Timer(checkKinectConnection, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
                 }
+
+            //get version number
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+
+            verno.Content = "Version no: " + version;
+
         }
 
         public void setPC(PointCloud pc, List<PointCloud> pcl)
@@ -271,7 +278,7 @@ namespace PARSE
             this.export2.IsEnabled = false;
             this.measurement.IsEnabled = true;
             this.removefloor.IsEnabled = false;
-            this.calculate.IsEnabled = false;
+            //this.calculate.IsEnabled = false;
         }
         
         private void NewScan_Click(object sender, RoutedEventArgs e)
@@ -321,14 +328,19 @@ namespace PARSE
         {
 
             /*gets all the planes by calling volume calculator*/
-            if (pcd!=null)
+            if (pcd != null)
             {
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
+                /*Requires generated model, raw depth array and previous*/
+                windowScanner.determineLimb(pcd);
             }
-
-            /*Requires generated model, raw depth array and previous*/
-            windowScanner.determineLimb(pcd);
+            else
+            {
+                HistoryLoader windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+                windowHistory.Show();
+            }
 
         }
 
@@ -437,9 +449,48 @@ namespace PARSE
             this.measurement.IsEnabled = true;
 
             this.shutAnyWindows();
-            windowScanner = new ScanLoader(pcdl);
+
+            windowScanner = new ScanLoader();
             windowScanner.Owner = this;
-            windowScanner.Show();
+
+            // Do UI stuff on UI thread
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = false;
+            this.removefloor.IsEnabled = true;
+
+            //define
+            windowHistory = new HistoryLoader();
+            windowHistory.Owner = this;
+
+            // Background thread to get all the heavy computation off of the UI thread
+            BackgroundWorker B = new BackgroundWorker();
+            B.DoWork += new DoWorkEventHandler(loadScanThread);
+
+            // Catch the progress update events
+            B.WorkerReportsProgress = true;
+            B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
+            {
+                windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
+                if (args.UserState != null)
+                {
+                    if (args.UserState is string)
+                    {
+                        System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                    }
+                    else if (args.UserState is Action)
+                    {
+                        ((Action)args.UserState)();
+                    }
+                }
+            });
+            B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
+            {
+                windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+            });
+
+            // GOOO!!! Pass the file name so it can be loaded
+            B.RunWorkerAsync(filename);
+
         }
 
         private void OpenDebug_Click(object sender, RoutedEventArgs e)
@@ -456,89 +507,31 @@ namespace PARSE
              * 3) calcs height
              */
 
-            try
-            {
-                /*0)*/
-                //this.kinectInterp.stopStreams();
-                this.shutAnyWindows();
-                this.resetButtons();
+            //Load metaloader with list of currently recorded patients provide the option to just load point cloud if required.
 
-                /*1)*/
-                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-                dlg.DefaultExt = ".PARSE";
-                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+            MetaLoader windowMeta = new MetaLoader();
+            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            windowMeta.Show();
 
-                String filename = "";
-
-                if (dlg.ShowDialog() == true)
-                {
-                    filename = dlg.FileName;
-                }
-
-                if ((filename == null) || (dlg.FileName.Length == 0))
-                {
-
-                    return;
-                }
-
-                // Show the window first - keep UI speedy!
-                System.Diagnostics.Debug.WriteLine("Showing window");
-                windowScanner = new ScanLoader();
-                windowScanner.Owner = this;
-
-                // Do UI stuff on UI thread
-                this.export1.IsEnabled = false;
-                this.export2.IsEnabled = false;
-                this.removefloor.IsEnabled = true;
-
-                //define
-                windowHistory = new HistoryLoader();
-                windowHistory.Owner = this;
-
-                // Background thread to get all the heavy computation off of the UI thread
-                BackgroundWorker B = new BackgroundWorker();
-                B.DoWork += new DoWorkEventHandler(loadScanThread);
-
-                // Catch the progress update events
-                B.WorkerReportsProgress = true;
-                B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
-                    {
-                        windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
-                        if (args.UserState != null)
-                        {
-                            if (args.UserState is string)
-                            {
-                                System.Diagnostics.Debug.WriteLine((string)args.UserState);
-                            }
-                            else if (args.UserState is Action)
-                            {
-                                ((Action)args.UserState)();
-                            }
-                        }
-                    });
-                B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
-                {
-                    windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
-                });
-
-                // GOOO!!! Pass the file name so it can be loaded
-                B.RunWorkerAsync(filename);
-            }
-            catch (Exception exc)
-            {
-
-            }
         }
 
         private void loadScanThread(Object sender, DoWorkEventArgs e)
         {
             // Cast object back into BackgroundWorker
+
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
             ScanSerializer.deserialize((string)e.Argument);
+
+            System.Diagnostics.Debug.WriteLine(e.Argument);
+
             B.ReportProgress(8, "Model deserialised");
+
             pcdl = ScanSerializer.depthPc;
+
+            System.Diagnostics.Debug.WriteLine(pcdl.Count);
+
             B.ReportProgress(2, "Model loaded");
 
             /*2)*/
@@ -585,9 +578,11 @@ namespace PARSE
         {
             //open patient detail viewer
             this.shutAnyWindows();
-            windowPatient = new PatientLoader(true);
+            windowPatient = new PatientLoader(false);
             windowPatient.Owner = this;
             windowPatient.Show();
+            ApplyBlur(this);
+            windowPatient.Closed += new EventHandler(RemoveBlur_Closed);
         }
 
         private void checkKinectConnection(object state)
@@ -613,14 +608,113 @@ namespace PARSE
             return false;
         }
 
+        private void ApplyBlur(Window window)
+        {
+            //applies blur to windows not in the foreground as and when appropriate.
+
+            System.Windows.Media.Effects.BlurEffect windowBlur = new System.Windows.Media.Effects.BlurEffect();
+            windowBlur.Radius = 4;
+            window.Effect = windowBlur;
+
+        }
+
+        private void RemoveBlur_Closed(object sender, EventArgs e)
+        {
+
+            this.Effect = null;
+
+        }
+
         void MenuItem_Exit(object sender, RoutedEventArgs e)
         {
             //kinectInterp.stopStreams();
             //kinectInterp.kinectSensor.Stop();
             Environment.Exit(0);
         }
-        
-        
+
+        private void OpenPatient_Click(object sender, RoutedEventArgs e)
+        {
+            /*Automates the following procedure:
+                * 0) kills kinect, closes any viewer, resets buttons
+                * 1) adds selected point cloud to visualiser
+                * 2) groups it
+                * 3) calcs height
+                */
+
+            try
+            {
+                /*0)*/
+                //this.kinectInterp.stopStreams();
+                this.shutAnyWindows();
+                this.resetButtons();
+
+                /*1)*/
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                dlg.DefaultExt = ".PARSE";
+                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+                filename = "";
+
+                if (dlg.ShowDialog() == true)
+                {
+                    filename = dlg.FileName;
+                }
+
+                if ((filename == null) || (dlg.FileName.Length == 0))
+                {
+
+                    return;
+                }
+
+                // Show the window first - keep UI speedy!
+                System.Diagnostics.Debug.WriteLine("Showing window");
+                windowScanner = new ScanLoader();
+                windowScanner.Owner = this;
+
+                // Do UI stuff on UI thread
+                this.export1.IsEnabled = false;
+                this.export2.IsEnabled = false;
+                this.removefloor.IsEnabled = true;
+
+                //define
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+
+                // Background thread to get all the heavy computation off of the UI thread
+                BackgroundWorker B = new BackgroundWorker();
+                B.DoWork += new DoWorkEventHandler(loadScanThread);
+
+                // Catch the progress update events
+                B.WorkerReportsProgress = true;
+                B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
+                {
+                    windowScanner.loadingwidgetcontrol.UpdateProgressBy(args.ProgressPercentage);
+                    if (args.UserState != null)
+                    {
+                        if (args.UserState is string)
+                        {
+                            System.Diagnostics.Debug.WriteLine((string)args.UserState);
+                        }
+                        else if (args.UserState is Action)
+                        {
+                            ((Action)args.UserState)();
+                        }
+                    }
+                });
+                B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
+                {
+                    windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+                });
+
+                // GOOO!!! Pass the file name so it can be loaded
+                B.RunWorkerAsync(filename);
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.ToString());
+            }
+        }
+       
        
     }
 }

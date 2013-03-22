@@ -312,65 +312,85 @@ namespace PARSE.Tracking
         /// </summary>
         private void updateVisualisation()
         {
-            //Console.WriteLine("Updating visualisation!");
-            bool display = true;
+            Console.WriteLine("Capture position!!!");
+
+            Skeleton[] frame;
+            Skeleton patient = new Skeleton();
+
             lock (this)
             {
-                if (tracking)
-                    display = true;
-                else
-                    display = false;
+                frame = skeletonFrame;
             }
 
-            if (display)
-            {
-                highlightSensor(this.x, this.y);
-            }
+            for (int index = 0; index < frame.Length; index++)
+                if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
+                {
+                    if (frame[index].TrackingId == patientSkeletonID)
+                        patient = frame[index];
+                }
 
-            // Update text!
-
-            // If not enough skeletons, not enough people. Wait for them!
-            if (activeSkeletons < 2)
+            SkeletonPosition skeletonPosition = new SkeletonPosition(patient, this.x, this.y, this.angleXY, this.angleZ);
             {
+                //Console.WriteLine("Updating visualisation!");
+                bool display = true;
+                lock (this)
+                {
+                    if (tracking)
+                        display = true;
+                    else
+                        display = false;
+                }
+
+                if (display)
+                {
+                    highlightSensor(this.x, this.y);
+                }
+
+                // Update text!
+
+                // If not enough skeletons, not enough people. Wait for them!
+                if (activeSkeletons < 2)
+                {
                 if (!this.displayText.Text.Contains("Waiting for doctor and patient"))
                     this.displayText.Text = "Waiting for doctor and patient";
-            }
-            // If enough people (exactly)...
-            else if (activeSkeletons == 2)
-            {
-                // Wait to identify the doctor/patient by finding the scanner
-                if (!skeletonsIdentified)
-                {
-                    this.displayText.Text = "Identifying doctor & searching for scanner";
                 }
-                // Display timer as all is going so well
-                else
+                // If enough people (exactly)...
+                else if (activeSkeletons == 2)
                 {
-                    if ((capture_timer_length - captureTimer) < 11)
+                    // Wait to identify the doctor/patient by finding the scanner
+                    if (!skeletonsIdentified)
                     {
-                        //this.displayText.FontSize = Math.Max(4 * captureTimer, this.displayText.FontSize);
-                        this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        this.displayText.Text = "Identifying doctor & searching for scanner";
                     }
+                    // Display timer as all is going so well
                     else
                     {
+                        if ((capture_timer_length - captureTimer) < 11)
+                        {
+                        //this.displayText.FontSize = Math.Max(4 * captureTimer, this.displayText.FontSize);
+                            this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        }
+                        else
+                        {
                         //this.displayText.FontSize = 16;
-                        this.displayText.Text = "Waiting...";
+                            this.displayText.Text = "Waiting...";
+                        }
                     }
+
                 }
 
+                // Output processed image
+                if (VisualisationOutput == null)
+                    VisualisationOutput = new WriteableBitmap(640, 480, 90, 90, PixelFormats.Bgr32, null);
+
+                this.VisualisationOutput.WritePixels(
+                    new Int32Rect(0, 0, 640, 480),
+                    colorFrame,
+                    640 * Bgr32BytesPerPixel,
+                    0);
+
+                Visualisation.Source = VisualisationOutput;
             }
-
-            // Output processed image
-            if (VisualisationOutput == null)
-                VisualisationOutput = new WriteableBitmap(640, 480, 90, 90, PixelFormats.Bgr32, null);
-
-            this.VisualisationOutput.WritePixels(
-                new Int32Rect(0, 0, 640, 480),
-                colorFrame,
-                640 * Bgr32BytesPerPixel,
-                0);
-
-            Visualisation.Source = VisualisationOutput;
         }
 
         /// <summary>
@@ -500,6 +520,10 @@ namespace PARSE.Tracking
                     }
                 }
                 else if (distance >= 30)
+                for (int index = 0; index < frame.Length; index ++)
+                    if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
+                        if (frame[index].TrackingId != doctorID)
+                            patientSkeletonID = (byte)frame[index].TrackingId;
                 {
                     //this.displayText.Text = "Sensor found, but not close enough to a hand";
                     System.Diagnostics.Debug.WriteLine("Sensor found, but not close enough to a hand");
