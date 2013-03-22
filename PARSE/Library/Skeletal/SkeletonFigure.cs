@@ -50,14 +50,18 @@ namespace PARSE
 
         public ActivityState Status { get; set; }
 
-        public SkeletonFigure(Canvas c)
+        private Brush color;
+
+        public SkeletonFigure(Canvas c, Brush color)
         {
             this.canvas = c;
             this.canvas.Height = 426;
             this.canvas.Width = 543;
 
-            InitJoints();
-            InitBones();
+            this.color = color;
+
+            InitJoints(color);
+            InitBones(color);
         }
 
         public void Erase()
@@ -77,14 +81,22 @@ namespace PARSE
             Bones.Clear();
         }
 
+        public void setColor(Brush c)
+        {
+            this.color = c;
+            this.Erase();
+            InitJoints(color);
+            InitBones(color);
+        }
+        
         public void Update(JointType jointType, Point point, float distance = 2.0f)
         {
             instruction = "Move your arms into a horizontal position";
 
             if (Status == ActivityState.Erased)
             {
-                InitJoints();
-                InitBones();
+                InitJoints(color);
+                InitBones(color);
             }
 
             var ellipse = Joints[jointType];
@@ -135,83 +147,92 @@ namespace PARSE
 
         #region Private methods
 
-        private void InitBones()
+        private void InitBones(Brush color)
         {
             Bones = new Dictionary<SkeletonBones, Line>
             {
-                { new SkeletonBones(JointType.Head,JointType.ShoulderCenter), GenerateLine()},
-                { new SkeletonBones(JointType.ShoulderCenter,JointType.ShoulderLeft), GenerateLine()},
-                { new SkeletonBones(JointType.ShoulderCenter,JointType.ShoulderRight), GenerateLine()},
-                { new SkeletonBones(JointType.ShoulderCenter,JointType.Spine), GenerateLine()},
-                { new SkeletonBones(JointType.Spine,JointType.ShoulderLeft), GenerateLine()},
-                { new SkeletonBones(JointType.Spine,JointType.ShoulderRight), GenerateLine()},
-                { new SkeletonBones(JointType.Spine,JointType.HipCenter), GenerateLine()},
-                { new SkeletonBones(JointType.Spine,JointType.HipLeft), GenerateLine()},
-                { new SkeletonBones(JointType.Spine,JointType.HipRight), GenerateLine()},
-                { new SkeletonBones(JointType.HipCenter,JointType.HipLeft), GenerateLine()},
-                { new SkeletonBones(JointType.HipCenter,JointType.HipRight), GenerateLine()},
+                { new SkeletonBones(JointType.Head,JointType.ShoulderCenter), GenerateLine(color)},
+                { new SkeletonBones(JointType.ShoulderCenter,JointType.ShoulderLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.ShoulderCenter,JointType.ShoulderRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.ShoulderCenter,JointType.Spine), GenerateLine(color)},
+                { new SkeletonBones(JointType.Spine,JointType.ShoulderLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.Spine,JointType.ShoulderRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.Spine,JointType.HipCenter), GenerateLine(color)},
+                { new SkeletonBones(JointType.Spine,JointType.HipLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.Spine,JointType.HipRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.HipCenter,JointType.HipLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.HipCenter,JointType.HipRight), GenerateLine(color)},
 
-                { new SkeletonBones(JointType.ShoulderLeft,JointType.ElbowLeft), GenerateLine()},
-                { new SkeletonBones(JointType.ElbowLeft,JointType.WristLeft), GenerateLine()},
-                { new SkeletonBones(JointType.WristLeft,JointType.HandLeft), GenerateLine()},
+                { new SkeletonBones(JointType.ShoulderLeft,JointType.ElbowLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.ElbowLeft,JointType.WristLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.WristLeft,JointType.HandLeft), GenerateLine(color)},
 
-                { new SkeletonBones(JointType.ShoulderRight,JointType.ElbowRight), GenerateLine()},
-                { new SkeletonBones(JointType.ElbowRight,JointType.WristRight), GenerateLine()},
-                { new SkeletonBones(JointType.WristRight,JointType.HandRight), GenerateLine()},
+                { new SkeletonBones(JointType.ShoulderRight,JointType.ElbowRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.ElbowRight,JointType.WristRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.WristRight,JointType.HandRight), GenerateLine(color)},
 
-                { new SkeletonBones(JointType.HipRight,JointType.KneeRight), GenerateLine()},
-                { new SkeletonBones(JointType.KneeRight,JointType.AnkleRight), GenerateLine()},
-                { new SkeletonBones(JointType.AnkleRight,JointType.FootRight), GenerateLine()},
+                { new SkeletonBones(JointType.HipRight,JointType.KneeRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.KneeRight,JointType.AnkleRight), GenerateLine(color)},
+                { new SkeletonBones(JointType.AnkleRight,JointType.FootRight), GenerateLine(color)},
 
-                { new SkeletonBones(JointType.HipLeft,JointType.KneeLeft), GenerateLine()},
-                { new SkeletonBones(JointType.KneeLeft,JointType.AnkleLeft), GenerateLine()},
-                { new SkeletonBones(JointType.AnkleLeft,JointType.FootLeft), GenerateLine()},
+                { new SkeletonBones(JointType.HipLeft,JointType.KneeLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.KneeLeft,JointType.AnkleLeft), GenerateLine(color)},
+                { new SkeletonBones(JointType.AnkleLeft,JointType.FootLeft), GenerateLine(color)},
             };
 
             //foreach (Line line in Bones.Values)
             //    canvas.Children.Add(line);
         }
 
-        private void InitJoints()
+        private void InitJoints(Brush color)
         {
             Joints = new Dictionary<JointType, Ellipse>()
             {
-                  { JointType.Head,             GenerateEllipse(50)},
-                  { JointType.AnkleLeft,        GenerateEllipse()},
-                  { JointType.AnkleRight,       GenerateEllipse()},
-                  { JointType.ElbowLeft,        GenerateEllipse()},
-                  { JointType.ElbowRight,       GenerateEllipse()},
-                  { JointType.FootLeft,         GenerateEllipse()},
-                  { JointType.FootRight,        GenerateEllipse()},
-                  { JointType.HandLeft,         GenerateEllipse()},
-                  { JointType.HandRight,        GenerateEllipse()},
-                  { JointType.HipCenter,        GenerateEllipse()},
-                  { JointType.HipLeft,          GenerateEllipse()},
-                  { JointType.HipRight,         GenerateEllipse()},
-                  { JointType.KneeLeft,         GenerateEllipse()},
-                  { JointType.KneeRight,        GenerateEllipse()},
-                  { JointType.ShoulderCenter,   GenerateEllipse()},
-                  { JointType.ShoulderRight,    GenerateEllipse()},
-                  { JointType.ShoulderLeft,     GenerateEllipse()},
-                  { JointType.Spine,            GenerateEllipse()},
-                  { JointType.WristLeft,        GenerateEllipse()},
-                  { JointType.WristRight,       GenerateEllipse()},
+                  { JointType.Head,             GenerateEllipse(color)},
+                  { JointType.AnkleLeft,        GenerateEllipse(color)},
+                  { JointType.AnkleRight,       GenerateEllipse(color)},
+                  { JointType.ElbowLeft,        GenerateEllipse(color)},
+                  { JointType.ElbowRight,       GenerateEllipse(color)},
+                  { JointType.FootLeft,         GenerateEllipse(color)},
+                  { JointType.FootRight,        GenerateEllipse(color)},
+                  { JointType.HandLeft,         GenerateEllipse(color)},
+                  { JointType.HandRight,        GenerateEllipse(color)},
+                  { JointType.HipCenter,        GenerateEllipse(color)},
+                  { JointType.HipLeft,          GenerateEllipse(color)},
+                  { JointType.HipRight,         GenerateEllipse(color)},
+                  { JointType.KneeLeft,         GenerateEllipse(color)},
+                  { JointType.KneeRight,        GenerateEllipse(color)},
+                  { JointType.ShoulderCenter,   GenerateEllipse(color)},
+                  { JointType.ShoulderRight,    GenerateEllipse(color)},
+                  { JointType.ShoulderLeft,     GenerateEllipse(color)},
+                  { JointType.Spine,            GenerateEllipse(color)},
+                  { JointType.WristLeft,        GenerateEllipse(color)},
+                  { JointType.WristRight,       GenerateEllipse(color)},
             };
 
             //foreach (Ellipse ellipse in Joints.Values)
             //    canvas.Children.Add(ellipse);
         }
 
-        private Ellipse GenerateEllipse(int size = JOINT_WIDTH)
+        private double skelDepth = 0;
+
+        public void setDepth(double depth)
         {
-            var ellipse = new Ellipse() { Width = size, Height = size, Fill = Brushes.LightBlue };
+            this.skelDepth = depth;
+        }
+
+        private Ellipse GenerateEllipse(Brush color)
+        {
+            int size = JOINT_WIDTH;
+            
+            var ellipse = new Ellipse() { Width = size, Height = size, Fill = color };
             canvas.Children.Add(ellipse);
             return ellipse;
         }
 
-        private Line GenerateLine()
+        private Line GenerateLine(Brush color)
         {
-            var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = Brushes.Blue, Stroke = Brushes.Blue };
+            var line = new Line() { StrokeThickness = BONES_THICKNESS, Fill = color, Stroke = color };
             canvas.Children.Add(line);
             return line;
         }

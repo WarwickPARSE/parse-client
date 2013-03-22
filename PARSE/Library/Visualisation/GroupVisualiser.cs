@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
 using System.Windows.Media;
@@ -15,9 +16,10 @@ using Microsoft.Kinect;
 
 namespace PARSE
 {
-    /*CloudVisualisation Class
-     * - Displays a cloud visualisation based on the received point cloud structure
-     * - Currently uses int arrays. Will use PointCloud type */
+    /*GroupVisualiser class 
+     * Two display modes, one which display the point cloud as is using the point cloud object.
+     * The other uses point cloud list constructor for a little bit more flexibility over colouring labelling. 
+     */
 
     public class GroupVisualiser
     {
@@ -26,7 +28,9 @@ namespace PARSE
         private int depthFrameWidth = 640;
         private int depthFrameHeight = 480;
 
+        //Mesh geometry for visualisation computation.
         MeshGeometry3D mesh;
+        List<PointCloud> clouds;
 
         //Geometry for visualisation computation.
         Point3D[] depthFramePoints;
@@ -35,6 +39,10 @@ namespace PARSE
         List<int> triangleIndices = new List<int>();
         PARSE.ICP.PointRGB[] prgbs;
         Point3DCollection pcc;
+        List<Point3DCollection> cloudList;
+
+        // TODO remove?
+        //BackgroundWorker progressMonitor;
 
         public GroupVisualiser()
         {
@@ -43,6 +51,8 @@ namespace PARSE
 
         public GroupVisualiser(PointCloud pc)
         {
+            //Constructor 1: construct point cloud as a single entity.
+
             mesh = new MeshGeometry3D();
 
             textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
@@ -52,31 +62,145 @@ namespace PARSE
 
             //resize the depthframe array (for efficiency)
             depthFramePoints = new Point3D[prgbs.Length];
+        }
+
+        public GroupVisualiser(List<PointCloud> pcs)
+        {
+            
+            //Constructor 2: construct point cloud as a multiple scan entity.
+
+            mesh = new MeshGeometry3D();
+
+            this.clouds = pcs;
+
+            textureCoordinates = new Point[depthFrameHeight * depthFrameWidth];
+            depthFramePoints = new Point3D[depthFrameHeight * depthFrameWidth];
 
         }
 
-        public void preprocess()
-        {
-            pcc = new Point3DCollection();
+        /*POINT CLOUD RENDERING*/
 
-            //iterate over each point and stick it in depthframe points
-            for (int i = 0; i < depthFramePoints.Length; i++)
+        public void preprocess(LoadingWidget progressMonitor)
+        {
+            if (this.clouds == null)
             {
-                pcc.Add(prgbs[i].point);
+                //preprocess condition for when we have a single point cloud to convert into point 3ds
+                pcc = new Point3DCollection();
+
+                //iterate over each point and stick it in depthframe points
+                for (int i = 0; i < depthFramePoints.Length; i++)
+                {
+                    pcc.Add(prgbs[i].point);
+                }
+
+                createPointCloud(pcc);
+
+                render(progressMonitor);
             }
+            else
+            {
+                if (progressMonitor != null)
+                    progressMonitor.ReportProgress(1, "starting preprocess");
 
-            createPointCloud(pcc);
+                cloudList = new List<Point3DCollection>();
 
-            render();
+                //create a list of point 3d collections
+                for (int i = 0; i < this.clouds.Count; i++)
+                {
+                    Point3DCollection pcc = new Point3DCollection();
+                    depthFramePoints = new Point3D[this.clouds[i].getAllPoints().Length];
+                    
+                    ICP.PointRGB[] tmp = clouds[i].getAllPoints();
+
+                    int progressPerCloud = (int)Math.Round((30 / (decimal)this.clouds.Count), 0);
+                    double progressPerPoint = progressPerCloud / (this.clouds[i].getAllPoints().Length);
+
+                    //jam into point cloud collection.
+                    for (int j = 0; j < depthFramePoints.Length; j++)
+                    {
+                        pcc.Add(tmp[j].point);
+                    }
+
+                    cloudList.Add(pcc);
+
+                    if (progressMonitor != null)
+                        progressMonitor.ReportProgress((int)(progressPerCloud), "Created point cloud " + (i + 1) + " of " + this.clouds.Count);
+                }
+
+
+                // Render the model!
+                if (progressMonitor != null)
+                {
+                    progressMonitor.ReportProgress(10, "Rendering");
+                }            
+                render(progressMonitor);
+            }
         }
 
-        public void render()
+        public void render(LoadingWidget progressMonitor)
         {
-            runDemoModel();
 
-            this.Model.Geometry = createMesh();
-            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
-            this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+            if (this.cloudList == null)
+            {
+                //Rendering method for gradient collection.
+                GradientStopCollection gsc = new GradientStopCollection(4);
+                gsc.Add(new GradientStop(Colors.Red, 0.1));
+                gsc.Add(new GradientStop(Colors.Green, 0.2));
+                gsc.Add(new GradientStop(Colors.Blue, 0.3));
+                gsc.Add(new GradientStop(Colors.Orange, 0.4));
+
+                runDemoModel();
+
+                this.Model.Geometry = createMesh();
+                this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new LinearGradientBrush(gsc, new Point(0, 0), new Point(100, 100)));
+                //this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.LightSteelBlue));
+                this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+
+            }
+            else
+            {
+                int progressPerCloud = (int)Math.Round((30 / (decimal)this.cloudList.Count), 0);
+
+                runDemoModel();
+
+                for (int i = 0; i < this.cloudList.Count; i++)
+                {
+                    if (progressMonitor != null)
+                        progressMonitor.ReportProgress(progressPerCloud, "Rendering model " + i + " of " + this.cloudList.Count);
+
+                    switch (i)
+                    {
+                        case 0:
+                            createPointCloud(this.cloudList[0]);
+                            this.Model.Geometry = createMesh();
+                            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+                            this.Model.Transform = new TranslateTransform3D(-1, -2, 1);
+                            this.armLabel.Geometry = createTextLabel("THIS IS AN ARM");
+                            break;
+                        case 1:
+                            mesh = new MeshGeometry3D();
+                            createPointCloud(this.cloudList[1]);
+                            this.Model2.Geometry = createMesh();
+                            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Blue));
+                            this.Model2.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                        case 2:
+                            mesh = new MeshGeometry3D();
+                            createPointCloud(this.cloudList[2]);
+                            this.Model3.Geometry = createMesh();
+                            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Green));
+                            this.Model3.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                        case 3:
+                            mesh = new MeshGeometry3D();
+                            createPointCloud(this.cloudList[3]);
+                            this.Model4.Geometry = createMesh();
+                            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
+                            this.Model4.Transform = new TranslateTransform3D(-1, -2, 1);
+                            break;
+                    }
+                }
+            }
         }
 
         private Vector3D CalculateNormal(Point3D p0, Point3D p1, Point3D p2)
@@ -89,38 +213,57 @@ namespace PARSE
 
         public MeshGeometry3D createMesh()
         {
+            if (this.mesh == null) { Console.WriteLine("GroupVisualiser: Tried to create mesh - but was null"); }
             return this.mesh;
-        }
-
-        /// <summary>
-        /// Sanity check.
-        /// </summary>
-        public void runDemoModel()
-        {
-            // Create a mesh builder and add a box to it
-            var meshBuilder = new MeshBuilder(false, false);
-            meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
-            meshBuilder.AddBox(new Rect3D(0, 0, 1.2, 0.5, 1, 0.4));
-
-            // Create a mesh from the builder (and freeze it)
-            var mesh = meshBuilder.ToMesh(true);
-
-            // Create some materials
-            var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
-
-            //create a model
-            this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
         }
 
         private void createPointCloud(Point3DCollection points)
         {
+
             for (int i = 0; i < points.Count; i++)
             {
                 //AddCubeToMesh(pointCloudMesh, points[i], 0.005);
                 addCubeToMesh(this.mesh, points[i], 0.002);
+                //createAlternativeMesh();
             }
         }
 
+        public MeshGeometry3D createAlternativeMesh()
+        {
+
+            //this.mesh is the relevant mesh that we are setting.
+
+            //Define list of triangle indices over the whole model.
+            var triangleIndices = new List<int>();
+
+            //Define Vector3D normals.
+            Vector3DCollection myNormalCollection = new Vector3DCollection();
+            myNormalCollection.Add(new Vector3D(0, 0, 1));
+            myNormalCollection.Add(new Vector3D(0, 1, 1));
+            myNormalCollection.Add(new Vector3D(1, 1, 1));
+
+            //iterate over each 3 points and create a triangle with the relevant indices.
+            for (int i = 0; i < this.cloudList[0].Count-3; i+=3)
+            {
+                this.mesh.Positions.Add(this.cloudList[0][i]);
+                this.mesh.Positions.Add(this.cloudList[0][i + 1]);
+                this.mesh.Positions.Add(this.cloudList[0][i + 2]);
+
+                //set triangle normals on the mesh.
+                triangleIndices.Add(0);
+                triangleIndices.Add(1);
+                triangleIndices.Add(2);
+            }
+
+            return new MeshGeometry3D()
+            {
+                Positions = new Point3DCollection(this.cloudList[0]),
+                //TextureCoordinates = new System.Windows.Media.PointCollection(this.textureCoordinates),
+                TriangleIndices = new Int32Collection(triangleIndices),
+                Normals = myNormalCollection
+            };
+
+        }
         /// <summary>
         /// Adds a cube to a given mesh with the centre at a given point
         /// </summary>
@@ -194,11 +337,143 @@ namespace PARSE
             }
         }
 
+        public void setMaterial()
+        {
+
+            //TODO: Accept custom parameters for resetting material
+            this.Model.Material = this.Model.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
+            this.Model2.Material = this.Model2.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
+            this.Model3.Material = this.Model3.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
+            this.Model4.Material = this.Model4.BackMaterial = new DiffuseMaterial(new SolidColorBrush(Colors.Orange));
+
+        }
+
+        /* TEXT LABEL RENDERING METHODS */
+
+        public MeshGeometry3D createTextLabel(String label) //,position data?
+        {
+            TextBlock textblock = new TextBlock();
+            DiffuseMaterial materialWithLabel = new DiffuseMaterial();
+
+            //Set text parameters
+            textblock.Text = label;
+            textblock.Foreground = Brushes.Black; // setting the text color
+            textblock.FontFamily = new FontFamily("Arial"); // setting the font to be used
+
+            //Set brush parameters
+            materialWithLabel.Brush = new VisualBrush(textblock);
+
+            //Set width
+            double width = label.Length * 30;
+
+            //Positioning
+            Point3D p0 = new Point3D(0,0,0) - width / 2 * new Vector3D(1,1,1) - 10 / 30 * new Vector3D(0.5,0.5,0.5);
+            Point3D p1 = p0 + new Vector3D(0.5,0.5,0.5) * 1 * 30;
+            Point3D p2 = p0 + new Vector3D(1,1,1) * width;
+            Point3D p3 = p0 + new Vector3D(0.5,0.5,0.5) * 1 * 30 + new Vector3D(1,1,1) * width;
+
+            //Create relevant mesh geometry.
+            MeshGeometry3D mg = new MeshGeometry3D();
+            mg.Positions = new Point3DCollection();
+            mg.Positions.Add(p0);    // 0
+            mg.Positions.Add(p1);    // 1
+            mg.Positions.Add(p2);    // 2
+            mg.Positions.Add(p3);    // 3
+
+            mg.Positions.Add(p0);    // 4
+            mg.Positions.Add(p1);    // 5
+            mg.Positions.Add(p2);    // 6
+            mg.Positions.Add(p3);    // 7
+
+            mg.TriangleIndices.Add(0);
+            mg.TriangleIndices.Add(3);
+            mg.TriangleIndices.Add(1);
+            mg.TriangleIndices.Add(0);
+            mg.TriangleIndices.Add(2);
+            mg.TriangleIndices.Add(3);
+
+            mg.TriangleIndices.Add(4);
+            mg.TriangleIndices.Add(5);
+            mg.TriangleIndices.Add(7);
+            mg.TriangleIndices.Add(4);
+            mg.TriangleIndices.Add(7);
+            mg.TriangleIndices.Add(6);
+
+            mg.TextureCoordinates.Add(new Point(0, 1));
+            mg.TextureCoordinates.Add(new Point(0, 0));
+            mg.TextureCoordinates.Add(new Point(1, 1));
+            mg.TextureCoordinates.Add(new Point(1, 0));
+
+            mg.TextureCoordinates.Add(new Point(1, 1));
+            mg.TextureCoordinates.Add(new Point(1, 0));
+            mg.TextureCoordinates.Add(new Point(0, 1));
+            mg.TextureCoordinates.Add(new Point(0, 0));
+
+            return mg;
+        }
+
+        /* HELIX3D SANITY CHECKS/SETTERS/GETTERS*/
+
+        /// <summary>
+        /// Sanity check.
+        /// </summary>
+        public void runDemoModel()
+        {
+            // Create a mesh builder and add a box to it
+            var meshBuilder = new MeshBuilder(false, false);
+            meshBuilder.AddBox(new Point3D(0, 0, 1), 1, 2, 0.5);
+            meshBuilder.AddBox(new Rect3D(0, 0, 1.2, 0.5, 1, 0.4));
+
+
+            // Create a mesh from the builder (and freeze it)
+            var mesh = meshBuilder.ToMesh(true);
+
+            // Create some materials
+            var greenMaterial = MaterialHelper.CreateMaterial(Colors.Green);
+
+            if (cloudList != null)
+            {
+                this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+                this.Model2 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+                this.Model3 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+                this.Model4 = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+                this.armLabel = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            }
+            else
+            {
+                this.Model = new GeometryModel3D { Geometry = mesh, Transform = new TranslateTransform3D(0, 0, 0), Material = greenMaterial, BackMaterial = greenMaterial };
+            }
+        }
+
         /// <summary>
         /// Gets or sets the sanity model.
         /// </summary>
         /// <value>The model.</value>
+        
+        //Point cloud getters/setters
         public GeometryModel3D Model { get; set; }
+        public GeometryModel3D BaseModel { get; set; }
+        public GeometryModel3D Model2 { get; set; }
+        public GeometryModel3D Model3 { get; set; }
+        public GeometryModel3D Model4 { get; set; }
 
+        //Text label getters/setters
+        public GeometryModel3D armLabel { get; set; }
+        public GeometryModel3D legLabel { get; set; }
+        public GeometryModel3D waistLabel { get; set; }
+        public GeometryModel3D headLabel { get; set; }
+
+        // TODO Can this work?
+        /*
+        internal void attachProgressMonitor(BackgroundWorker B)
+        {
+            this.progressMonitor = B;
+        }
+        
+        internal void removeProgressMonitor()
+        {
+            this.progressMonitor = null;
+        }
+        */
     }
 }

@@ -1,32 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Windows.Interop;
+using System.Speech.Synthesis;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Threading;
-using System.Speech.Synthesis;
-using System.Windows.Media;
-using System.IO;
 using System.Windows.Media.Media3D;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Kinect;
+using System.Windows.Shapes;
+using System.Data.SqlClient;
+using System.Data.SqlServerCe;
+using System.Text.RegularExpressions;
 using HelixToolkit.Wpf;
+using Microsoft.Kinect;
+using PARSE.ICP.Stitchers;
 
 namespace PARSE
 {
@@ -36,55 +35,102 @@ namespace PARSE
     public partial class ScanLoader : Window
     {
         //point cloud lists for visualisation
-        private List<PointCloud> fincloud;
-        private PointCloud gCloud;
-        private System.Windows.Forms.Timer pcTimer;
-        private CloudVisualisation cloudvis;
+        private List<PointCloud>                fincloud;
+        private PointCloud                      gCloud;
+        private System.Windows.Forms.Timer      pcTimer;
         private Dictionary<JointType, double[]> jointDepths;
-        private Thread visThread;
+        private RayHitTestResult                rayResult;
+        private volatile GroupVisualiser gv;
+        private Point3D                         point2;
+        private Model3D                         model2;
+        private PointCloud                      pcd;
+
+        private delegate void OneArgDelegate(GroupVisualiser gv);
+
+        //Coreloader modifiable hit state
+        public int hitState;
 
         //speech synthesizer instances
-        private SpeechSynthesizer ss;
+        private SpeechSynthesizer sandra;
         private int countdown;
 
         //Kinect instance
         private KinectInterpreter kinectInterp;
+        private Boolean wantKinect;
 
         //Captured canvas
         private Canvas tmpCanvas;
 
+        //Database object
+        DatabaseEngine db;
+
         public ScanLoader()
         {
             InitializeComponent();
+
+            //hide buttons from form
+            cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
+            this.instructionblock.Visibility = Visibility.Collapsed;
+            this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+
+            this.Show();
+
+            //wantKinect = true; // Nathan changed this
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            db = new DatabaseEngine();
+            hitState = 0;
         }
 
         //Event handlers for viewport interaction
 
         public ScanLoader(List<PointCloud> fcloud)
         {
-            InitializeComponent();
+            
+        }
+        public void processCloudList(List<PointCloud> fcloud, LoadingWidget loadingControl)
+        {
+            wantKinect = false;
 
-            //hide buttons from form
-            cancel_scan.Visibility = Visibility.Collapsed;
-            start_scan.Visibility = Visibility.Collapsed;
-            this.instructionblock.Visibility = Visibility.Collapsed;
+            System.Diagnostics.Debug.WriteLine("Number of items in fcloud list: " + fcloud.Count);
 
-            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
-            this.DataContext = new CloudVisualisation(fcloud, false);
-            fincloud = fcloud;
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            this.gv = new GroupVisualiser(fcloud);
+            loadingwidgetcontrol.UpdateProgressBy(2);
+            
+            // Run this as separate 'job' on UI thread
+            this.Dispatcher.Invoke(
+                System.Windows.Threading.DispatcherPriority.Normal,
+                (Action)(() => { 
+                    this.gv = new GroupVisualiser(fcloud);
+                }));
+            loadingwidgetcontrol.UpdateProgressBy(5);
+
+            // Run this as lower priority 'job' (on UI thread),
+            // with hope that UI remains a bit responsive
+            this.Dispatcher.Invoke(
+                System.Windows.Threading.DispatcherPriority.Input,
+                (Action)(() => { 
+                    this.gv.preprocess(loadingwidgetcontrol);
+                }));
+            loadingwidgetcontrol.UpdateProgressBy(5);
+            
+            this.hvpcanvas.DataContext = this.gv;
+            loadingwidgetcontrol.UpdateProgressBy(1);
+
+            this.hitState = 0;
+            this.ScanLoaderReady(0);
         }
 
         public ScanLoader(PointCloud gcloud)
         {
             InitializeComponent();
+            wantKinect = false;
             //hide buttons from form
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
             this.instructionblock.Visibility = Visibility.Collapsed;
-            GroupVisualiser gv = new GroupVisualiser(gcloud);
+            gv = new GroupVisualiser(gcloud);
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
 
@@ -92,7 +138,7 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Loading model");
             this.Dispatcher.Invoke((Action)(() =>
             {
-                gv.preprocess();
+                gv.preprocess(null);
             }));
 
             //Assigned threaded object result to the data context.
@@ -100,8 +146,26 @@ namespace PARSE
             gCloud = gcloud;
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             System.Diagnostics.Debug.WriteLine("Model loaded");
+
+            hitState = 0;
         }
 
+        public void ScanLoaderReady(int mode)
+        {
+            this.hvpcanvas.Visibility = Visibility.Visible;
+            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+
+            if (mode == 1)
+            {
+                this.start_scan.Visibility = Visibility.Visible;
+                this.cancel_scan.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.start_scan.Visibility = Visibility.Collapsed;
+                this.cancel_scan.Visibility = Visibility.Collapsed;
+            }
+        }
 
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {
@@ -111,7 +175,16 @@ namespace PARSE
 
             //start scanning procedure
             kinectInterp = new KinectInterpreter(skeloutline);
-            kinectInterp.stopStreams();
+
+            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
+            if (!wantKinect)
+            {
+                kinectInterp.stopStreams();
+            }
           
         }
 
@@ -122,30 +195,22 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
-
-
-            if (ss == null)
+            if (sandra == null)
             {
                 //initalize speech sythesizer
-                ss = new SpeechSynthesizer();
-                ss.Rate = 1;
-                ss.Volume = 100;
+                sandra = new SpeechSynthesizer();
+                sandra.Rate = 1;
+                sandra.Volume = 100;
             }
             
             //init kinect
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.isDepthEnabled())
             {
                 this.kinectInterp.startDepthStream();
                 this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
 
-            if (!this.kinectInterp.IsSkelStreamUpdating)
-            {
-                this.kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-
-            if (!this.kinectInterp.IsDepthStreamUpdating)
+            if (!this.kinectInterp.isColorEnabled())
             {
                 this.kinectInterp.startRGBStream();
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
@@ -155,17 +220,17 @@ namespace PARSE
 
             if (kinectInterp.tooFarForward())
             {
-                ss.Speak("Step Backward");
+                sandra.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
             }
             else if (kinectInterp.tooFarBack())
             {
-                ss.Speak("Step Forward");
+                sandra.Speak("Step Forward");
                 Console.Write("Step Forward");
             }
             else
             {
-                ss.Speak("Your positioning is optimal.");
+                sandra.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
 
@@ -180,7 +245,7 @@ namespace PARSE
                 pcTimer = new System.Windows.Forms.Timer();
                 pcTimer.Tick += new EventHandler(pcTimer_tick);
                 
-                ss.Speak("Please face the camera.");
+                sandra.Speak("Please face the camera.");
                 this.instructionblock.Text = "Please face the camera";
 
                 //Initialize and start timerr
@@ -194,34 +259,35 @@ namespace PARSE
         {
             if (countdown == 3)
             {
-                //enable update of skelL, skelR, skelDepth
-                this.kinectInterp.enableUpdateSkelVars();
-
                 //get current skeleton tracking state
                 Skeleton skeleton = this.kinectInterp.getSkeletons();
-                jointDepths  = enumerateSkeletonDepths(skeleton);
+                jointDepths = enumerateSkeletonDepths(skeleton);
 
                 //PointCloud structure methods
                 PointCloud frontCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                //frontCloud.deleteFloor();
                 fincloud.Add(frontCloud);
+                sandra.Speak("Scan Added.");
 
                 //freeze skelL skelDepth and skelR
-                this.kinectInterp.disableUpdateSkelVars();
+                this.kinectInterp.kinectSensor.SkeletonStream.Disable();
 
                 tmpCanvas = skeloutline;
+                skeloutline = tmpCanvas;
+                skeloutline.Visibility = Visibility.Collapsed;
 
-                ss.Speak("Turn left");
+                sandra.Speak("Please turn left.");
                 this.instructionblock.Text = "Please turn left";
                 countdown--;
             }
             else if (countdown == 2)
             {
-
                 //PointCloud structure methods
                 PointCloud rightCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                //rightCloud.deleteFloor();
                 fincloud.Add(rightCloud);
-
-                ss.Speak("Turn left with your back to the camera");
+                sandra.Speak("Scan Added.");
+                sandra.Speak("Please turn left with your back to the camera.");
                 this.instructionblock.Text = "Turn left with your back to the camera";
                 countdown--;
             }
@@ -230,32 +296,56 @@ namespace PARSE
 
                 //PointCloud structure methods
                 PointCloud backCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                //backCloud.deleteFloor();
                 fincloud.Add(backCloud);
-
-                ss.Speak("Turn left once more");
-                this.instructionblock.Text = "Please turn left once more";
+                sandra.Speak("Scan Added.");
+                sandra.Speak("Please turn left once more.");
+                this.instructionblock.Text = "Please turn left once more.";
                 countdown--;
             }
             else if (countdown == 0)
             {
-
                 //PointCloud structure methods
                 PointCloud leftCloud = new PointCloud(this.kinectInterp.getRGBTexture(), this.kinectInterp.getDepthArray());
+                //leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
 
-                //Visualisation instantiation based on int array clouds
-                cloudvis = new CloudVisualisation(fincloud, false);
-                this.DataContext = cloudvis;
+                sandra.Speak("Scan Added.");
+                sandra.Speak("You have now been captured. Thank you for your time.");
 
                 //stop streams
                 kinectInterp.stopStreams();
-                skeloutline = tmpCanvas;
-                skeloutline.Visibility = Visibility.Hidden;
+
+                //stitch me
+                //instantiate the stitcher 
+                BoundingBox stitcher = new BoundingBox();
+
+                //jam points into stitcher
+                stitcher.add(fincloud);
+                stitcher.stitch();
+
+                pcd = stitcher.getResult();
+                fincloud = stitcher.getResultList();
+
+                ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
+                
+                double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
+                ((CoreLoader)(this.Owner)).windowHistory.heightoutput.Content = height + "m";
+
+                GroupVisualiser gg = new GroupVisualiser(fincloud);
+                gg.preprocess(null);
+                this.DataContext = gg;
 
                 //Visualisation instantiation based on KDTree array clouds
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
+
+                ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
+                ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
+                ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
                 pcTimer.Stop();
+
+                //TODO: write all these results to the database; sql insertion clauses.
             }
         }
 
@@ -282,22 +372,98 @@ namespace PARSE
         void hvpcanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
 
+            //TODO: This performs the limb segmentation procedure.
+
             Point location = e.GetPosition(hvpcanvas);
-            ModelVisual3D result = GetHitTestResult(location);
+            BoundingBox fineStitcher = new BoundingBox();
+            TranslateTransform3D translationVector = new TranslateTransform3D();
 
-            this.instructionblock.Visibility = Visibility.Collapsed;
+            hitState = 1;
 
-            if (result == null)
+            //do manual alignment step 1
+            if (hitState == 1)
             {
-                System.Diagnostics.Debug.WriteLine("No click point bubbled");
-                return;
+                //ModelVisual3D result = GetHitTestResult(location);
+                //point1 = rayResult.PointHit;
+                //model1 = rayResult.ModelHit;
+
+                //System.Diagnostics.Debug.WriteLine(point1.X + ", " + point1.Y + ", " + point1.Z);
+
+                //.hitStathitState = 2;
+            }
+            else if (hitState == 2)
+            {
+
+            //do manual alignment step 2
+
+                ModelVisual3D result = GetHitTestResult(location);
+                point2 = rayResult.PointHit;
+                model2 = rayResult.ModelHit;
+
+                System.Diagnostics.Debug.WriteLine(point2.X);
+
+                this.viewertext.Content = "Select corresponding point on 2nd point cloud (pairwise)";
+
+                hitState = 4;
+            }
+            else if (hitState == 3)
+            {
+
+                System.Diagnostics.Debug.WriteLine(location.ToString());
+                //perform limb circumference height selection.
+                //LimbCalculator.calculate(limbCloud, 1);
+
+            }
+        }
+
+        public void determineLimb(PointCloud pcdexisting)
+        {
+         
+            //pull in skeleton measures from a temporary file for corbett.parse for now.
+
+            if (true)
+            {
+                Dictionary<String, double[]> jointDepths = new Dictionary<String, double[]>();
+                StreamReader sr = new StreamReader("SKEL.ptemp");
+                String line;
+
+                while ((line=sr.ReadLine())!=null)
+                {
+                    String[] joint = Regex.Split(line,":");
+                    String[] positions = Regex.Split(joint[1], ",");
+
+                    double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2],"\n")[0]) };
+                    jointDepths.Add(joint[0], jointPos);
+                }
+
+                foreach (var item in jointDepths.Keys)
+                {
+                    System.Diagnostics.Debug.WriteLine(item);
+                }
+
+                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "WAIST");
+            }
+            else
+            {
+
+                //if we have passed an existing pointcloud from coreloader
+                if (pcdexisting != null)
+                {
+                   // LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
+                }
+                else
+                //otherwise if we have passed a new scan from coreloader
+                {
+                   // LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
+                }
+
             }
 
-            if (result is ModelVisual3D)
-            {
-                System.Diagnostics.Debug.WriteLine("You clicked " + location.X + "," + location.Y);
-                return;
-            }
+            //change colour of point cloud for limb selection mode
+            gv.setMaterial();
+            this.DataContext = gv;
+
+            hitState = 3;
 
         }
 
@@ -349,14 +515,24 @@ namespace PARSE
 
         ModelVisual3D GetHitTestResult(Point location)
         {
-            HitTestResult result = VisualTreeHelper.HitTest(hvpcanvas, location);
-            if (result != null && result.VisualHit is ModelVisual3D)
-            {
-                ModelVisual3D visual = (ModelVisual3D)result.VisualHit;
-                return visual;
-            }
+            PointHitTestParameters hitParams = new PointHitTestParameters(location);
+            VisualTreeHelper.HitTest(hvpcanvas, null, resultCallback, hitParams);
 
             return null;
+        }
+
+        public HitTestResultBehavior resultCallback(HitTestResult result)
+        {
+            rayResult = result as RayHitTestResult;
+            if (rayResult != null)
+            {
+                // Did we hit a MeshGeometry3D?
+                RayMeshGeometry3DHitTestResult rayMeshResult =
+                    rayResult as RayMeshGeometry3DHitTestResult;
+
+            }
+
+            return HitTestResultBehavior.Stop;
         }
 
         /*Publicly accessible methods*/

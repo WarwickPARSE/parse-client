@@ -32,12 +32,9 @@ namespace PARSE
     class KinectInterpreter : Window
     {
         //Kinect sensor definitions
-        public KinectSensor                             kinectSensor { get; private set; }
+        public KinectSensor                            kinectSensor { get; private set; }
         public string                                   kinectStatus { get; private set; }
         public bool                                     kinectReady { get; private set; }
-        public bool                                     IsColorStreamUpdating { get; set; }
-        public bool                                     IsDepthStreamUpdating { get; set; }
-        public bool                                     IsSkelStreamUpdating { get; set; }
 
         //RGB point array and frame definitions
         private byte[]                                  colorpixelData;
@@ -87,9 +84,15 @@ namespace PARSE
         public const double oneParseUnitDelta = 7.5;
         public const int oneParseRadian = 0;
 
+        private System.Windows.Media.Brush red = System.Windows.Media.Brushes.Red;
+        private System.Windows.Media.Brush green = System.Windows.Media.Brushes.Green;
+        private System.Windows.Media.Brush blue = System.Windows.Media.Brushes.Blue;
+        private System.Windows.Media.Brush color;
+
         public KinectInterpreter(Canvas c)
         {
             kinectReady = false;
+            color = blue;
 
             Model = new GeometryModel3D();
             /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
@@ -122,6 +125,56 @@ namespace PARSE
             }
         }
 
+        public void disableDepth()
+        {
+            this.kinectSensor.DepthStream.Disable();
+        }
+
+        public Boolean isDepthEnabled()
+        {
+            return this.kinectSensor.DepthStream.IsEnabled;
+        }
+
+        public void enableDepth()
+        {
+            this.kinectSensor.DepthStream.Enable();
+        }
+
+        public void disableColor()
+        {
+            this.kinectSensor.ColorStream.Disable();
+        }
+
+        public Boolean isColorEnabled()
+        {
+            return this.kinectSensor.ColorStream.IsEnabled;
+        }
+
+        public void enableColor()
+        {
+            this.kinectSensor.ColorStream.Enable();
+        }
+
+        public void disableSkeleton()
+        {
+            this.kinectSensor.SkeletonStream.Disable();
+        }
+
+        public Boolean isSkeletonEnabled()
+        {
+            return this.kinectSensor.SkeletonStream.IsEnabled;
+        }
+
+        public void enableSkeleton()
+        {
+            this.kinectSensor.SkeletonStream.Enable();
+        }
+
+        public Boolean goldilocks()
+        {
+            return (!(tooFarBack() || tooFarForward()));
+        }
+        
         public Boolean tooFarBack()
         {
             return (skelDepthPublic > (oneParseUnit + oneParseUnitDelta));
@@ -134,29 +187,14 @@ namespace PARSE
 
         public void calibrate()
         {
+            
             this.kinectSensor.ElevationAngle = oneParseRadian;
         }
         
-        /*public Boolean isCalibrated()
-        {
-            return (this.kinectSensor.ElevationAngle == oneParseRadian);    
-        }*/
-        
-        public void enableUpdateSkelVars()
-        {
-            this.IsSkelStreamUpdating = true;
-        }
-
-        public void disableUpdateSkelVars()
-        {
-            this.IsSkelStreamUpdating = false;
-        }
-
         //Enable depthStream
         public void startDepthStream()
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-            this.IsDepthStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus+", Depth Ready";
         }
@@ -186,7 +224,6 @@ namespace PARSE
         public void startRGBStream()
         {
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-            this.IsColorStreamUpdating = true;
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", RGB Ready";
         }
@@ -199,12 +236,25 @@ namespace PARSE
 
             this.kinectSensor.SkeletonStream.Enable();
 
-            this.IsSkelStreamUpdating = true;
-            this.enableUpdateSkelVars();
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        public Boolean noKinect()
+        {
+            if (KinectSensor.KinectSensors.Count == 0)
+            {
+                this.kinectSensor = null;
+                return true;
+            }
+            return (this.kinectSensor == null);
+        }
+
+        //called when you plug a kinect in to a running PARSE
+        public void setSensor(KinectSensor c)
+        {
+            this.kinectSensor = c;
+        }
 
         //Disable all streams on changeover
         public void stopStreams()
@@ -213,26 +263,21 @@ namespace PARSE
             //visActive set to false to stop duplicate visualisations
             visMode = 0;
 
-            if (this.IsSkelStreamUpdating)
+            if (this.noKinect())
+            {
+                return;
+            }
+            if (this.kinectSensor.SkeletonStream.IsEnabled)
             {
                 this.kinectSensor.SkeletonStream.Disable();
             }
-            if (this.IsDepthStreamUpdating)
+            if (this.kinectSensor.DepthStream.IsEnabled)
             {
                 this.kinectSensor.DepthStream.Disable();
             }
-            if (this.IsColorStreamUpdating)
+            if (this.kinectSensor.ColorStream.IsEnabled)
             {
                 this.kinectSensor.ColorStream.Disable();
-                //Don't need this code because this.IsColorStreamUpdating is only true if the colour stream is enabled
-                /*
-                    try
-                    {
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("KinectInterpreter/StopStreams() - closing streams that aren't open causes exceptions. Ignore them for now.");
-                    }*/
             }
         }
 
@@ -264,9 +309,7 @@ namespace PARSE
             }
         
         }
-
-        int count = 10;
-
+        
         public WriteableBitmap DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
 
@@ -331,13 +374,10 @@ namespace PARSE
 
         public void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
-
                 if (skeletonFrame != null)
                 {
-
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state
@@ -352,11 +392,12 @@ namespace PARSE
                     foreach (Skeleton trackedSkeleton in trackedSkeletons)
                     {
                         SkeletonFigure skeletonFigure;
+
                         // Checks if the tracked skeleton is already drawn.
                         if (!skeletons.TryGetValue(trackedSkeleton.TrackingId, out skeletonFigure))
                         {
                             // If not, create a new drawing on our canvas
-                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas);
+                            skeletonFigure = new SkeletonFigure(this.skeletonCanvas, this.color);
                             try
                             {
                                 skeletons.Add(trackedSkeleton.TrackingId, skeletonFigure);
@@ -370,23 +411,39 @@ namespace PARSE
                             Canvas.SetLeft(this.skeletonCanvas, 0);
                         }
 
-                        if (IsSkelStreamUpdating)
-                        {
-                            //update the depth of the tracked skeleton
-                            skelDepth = trackedSkeleton.Position.Z;
-                            skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
-                            skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
-                            //skelB = trackedSkeleton.Joints[JointType.AnkleLeft].Position.Y;
-
-                            skelDepth = skelDepth * 1000;
-                            skelDepthPublic = skelDepth;
-                            skelL = (320 * (1 + skelL)) * 4;
-                            skelR = (320 * (1 + skelR)) * 4;
-                            //skelB = 480 * (1-((1+skelB)/2));
-                        }
+                        //update the depth of the tracked skeleton
+                        skelDepth = trackedSkeleton.Position.Z;
+                        skelL = trackedSkeleton.Joints[JointType.HandLeft].Position.X;
+                        skelR = trackedSkeleton.Joints[JointType.HandRight].Position.X;
+                            
+                        skelDepth = skelDepth * 1000;
+                        skelDepthPublic = skelDepth;
+                        skeletonFigure.setDepth(skelDepthPublic);
+                        skelL = (320 * (1 + skelL)) * 4;
+                        skelR = (320 * (1 + skelR)) * 4;
+                            
                         // Update the drawing
                         Update(trackedSkeleton, skeletonFigure);
                         skeletonFigure.Status = ActivityState.Active;
+
+                        System.Windows.Media.Brush prevColor = this.color;
+
+                        if (tooFarForward())
+                        {
+                            this.color = blue;
+                        }
+                        else if (tooFarBack())
+                        {
+                            this.color = red;
+                        }
+                        else
+                        {
+                            this.color = green;
+                        }
+                        if (!(this.color.Equals(prevColor)))
+                        {
+                            skeletonFigure.setColor(this.color);
+                        }
                     }
 
                     foreach (SkeletonFigure skeleton in skeletons.Values)
@@ -568,7 +625,6 @@ namespace PARSE
             int colorPixelIndex = 0;
             this.rawDepth = new int[depthFrame.Length];
             int realDepth = 0;
-            int depthPixelIndex = 0;
 
             for (int i = 0; i < depthFrame.Length; i++)
                 {
@@ -670,6 +726,5 @@ namespace PARSE
                 return null;
             }
         }
-
     }
 }

@@ -8,6 +8,18 @@ namespace PARSE
 {
     static class AreaCalculator
     {
+        //return REAL WORLD AREAS, NOT POINT CLOUD AREAS
+        public static List<double> getAllAreas(List<List<Point3D>> planes)
+        {
+            List<double> output = new List<double>();
+            for (int i = 0; i < planes.Count; i++)
+            {
+                output.Add(UnitConvertor.convertPCM(AreaCalculator.calculateArea(planes[i]),2));
+            }
+            return output;
+        }
+
+        //return POINT CLOUD AREAS, NOT REAL WORLD AREAS
         public static double calculateArea(List<Point3D> plane)
         {
             double area = 0;
@@ -16,7 +28,6 @@ namespace PARSE
                area = area + ((plane[j].X * plane[j + 1].Z) - (plane[j + 1].X * plane[j].Z));
             }
             area = Math.Abs(area / 2);
-            Console.WriteLine("Area1:" + UnitConvertor.convertPC2DMeasurement(area));
             return area;
         }
     }

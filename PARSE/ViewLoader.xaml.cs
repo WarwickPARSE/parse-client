@@ -23,18 +23,64 @@ namespace PARSE
 
         private KinectInterpreter kinectInterp;
 
-        public ViewLoader()
+        public ViewLoader(String tmp)
         {
             InitializeComponent();
+            //Console.WriteLine("Widget width: " + Loadingwidget.ActualWidth);
+
             this.Loaded += new RoutedEventHandler(ViewLoader_Loaded);
+
+            //start kinectinterpreter
+            kinectInterp = new KinectInterpreter(vpcanvas2);
+
+            if (kinectInterp.kinectReady)
+            {
+                if (tmp == "RGB")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startRGBStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                }
+                else if (tmp == "RGB Isolation")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startRGBStream();
+                    kinectInterp.startDepthStream();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+                }
+                else if (tmp == "Depth Isolation")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startDepthStream();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                }
+                else if (tmp == "Skeleton")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                }
+                else if (tmp == "Depth")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startDepthStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                }
+                else
+                {
+                    //not sure if this will break
+                    this.Close();
+                }
+            }
         }
 
         private void ViewLoader_Loaded(object Sender, RoutedEventArgs e) {
             //place relative to coreloader
             this.Top = this.Owner.Top + 70;
             this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width - 20;
-            //start kinectinterpreter
-            kinectInterp = new KinectInterpreter(vpcanvas2);
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -55,59 +101,6 @@ namespace PARSE
             this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
 
             //track waist cue.
-
-
-        }
-
-        private void feed_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            string tmp = (selection.SelectedValue as ComboBoxItem).Content.ToString();
-
-            if (tmp == "RGB")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startRGBStream();
-                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-            }
-            else if (tmp == "RGB-D")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            }
-            else if (tmp == "RGB Isolation")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startRGBStream();
-                kinectInterp.startDepthStream();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
-            }
-            else if (tmp == "Depth Isolation")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-            else if (tmp == "Skeleton")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-            else if (tmp == "Depth")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            }
-            else
-            {
-                //Console.WriteLine("PISS and SHIT");
-                Environment.Exit(-9000);
-            }
         }
 
         private void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)

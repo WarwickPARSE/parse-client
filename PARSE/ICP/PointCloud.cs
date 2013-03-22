@@ -1,4 +1,8 @@
-﻿using System;
+﻿using HelixToolkit.Wpf;
+using KdTree;
+using MathNet.Numerics.LinearAlgebra.Double;
+using PARSE.ICP;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -14,16 +18,13 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
 
-using HelixToolkit.Wpf;
-using KdTree;
-
 namespace PARSE
 {
     public class PointCloud
     {
-        //dodgy global variables (to be changed)
-        //private int width;
-        //private int height;
+        //todo: make these into variables at some point... 
+        private const int width = 640;
+        private const int height = 480;
 
         //tree of points
         private KdTree.KDTree points;
@@ -37,8 +38,8 @@ namespace PARSE
         private const double scale = 0.001;             //for rendering 
 
         //dimension constants 
-        private int depthFrameWidth = 640;
-        private int depthFrameHeight = 480;
+        private const int depthFrameWidth = 640;
+        private const int depthFrameHeight = 480;
 
         //centre points (these will need changing at some point)
         private const int cx = 640 / 2;
@@ -58,11 +59,13 @@ namespace PARSE
         double miny = double.MaxValue;
         double minz = double.MaxValue;
 
-
-        //geometry, accessible for visualisation.
+        //geometry, accessible for serialisation.
         public int[] rawDepth;
         Point3D[] depthFramePoints;
         System.Windows.Point[] textureCoordinates;
+
+        //matrix representation of point cloud 
+        DenseMatrix m; 
 
         //percentage of opacity that we want the colour to be 
         private const int opacity = 100;
@@ -71,8 +74,7 @@ namespace PARSE
         //sensor_orientation
         //sensor_origin
 
-        public PointCloud(BitmapSource bs, int[] rawDepth) 
-        {
+        public PointCloud(BitmapSource bs, int[] rawDepth) {
             this.bs = bs;
             this.rawDepth = rawDepth;
 
@@ -82,23 +84,97 @@ namespace PARSE
             this.points = new KdTree.KDTree(3);
 
             //convert bitmap stream into a format that is supported by the kd-tree method
-            if (bs != null)
-            {
+            if (bs != null) {
                 Bitmap b = convertToBitmap(bs);
                 setPoints(rawDepth, b);
             }
-            else
-            {
+            else {
                 setPoints(rawDepth);
             }
         }
 
-        public PointCloud()
-        {
+        public PointCloud() {
             //parameterless constructor needed for serialization
             //this.points = new KdTree.KDTree(3);
         }
-     
+
+        /// <summary>
+        /// Suboptimal constructor, used for list of 3d points 
+        /// </summary>
+        /// <param name="input"></param>
+        public PointCloud(List<Point3D> input) {
+            this.points = new KdTree.KDTree(3);
+            
+            for (int i = 0; i < input.Count; i++) { 
+                Point3D poLoc = input[i];
+
+                //check min values
+                if (poLoc.X < minx) { minx = poLoc.X; }
+                if (poLoc.Y < miny) { miny = poLoc.Y; }
+                if (poLoc.Z < minz) { minz = poLoc.Z; }
+
+                //check max values
+                if (poLoc.X > maxx) { maxx = poLoc.X; }
+                if (poLoc.Y > maxy) { maxy = poLoc.Y; }
+                if (poLoc.Z > maxz) { maxz = poLoc.Z; }
+
+                //this is a very dark kd hole
+                PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, 0, 0, 0);
+
+                double[] key = { poLoc.X, poLoc.Y, poLoc.Z };
+
+                this.points.insert(key, po);
+            }
+        }
+
+        //method for bernard
+        public PointCloud getSubRegion(double[] points) {
+
+            //check subregion is actually a sub region
+            if (points[0] < this.minx)
+            {
+                throw new SubRegionOutOfBoundsException("xmin");
+            }
+            if (points[1] < this.miny)
+            {
+                throw new SubRegionOutOfBoundsException("ymin");
+            }
+            if (points[2] < this.minz)
+            {
+                throw new SubRegionOutOfBoundsException("zmin");
+            }
+            if (points[3] > this.maxx)
+            {
+                throw new SubRegionOutOfBoundsException("xmax");
+            }
+            if (points[4] > this.maxy)
+            {
+                throw new SubRegionOutOfBoundsException("ymax");
+            }
+            if (points[5] > this.maxz)
+            {
+                throw new SubRegionOutOfBoundsException("zmax");
+            }
+            
+            double[] pointMin = { points[0], points[1], points[2] };
+            double[] pointMax = { points[3], points[4], points[5] };
+
+            Object[] temp = this.points.range(pointMin, pointMax);
+
+            List<Point3D> output = new List<Point3D>();
+            for (int i = 0; i < temp.Length; i++) {
+                output.Add(((PointRGB)(temp[i])).point);
+            }
+
+            PointCloud pc = new PointCloud(output);
+
+            return pc;
+        }
+
+        public int size() {
+            return this.points.numberOfNodes();
+        }
+        
         /// <summary>
         /// Converts a bitmap stream into a bitmap image 
         /// </summary>
@@ -122,15 +198,13 @@ namespace PARSE
         /// Generates a point cloud with no colours
         /// </summary>
         /// <param name="rawDepth"></param>
-        public void setPoints(int[] rawDepth) 
-        {
+        public void setPoints(int[] rawDepth) {
             int[] r= new int [rawDepth.Length];
             int[] g = new int[rawDepth.Length];
             int[] b = new int[rawDepth.Length];
 
             //fill each colour element with an empty color
-            for (int i=0; i<rawDepth.Length; i++) 
-            {
+            for (int i=0; i<rawDepth.Length; i++) {
                 r[i] = 0;
                 g[i] = 0;
                 b[i] = 0;
@@ -141,8 +215,7 @@ namespace PARSE
         }
 
         //this may cause runtime errors - due to the implicit typecasting from byte to int, will need to test this further
-        public void setPoints(int[] rawDepth, Bitmap image)
-        {
+        public void setPoints(int[] rawDepth, Bitmap image) {
             Rectangle rec = new Rectangle(0, 0, image.Width, image.Height);
             BitmapData imageData = image.LockBits(rec, ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
@@ -165,10 +238,8 @@ namespace PARSE
             int stride = imageData.Stride;
 
             //shove the image data into its place 
-            for (int col = 0; col < imageData.Height; col++)
-            {
-                for (int row = 0; row < imageData.Width; row++) 
-                {
+            for (int col = 0; col < imageData.Height; col++) {
+                for (int row = 0; row < imageData.Width; row++) {
                     b[i] = (rgbData[(col * stride) + (row * 3)]); 
                     g[i] = (rgbData[(col * stride) + (row * 3) + 1]);
                     r[i] = (rgbData[(col * stride) + (row * 3) + 2]);
@@ -180,10 +251,65 @@ namespace PARSE
             setPoints(rawDepth, r, g, b);
         }
 
+        public void setPoints(int[] rawDepth, int r, int g, int b) {
+            for (int iy = 0; iy < 480; iy++) {
+                for (int ix = 0; ix < 640; ix++) {
+                    int i = (iy * 640) + ix;
+
+                    if (rawDepth[i] == unknownDepth || rawDepth[i] < tooCloseDepth || rawDepth[i] > tooFarDepth) {
+                        rawDepth[i] = -1;
+
+                        //at the moment we seem to be deleting points that are too far away, this will need changing at some point
+                        //this.depthFramePoints[i] = new Point3D();
+                    }
+                    else {
+                        double zz = rawDepth[i] * scale;
+                        double x = (cx - ix) * zz * fxinv;
+                        double y = (cy - iy) * zz * fyinv;
+                        double z = zz;
+
+                        //TODO: this can probably be made more efficient at a later date, perhaps through threading... 
+                        //check min values
+                        if (x < minx) { minx = x; }
+                        if (y < miny) { miny = y; }
+                        if (z < minz) { minz = z; }
+
+                        //check max values
+                        if (x > maxx) { maxx = x; }
+                        if (y > maxy) { maxy = y; }
+                        if (z > maxz) { maxz = z; }
+
+                        //create a new point key
+                        double[] pointKey = new double[3];
+
+                        //set key
+                        pointKey[0] = x;
+                        pointKey[1] = y;
+                        pointKey[2] = z;
+
+                        //shove point into the kd-tree
+                        Point3D poLoc = new Point3D(x, y, z);
+                        PARSE.ICP.PointRGB po = new PARSE.ICP.PointRGB(poLoc, r, g, b);
+                        this.points.insert(pointKey, po);
+
+                        //calculate the matrix row
+                        int row = height * iy + ix;
+
+                        //dump the data into the row
+                        m.At(row, 1, x);
+                        m.At(row, 2, y);
+                        m.At(row, 3, z);
+                    }
+                }
+            }
+        }
+
         //this is not fully implemented as I don't know how colours are represented!
         //TODO: throw an exception if the rawdepth is not the same length as rgb
-        public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) 
-        {
+        public void setPoints(int[] rawDepth, int[] r, int[] g, int[] b) {
+            //instantiate the matrix object, now that we have the data points
+            m = new DenseMatrix(width * height, 3);
+
             for (int iy = 0; iy < 480; iy++)
             {
                 for (int ix = 0; ix < 640; ix++)
@@ -203,11 +329,6 @@ namespace PARSE
                         double x = (cx - ix) * zz * fxinv;
                         double y = (cy - iy) * zz * fyinv;
                         double z = zz;
-
-                        /*
-                         * This is a cheeky bug fix that I cannot be proud of. I am not sure why it works, but it does...  
-                         */
-                     
                         
                         //check min values
                         if (x < minx) { minx = x; }
@@ -302,8 +423,7 @@ namespace PARSE
         /// Translate the point cloud by a given value
         /// </summary>
         /// <param name="tx">Up to three co-ords</param>
-        public void translate(double[] tx) 
-        {
+        public void translate(double[] tx) {
             if (tx.Length == 3) {
                 //turn the transformation vector into and object
                 Console.WriteLine("Translating");
@@ -359,8 +479,7 @@ namespace PARSE
         /// </summary>
         /// <param name="axis">The axis of rotation</param>
         /// <param name="angle">The angle to which te point cloud is to be rotated</param>
-        public void rotate(double[] axis, double angle) 
-        {
+        public void rotate(double[] axis, double angle) {
             if (!(axis.Length != 3)) {
                 //centre of rotation 
                 Point3D centre = new Point3D(axis[0], axis[1], axis[2]);
@@ -393,7 +512,7 @@ namespace PARSE
                     if (newPoint.Y > maxy) { maxy = newPoint.Y; }
                     if (newPoint.Z > maxz) { maxz = newPoint.Z; }  
 
-                    //jam into the tree 
+                    //jam into the tree hole
                     double[] key = new double[3] { newPoint.X, newPoint.Y, newPoint.Z };
                     newPoints.insert(key, new PARSE.ICP.PointRGB(newPoint, point.r, point.g, point.b));
                 }
@@ -407,12 +526,32 @@ namespace PARSE
         }
 
         /// <summary>
+        /// Colours all the points in the point cloud based on specified RGB. Sets overall texture colour.
+        /// </summary>
+        /// <param name="r">r value</param>
+        /// <param name="g">g value</param>
+        /// <param name="g">b value</param>
+        /// 
+        public PointCloud setColour(PointCloud pc, int r, int g, int b) {
+            pc.setPoints(pc.rawDepth, r, g, b);
+
+            return pc;
+        }
+
+        /// <summary>
         /// returns kd-tree representation of point cloud
         /// </summary>
         /// <param name="points"></param>
-        public KdTree.KDTree getKDTree()
-        {
+        public KdTree.KDTree getKDTree() {
             return this.points;
+        }
+
+        /// <summary>
+        /// returns a matrix representation of the point cloud 
+        /// </summary>
+        /// <returns></returns>
+        public DenseMatrix getMatrix() {
+            return this.m; 
         }
 
         public double getxMax() { return maxx; }
@@ -421,6 +560,51 @@ namespace PARSE
         public double getxMin() { return minx; }
         public double getyMin() { return miny; }
         public double getzMin() { return minz; }
-    
+
+        public void deleteFloor()
+        {
+            double[] pointMin = { minx, miny, minz };
+            double[] pointMax = { maxx, miny + ((maxy - miny) / (PlanePuller.planeNumber)), maxz };
+            
+            //list of supposed floor points
+            Object[] temp = points.range(pointMin, pointMax);
+
+
+            for (int i = 0; i < temp.Length; i++)
+            {
+                Point3D tempPoint = ((PointRGB)temp[i]).point;
+                double[] tempArray = { tempPoint.X, tempPoint.Y, tempPoint.Z };
+                this.points.delete(tempArray);
+            }
+
+            //re calc minx, miny, minz
+            //this does not work, i dont know why. if someone wants to try feel free
+            double[] minPoint = { double.MinValue, double.MinValue, double.MinValue };
+            double[] maxPoint = { double.MaxValue, double.MaxValue, double.MaxValue }; 
+
+            //pull all points from the kd-tree
+            Object[] points3d = points.range(minPoint,maxPoint);
+
+            //start with min and max values defined in terms of their opposites
+            minx = double.MaxValue;
+            miny = double.MaxValue;
+            minz = double.MaxValue;
+            maxx = double.MinValue;
+            maxy = double.MinValue;
+            maxz = double.MinValue;
+
+            //check each point for minimal-ness
+            for (int i = 0; i < points3d.Length; i++)
+            {
+                Point3D oldPoint = ((PointRGB)(points3d[i])).point;
+                if (oldPoint.X < minx) { minx = oldPoint.X; }
+                if (oldPoint.Y < miny) { miny = oldPoint.Y; }
+                if (oldPoint.Z < minz) { minz = oldPoint.Z; }
+                if (oldPoint.X > maxx) { maxx = oldPoint.X; }
+                if (oldPoint.Y > maxy) { maxy = oldPoint.Y; }
+                if (oldPoint.Z > maxz) { maxz = oldPoint.Z; }  
+            }
+        }
     }
 }
+

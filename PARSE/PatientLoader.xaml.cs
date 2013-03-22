@@ -100,5 +100,24 @@ namespace PARSE
 
         }
 
+        void NewScan_Click(Object sender, RoutedEventArgs e)
+        {
+            MeasurementLoader NewScanWindow = new MeasurementLoader();
+            NewScanWindow.Show();
+            // TODO Refresh when results saved
+
+        }
+        void RemoveScan_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        void ScanAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        void ScanSelected_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

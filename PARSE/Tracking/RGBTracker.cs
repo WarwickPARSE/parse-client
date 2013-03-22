@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -19,33 +20,26 @@ namespace PARSE.Tracking
         private byte[] colorpixelData;
         private byte[] processedcolorpixelData;
         private byte[] colorFrameRGB;
-        private WriteableBitmap outputColorBitmap;
         private WriteableBitmap processedBitmap;
-        private ColorImageFormat rgbImageFormat;
-
-        //RGB Constants
-        private  int RedIndex = 2;
-        private  int GreenIndex = 1;
-        private  int BlueIndex = 0;
 
         //frame sizes
-        private  int width = 640;
-        private  int height = 480;
+        private int width = 640;
+        private int height = 480;
+        private int[] rowHeaders;
 
-        // Kinecty things
-        //private int[] realDepthCollection;
-        //private int realDepth;
+        // Sensor Position
         private int x;
         private int y;
         private double angle;
-        //private int s = 4;
-        //private bool pc = false;
-
-        //Kinect sensor
-        KinectSensor kinectSensor;
 
         public RGBTracker()
         {
+            // Get row pointers
+            rowHeaders = new int[height];
+            for (int row = 0; row < height; row++)
+            {
+                rowHeaders[row] = row * width * 4;
+            }
         }
 
         public void ProcessFrame(byte[] byteFrame, out int x, out int y, out double angle)
@@ -99,13 +93,6 @@ namespace PARSE.Tracking
             List<int> xList = new List<int>();
             List<int> yList = new List<int>();
 
-            // Get row pointers
-            int[] rowHeaders = new int[height];
-            for (int row = 0; row < height; row++)
-            {
-                rowHeaders[row] = row * width * 4;
-            }
-
             // Convolve!
             for (int row = 0; row < height - 4; row++)
             {
@@ -135,7 +122,8 @@ namespace PARSE.Tracking
                 }
             }
 
-            if (featurePixelCount > 0)
+            // New >10 Threshold in place, to help prevent noise.
+            if (featurePixelCount > 1)
             {
                 //centroidX = featureX / featurePixelCount;
                 xList.ForEach(delegate(int element)
@@ -151,21 +139,8 @@ namespace PARSE.Tracking
                 centroidY = centroidY / featurePixelCount;
                 this.y = centroidY;
 
-                // Don't need to draw the sensor here - this bitmap won't be shown
-                /*
-                for (int row = centroidY - 4; row < centroidY + 4; row++)
-                    for (int col = centroidX - 4; col < centroidX + 4; col++)
-                    {
-                        if (row > 0 & col > 0 & row < 480 & col < 640)
-                        {
-                            int index = rowHeaders[row] + col * 4;
-                            featureMap[index] = 0;
-                            featureMap[index + 1] = 255;
-                            featureMap[index + 2] = 0;
-                            featureMap[index + 3] = 0;
-                        }
-                    }
-                */
+
+
                 Matrix inertiaMatrix = new Matrix();
 
                 IEnumerator<int> xListEnumerator = xList.GetEnumerator();
@@ -250,7 +225,7 @@ namespace PARSE.Tracking
                     )
                 {
                     // Left vector is the larger
-                    // Angle = tan^-1 y/x
+                    // Angle = tan^-1 y/x + correction
                     angle = Math.Atan(eigenMatrix.value[0, 0] / eigenMatrix.value[1, 0]);
                     if (angle < 0)
                         angle += Math.PI / 2;
@@ -264,7 +239,12 @@ namespace PARSE.Tracking
                     angle = Math.Atan(eigenMatrix.value[0, 1] / eigenMatrix.value[1, 1]);
                 }
             }
-
+            else
+            {
+                this.x = 0;
+                this.y = 0;
+                this.angle = 0;
+            }
             return featureMap;
         }
 

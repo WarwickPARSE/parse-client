@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,70 +13,72 @@ namespace PARSE.Tracking
 {
     class SensorTracker
     {
+        #region Globals
         // Scan Process
-        MeasurementLoader ScanProcessManager;
-            //bool CaptureOnStill;
-        System.Windows.Controls.TextBlock displayText;
+        MeasurementLoader ScanProcessManager;           // The class that called me
+        System.Windows.Controls.TextBlock displayText;  // The text element in the vis window
         enum Capture_Modes {Capture_On_Still, Capture_At_Position};
-        int Capture_Mode;
-        bool capture_timer_running;
-        int capture_timer_length = 15;
-        bool tracking = false;
-
-
+        int Capture_Mode;                               // Determines the capture mode
+        bool capture_timer_running;                     // Is the timer running?
+        int capture_timer_length = 15;                  // How long should the timer take?
+        public int captureTimer = 0;                    // The timer itself
+        bool tracking = false;                          // Should the system be tracking?
+    
         // Tracking & frame processing
-        private int gapBetweenFrames = 10;       // How many frames to skip between processed frames?
-        private volatile int frameCounter = 0;  // frameCounter % gapbetweenframes ==0  -> process frame
-        private volatile int frames = 0;
-        RGBTracker tracker;                     // Reference to RGBTracker
-        //bool capturePosition = false;
+        private int gapBetweenFrames = 8;              // How many frames to skip between processed frames?
+        private volatile int frameCounter = 0;          // frameCounter % gapbetweenframes ==0  -> process frame
+                                                        // TODO Use this to cancel frame processing if getting behind.
+        RGBTracker tracker;                             // Reference to RGBTracker
 
         // Sensor properties
-        public int x = 0;
-        public int y = 0;
-        private int prevX = 0;
-        private int prevY = 0;
-        private int dx = 0;
-        private int dy = 0;
-        public int captureTimer = 0;
-        public double angleXY = 0;
-        public double angleZ = 0;
-
+        public int x = 0;                               // current x coordinate of sensor
+        public int y = 0;                               // current y coordinate of sensor
+        private int prevX = 0;                          // previous x coordinate of sensor
+        private int prevY = 0;                          // previous y coordinate of sensor
+        private int dx = 0;                             // change in x between frames
+        private int dy = 0;                             // change in y between frames
+        public double angleXY = 0;                      // the angle of the sensor in the x/y plane, from the RGB feed
+        public double angleZ = 0;                       // the angle of the sensor in the z plane
+        
         // Kinect
-        bool kinectConnected;
-        KinectSensor kinectSensor;
+        bool kinectConnected;                           // do we have a kinect?
+        KinectSensor kinectSensor;                      // the kinect!
 
         // Frames
-        private byte[] colorFrame;
-        private short[] depthFrame;
-        private Skeleton[] skeletonFrame;
-        private WriteableBitmap VisualisationOutput;
-        private System.Windows.Controls.Image Visualisation;
-        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        private byte[] colorFrame;                      // Put the color frame data in here
+        private short[] depthFrame;                     // Put the depth frame data in here
+        private Skeleton[] skeletonFrame;               // Put the skeleton frame data in here
+        private WriteableBitmap VisualisationOutput;    // Write the final visualisation to here
+        private System.Windows.Controls.Image Visualisation; // Write visualisation stuff into here
+        private static readonly int Bgr32BytesPerPixel = 
+            (PixelFormats.Bgr32.BitsPerPixel + 7) / 8; // Need for image properties.
+        private int[] rowHeaders;                       // 'Pointers' to rows in the image byte array
 
         // Skeletons
-        private bool skeletonsIdentified = false;
-        //private bool captureSkeleton = false;
-        private byte doctorSkeletonID;
-        private byte patientSkeletonID;
-        private int activeSkeletons = 0;
- 
+        private bool skeletonsIdentified = false;       // Have the doctor/patient been identified?
+        private byte doctorSkeletonID;                  // What is the doctor's skeleton ID?
+        private byte patientSkeletonID;                 // What is the patient's skeleton ID?
+        private int activeSkeletons = 0;                // How many skeletons are in view?
+
+        #endregion 
+
+        #region Startup_Methods
         private bool start()
         {
-            System.Diagnostics.Debug.WriteLine("Start!");
+            // Prepare kinect etc.
+            // Need in a separate function so can call any time?
+            // TODO Make loading faster
+            prepare();
 
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count > 0)
             {
-                System.Diagnostics.Debug.WriteLine("Waiting for frames...");
+                System.Diagnostics.Debug.WriteLine("Tracker ready. Waiting for images from Kinect...");
                 lock (this)
                 {
                     tracking = true;
                     //captureSkeleton = true;
                 }
-
-                this.displayText.Foreground = Brushes.White;
-
                 return true;
             }
             else
@@ -83,6 +86,21 @@ namespace PARSE.Tracking
                 System.Diagnostics.Debug.WriteLine("No Kinect connected!");
                 return false;
             }
+        }
+
+        public void stop()
+        {
+            lock (this)
+            {
+                tracking = false;
+                kinectSensor.Stop();
+            }
+        }
+
+        public void close()
+        {
+            this.stop();
+            kinectSensor.Stop();
         }
 
         internal void captureNewLocation()
@@ -99,28 +117,31 @@ namespace PARSE.Tracking
             this.start();
         }
 
-        private void capture()
-        {
-            CapturePosition();
-
-            this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
-        }
-
         public SensorTracker(System.Windows.Controls.Image visualisation, MeasurementLoader manager, bool captureOnStill, System.Windows.Controls.TextBlock textBlock)
         {
+            System.Diagnostics.Debug.WriteLine("Initialising tracking system...");
+
+            // Store given variables
             this.ScanProcessManager = manager;
             this.displayText = textBlock;
 
-            kinectConnected = (KinectSensor.KinectSensors.Count > 0); // true;
+            // Prepare visualisation
+            Visualisation = visualisation;
+
+            // Get row pointers, to have as reference rather than calculating every time (used by Highlight)
+            rowHeaders = new int[480];
+            for (int row = 0; row < 480; row++)
+            {
+                rowHeaders[row] = row * 640 * 4;
+            }
+        }
+
+        private void prepare()
+        {
+            kinectConnected = (KinectSensor.KinectSensors.Count > 0);
 
             if (kinectConnected)
             {
-                System.Diagnostics.Debug.WriteLine("Initialising tracker...");
-
-                // Prepare visualisation
-                Visualisation = visualisation;
-                System.Diagnostics.Debug.WriteLine("Visualisation: " + Visualisation.Uid);
-
                 //Initialize sensor
                 kinectSensor = KinectSensor.KinectSensors[0];
                 kinectSensor.Start();
@@ -149,6 +170,11 @@ namespace PARSE.Tracking
             }
         }
 
+        #endregion
+
+        /*
+         * Called whenever the frames are ready. When processed, calls frameReady for post-frame work & visualisation
+         */
         private void handleNewFrame(object sender, AllFramesReadyEventArgs frames)
         {
             //Console.WriteLine("Frame!");
@@ -190,9 +216,7 @@ namespace PARSE.Tracking
                                 if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                                     skeletons++;
                             }
-
-                            System.Diagnostics.Debug.WriteLine("There should be " + skeletons + " skeletons");
-
+                            activeSkeletons = skeletons;
                         }
                     }
                     else
@@ -201,7 +225,8 @@ namespace PARSE.Tracking
                         return;
                     }
 
-                    //Console.WriteLine("Do stuff");
+                    // Now the frame data has been captured, process it!
+                    
                     // Need to use local copies to maintain volatility of actual variables
                     int tempX = 0;
                     int tempY = 0;
@@ -209,7 +234,10 @@ namespace PARSE.Tracking
 
                     // Get the values
                     byte[] colorFrame2 = (byte[])thisColorFrame.Clone();
+
                     tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle);
+
+                    Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
                     lock (this)
                     {
@@ -227,7 +255,7 @@ namespace PARSE.Tracking
                     }
 
                     // Post-frame work
-                    FrameReady();
+                    frameReady();
                 }
             }
             else
@@ -244,15 +272,17 @@ namespace PARSE.Tracking
                         frames.OpenColorImageFrame().CopyPixelDataTo(colorFrame);
 
                 }
+
+                updateVisualisation();
             }
         }
 
-        private void FrameReady()
+        private void frameReady()
         {
             //Console.WriteLine("Frame ready running");
 
             // Put the most recent colour frame up
-            UpdateVisualisation();
+            updateVisualisation();
 
             // Update timer
             updateCaptureTimer();
@@ -267,11 +297,7 @@ namespace PARSE.Tracking
                 
         }
 
-        /*
-         * Take the x, y, z, angles, depthframe & skeletonframe and convert to a skeleton-relative position.
-         */
-        private void CapturePosition()
-        {
+        private void updateVisualisation()
             Console.WriteLine("Capture position!!!");
 
             Skeleton[] frame;
@@ -290,56 +316,6 @@ namespace PARSE.Tracking
                 }
 
             SkeletonPosition skeletonPosition = new SkeletonPosition(patient, this.x, this.y, this.angleXY, this.angleZ);
-        }
-
-        private void updateCaptureTimer()
-        {
-            // If mode is new scan
-            if (this.Capture_Mode == (int)Capture_Modes.Capture_On_Still)
-            {
-                int temp_activeSkeletons = 0;
-                lock (this)
-                {
-                    temp_activeSkeletons = activeSkeletons;
-                }
-
-                // TODO Probably shouldn't do this here
-                temp_activeSkeletons = 0;
-                if (skeletonFrame != null)
-                    for (int index = 0; index < skeletonFrame.Length; index++)
-                        if (skeletonFrame[index].TrackingState == SkeletonTrackingState.Tracked)
-                            temp_activeSkeletons++;
-
-                lock (this)
-                    activeSkeletons = temp_activeSkeletons;
-
-                // If the scanner hasn't moved too much, and there are still two skeletons in the frame!
-                if ( (this.dx < 10 & this.dy < 10 & this.x != 0 & this.y != 0)
-                    &&
-                    (skeletonFrame != null)  // Need this check before trying to check the frame length! (otherwise get NPE)
-                    &&
-                     (temp_activeSkeletons == 2)
-                    )
-                    this.captureTimer++;
-                else
-                    this.captureTimer = 0;
-
-            }
-            else
-            {
-                // Convert to skeleton-relative position, and find the distance.
-                // If distance < threshold, start timer.
-                
-                if (capture_timer_running)
-                {
-                    // If distance > threshold, stop timer.
-                    // If distance < threshold, increment.
-                }
-            }
-
-        }
-
-        private void UpdateVisualisation()
         {
             //Console.WriteLine("Updating visualisation!");
             bool display = true;
@@ -353,55 +329,96 @@ namespace PARSE.Tracking
 
             if (display)
             {
-                HighlightSensor(this.x, this.y);
+                highlightSensor(this.x, this.y);
             }
-                // Output processed image
-                if (VisualisationOutput == null)
-                    VisualisationOutput = new WriteableBitmap(640, 480, 90, 90, PixelFormats.Bgr32, null);
 
-                this.VisualisationOutput.WritePixels(
-                    new Int32Rect(0, 0, 640, 480),
-                    colorFrame,
-                    640 * Bgr32BytesPerPixel,
-                    0);
+            // Update text!
 
-                Visualisation.Source = VisualisationOutput;
-
-            // Update text
+            // If not enough skeletons, not enough people. Wait for them!
             if (activeSkeletons < 2)
             {
                 this.displayText.Text = "Waiting for doctor and patient";
             }
+            // If enough people (exactly)...
             else if (activeSkeletons == 2)
             {
+                // Wait to identify the doctor/patient by finding the scanner
                 if (!skeletonsIdentified)
                 {
                     this.displayText.Text = "Identifying doctor & searching for scanner";
                 }
+                // Display timer as all is going so well
                 else
                 {
                     if ((capture_timer_length - captureTimer) < 11)
                     {
                         this.displayText.FontSize = Math.Max(4 * captureTimer, this.displayText.FontSize);
-                        //this.displayText.Foreground.Opacity = Math.Max(5 * (captureTimer), 20);
                         this.displayText.Text = (capture_timer_length - captureTimer).ToString();
                     }
                     else
                     {
                         this.displayText.FontSize = 16;
-                        //this.displayText.Foreground.Opacity = Math.Max(5 * (captureTimer), 20);
                         this.displayText.Text = "Waiting...";
                     }
                 }
 
-            }   
+            }
+
+            // Output processed image
+            if (VisualisationOutput == null)
+                VisualisationOutput = new WriteableBitmap(640, 480, 90, 90, PixelFormats.Bgr32, null);
+
+            this.VisualisationOutput.WritePixels(
+                new Int32Rect(0, 0, 640, 480),
+                colorFrame,
+                640 * Bgr32BytesPerPixel,
+                0);
+
+            Visualisation.Source = VisualisationOutput;
+        }
+
+        private void updateCaptureTimer()
+        {
+            // If mode is new scan
+            if (this.Capture_Mode == (int)Capture_Modes.Capture_On_Still)
+            {
+                int temp_activeSkeletons = 0;
+                lock (this)
+                {
+                    temp_activeSkeletons = activeSkeletons;
+                }
+
+                // If the scanner hasn't moved too much, and there are still two skeletons in the frame!
+                if ((this.dx < 10 & this.dy < 10 & this.x != 0 & this.y != 0)
+                    &&
+                    //(skeletonFrame != null)
+                    //&&
+                     (temp_activeSkeletons == 2)
+                    )
+                    this.captureTimer++;
+                else
+                    this.captureTimer = 0;
+
+            }
+            else
+            {
+                // Convert to skeleton-relative position, and find the distance.
+                // If distance < threshold, start timer.
+
+                if (capture_timer_running)
+                {
+                    // If distance > threshold, stop timer.
+                    // If distance < threshold, increment.
+                }
+            }
+
         }
 
         private void identifySkeletons()
         {
             System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
 
-            if (skeletonFrame != null)
+            if (skeletonFrame != null & activeSkeletons == 2)
             {
                 Skeleton[] frame;
 
@@ -411,6 +428,7 @@ namespace PARSE.Tracking
                 }
 
                 int doctorID = -1;
+                int patientID = -1;
                 float distance = float.MaxValue;
                 for (int person = 0; person < frame.Length; person++)
                 {
@@ -438,80 +456,102 @@ namespace PARSE.Tracking
                     }
                 }
 
+                // Found a doctor!
                 if (distance < 30 & doctorID != -1)
                 {
-                    skeletonsIdentified = true;
-                    System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID);
+                    //  Try to find the patient
+                    for (int index = 0; index < frame.Length; index++)
+                        if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
+                        {
+                            if (frame[index].TrackingId != doctorID)
+                                patientID = (byte)frame[index].TrackingId;
+                        }
+
+                    // If we find a patient, set skeletonsIdentified
+                    if (patientID != -1)
+                    {
+                        skeletonsIdentified = true;
+                        this.displayText.Text = "Doctor and patient identified!";
+                        System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID + ", and patient as ID: " + patientID);
+                    }
                 }
                 else if (doctorID == -1)
                 {
                     System.Diagnostics.Debug.WriteLine("Sensor tracker could not identify the doctor");
                     if (x == 0 || y == 0)
                     {
+                        this.displayText.Text = "The sensor tracker is looking for the sensor...";
                         System.Diagnostics.Debug.WriteLine("This could be because the sensor has not yet been located");
                     }
                 }
-
-                int activeSkeletons = 0;
+                else if (distance >= 30)
                 for (int index = 0; index < frame.Length; index ++)
                     if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
-                    {
-                        activeSkeletons++;
                         if (frame[index].TrackingId != doctorID)
                             patientSkeletonID = (byte)frame[index].TrackingId;
-                    }
-
-                if (activeSkeletons > 2)
                 {
-                    System.Diagnostics.Debug.WriteLine("There are too many skeletons");
-                    doctorSkeletonID = 8;
-                    patientSkeletonID = 8;
+                    this.displayText.Text = "Sensor found, but not close enough to a hand";
+                    System.Diagnostics.Debug.WriteLine("Sensor found, but not close enough to a hand");
                 }
-
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Frame is null -> No skeletons detected");
+                this.displayText.Text = "There are not 2 skeletons in the frame";
+                System.Diagnostics.Debug.WriteLine("There are not 2 skeletons in the frame.");
                 return;
             }
         }
 
-        public void Stop()
+        private void highlightSensor(int posX, int posY)
         {
-            lock (this)
+            // No position? Don't highlight!
+            if (posX != 0 & posY != 0)
             {
-                tracking = false;
-                kinectSensor.Stop();
-            }
-        }
-
-        public void close()
-        {
-            this.Stop();
-            kinectSensor.Stop();
-        }
-
-        private void HighlightSensor(int posX, int posY)
-        {
-            // Get row pointers
-            int[] rowHeaders = new int[480];
-            for (int row = 0; row < 480; row++)
-            {
-                rowHeaders[row] = row * 640 * 4;
-            }
-
-            for (int row = posY - 4; row < posY + 4; row++)
-                for (int col = posX - 4; col < posX + 4; col++)
+                // Choose a depth-dependant highlight size
+                short depth = depthFrame[640 * posY + posX];
+                int size = 3;
+                if (depth < 9500)
+                    size = 8;
+                else if (depth > 30000)
+                    size = 3;
+                else
                 {
-                    if (row > 0 & col > 0 & row < 480 & col < 640)
+                    size = (int)(16 - (4 * (depth / 10000)));
+                    size = Math.Max(size, 3);
+                    size = Math.Min(size, 10);
+                }
+
+                // Place the highlight
+                for (int row = posY - size; row < posY + size; row++)
+                {
+                    for (int col = posX - size; col < posX + size; col++)
                     {
-                        int index = rowHeaders[row] + col * 4;
-                        colorFrame[index] = 0;
-                        colorFrame[index + 1] = 255;
-                        colorFrame[index + 2] = 0;
-                        colorFrame[index + 3] = 0;
+                        if (row > 0 & col > 0 & row < 480 & col < 640)
+                        {
+                            int index = rowHeaders[row] + col * 4;
+                            colorFrame[index] = 0;
+                            colorFrame[index + 1] = 255;
+                            colorFrame[index + 2] = 0;
+                            colorFrame[index + 3] = 0;
+                        }
                     }
                 }
-        }        
+            }
+        }
+
+        /*
+         * Take the x, y, z, angles, depthframe & skeletonframe and convert to a skeleton-relative position.
+         */
+        private void capturePosition()
+        {
+            Console.WriteLine("Capture position!!!");
+        }
+
+        private void capture()
+        {
+            capturePosition();
+
+            this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
+        }
     }
 }

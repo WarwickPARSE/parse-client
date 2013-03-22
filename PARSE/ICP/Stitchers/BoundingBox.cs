@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
 
 namespace PARSE.ICP.Stitchers
 {
@@ -156,7 +157,8 @@ namespace PARSE.ICP.Stitchers
             return pcd;
         }
 
-        public override List<PointCloud> getResultList() {
+        public override List<PointCloud> getResultList() 
+        {
             return txpointClouds; 
         }
 

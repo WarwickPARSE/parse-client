@@ -24,40 +24,39 @@
         <Menu>
         <!--Menu definition-->
         <MenuItem Header="_File">
-            <MenuItem Header="_New Patient" IsCheckable="true"/>
-            <MenuItem Header="_Open Patient" IsCheckable="true"/>
-            <MenuItem Header="_Save Patient" IsCheckable="true"/>
+            <MenuItem Header="_New Patient" IsCheckable="false"/>
+            <MenuItem Header="_Open Patient" />
+            <MenuItem Header="_Save Patient" />
             <Separator/>
-            <MenuItem Header="Exit" IsCheckable="true"/>
+            <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
-        <MenuItem Header="_Edit">
-
-        </MenuItem>
-            <MenuItem Header="_Control">
-                <MenuItem Header="_Calibrate" IsCheckable="False" Click="btnCalibrate_Click"/>
-                <Separator/>
+        <MenuItem Header="Patient">
+                <MenuItem Header="New Scan" Name="newscan" IsEnabled="{Binding}" IsCheckable="False" Click="NewScan_Click" />
+                <MenuItem Header="View Previous Scan" Name="oldscan" IsEnabled="{Binding}" IsCheckable="False" Click="LoadScan_Click"/>
+                <MenuItem Header="Export Scan to .PARSE" Name="export1" IsEnabled="{Binding}" IsCheckable="False" Click="ExportScan_Click"/>
+                <MenuItem Header="Export Scan to .PCD" Name="export2" IsEnabled="{Binding}" IsCheckable="False" Click="ExportScanPCD_Click"/>
+                <MenuItem Header="Add Measurement"  Name="measurement" IsEnabled="{Binding}" Click="AddMeasurement_Click"/>
+                <MenuItem Header="Remove Their Feet" Name="removefloor" IsEnabled="{Binding}" IsCheckable="False" Click="RemoveFeet_Click"/>
+                </MenuItem>
+            <MenuItem Header="Calculate" Name="calculate" IsEnabled="{Binding}">
+                    <MenuItem Header="Volume" Click="VolumeOption_Click"/>
+                    <MenuItem Header="Limb Circumference" Click="LimbOption_Click"/>
+     </MenuItem>
+            <MenuItem Header="Kinect" Name="kinectmenu">
+                <MenuItem Header="View Feed">
+                    <MenuItem Header="RGB" Click="RGB_Click"/>
+                    <MenuItem Header="Depth" Click="Depth_Click"/>
+                    <MenuItem Header="Skeleton" Click="Skeleton_Click"/>
+                    <MenuItem Header="RGB Isolation" Click="RGBIso_Click"/>
+                    <MenuItem Header="Depth Isolation" Click="DepthIso_Click"/>
+                </MenuItem>
                 <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
                 <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>
             </MenuItem>
-        <MenuItem Header="Patient">
-            <MenuItem Header="Capture">
-                <MenuItem Header="Volume" IsCheckable="true" Click="VolumeOption_Click"/>
-                <MenuItem Header="Limb Circumference" IsCheckable="true" Click="LimbOption_Click"/>
-            </MenuItem>
-            <MenuItem Header="_Details" IsCheckable="False"/>
-            <Separator/>
-                <MenuItem Header="_New Scan..." IsCheckable="False" Click="NewScan_Click" />
-                <MenuItem Header="_Import Scan" IsCheckable="False" Click="ImportScan_Click"/>
-                <MenuItem Header="_Export Scan to .PARSE" IsCheckable="False" Click="ExportScan_Click"/>
-                <MenuItem Header="_Export Scan to .PCD" IsCheckable="False" Click="ExportScanPCD_Click"/>
-                <MenuItem Header="_Group Point Clouds" IsCheckable="False" Click="SimpleStitchTest_Click"/>
-                <MenuItem Header="_Cloud Processor" IsCheckable="False" Click="CloudProcessor_Click"/>
-                <MenuItem Header="Add Measurement"  Click="AddMeasurement_Click"/>
-            </MenuItem>
-        <MenuItem Header="_Help">
-
-        </MenuItem>
-        </Menu>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Debug Console" Click="OpenDebug_Click"/> 
+     </MenuItem>
+    </Menu>
 
         <!--Central Textblock -->
         <Canvas Name="optioncv" Margin="363,220,375,182" Grid.Row="1">
@@ -69,13 +68,13 @@
         </TextBlock>
         <TextBlock Margin="455,434,667,286" Grid.Row="1" Canvas.Left="-353" Canvas.Top="-227">   
              <Image Name="load" Source="Resources/open.png" Width="15" Height="15" VerticalAlignment="Center"/>
-            <Hyperlink NavigateUri="http://www.google.com">
+            <Hyperlink Click="LoadScan_Click">
                     Load Existing Patient
             </Hyperlink>
         </TextBlock>
         <TextBlock Margin="455,466,597,255" Grid.Row="1" Canvas.Left="-353" Canvas.Top="-227">
              <Image Name="person" Source="Resources/person.png" Width="15" Height="15" VerticalAlignment="Center"/>
-            <Hyperlink NavigateUri="http://www.google.com">
+            <Hyperlink Click="NewScan_Click">
                     Start Volume Scanning Procedure
             </Hyperlink>
         </TextBlock>

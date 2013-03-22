@@ -12,7 +12,7 @@ namespace PARSE
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
             double height = ymax - ymin;
-            height = UnitConvertor.convertPC1DMeasurement(height);
+            height = UnitConvertor.convertPCM(height,1);
             return height;
         }
     }
