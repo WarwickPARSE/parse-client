@@ -468,6 +468,12 @@ namespace PARSE
              * 3) calcs height
              */
 
+            //Load metaloader with list of currently recorded patients provide the option to just load point cloud if required.
+
+            MetaLoader windowMeta = new MetaLoader();
+            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            windowMeta.Show();
+
             try
             {
                 /*0)*/

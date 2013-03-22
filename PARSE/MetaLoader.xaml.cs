@@ -16,11 +16,31 @@ namespace PARSE
     /// <summary>
     /// Interaction logic for MetaLoader.xaml
     /// </summary>
+
     public partial class MetaLoader : Window
     {
+
+        private DatabaseEngine db = new DatabaseEngine();
+        private Object[] patientslist;
+
         public MetaLoader()
         {
             InitializeComponent();
+            this.Loaded += new RoutedEventHandler(MetaLoader_Loaded);
+        }
+
+        void MetaLoader_Loaded(object sender, RoutedEventArgs e)
+        {
+            /// <summary>
+            /// Calls patient information records from the database
+            /// </summary>
+
+            Selection patients = db.selectQueries;
+
+            patientslist = patients.SelectAllPatients();
+            
+            System.Diagnostics.Debug.WriteLine(patientslist[0]);
+
         }
     }
 }
