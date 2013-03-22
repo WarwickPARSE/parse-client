@@ -52,7 +52,7 @@ namespace PARSE
                 var nextName = nodeName.Next;
                 var nextNHSNo = nodeNHSNo.Next;
 
-                listBox1.Items.Add(new { Id = patientsList.Item1.Remove(nodeID), Patientname = patientsList.Item2.Remove(nodeName), Patientnhsno = patientsList.Item3.Remove(nodeNHSNo) } );
+               // listBox1.Items.Add(new { Id = patientsList.Item1.Remove(nodeID), Patientname = patientsList.Item2.Remove(nodeName), Patientnhsno = patientsList.Item3.Remove(nodeNHSNo) } );
 
                 nodeID = nextID;
                 nodeName = nextName;
