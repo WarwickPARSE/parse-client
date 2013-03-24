@@ -19,8 +19,11 @@ namespace PARSE
     public partial class PatientLoader : Window
     {
         private DatabaseEngine db = new DatabaseEngine();
-        private int activeID;
         private bool existing;
+        private bool runtimeExisting;
+        public int activeID;
+
+        //For new or already open patient records
 
         public PatientLoader(bool existing)
         {
@@ -32,11 +35,25 @@ namespace PARSE
             {
                 //this will eventually set the activeid to the appropriately loaded record.
                 this.Loaded += new RoutedEventHandler(PatientLoaderExisting_Loaded);
+                runtimeExisting = false;
             }
             else
             {
                 this.Loaded += new RoutedEventHandler(PatientLoader_Loaded);
             }
+        }
+
+       //For patient records that need to be loaded at runtime.
+
+        public PatientLoader(int recordid)
+        {
+            InitializeComponent();
+
+            this.activeID = recordid;
+            runtimeExisting = true;
+
+            this.Loaded += new RoutedEventHandler(PatientLoaderExisting_Loaded);
+
         }
 
         private void PatientLoader_Loaded(object Sender, RoutedEventArgs e)
@@ -82,7 +99,10 @@ namespace PARSE
 
             db.dbOpen();
 
-            this.activeID = db.getAllPatients().Item1.Last();
+            if (runtimeExisting == false)
+            {
+                this.activeID = db.getAllPatients().Item1.Last();
+            }
 
             //hide existing patient labels
             this.patientIDExisting.Visibility = Visibility.Visible;
@@ -145,7 +165,7 @@ namespace PARSE
                 this.conditiondetail.Visibility = Visibility.Visible;
                 this.patientEntry.SelectedIndex = 1;
 
-            } else if (existing && this.proceedCon.Content=="Proceed -->") {
+            } else if (existing & this.proceedCon.Content=="Proceed -->") {
                 this.conditiondetail.Visibility = Visibility.Visible;
                 this.patientEntry.SelectedIndex = 1;
 

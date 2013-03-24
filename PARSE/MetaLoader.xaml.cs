@@ -21,7 +21,10 @@ namespace PARSE
     {
 
         private DatabaseEngine db = new DatabaseEngine();
-        private Object[] patientslist;
+        Tuple<int, String, String> selectedRecord;
+        LinkedListNode<int> nodeID;
+        LinkedListNode<String> nodeName;
+        LinkedListNode<String> nodeNHSNo;
 
         public MetaLoader()
         {
@@ -40,9 +43,9 @@ namespace PARSE
             //access all patients from database.
             Tuple<LinkedList<int>,LinkedList<String>,LinkedList<string>> patientsList = db.getAllPatients();
 
-            LinkedListNode<int> nodeID = patientsList.Item1.First;
-            LinkedListNode<String> nodeName = patientsList.Item2.First;
-            LinkedListNode<String> nodeNHSNo = patientsList.Item3.First;
+            nodeID = patientsList.Item1.First;
+            nodeName = patientsList.Item2.First;
+            nodeNHSNo = patientsList.Item3.First;
 
             //populate datagrid
 
@@ -52,13 +55,41 @@ namespace PARSE
                 var nextName = nodeName.Next;
                 var nextNHSNo = nodeNHSNo.Next;
 
-               // listBox1.Items.Add(new { Id = patientsList.Item1.Remove(nodeID), Patientname = patientsList.Item2.Remove(nodeName), Patientnhsno = patientsList.Item3.Remove(nodeNHSNo) } );
+                patientsList.Item1.Remove(nodeID);
+                patientsList.Item2.Remove(nodeName);
+                patientsList.Item3.Remove(nodeNHSNo);
 
                 nodeID = nextID;
                 nodeName = nextName;
                 nodeNHSNo = nextNHSNo;
+
+                var nodes = new { Id = nodeID.Value, Patientname = nodeName.Value, Patientnhsno = nodeNHSNo.Value };
+                listBox1.Items.Add(nodes);
             }
 
+        }
+
+        public Tuple<int, String, String> returnSelectedRecord()
+        {
+            return selectedRecord;
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            //retrieve as an anonymous object type
+            Object activeRecord = listBox1.SelectedItems[0];
+
+            //access attributes through reflection
+            dynamic d = activeRecord;
+            object id = d.Id;
+            object nm = d.Patientname;
+            object nhs = d.Patientnhsno;
+
+            //cast attributes to a tuple
+            selectedRecord = new Tuple<int, String, String>(Convert.ToInt32(id), nm.ToString(), nhs.ToString());
+
+            //close the window
+            this.Close();
         }
     }
 }

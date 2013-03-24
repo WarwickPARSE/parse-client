@@ -47,6 +47,7 @@ namespace PARSE
         public HistoryLoader               windowHistory;
         public MeasurementLoader           windowMeasurement;
         public DebugLoader                 windowDebug;
+        public MetaLoader                  windowMeta;
 
         //Modelling specific definitions
         private GeometryModel3D             Model;
@@ -509,9 +510,27 @@ namespace PARSE
 
             //Load metaloader with list of currently recorded patients provide the option to just load point cloud if required.
 
-            MetaLoader windowMeta = new MetaLoader();
+            windowMeta = new MetaLoader();
             windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            windowMeta.Owner = this;
             windowMeta.Show();
+
+            windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
+
+        }
+
+        void windowMeta_Closing(object sender, CancelEventArgs e)
+        {
+            //This is called when window meta is closed as control needs to be passed back to coreloader
+            //to load the relevant windows based on what scans a particular patient may have undergone.
+
+            Tuple<int,String,String> activeRecord = windowMeta.returnSelectedRecord();
+
+            //Load patient loader with new patient information using the existing constructor.
+
+            windowPatient = new PatientLoader(activeRecord.Item1);
+            windowPatient.Owner = this;
+            windowPatient.Show();
 
         }
 
