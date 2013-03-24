@@ -460,7 +460,7 @@ namespace PARSE
 
                 LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
-            else
+            /*else
             {
 
                 //if we have passed an existing pointcloud from coreloader
@@ -474,7 +474,7 @@ namespace PARSE
                    // LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
                 }
 
-            }
+            }*/
 
             //change colour of point cloud for limb selection mode
             gv.setMaterial();
