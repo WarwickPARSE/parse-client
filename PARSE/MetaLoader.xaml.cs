@@ -91,5 +91,11 @@ namespace PARSE
             //close the window
             this.Close();
         }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            (Owner as CoreLoader).LoadPointCloudFromFile();            
+        }
     }
 }

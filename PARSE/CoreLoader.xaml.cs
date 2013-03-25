@@ -293,10 +293,9 @@ namespace PARSE
 
             this.resetButtons();
             
-            windowScanner = new ScanLoader();
+            windowScanner = new ScanLoader((int)ScanLoader.OperationModes.CaptureNewCloud);
             windowScanner.Owner = this;
             windowScanner.Show();
-            windowScanner.ScanLoaderReady(1); // 1 = new scan (show the buttons)
 
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
@@ -451,7 +450,7 @@ namespace PARSE
 
             this.shutAnyWindows();
 
-            windowScanner = new ScanLoader();
+            windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingCloud);
             windowScanner.Owner = this;
 
             // Do UI stuff on UI thread
@@ -653,12 +652,18 @@ namespace PARSE
 
         private void OpenPatient_Click(object sender, RoutedEventArgs e)
         {
-            /*Automates the following procedure:
-                * 0) kills kinect, closes any viewer, resets buttons
-                * 1) adds selected point cloud to visualiser
-                * 2) groups it
-                * 3) calcs height
-                */
+            this.LoadPointCloudFromFile();
+        }
+
+        public void LoadPointCloudFromFile()
+        {
+            /*
+             *Automates the following procedure:
+             * 0) kills kinect, closes any viewer, resets buttons
+             * 1) adds selected point cloud to visualiser
+             * 2) groups it
+             * 3) calcs height
+            */
 
             try
             {
@@ -687,7 +692,7 @@ namespace PARSE
 
                 // Show the window first - keep UI speedy!
                 System.Diagnostics.Debug.WriteLine("Showing window");
-                windowScanner = new ScanLoader();
+                windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingCloud);
                 windowScanner.Owner = this;
 
                 // Do UI stuff on UI thread
@@ -733,7 +738,5 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine(err.ToString());
             }
         }
-       
-       
     }
 }
