@@ -66,7 +66,8 @@ namespace PARSE.ICP.Stitchers
             //change in distance error between two iterations 
             double fval_percep = 0;
 
-            //todo: some array to contain the transformed points 
+            //matrix that contains the transformed points
+            DenseMatrix pointsMoved = m2;
 
             //number of iterations 
             int itt = 0;
@@ -170,14 +171,62 @@ namespace PARSE.ICP.Stitchers
             return txpointClouds;
         }
 
+        /// <summary>
+        /// Finds the maximal column values for a matrix 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public DenseVector maxP(DenseMatrix m) {
+            //maintain an array of colum max values
+            double[] maxVals = new double[m.ColumnCount];
 
-        //todo: implement these methods 
-        public double maxP() {
-            return 0;
+            //set every value to the min value
+            for (int i = 0; i < maxVals.Length; i++) {
+                maxVals[i] = double.MinValue;
+            }
+
+            //iterate over each column starting 
+            for (int i = 0; i < m.ColumnCount; i++) {
+                for (int j = 0; i < m.RowCount; j++) { 
+                    //reassign the max value if the value being looked at is greater
+                    if(maxVals[i] > m[i, j]) {
+                        maxVals[i] = m[i, j];
+                    }
+                }
+            }
+
+            return new DenseVector(maxVals);
         }
 
-        public double minP() {
-            return 0; 
+        /// <summary>
+        /// Finds the minimal column values for a matrix 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public DenseVector minP(DenseMatrix m) {
+            //maintain an array of colum min values
+            double[] minVals = new double[m.ColumnCount];
+
+            //set every value to the max value
+            for (int i = 0; i < minVals.Length; i++)
+            {
+                minVals[i] = double.MaxValue;
+            }
+
+            //iterate over each column starting 
+            for (int i = 0; i < m.ColumnCount; i++)
+            {
+                for (int j = 0; i < m.RowCount; j++)
+                {
+                    //reassign the min value if the value being looked at is less 
+                    if (minVals[i] < m[i, j])
+                    {
+                        minVals[i] = m[i, j];
+                    }
+                }
+            }
+
+            return new DenseVector(minVals);
         }
     }
 }
