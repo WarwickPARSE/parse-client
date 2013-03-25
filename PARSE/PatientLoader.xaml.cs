@@ -19,9 +19,11 @@ namespace PARSE
     public partial class PatientLoader : Window
     {
         private DatabaseEngine db = new DatabaseEngine();
-        private Object[] dbReceiver;
-        private int currentID;
         private bool existing;
+        private bool runtimeExisting;
+        public int activeID;
+
+        //For new or already open patient records
 
         public PatientLoader(bool existing)
         {
@@ -31,7 +33,9 @@ namespace PARSE
 
             if (existing)
             {
+                //this will eventually set the activeid to the appropriately loaded record.
                 this.Loaded += new RoutedEventHandler(PatientLoaderExisting_Loaded);
+                runtimeExisting = false;
             }
             else
             {
@@ -39,9 +43,23 @@ namespace PARSE
             }
         }
 
+       //For patient records that need to be loaded at runtime.
+
+        public PatientLoader(int recordid)
+        {
+            InitializeComponent();
+
+            this.activeID = recordid;
+            runtimeExisting = true;
+
+            this.Loaded += new RoutedEventHandler(PatientLoaderExisting_Loaded);
+
+        }
+
         private void PatientLoader_Loaded(object Sender, RoutedEventArgs e)
         {
-            Selection getID = db.selectQueries;
+            //open database
+            db.dbOpen();
 
             //hide existing patient labels
             this.patientIDExisting.Visibility = Visibility.Collapsed;
@@ -58,7 +76,18 @@ namespace PARSE
 
             //enable/disable appropriate controls
             this.patientIDText.IsEnabled = false;
-            //this.patientIDText.Text = (getID.getLastPatientID()+1).ToString();
+
+            if (db.getAllPatients().Item1.Count != 0)
+            {
+                this.activeID = db.getAllPatients().Item1.Last();
+                this.patientIDText.Text = (activeID + 1).ToString();
+            }
+            else
+            {
+                this.activeID = 0;
+                this.patientIDText.Text = (activeID + 1).ToString();
+            }
+
         }
 
         private void PatientLoaderExisting_Loaded(object Sender, RoutedEventArgs e)
@@ -67,6 +96,13 @@ namespace PARSE
             this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             Selection select = db.selectQueries;
             //currentID = select.getLastPatientID();
+
+            db.dbOpen();
+
+            if (runtimeExisting == false)
+            {
+                this.activeID = db.getAllPatients().Item1.Last();
+            }
 
             //hide existing patient labels
             this.patientIDExisting.Visibility = Visibility.Visible;
@@ -89,27 +125,17 @@ namespace PARSE
             this.proceedCon.Content = "Edit Details";
 
             //Select patient information provided by id (to be added)
+            this.label1.Content = db.getPatientInformation(this.activeID).Item2.First();
+            this.patientIDExisting.Content = db.getPatientInformation(this.activeID).Item1.First();
+            this.patientNameExisting.Content = this.label1.Content;
+            this.patientDOBExisting.Content = Convert.ToString(db.getPatientInformation(this.activeID).Item3.First());
+            this.patientNationalityExisting.Content = db.getPatientInformation(this.activeID).Item4.First();
+            this.patientNhsNoExisting.Content = db.getPatientInformation(this.activeID).Item5.First();
+            this.patientAddressExisting.Text = db.getPatientInformation(this.activeID).Item6.First();
+            this.patientweightExisting.Content = Convert.ToString(db.getPatientInformation(this.activeID).Item7.First());
 
-            select = db.selectQueries;
-
-            //dbReceiver = select.SelectPatientInformation(currentID);
-            this.label1.Content = dbReceiver[1];
+            //set connection string status
             this.patientEntryStatus.Text = "Patients database: " + db.con.ConnectionString;
-
-            for (int item = 0; item < dbReceiver.Length; item++)
-            {
-                switch (item)
-                {
-                    case 0: this.patientIDExisting.Content = dbReceiver[item]; break;
-                    case 1: this.patientNameExisting.Content = dbReceiver[item]; break;
-                    case 2: this.patientDOBExisting.Content = Convert.ToString(dbReceiver[item]); break;
-                    case 3: this.patientNationalityExisting.Content = dbReceiver[item]; break;
-                    case 4: this.patientNhsNoExisting.Content = dbReceiver[item]; break;
-                    case 5: this.patientAddressExisting.Text = dbReceiver[item].ToString(); break;
-                    case 6: this.patientweightExisting.Content = dbReceiver[item]; break;
-                }
-            }
-
 
         }
 
@@ -139,7 +165,7 @@ namespace PARSE
                 this.conditiondetail.Visibility = Visibility.Visible;
                 this.patientEntry.SelectedIndex = 1;
 
-            } else if (existing && this.proceedCon.Content=="Proceed -->") {
+            } else if (existing & this.proceedCon.Content=="Proceed -->") {
                 this.conditiondetail.Visibility = Visibility.Visible;
                 this.patientEntry.SelectedIndex = 1;
 
@@ -170,10 +196,6 @@ namespace PARSE
 
         private void proceedSave_Click(object sender, RoutedEventArgs e)
         {
-            //save patient data to database (include the multiple conditions as above)
-
-            Insertion insertPatient = db.insertQueries;
-            Selection getID = db.selectQueries;
 
             //remove content from address box (as it's an annoying rich textbox control)
             TextRange textRange = new TextRange(
@@ -183,12 +205,7 @@ namespace PARSE
                 this.addressText.Document.ContentEnd
             );
 
-            //insertPatient.InsertPatientInformation(0, this.nameText.Text, this.dobText.Text, this.nationalityText.Text, Convert.ToInt32(this.nhsNoText.Text), textRange.Text, this.weightText.Text);
-
-            //We then need to get back the id of the recorded inserted so it can be stored on a volatile basis.
-            //currentID = getID.getLastPatientID();
-
-            db.con.Close();
+            db.insertPatientInformation(this.nameText.Text, this.dobText.Text, this.nationalityText.Text, Convert.ToInt32(this.nhsNoText.Text), textRange.Text, this.weightText.Text);
 
             //load windows for basic volume scanning procedure
             if (!existing)
