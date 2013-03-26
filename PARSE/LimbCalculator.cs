@@ -65,7 +65,7 @@ namespace PARSE
 
             segmentedPointcloud = pc.getSubRegion(bounds);
 
-            Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(segmentedPointcloud);
+            Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(segmentedPointcloud,2);
 
             System.Diagnostics.Debug.WriteLine("Your arm is " + CircumferenceCalculator.calculate(T.Item1, 1) + "m");
 
