@@ -72,13 +72,19 @@ namespace PARSE.ICP.Stitchers
             //number of iterations 
             int itt = 0;
 
-            //get the max and min points of the static points 
+            //get the max and min points of the static points (operator divides only works over vectors for some reason >:( )
             DenseVector maxP = this.maxP(m1);
             DenseVector minP = this.minP(m1);
 
             DenseVector tolX = (maxP - minP) / 1000;
 
             double spacing = (m1.ColumnCount ^ (1/6)) * Math.Sqrt(3);
+
+            //convert the vectors into column marix representations 
+            DenseMatrix maxPCol = (DenseMatrix)maxP.ToColumnMatrix();
+            DenseMatrix minPCol = (DenseMatrix)minP.ToColumnMatrix();
+
+            DenseMatrix spacingDistance = (DenseMatrix)this.maxP(minPCol - maxPCol).ToColumnMatrix(); //sketchy  
 
         }
         
