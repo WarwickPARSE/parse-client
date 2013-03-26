@@ -463,10 +463,12 @@ namespace PARSE
             windowHistory.Owner = this;
 
             // Background thread to get all the heavy computation off of the UI thread
+            /*
             BackgroundWorker B = new BackgroundWorker();
+             */
             //TODO Confirm we don't need this - the point cloud is loaded and stitched already?
             //B.DoWork += new DoWorkEventHandler(loadScanThread);
-
+            /*
             // Catch the progress update events
             B.WorkerReportsProgress = true;
             B.ProgressChanged += new ProgressChangedEventHandler((obj, args) =>
@@ -485,13 +487,15 @@ namespace PARSE
                 }
             });
             B.RunWorkerCompleted += new RunWorkerCompletedEventHandler((obj, args) =>
-            {
+            {*/
                 windowScanner.processCloudList(pcdl, windowScanner.loadingwidgetcontrol);
+            /*
             });
+
 
             // GOOO!!! Pass the file name so it can be loaded
             B.RunWorkerAsync(null);
-
+            */
         }
 
         private void OpenDebug_Click(object sender, RoutedEventArgs e)
