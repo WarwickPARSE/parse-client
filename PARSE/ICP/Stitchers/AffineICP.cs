@@ -73,10 +73,10 @@ namespace PARSE.ICP.Stitchers
             int itt = 0;
 
             //get the max and min points of the static points 
-            double maxP = this.maxP();
-            double minP = this.minP();
+            DenseVector maxP = this.maxP(m1);
+            DenseVector minP = this.minP(m1);
 
-            double tolX = (maxP - minP) / 1000;
+            DenseVector tolX = (maxP - minP) / 1000;
 
             double spacing = (m1.ColumnCount ^ (1/6)) * Math.Sqrt(3);
 
