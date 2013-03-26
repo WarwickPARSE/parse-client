@@ -96,14 +96,16 @@ namespace PARSE.ICP.Stitchers
             DenseVector xa = new DenseVector(noCols);
             DenseVector xb = new DenseVector(noCols);
             DenseVector xc = new DenseVector(noCols);
-
+            
+            //todo: if this doesn't work properly, then I need to have a look over the spacingDistance definition... 
             for (int i = 0; i < noCols; i++) {
                 xa[i] = minPCol[0, 1] + i * spacingDistance;
                 xb[i] = minPCol[0, 2] + i * spacingDistance;
                 xc[i] = minPCol[0, 3] + i * spacingDistance;
             }
 
-            double x, y, z; 
+            //create a bunch of three dimensional matrices to hold the correspondence data - values gathered through empirical analysis
+             
 
         }
         
@@ -252,6 +254,17 @@ namespace PARSE.ICP.Stitchers
             }
 
             return new DenseVector(minVals);
+        }
+
+        /// <summary>
+        /// An attempt at cloning the matlab ndgrid function, for all three vector inputs
+        /// </summary>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="v3"></param>
+        /// <returns></returns>
+        public DenseMatrix ndgrid(DenseVector v1, DenseVector v2, DenseVector v3) {
+            return null; 
         }
     }
 }
