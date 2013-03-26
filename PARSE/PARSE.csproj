@@ -185,6 +185,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Patients.xsd</DependentUpon>
     </Compile>
+    <Compile Include="PointCloudException.cs" />
     <Compile Include="PointCloudHandler.cs" />
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>

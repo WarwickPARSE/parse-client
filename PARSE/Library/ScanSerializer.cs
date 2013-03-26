@@ -43,6 +43,9 @@ namespace PARSE
             {
                 /*Extracts raw depth data from serialization and creates pc struct*/
 
+                // TODO check this is ok - this line wasn't here before? Nath
+                depthPc = new List<PointCloud>();
+
                 XmlSerializer deserializer = new XmlSerializer(typeof(List<int[]>));
                 TextReader textReader = new StreamReader(filename);
                 List<int[]> temp = (List<int[]>)(deserializer.Deserialize(textReader));

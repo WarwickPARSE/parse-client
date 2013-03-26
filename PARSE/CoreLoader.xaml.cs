@@ -464,7 +464,8 @@ namespace PARSE
 
             // Background thread to get all the heavy computation off of the UI thread
             BackgroundWorker B = new BackgroundWorker();
-            B.DoWork += new DoWorkEventHandler(loadScanThread);
+            //TODO Confirm we don't need this - the point cloud is loaded and stitched already?
+            //B.DoWork += new DoWorkEventHandler(loadScanThread);
 
             // Catch the progress update events
             B.WorkerReportsProgress = true;
@@ -489,7 +490,7 @@ namespace PARSE
             });
 
             // GOOO!!! Pass the file name so it can be loaded
-            B.RunWorkerAsync(filename);
+            B.RunWorkerAsync(null);
 
         }
 
@@ -540,17 +541,27 @@ namespace PARSE
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
-            ScanSerializer.deserialize((string)e.Argument);
+            String filename = (string)e.Argument;
 
-            System.Diagnostics.Debug.WriteLine(e.Argument);
+            if (filename != null)
+            {
+                B.ReportProgress(0, "Loading file: " + filename);
+               
+                ScanSerializer.deserialize(filename);
 
-            B.ReportProgress(8, "Model deserialised");
+                System.Diagnostics.Debug.WriteLine(e.Argument);
 
-            pcdl = ScanSerializer.depthPc;
+                B.ReportProgress(8, "Model deserialised");
 
-            System.Diagnostics.Debug.WriteLine(pcdl.Count);
+                pcdl = ScanSerializer.depthPc;
 
-            B.ReportProgress(2, "Model loaded");
+                System.Diagnostics.Debug.WriteLine(pcdl.Count);
+
+                B.ReportProgress(2, "Model loaded");
+            }
+
+            if (pcdl.Count == 0)
+                throw new PointCloudException("PCDL is empty");
 
             /*2)*/
             //instantiate the stitcher 
@@ -566,7 +577,9 @@ namespace PARSE
             
             pcd = stitcher.getResult();
             pcdl = stitcher.getResultList();
-            B.ReportProgress(1, "Point Cloud Stitched");
+            B.ReportProgress(1, "Point Cloud Stitched (with " + pcdl.Count + " components)");
+            if (pcdl.Count == 0)
+                throw new PointCloudException("Stitcher returned empty point cloud list");
 
             // Get the height
             double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
@@ -669,8 +682,6 @@ namespace PARSE
             {
                 /*0)*/
                 //this.kinectInterp.stopStreams();
-                this.shutAnyWindows();
-                this.resetButtons();
 
                 /*1)*/
                 Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -682,6 +693,8 @@ namespace PARSE
                 if (dlg.ShowDialog() == true)
                 {
                     filename = dlg.FileName;
+                    this.shutAnyWindows();
+                    this.resetButtons();
                 }
 
                 if ((filename == null) || (dlg.FileName.Length == 0))
@@ -692,6 +705,7 @@ namespace PARSE
 
                 // Show the window first - keep UI speedy!
                 System.Diagnostics.Debug.WriteLine("Showing window");
+                shutAnyWindows();
                 windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingCloud);
                 windowScanner.Owner = this;
 
