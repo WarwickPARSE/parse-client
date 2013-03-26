@@ -78,13 +78,32 @@ namespace PARSE.ICP.Stitchers
 
             DenseVector tolX = (maxP - minP) / 1000;
 
+            /* 
+             * Make a uniform grid of points - used to sort points into local groups to speed up distance measurement
+             */
             double spacing = (m1.ColumnCount ^ (1/6)) * Math.Sqrt(3);
 
             //convert the vectors into column marix representations 
             DenseMatrix maxPCol = (DenseMatrix)maxP.ToColumnMatrix();
             DenseMatrix minPCol = (DenseMatrix)minP.ToColumnMatrix();
 
-            DenseMatrix spacingDistance = (DenseMatrix)this.maxP(minPCol - maxPCol).ToColumnMatrix(); //sketchy  
+            //determine the number of rows in these matrices 
+            int noCols = maxPCol.RowCount;
+
+            double spacingDistance = this.maxP(maxPCol - minPCol)[0]; //sketchy  
+
+            //generate a new row matrix of normally spaced values 
+            DenseVector xa = new DenseVector(noCols);
+            DenseVector xb = new DenseVector(noCols);
+            DenseVector xc = new DenseVector(noCols);
+
+            for (int i = 0; i < noCols; i++) {
+                xa[i] = minPCol[0, 1] + i * spacingDistance;
+                xb[i] = minPCol[0, 2] + i * spacingDistance;
+                xc[i] = minPCol[0, 3] + i * spacingDistance;
+            }
+
+            double x, y, z; 
 
         }
         
