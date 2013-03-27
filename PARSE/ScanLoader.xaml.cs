@@ -417,48 +417,14 @@ namespace PARSE
         void hvpcanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
 
-            //TODO: This performs the limb segmentation procedure.
-
             Point location = e.GetPosition(hvpcanvas);
-            BoundingBox fineStitcher = new BoundingBox();
-            TranslateTransform3D translationVector = new TranslateTransform3D();
 
-            hitState = 1;
+            ModelVisual3D result = GetHitTestResult(location);
+            point2 = rayResult.PointHit;
+            model2 = rayResult.ModelHit;
 
-            //do manual alignment step 1
-            if (hitState == 1)
-            {
-                //ModelVisual3D result = GetHitTestResult(location);
-                //point1 = rayResult.PointHit;
-                //model1 = rayResult.ModelHit;
+            System.Diagnostics.Debug.WriteLine(point2.X + ":" + point2.Y + ":" + point2.Z);
 
-                //System.Diagnostics.Debug.WriteLine(point1.X + ", " + point1.Y + ", " + point1.Z);
-
-                //.hitStathitState = 2;
-            }
-            else if (hitState == 2)
-            {
-
-            //do manual alignment step 2
-
-                ModelVisual3D result = GetHitTestResult(location);
-                point2 = rayResult.PointHit;
-                model2 = rayResult.ModelHit;
-
-                System.Diagnostics.Debug.WriteLine(point2.X);
-
-                this.viewertext.Content = "Select corresponding point on 2nd point cloud (pairwise)";
-
-                hitState = 4;
-            }
-            else if (hitState == 3)
-            {
-
-                System.Diagnostics.Debug.WriteLine(location.ToString());
-                //perform limb circumference height selection.
-                //LimbCalculator.calculate(limbCloud, 1);
-
-            }
         }
 
         public void determineLimb(PointCloud pcdexisting)
