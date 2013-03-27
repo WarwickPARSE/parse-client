@@ -66,14 +66,28 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("Starting measurement window...");
 
             // Start tracking
-            tracker = new SensorTracker(Visualisation, this, true, instructionblock2);
+            tracker = new SensorTracker(Visualisation, this, instructionblock2);
             tracker.captureNewLocation();
             //tracker.captureAtLocation();
+            
+            // Hook up to the capture event, fired by the tracker.
+            tracker.Capture += new SensorTracker.CaptureEventHandler(capture);
         }
 
-        internal void capture(int x, int y, double angleXY, double angleZ)
+        /// <summary>
+        /// Capture and act upon the 'capture' event, fired by the tracker.
+        /// Can use this method to actually collect a value from the sensor.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="skel"></param>
+        internal void capture(object sender, SkeletonPosition skel)
         {
             System.Diagnostics.Debug.WriteLine("Scan captured! END");
+
+            // Capture data from the scanner....
+
+            // TODO write to the database
+
             tracker.stop();
             this.Close();
         }
