@@ -30,7 +30,6 @@ using HelixToolkit.Wpf;
 using Microsoft.Kinect;
 using PARSE.ICP;
 using PARSE.ICP.Stitchers;
-using PARSE.Recognition;
 
 namespace PARSE
 {

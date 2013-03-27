@@ -187,17 +187,7 @@
     </Compile>
     <Compile Include="PointCloudException.cs" />
     <Compile Include="PointCloudHandler.cs" />
-    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
-      <DependentUpon>BasicTracker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Prototyping\Nathan\HSLTracker.xaml.cs">
-      <DependentUpon>HSLTracker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Prototyping\Nathan\Matrix.cs" />
     <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
-    <Compile Include="Recognition\SurfDetector.cs" />
-    <Compile Include="Recognition\SurfResults.cs" />
-    <Compile Include="Recognition\MultiSurf.cs" />
     <Compile Include="Library\ScanSerializer.cs" />
     <Compile Include="HistoryLoader.xaml.cs">
       <DependentUpon>HistoryLoader.xaml</DependentUpon>
@@ -285,14 +275,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Prototyping\Nathan\HSLTracker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="WhistlerBlue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -371,9 +353,6 @@
   <ItemGroup>
     <Folder Include="ICP\Stitchers\Exceptions\" />
     <Folder Include="Library\PointCloud\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Recognition\Classifiers\cascade.xml" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App_Readme\MathNet.Numerics.readme.txt" />

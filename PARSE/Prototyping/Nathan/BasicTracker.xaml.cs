@@ -21,7 +21,6 @@ namespace PARSE.Prototyping.Nathan
         private byte[] colorFrameRGB;
         private WriteableBitmap outputColorBitmap;
         private WriteableBitmap processedBitmap; 
-        private ColorImageFormat rgbImageFormat;
 
         // RGB Component images
         private byte[] redComponent;
@@ -88,7 +87,6 @@ namespace PARSE.Prototyping.Nathan
                 Console.WriteLine("Attaching frameready event...");
 
                 //Check if streams are ready
-                //TODO: there is no justification for isolating these events, it makes life much harder
                 //kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
                 kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(run);
 
@@ -183,10 +181,7 @@ namespace PARSE.Prototyping.Nathan
                         width * 1,
                         0);
                  
-                    //this.rgbImageFormat = colorFrame.Format;
-                    // ?!
                     frames++;
-
                 }
             }
         }

@@ -87,7 +87,6 @@ namespace PARSE.Prototyping.Nathan
                     Console.WriteLine("Attaching frameready event...");
 
                     //Check if streams are ready
-                    //TODO: there is no justification for isolating these events, it makes life much harder
                     //interpreter.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
                     kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
 

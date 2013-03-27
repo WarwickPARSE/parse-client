@@ -165,7 +165,7 @@ namespace PARSE
              //return result;
              Boolean isMatch = (homography != null);
 
-             // TODO Get an actual number of matches from somewhere
+             // Ideally, Get an actual number of matches from somewhere
              if (isMatch)
              {
                  Console.WriteLine("nonzerocount = " + matches);
