@@ -32,6 +32,7 @@ namespace PARSE
             this.Loaded += new RoutedEventHandler(MetaLoader_Loaded);
         }
 
+
         void MetaLoader_Loaded(object sender, RoutedEventArgs e)
         {
             /// <summary>
@@ -97,5 +98,7 @@ namespace PARSE
             this.Hide();
             (Owner as CoreLoader).LoadPointCloudFromFile();            
         }
+
+
     }
 }

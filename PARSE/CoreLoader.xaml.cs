@@ -531,9 +531,12 @@ namespace PARSE
 
             //Load patient loader with new patient information using the existing constructor.
 
-            windowPatient = new PatientLoader(activeRecord.Item1);
-            windowPatient.Owner = this;
-            windowPatient.Show();
+            if (windowPatient != null)
+            {
+                windowPatient = new PatientLoader(activeRecord.Item1);
+                windowPatient.Owner = this;
+                windowPatient.Show();
+            }
 
         }
 
