@@ -297,7 +297,7 @@ namespace PARSE.Tracking
                 
         }
 
-        private void updateVisualisation()
+        private void updateVisualisation() {
             Console.WriteLine("Capture position!!!");
 
             Skeleton[] frame;
@@ -316,7 +316,7 @@ namespace PARSE.Tracking
                 }
 
             SkeletonPosition skeletonPosition = new SkeletonPosition(patient, this.x, this.y, this.angleXY, this.angleZ);
-        {
+
             //Console.WriteLine("Updating visualisation!");
             bool display = true;
             lock (this)
