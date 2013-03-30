@@ -34,6 +34,11 @@ namespace PARSE
     /// </summary>
     public partial class ScanLoader : Window
     {
+        // Scan Window Operation mode
+        public enum OperationModes { ShowExistingCloud, CaptureNewCloud };
+        private int mode;
+        private Boolean preventClose = false;
+
         //point cloud lists for visualisation
         private List<PointCloud>                fincloud;
         private PointCloud                      gCloud;
@@ -44,8 +49,6 @@ namespace PARSE
         private Point3D                         point2;
         private Model3D                         model2;
         private PointCloud                      pcd;
-
-        private delegate void OneArgDelegate(GroupVisualiser gv);
 
         //Coreloader modifiable hit state
         public int hitState;
@@ -64,34 +67,52 @@ namespace PARSE
         //Database object
         DatabaseEngine db;
 
-        public ScanLoader()
+        
+
+        public ScanLoader( int mode )
         {
             InitializeComponent();
 
-            //hide buttons from form
-            cancel_scan.Visibility = Visibility.Collapsed;
-            start_scan.Visibility = Visibility.Collapsed;
-            this.instructionblock.Visibility = Visibility.Collapsed;
-            this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+            this.mode = mode;
+
+            if (this.mode == (int)OperationModes.ShowExistingCloud)
+            {
+                //hide buttons from form
+                cancel_scan.Visibility = Visibility.Collapsed;
+                start_scan.Visibility = Visibility.Collapsed;
+                this.instructionblock.Visibility = Visibility.Collapsed;
+                this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                cancel_scan.Visibility = Visibility.Visible;
+                start_scan.Visibility = Visibility.Visible;
+                this.instructionblock.Visibility = Visibility.Visible;
+                this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+            }
+
+            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
 
             this.Show();
 
             //wantKinect = true; // Nathan changed this
-            this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
+            
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             db = new DatabaseEngine();
             hitState = 0;
         }
 
-        //Event handlers for viewport interaction
-
-        public ScanLoader(List<PointCloud> fcloud)
+        void ScanLoader_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            
-        }
+            if (this.preventClose)
+                e.Cancel = true;
+        } 
+
         public void processCloudList(List<PointCloud> fcloud, LoadingWidget loadingControl)
         {
+            preventClose = true;
             wantKinect = false;
+            this.mode = 0;
 
             System.Diagnostics.Debug.WriteLine("Number of items in fcloud list: " + fcloud.Count);
 
@@ -119,17 +140,37 @@ namespace PARSE
             loadingwidgetcontrol.UpdateProgressBy(1);
 
             this.hitState = 0;
-            this.ScanLoaderReady(0);
+
+            // FINALLY, show the controls.
+            this.hvpcanvas.Visibility = Visibility.Visible;
+            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
+
+            preventClose = false;
+
+            /*
+             * Scanloaderready();
+            if (this.mode == (int)OperationModes.CaptureNewCloud)
+            {
+                this.start_scan.Visibility = Visibility.Visible;
+                this.cancel_scan.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.start_scan.Visibility = Visibility.Collapsed;
+                this.cancel_scan.Visibility = Visibility.Collapsed;
+            }
+            */
         }
 
         public ScanLoader(PointCloud gcloud)
         {
             InitializeComponent();
-            wantKinect = false;
+
+            System.Diagnostics.Debug.WriteLine("* * GLCLOUD SCANLOADER CALLED");
+
+            //wantKinect = false; // nathan changed this
+
             //hide buttons from form
-            cancel_scan.Visibility = Visibility.Collapsed;
-            start_scan.Visibility = Visibility.Collapsed;
-            this.instructionblock.Visibility = Visibility.Collapsed;
             gv = new GroupVisualiser(gcloud);
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
@@ -150,41 +191,31 @@ namespace PARSE
             hitState = 0;
         }
 
-        public void ScanLoaderReady(int mode)
-        {
-            this.hvpcanvas.Visibility = Visibility.Visible;
-            this.loadingwidgetcontrol.Visibility = Visibility.Collapsed;
-
-            if (mode == 1)
-            {
-                this.start_scan.Visibility = Visibility.Visible;
-                this.cancel_scan.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                this.start_scan.Visibility = Visibility.Collapsed;
-                this.cancel_scan.Visibility = Visibility.Collapsed;
-            }
-        }
-
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {
             //place relative to coreloader
             this.Top = this.Owner.Top + 70;
             this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width -20;
 
-            //start scanning procedure
-            kinectInterp = new KinectInterpreter(skeloutline);
-
-            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+            if (this.mode == (int)OperationModes.CaptureNewCloud)
             {
-                this.kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                //start scanning procedure
+                kinectInterp = new KinectInterpreter(skeloutline);
+
+                //if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+                if (!this.kinectInterp.isSkeletonEnabled())
+                {
+                    this.kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                }
             }
+            /*
             if (!wantKinect)
             {
                 kinectInterp.stopStreams();
             }
+            */
+            System.Diagnostics.Debug.WriteLine("Scan loader loading complete");
           
         }
 
@@ -204,6 +235,20 @@ namespace PARSE
             }
             
             //init kinect
+
+            //start scanning procedure
+            kinectInterp = new KinectInterpreter(skeloutline);
+
+            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+            {
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            }
+            if (!wantKinect)
+            {
+                kinectInterp.stopStreams();
+            }
+
             if (!this.kinectInterp.isDepthEnabled())
             {
                 this.kinectInterp.startDepthStream();
@@ -372,48 +417,14 @@ namespace PARSE
         void hvpcanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
 
-            //TODO: This performs the limb segmentation procedure.
-
             Point location = e.GetPosition(hvpcanvas);
-            BoundingBox fineStitcher = new BoundingBox();
-            TranslateTransform3D translationVector = new TranslateTransform3D();
 
-            hitState = 1;
+            ModelVisual3D result = GetHitTestResult(location);
+            point2 = rayResult.PointHit;
+            model2 = rayResult.ModelHit;
 
-            //do manual alignment step 1
-            if (hitState == 1)
-            {
-                //ModelVisual3D result = GetHitTestResult(location);
-                //point1 = rayResult.PointHit;
-                //model1 = rayResult.ModelHit;
+            System.Diagnostics.Debug.WriteLine(point2.X + ":" + point2.Y + ":" + point2.Z);
 
-                //System.Diagnostics.Debug.WriteLine(point1.X + ", " + point1.Y + ", " + point1.Z);
-
-                //.hitStathitState = 2;
-            }
-            else if (hitState == 2)
-            {
-
-            //do manual alignment step 2
-
-                ModelVisual3D result = GetHitTestResult(location);
-                point2 = rayResult.PointHit;
-                model2 = rayResult.ModelHit;
-
-                System.Diagnostics.Debug.WriteLine(point2.X);
-
-                this.viewertext.Content = "Select corresponding point on 2nd point cloud (pairwise)";
-
-                hitState = 4;
-            }
-            else if (hitState == 3)
-            {
-
-                System.Diagnostics.Debug.WriteLine(location.ToString());
-                //perform limb circumference height selection.
-                //LimbCalculator.calculate(limbCloud, 1);
-
-            }
         }
 
         public void determineLimb(PointCloud pcdexisting)
@@ -441,9 +452,9 @@ namespace PARSE
                     System.Diagnostics.Debug.WriteLine(item);
                 }
 
-                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "WAIST");
+                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
-            else
+            /*else
             {
 
                 //if we have passed an existing pointcloud from coreloader
@@ -457,7 +468,7 @@ namespace PARSE
                    // LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
                 }
 
-            }
+            }*/
 
             //change colour of point cloud for limb selection mode
             gv.setMaterial();

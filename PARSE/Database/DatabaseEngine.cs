@@ -11,16 +11,16 @@ namespace PARSE
     {
         public SqlCeConnection con;
 
-        Insertion insertQueries;
-        Selection selectQueries;
+        public Insertion insertQueries;
+        public Selection selectQueries;
 
         public DatabaseEngine()
         {
-            insertQueries = new Insertion(this.con);
-            selectQueries = new Selection(this.con);
+            this.insertQueries = new Insertion(this.con);
+            this.selectQueries = new Selection(this.con);
         }
 
-        private void dbOpen()
+        public void dbOpen()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace PARSE
             }
         }
 
-        private void dbClose()
+        public void dbClose()
         {
             con.Close();
 
@@ -46,11 +46,13 @@ namespace PARSE
         //Insert methods for all tables
 
         //Type 1 = tables that need a specialised query
-        public void insertPatientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void insertPatientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
         {
             dbOpen();
 
-            insertQueries.patientInformation(name, dateOfBirth, nationality, nhsNo, address);
+            Insertion ins = new Insertion(con);
+
+            ins.patientInformation(name, dateOfBirth, nationality, nhsNo, address, weight);
 
             dbClose();
         }
@@ -149,15 +151,28 @@ namespace PARSE
         // 1) select all patients (patientID and name)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllPatients()
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patients = selectQueries.AllPatients();
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patients = null;
+            Selection sr = new Selection(con);
+
+            try
+            {
+                patients = sr.AllPatients();
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine("Error is occuring here");
+            }
 
             return patients;
         }
 
         // 2) select patient information
-        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> patientInfo = selectQueries.PatientInformation("patientID", patientID.ToString());
+
+            Selection sr = new Selection(con);
+
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> patientInfo = sr.PatientInformation("patientID", patientID.ToString());
 
             return patientInfo;
         }
@@ -241,18 +256,22 @@ namespace PARSE
 
         //Insertion Queries for Type 1 tables
 
-        public void patientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address)
+        public void patientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientInformation (name, dateofbirth, nationality, nhsNo, address) VALUES ('@Name', '@DateOfBirth', '@Nationality', '@NhsNo', '@Address')";
+            insertQuery.CommandText = "INSERT INTO PatientInformation (name, dateofbirth, nationality, nhsNo, address, weight) VALUES (@Name, @DateOfBirth, @Nationality, @NhsNo, @Address, @Weight)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@Name", name);
-            insertQuery.Parameters.Add("@DateOfBirth", dateOfBirth);
+            insertQuery.Parameters.Add("@DateOfBirth", Convert.ToDateTime(dateOfBirth));
             insertQuery.Parameters.Add("@Nationality", nationality);
             insertQuery.Parameters.Add("@NhsNo", nhsNo);
             insertQuery.Parameters.Add("@Address", address);
+            insertQuery.Parameters.Add("@Weight", weight);
             rowsAffected = insertQuery.ExecuteNonQuery();
+
+            System.Diagnostics.Debug.WriteLine("Rows affected: " + rowsAffected);
+
         }
 
         public void scanLocations(String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, String jointsDist, DateTime timestamp)
@@ -332,7 +351,6 @@ namespace PARSE
             insertQuery.Parameters.Add("@Text2", text2);
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
-
         //Insertion Query for Type 3 tables
 
         public void type3(String tableName, String idCol1, String idCol2, int id1, int id2)
@@ -363,6 +381,7 @@ namespace PARSE
         //selecting all patients
         public Tuple<LinkedList<int>,LinkedList<String>,LinkedList<String>> AllPatients()
         {
+
             LinkedList<int> ids = new LinkedList<int>();
             LinkedList<String> names = new LinkedList<String>();
             LinkedList<String> nhsNos = new LinkedList<String>();
@@ -410,7 +429,7 @@ namespace PARSE
         //table type 1 queries
 
         //patient information
-        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>> PatientInformation(String colName, String criterion)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> PatientInformation(String colName, String criterion)
         {
             LinkedList<int> patientID = new LinkedList<int>();
             LinkedList<String> name = new LinkedList<String>();
@@ -418,12 +437,11 @@ namespace PARSE
             LinkedList<String> nationality = new LinkedList<String>();
             LinkedList<String> nhsNo = new LinkedList<String>();
             LinkedList<String> address = new LinkedList<String>();
+            LinkedList<String> weight = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT * FROM PatientInformation WHERE @ColName LIKE @Criterion";
+            selectQuery.CommandText = "SELECT * FROM PatientInformation WHERE patientID = " + criterion;
             selectQuery.Parameters.Clear();
-            selectQuery.Parameters.Add("@ColName", colName);
-            selectQuery.Parameters.Add("@Criterion", criterion);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
@@ -433,10 +451,11 @@ namespace PARSE
                 nationality.AddLast(reader.GetString(3));
                 nhsNo.AddLast(reader.GetString(4));
                 address.AddLast(reader.GetString(5));
+                weight.AddLast(reader.GetString(6));
             }
             reader.Close();
 
-            return Tuple.Create(patientID, name, dob, nationality, nhsNo, address);
+            return Tuple.Create(patientID, name, dob, nationality, nhsNo, address, weight);
         }
 
         //scan location

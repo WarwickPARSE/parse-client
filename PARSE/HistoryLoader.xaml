@@ -37,7 +37,7 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime" Height="20" Content="Scan Time" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="VH Ratio:" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="Siri (%BF):" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
 
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea" Height="20" Content="Plane {x}: {region}" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
 
@@ -52,8 +52,8 @@
                         <ModelVisual3D x:Name="planePlot" Content="{Binding Model}" />
                         <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
                     </h:HelixViewport3D>
-                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="430,195,0,0" Name="btnresults" VerticalAlignment="Top" Width="75" />
-                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,195,0,0" Name="btnrescan" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="520,145,0,0" Name="btnresults" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,175,0,0" Name="btnrescan" VerticalAlignment="Top" Width="75" />
                 </Grid>
                 <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
                     <Canvas.RenderTransform>
@@ -72,7 +72,16 @@
                     <!--"Headline" Labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumlabel" Height="20" Content="Calculated Circumference" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumoutput" Height="20" Content="cm" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselect" Height="20" Content="m" Margin="325,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselect" Width="145" Height="20" Margin="325,45,8,8">
+                        <!--General Event handler for each combo-box to be implemented -->
+                        <ComboBoxItem Content="Shoulders"></ComboBoxItem>
+                        <ComboBoxItem Content="Left Arm"></ComboBoxItem>
+                        <ComboBoxItem Content="Right Arm"></ComboBoxItem>
+                        <ComboBoxItem Content="Chest"></ComboBoxItem>
+                        <ComboBoxItem Content="Waist"></ComboBoxItem>
+                        <ComboBoxItem Content="Left Leg"></ComboBoxItem>
+                        <ComboBoxItem Content="Right Leg"></ComboBoxItem>
+                    </ComboBox>
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselecthdr" Height="20" Content="Limb Selection" Margin="325,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="planelabel" Height="20" Content="Plane Details" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanlabel" Height="20" Content="Scan Details" Margin="325,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
@@ -96,13 +105,13 @@
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalarea2" Height="20" Content="Plane Area: " Margin="8,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="totalperimiter2" Height="20" Content="Circumference:" Margin="8,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
 
-                    <Canvas Width="382" Height="244" Margin="670,0,33,16">
+                    <Canvas Width="382" Height="244" Margin="670,0,33,16" Name="limbrender">
                         <Rectangle Canvas.Left="40" Canvas.Top="31" Width="63" Height="41" Fill="Blue"  />
                         <Ellipse Canvas.Left="130" Canvas.Top="79" Width="58" Height="58" Fill="Blue"  />
                         <Path Canvas.Left="61" Canvas.Top="28" Width="133" Height="98" Fill="Blue" Stretch="Fill" Data="M61,125 L193,28"/>
                     </Canvas>
-                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="520,165,0,0" Name="btnresults2" VerticalAlignment="Top" Width="75" />
-                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,195,0,0" Name="btnrescan2" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="520,145,0,0" Name="btnresults2" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,175,0,0" Name="btnrescan2" VerticalAlignment="Top" Width="75" />
                 </Grid>
                 <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
                     <Canvas.RenderTransform>

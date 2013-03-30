@@ -38,7 +38,7 @@ namespace PARSE.ICP.Stitchers
         public override void add(List<PointCloud> pcs)
         {
             this.pointClouds = pcs;
-            Console.WriteLine("There are " + pcs.Count);
+            Console.WriteLine("#Stitcher: There are " + pcs.Count);
         }
 
         /// <summary>
