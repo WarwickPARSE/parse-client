@@ -39,5 +39,25 @@ namespace PARSE
             volume = UnitConvertor.convertPCM(volume,3);
             return volume;
         }
+
+        public static double calculateSiri(double volume, double weight, double height)
+        {
+            //For white people
+
+            return 0.0;
+        }
+
+        public static double calculateBrozek(double volume, double weight, double height)
+        {
+            //For black people
+
+            return 0.0;
+        }
+
+        public static double calculateBMI(double height, double weight)
+        {
+
+            return 0.0;
+        }
     }
 }

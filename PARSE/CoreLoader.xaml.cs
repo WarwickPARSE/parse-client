@@ -310,7 +310,6 @@ namespace PARSE
             
             double volume = VolumeCalculator.volume1stApprox(planes,increment);
             volume = Math.Round(volume,4);
-            sandra.Speak("Your Volume is " + Math.Round(volume / 0.058, 2) + " Bernards!");
 
             List<double> areaList = AreaCalculator.getAllAreas(planes);
             windowHistory.areaList = areaList;
@@ -332,7 +331,14 @@ namespace PARSE
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
                 /*Requires generated model, raw depth array and previous*/
-                windowScanner.determineLimb(pcd);
+                Tuple<double,double,List<List<Point3D>>> result = windowScanner.determineLimb(pcd);
+                /*Then open history loader (limb circum stuff will be set here soon)*/
+                HistoryLoader windowHistory = new HistoryLoader();
+                windowHistory.runtimeTab.SelectedIndex = 1;
+                windowHistory.Owner = this;
+                windowHistory.Show();
+                windowHistory.visualiseLimbs(result);
+
             }
             else
             {
