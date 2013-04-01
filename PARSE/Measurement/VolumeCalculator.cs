@@ -43,21 +43,36 @@ namespace PARSE
         public static double calculateSiri(double volume, double weight, double height)
         {
             //For white people
+            //% Body Fat = (495 / Body Density) - 450.
 
-            return 0.0;
+            double density = weight / volume*100;
+
+            return ((4.95 / density) - 4.50)*100;
         }
 
         public static double calculateBrozek(double volume, double weight, double height)
         {
             //For black people
+            // %fat = (457 / Body Density) – 414.2
 
-            return 0.0;
+            double density = weight / volume*100;
+
+            return ((4.57 / density) - 4.142)*100;
         }
 
         public static double calculateBMI(double height, double weight)
         {
+            return (weight / height)*1000;
+        }
 
-            return 0.0;
+        public static double calculateApproxWeight(double volume)
+        {
+            //The weight of a person in kg is based on their volume * 1000m^3
+            //This is done on the basis that a person's density is roughly
+            //equivalent to water at 1000m^3.
+
+            return volume * 1000;
+
         }
     }
 }

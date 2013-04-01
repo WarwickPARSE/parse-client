@@ -317,6 +317,9 @@ namespace PARSE
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m\u00B3";
+            windowHistory.scantime.Content = "Weight (Est): " + VolumeCalculator.calculateApproxWeight(volume) + "kg";
+            windowHistory.scanfileref.Content = "BMI Measure: " + VolumeCalculator.calculateBMI(VolumeCalculator.calculateApproxWeight(volume),HeightCalculator.getHeight(pcd));
+            windowHistory.scanvoxel.Content = "Siri (%BF): " + VolumeCalculator.calculateSiri(volume, VolumeCalculator.calculateApproxWeight(volume), HeightCalculator.getHeight(pcd)) + "%";
             
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
