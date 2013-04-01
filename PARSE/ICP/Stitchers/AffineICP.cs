@@ -75,6 +75,7 @@ namespace PARSE.ICP.Stitchers
             //get the max and min points of the static points (operator divides only works over vectors for some reason >:( )
             DenseVector maxP = this.maxP(m1);
             DenseVector minP = this.minP(m1);
+            int noEntries = maxP.Count;                         //for ease of code readability, a waste of four bytes tbh 
 
             DenseVector tolX = (maxP - minP) / 1000;
 
@@ -266,5 +267,53 @@ namespace PARSE.ICP.Stitchers
         public DenseMatrix ndgrid(DenseVector v1, DenseVector v2, DenseVector v3) {
             return null; 
         }
+
+        /// <summary>
+        /// Generates a 3d grid representation out of a set of three 
+        /// same-sized matrices. A watered down version of ndgrid.
+        /// </summary>
+        /// <param name="m1">The first matrix</param>
+        /// <param name="m2">The second matrix</param>
+        /// <param name="m3">The third matrix</param>
+        /// <returns>A tuple of three dimensional matrices</returns>
+        private Tuple<double[, ,], double[, ,], double[, ,]> grid3d(DenseVector m1, DenseVector m2, DenseVector m3)
+        {
+            //hopefully the matrices are all the same size, otherwise this has already fallen over
+
+            if (m1.Count == m2.Count && m2.Count == m3.Count) {
+                //calculate dimensions of the matrix (this only works because they are dense!)
+                int xDim, yDim, zDim;
+
+                xDim = m1.Count;
+                yDim = m2.Count;
+                zDim = m3.Count;
+
+                //generate three double "matrices" to hold our results
+                double[, ,] x = new double[xDim, yDim, zDim];
+                double[, ,] y = new double[xDim, yDim, zDim];
+                double[, ,] z = new double[xDim, yDim, zDim];
+
+                //now iterate over each of the three dimensions, adding values
+                for (int i = 0; i < xDim; i++) {
+                    for (int j = 0; j < yDim; j++) {
+                        for (int k = 0; k < zDim; k++) { 
+                            //this is horrible already 
+                        }
+                    }
+                }
+
+            }
+            else { 
+                //something terrible has happened! 
+            }
+
+            double[,,] a = new double[1,2,3];
+            return new Tuple<double[, ,], double[, ,], double[, ,]>(a, a, a);
+        }
+
+        private DenseMatrix groupPoints() {
+            return null; 
+        }
     }
+
 }
