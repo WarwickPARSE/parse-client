@@ -73,12 +73,30 @@ namespace PARSE.ICP.Stitchers
             int itt = 0;
 
             //get the max and min points of the static points 
-            double maxP = this.maxP();
-            double minP = this.minP();
+            DenseVector maxP = this.maxP(m1);
+            DenseVector minP = this.minP(m1);
+            int noEntries = maxP.Count;                         //for ease of code readability, a waste of four bytes tbh 
 
-            double tolX = (maxP - minP) / 1000;
+            DenseVector tolX = (maxP - minP) / 1000;
 
+            //generate a uniform grid of points, used to sort points into local groups 
             double spacing = (m1.ColumnCount ^ (1/6)) * Math.Sqrt(3);
+
+            DenseVector xa = new DenseVector(maxP.Count);
+            DenseVector xb = new DenseVector(maxP.Count);
+            DenseVector xc = new DenseVector(maxP.Count); 
+
+            //todo: not sure if this actually works, will need some testing. This is defo a weak point...
+            for (int i = 0; i < maxP.Count; i++) {
+                xa[i] = minP[0] + i * spacing;
+                xb[i] = minP[1] + i * spacing;
+                xc[i] = minP[2] + i * spacing;
+            }
+            
+            //radius of a point from the uniform grid 
+            double radius = spacing * Math.Sqrt(3); 
+
+            //sort the points into groups
 
         }
         
@@ -228,5 +246,32 @@ namespace PARSE.ICP.Stitchers
 
             return new DenseVector(minVals);
         }
+
+        /// <summary>
+        /// Generates a 3d grid representation out of a set of three 
+        /// same-sized matrices. A watered down version of ndgrid.
+        /// </summary>
+        /// <param name="m1">The first matrix</param>
+        /// <param name="m2">The second matrix</param>
+        /// <param name="m3">The third matrix</param>
+        /// <returns>A three dimensional matrix</returns>
+        private double[,,] grid3d(DenseVector m1, DenseVector m2, DenseVector m3) {
+            //hopefully the matrices are all the same size, otherwise this has already fallen over
+
+            if (m1.Count == m2.Count && m2.Count == m3.Count) {
+                //generate a few dense vectors to store our data 
+            }
+            else { 
+                //something terrible has happened! 
+            }
+
+            double[,,] a = new double[1,2,3];
+            return a;
+        }
+
+        private DenseMatrix groupPoints() {
+            return null; 
+        }
     }
+
 }
