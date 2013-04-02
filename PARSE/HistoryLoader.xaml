@@ -130,9 +130,9 @@
                     <!--"Headline" Labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchange" Height="20" Content="Change in Volume:" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchangeoutput" Height="20" Content="100%" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
-                    <DVC:Chart Canvas.Top="80" Canvas.Left="10" Name="volchart" Width="400" Height="250" Background="LightSteelBlue">
+                    <DVC:Chart HorizontalAlignment="Right" Canvas.Top="80" Canvas.Left="10" Name="volchart" Width="400" Height="250" Background="AliceBlue">
                         <DVC:Chart.Series>
-                            <DVC:LineSeries Title="Fat Man Volume" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+                            <DVC:LineSeries Title="Patient Volume" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
                             </DVC:LineSeries>
                         </DVC:Chart.Series>
                     </DVC:Chart>
