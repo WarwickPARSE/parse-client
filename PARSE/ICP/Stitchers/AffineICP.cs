@@ -270,7 +270,7 @@ namespace PARSE.ICP.Stitchers
 
         /// <summary>
         /// Generates a 3d grid representation out of a set of three 
-        /// same-sized matrices. A watered down version of ndgrid.
+        /// same-sized vectors. A watered down version of ndgrid.
         /// </summary>
         /// <param name="m1">The first matrix</param>
         /// <param name="m2">The second matrix</param>
@@ -293,22 +293,48 @@ namespace PARSE.ICP.Stitchers
                 double[, ,] y = new double[xDim, yDim, zDim];
                 double[, ,] z = new double[xDim, yDim, zDim];
 
-                //now iterate over each of the three dimensions, adding values
-                for (int i = 0; i < xDim; i++) {
-                    for (int j = 0; j < yDim; j++) {
-                        for (int k = 0; k < zDim; k++) { 
-                            //this is horrible already 
+                //the values have a gap and this depends on the number of rows (future use)
+                int xGap, yGap, zGap;
+
+                // x series. In this case the y value remains constant to the value of the position in the array
+                for (int alpha = 0; alpha < m1.Count; alpha++) { 
+                    //stick into all x and y indices
+                    for (int i = 0; i < xDim; i++) {
+                        for (int k = 0; k < zDim; k++) {
+                            x[i, alpha, k] = m1[alpha];
                         }
                     }
                 }
 
+                // y series. For this the row value remains constant to the value of the position in the array
+                for (int beta = 0; beta < m2.Count; beta++) { 
+                    //stick into all y and z indices
+                    for (int j = 0; j < yDim; j++) {
+                        for (int k = 0; k < zDim; k++) {
+                            y[beta, j, k] = m2[beta];
+                        }
+                    }
+                }
+
+                // z series. For this the depth value remains static (surprise)
+                for (int gamma = 0; gamma < zDim; gamma++) { 
+                    //stick in all x and y indices
+                    for (int i = 0; i < xDim; i++) {
+                        for (int j = 0; j < yDim; j++) {
+                            z[i, j, gamma] = m3[gamma];
+                        }
+                    }
+                }
+
+                return new Tuple<double[, ,], double[, ,], double[, ,]>(x, y, z);
             }
             else { 
                 //something terrible has happened! 
             }
 
-            double[,,] a = new double[1,2,3];
-            return new Tuple<double[, ,], double[, ,], double[, ,]>(a, a, a);
+            //pointless error double that will never be returned, if all goes to plan... else ahhh :(
+            double[,,] e = new double[0,0,0];
+            return new Tuple<double[, ,], double[, ,], double[, ,]>(e,e,e);
         }
 
         private DenseMatrix groupPoints() {
