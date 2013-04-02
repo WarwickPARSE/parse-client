@@ -254,19 +254,40 @@ namespace PARSE.ICP.Stitchers
         /// <param name="m1">The first matrix</param>
         /// <param name="m2">The second matrix</param>
         /// <param name="m3">The third matrix</param>
-        /// <returns>A three dimensional matrix</returns>
-        private double[,,] grid3d(DenseVector m1, DenseVector m2, DenseVector m3) {
+        /// <returns>A tuple of three dimensional matrices</returns>
+        private Tuple<double[, ,], double[, ,], double[, ,]> grid3d(DenseVector m1, DenseVector m2, DenseVector m3)
+        {
             //hopefully the matrices are all the same size, otherwise this has already fallen over
 
             if (m1.Count == m2.Count && m2.Count == m3.Count) {
-                //generate a few dense vectors to store our data 
+                //calculate dimensions of the matrix (this only works because they are dense!)
+                int xDim, yDim, zDim;
+
+                xDim = m1.Count;
+                yDim = m2.Count;
+                zDim = m3.Count;
+
+                //generate three double "matrices" to hold our results
+                double[, ,] x = new double[xDim, yDim, zDim];
+                double[, ,] y = new double[xDim, yDim, zDim];
+                double[, ,] z = new double[xDim, yDim, zDim];
+
+                //now iterate over each of the three dimensions, adding values
+                for (int i = 0; i < xDim; i++) {
+                    for (int j = 0; j < yDim; j++) {
+                        for (int k = 0; k < zDim; k++) { 
+                            //this is horrible already 
+                        }
+                    }
+                }
+
             }
             else { 
                 //something terrible has happened! 
             }
 
             double[,,] a = new double[1,2,3];
-            return a;
+            return new Tuple<double[, ,], double[, ,], double[, ,]>(a, a, a);
         }
 
         private DenseMatrix groupPoints() {
