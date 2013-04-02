@@ -329,7 +329,7 @@ namespace PARSE
         {
 
             /*gets all the planes by calling volume calculator*/
-            if (pcd != null)
+            if (KinectSensor.KinectSensors.Count > 0)
             {
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
@@ -340,14 +340,12 @@ namespace PARSE
                 windowHistory.runtimeTab.SelectedIndex = 1;
                 windowHistory.Owner = this;
                 windowHistory.Show();
-                windowHistory.visualiseLimbs(result);
+                windowHistory.visualiseLimbs(result, 1);
 
             }
             else
             {
-                HistoryLoader windowHistory = new HistoryLoader();
-                windowHistory.Owner = this;
-                windowHistory.Show();
+                MessageBoxResult result = System.Windows.MessageBox.Show(this, "You need a Kinect to perform this action.","Kinect Sensor Missing", MessageBoxButton.OK, MessageBoxImage.Stop);
             }
 
         }
@@ -529,6 +527,7 @@ namespace PARSE
 
             windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
 
+
         }
 
         void windowMeta_Closing(object sender, CancelEventArgs e)
@@ -545,6 +544,7 @@ namespace PARSE
                 windowPatient = new PatientLoader(activeRecord.Item1);
                 windowPatient.Owner = this;
                 windowPatient.Show();
+                RemoveBlur();
             }
 
         }
@@ -627,8 +627,6 @@ namespace PARSE
             windowPatient = new PatientLoader(false);
             windowPatient.Owner = this;
             windowPatient.Show();
-            ApplyBlur(this);
-            windowPatient.Closed += new EventHandler(RemoveBlur_Closed);
         }
 
         private void checkKinectConnection(object state)
@@ -664,7 +662,7 @@ namespace PARSE
 
         }
 
-        private void RemoveBlur_Closed(object sender, EventArgs e)
+        private void RemoveBlur()
         {
 
             this.Effect = null;

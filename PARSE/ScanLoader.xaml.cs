@@ -438,7 +438,7 @@ namespace PARSE
             //temporary tuple for results
             Tuple<double, double, List<List<Point3D>>> T = new Tuple<double, double, List<List<Point3D>>>(0,0,null);
 
-            if (this.mode == (int)OperationModes.ShowExistingCloud)
+            if (KinectSensor.KinectSensors.Count > 0)
             {
                 Dictionary<String, double[]> jointDepths = new Dictionary<String, double[]>();
                 StreamReader sr = new StreamReader("SKEL.ptemp");
@@ -473,6 +473,7 @@ namespace PARSE
                     System.Diagnostics.Debug.WriteLine(item);
                 }
 
+                //pass point cloud and correct bounds to Limb Calculator
                 T = LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
             else
