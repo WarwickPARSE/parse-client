@@ -278,7 +278,7 @@ namespace PARSE
             this.export2.IsEnabled = false;
             this.measurement.IsEnabled = true;
             this.removefloor.IsEnabled = false;
-            //this.calculate.IsEnabled = false;
+            this.calculate.IsEnabled = false;
         }
         
         private void NewScan_Click(object sender, RoutedEventArgs e)
