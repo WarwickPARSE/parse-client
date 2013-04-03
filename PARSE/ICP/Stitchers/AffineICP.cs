@@ -115,6 +115,11 @@ namespace PARSE.ICP.Stitchers
 
             //group the values into one big (horrible, dirty) structure
             double[,] points_group = groupPoints(x, y, z);
+
+            //calculate the radius of a point to the uniform grid
+            double radius = spacingDistance * Math.Sqrt(3);
+
+            //sort the points into groups
         }
         
 
@@ -374,6 +379,20 @@ namespace PARSE.ICP.Stitchers
                 }
             }
 
+            return res; 
+        }
+
+        /// <summary>
+        /// Generates an array of empty matrices equal to the number of grouped points
+        /// </summary>
+        /// <param name="pt">The grouped point list</param>
+        /// <returns></returns>
+        private DenseMatrix[] cell(double[,] pt) {
+            int size = pt.GetLength(1);
+
+            //generate array
+            DenseMatrix[] res = new DenseMatrix[size];
+            
             return res; 
         }
     }
