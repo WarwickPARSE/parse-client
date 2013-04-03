@@ -106,8 +106,15 @@ namespace PARSE.ICP.Stitchers
             }
 
             //create a bunch of three dimensional matrices to hold the correspondence data - values gathered through empirical analysis
-             
+            double[, ,] x, y, z;
 
+            Tuple<double[, ,], double[, ,], double[, ,]> res = grid3d(xa, xb, xc);
+            x = res.Item1;
+            y = res.Item2;
+            z = res.Item3;
+
+            //group the values into one big (horrible, dirty) structure
+            double[,] points_group = groupPoints(x, y, z);
         }
         
 
@@ -337,8 +344,37 @@ namespace PARSE.ICP.Stitchers
             return new Tuple<double[, ,], double[, ,], double[, ,]>(e,e,e);
         }
 
-        private DenseMatrix groupPoints() {
-            return null; 
+        /// <summary>
+        /// Joins the column representation of three matrices
+        /// </summary>
+        /// <param name="x">An n x n x n matrix</param>
+        /// <param name="y">An n x n x n matrix</param>
+        /// <param name="z">An n x n x n matrix</param>
+        /// <returns></returns>
+        private double[,] groupPoints(double[,,] x, double[,,] y, double[,,] z) {
+            //instantiate the result matrix
+            double[,] res = new double[3,x.Length];
+            
+            //determine dimensions of array
+            int xDim = x.GetLength(0);
+            int yDim = x.GetLength(1);
+            int zDim = x.GetLength(2);
+
+            //go over each matrix, column by column in each dimension
+            int itr = 0;
+
+            for (int k = 0; k < zDim; k++) {
+                for (int i = 0; i < xDim; i++) {
+                    for (int j = 0; j < yDim; j++) {
+                        res[0, itr] = x[i, j, k];
+                        res[1, itr] = y[i, j, k];
+                        res[2, itr] = z[i, j, k];
+                        itr++;
+                    }
+                }
+            }
+
+            return res; 
         }
     }
 
