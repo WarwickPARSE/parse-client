@@ -35,7 +35,7 @@
                     </TextBlock>
                     <!--Secondary "headline" labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime" Height="20" Content="Scan Time" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime" Height="20" Content="Weight (Est):" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="Siri (%BF):" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
 
@@ -126,13 +126,21 @@
                         <TextBlock Text="History" Margin="2,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                 </TabItem.Header>
-                <Grid Width="{x:Static SystemParameters.PrimaryScreenWidth}" Height="240">
+                <Grid Width="{x:Static SystemParameters.PrimaryScreenWidth}" Height="{x:Static SystemParameters.PrimaryScreenHeight}">
                     <!--"Headline" Labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchange" Height="20" Content="Change in Volume:" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="volchangeoutput" Height="20" Content="100%" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
-                    <DVC:Chart Canvas.Top="80" Canvas.Left="10" Name="volchart" Width="400" Height="250" Background="LightSteelBlue">
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbchange" Height="20" Content="Change in Limb Circumference:" Margin="8,90,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbchangeoutput" Height="20" Content="75%" Margin="8,127,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <DVC:Chart HorizontalAlignment="Right" VerticalAlignment="Top"  Canvas.Top="0" Canvas.Left="0" Name="volchart" Width="900" Height="300" Background="AliceBlue" Margin="10,10,10,10">
                         <DVC:Chart.Series>
-                            <DVC:LineSeries Title="Fat Man Volume" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+                            <DVC:LineSeries Title="Patient Volume" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
+                            </DVC:LineSeries>
+                        </DVC:Chart.Series>
+                    </DVC:Chart>
+                    <DVC:Chart HorizontalAlignment="Right" VerticalAlignment="Top"  Canvas.Top="0" Canvas.Left="0" Name="limbchart" Width="900" Height="300" Background="AliceBlue" Margin="10,330,10,10">
+                        <DVC:Chart.Series>
+                            <DVC:LineSeries Title="Limb Circumference" IndependentValueBinding="{Binding Path=Key}" DependentValueBinding="{Binding Path=Value}">
                             </DVC:LineSeries>
                         </DVC:Chart.Series>
                     </DVC:Chart>

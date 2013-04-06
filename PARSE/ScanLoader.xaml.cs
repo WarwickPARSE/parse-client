@@ -418,33 +418,54 @@ namespace PARSE
         {
 
             Point location = e.GetPosition(hvpcanvas);
-
             ModelVisual3D result = GetHitTestResult(location);
-            point2 = rayResult.PointHit;
-            model2 = rayResult.ModelHit;
 
-            System.Diagnostics.Debug.WriteLine(point2.X + ":" + point2.Y + ":" + point2.Z);
+            if (rayResult != null)
+            {
+                point2 = rayResult.PointHit;
+                model2 = rayResult.ModelHit;
+
+                System.Diagnostics.Debug.WriteLine(point2.X + ":" + point2.Y + ":" + point2.Z);
+            }
 
         }
 
-        public void determineLimb(PointCloud pcdexisting)
+        public Tuple<double,double,List<List<Point3D>>> determineLimb(PointCloud pcdexisting)
         {
          
             //pull in skeleton measures from a temporary file for corbett.parse for now.
+            kinectInterp = new KinectInterpreter(skeloutline);
+            //temporary tuple for results
+            Tuple<double, double, List<List<Point3D>>> T = new Tuple<double, double, List<List<Point3D>>>(0,0,null);
 
-            if (true)
+            if (this.mode == (int)OperationModes.ShowExistingCloud)
             {
                 Dictionary<String, double[]> jointDepths = new Dictionary<String, double[]>();
                 StreamReader sr = new StreamReader("SKEL.ptemp");
                 String line;
 
-                while ((line=sr.ReadLine())!=null)
+                while ((line = sr.ReadLine()) != null)
                 {
-                    String[] joint = Regex.Split(line,":");
+                    String[] joint = Regex.Split(line, ":");
                     String[] positions = Regex.Split(joint[1], ",");
 
-                    double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2],"\n")[0]) };
-                    jointDepths.Add(joint[0], jointPos);
+                    double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2], "\n")[0]) };
+
+                    //convert to depth co-ordinate space
+                    SkeletonPoint sp = new SkeletonPoint();
+                    sp.X = (float)Convert.ToDouble(jointPos[1]);
+                    sp.Y = (float)Convert.ToDouble(jointPos[2]);
+                    sp.Z = (float)Convert.ToDouble(jointPos[0]);
+
+                    CoordinateMapper cm = new CoordinateMapper(kinectInterp.kinectSensor);
+                    DepthImagePoint dm = cm.MapSkeletonPointToDepthPoint(sp, DepthImageFormat.Resolution640x480Fps30);
+
+                    //convert x and y co-ords to arbitrary point cloud space
+                    Tuple<double, double, double> convertedPoints = LimbCalculator.convertToPCCoords(dm.X, dm.Y, sp.Z);
+                    double[] jointPos2 = { convertedPoints.Item3, convertedPoints.Item1, convertedPoints.Item2 };
+
+                    //place back into jointDepths array in terms of depth space.
+                    jointDepths.Add(joint[0], jointPos2);
                 }
 
                 foreach (var item in jointDepths.Keys)
@@ -452,29 +473,19 @@ namespace PARSE
                     System.Diagnostics.Debug.WriteLine(item);
                 }
 
-                LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
+                T = LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
-            /*else
+            else
             {
-
-                //if we have passed an existing pointcloud from coreloader
-                if (pcdexisting != null)
-                {
-                   // LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
-                }
-                else
-                //otherwise if we have passed a new scan from coreloader
-                {
-                   // LimbCalculator.calculateLimbBounds(pcd, jointDepths, "ARM_LEFT");
-                }
-
-            }*/
+                MessageBoxResult result = System.Windows.MessageBox.Show(this, "You need a Kinect to perform this action.",
+"Kinect Sensor Missing", MessageBoxButton.OK, MessageBoxImage.Stop);
+            }
 
             //change colour of point cloud for limb selection mode
             gv.setMaterial();
             this.DataContext = gv;
 
-            hitState = 3;
+            return T;
 
         }
 

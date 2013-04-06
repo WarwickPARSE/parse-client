@@ -102,7 +102,7 @@ namespace PARSE
             {
                 this.kinectReady = true;
                 this.skeletonCanvas = c;
-                
+
                 //Initialize sensor
                 this.kinectSensor = KinectSensor.KinectSensors[0];
                 this.kinectStatus = "Initialized";
@@ -123,6 +123,7 @@ namespace PARSE
 
                 this.kinectSensor.Start();
             }
+            
         }
 
         public void disableDepth()

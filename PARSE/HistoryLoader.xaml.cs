@@ -97,10 +97,10 @@ namespace PARSE
                 btnresults2.Visibility = Visibility.Collapsed;
                 btnrescan2.Visibility = Visibility.Collapsed;
 
-            }
+                //this.scanvoxel.Content = "VH Ratio: " + ((Convert.ToDouble(this.voloutput.Content) / Convert.ToDouble(this.heightoutput.Content)));
+                //this.scanfileref.Content = "BMI Measure: " + (66 / (Convert.ToDouble(this.heightoutput.Content)));
 
-            //this.scanvoxel.Content = "VH Ratio: " + ((Convert.ToDouble(this.voloutput.Content) / Convert.ToDouble(this.heightoutput.Content)));
-            this.scanfileref.Content = "BMI Measure: " + (66 / (Convert.ToDouble(this.heightoutput.Content)));
+            }
 
         }
 
@@ -208,6 +208,40 @@ namespace PARSE
                     new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
                     new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(3), 125),
                     new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
+        }
+
+        public void visualiseLimbs(Tuple<double, double, List<List<Point3D>>> limbData)
+        {
+            System.Diagnostics.Debug.WriteLine("Opening Limb Visualisation Panel");
+
+            circumlabel.Visibility = Visibility.Visible;
+            circumoutput.Visibility = Visibility.Visible;
+            limbselect.Visibility = Visibility.Visible;
+            limbselecthdr.Visibility = Visibility.Visible;
+            planelabel.Visibility = Visibility.Visible;
+            scanlabel.Visibility = Visibility.Visible;
+            viewborder2.Visibility = Visibility.Visible;
+            planeChooser2.Visibility = Visibility.Visible;
+            limbimg.Visibility = Visibility.Visible;
+            noresults2.Visibility = Visibility.Visible;
+            newscan2.Visibility = Visibility.Visible;
+            scanno2.Visibility = Visibility.Visible;
+            scantime2.Visibility = Visibility.Visible;
+            scanfileref2.Visibility = Visibility.Visible;
+            scanvoxel2.Visibility = Visibility.Visible;
+            maxarea2.Visibility = Visibility.Visible;
+            totalarea2.Visibility = Visibility.Visible;
+            totalperimiter2.Visibility = Visibility.Visible;
+            limbrender.Visibility = Visibility.Visible;
+            btnresults2.Visibility = Visibility.Visible;
+            btnrescan2.Visibility = Visibility.Visible;
+            //Set relevant ui components to collapsed
+            noresults.Visibility = Visibility.Collapsed;
+            newscan.Visibility = Visibility.Collapsed;
+
+            circumoutput.Content = limbData.Item1+"cm"; 
+            totalarea2.Content = limbData.Item2;
+            totalperimiter2.Content = limbData.Item1+"cm";
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

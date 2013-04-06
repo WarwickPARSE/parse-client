@@ -18,11 +18,14 @@ namespace PARSE
         private static double xmax;
         private static double ymax;
         private static double zmax;
-        private static PointCloud segmentedPointcloud;
+        public static PointCloud segmentedPointcloud;
 
-        public static void calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, String limb) {
+        public static Tuple<double,double,List<List<Point3D>>> calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, String limb) {
 
             //Calculate limb bounds based on limb choice
+            double finalCircum = 0.0;
+            double numPlanes = 0.0;
+            Tuple<List<List<Point3D>>, double> T = new Tuple<List<List<Point3D>>, double>(null, 0);
 
             switch (limb) 
             {
@@ -38,6 +41,8 @@ namespace PARSE
                 zmax = pc.getzMax();
 
                 bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
+
+                //translate bounds according to pointcloud data points
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
@@ -56,6 +61,8 @@ namespace PARSE
 
                 bounds = new double[] {xmin, ymin, zmin, xmax, ymax, zmax};
 
+                //translate bounds according to pointcloud data points
+
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
                 break;
@@ -63,11 +70,50 @@ namespace PARSE
                 default: break;
             }
 
-            segmentedPointcloud = pc.getSubRegion(bounds);
+            try
+            {
 
-            Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(segmentedPointcloud,2);
+                segmentedPointcloud = pc.getSubRegion(bounds);
 
-            System.Diagnostics.Debug.WriteLine("Your arm is " + CircumferenceCalculator.calculate(T.Item1, 1) + "m");
+                T = PlanePuller.pullAll(segmentedPointcloud, 2);
+                finalCircum = CircumferenceCalculator.calculate(T.Item1, 1);
+                numPlanes = T.Item2;
+
+            }
+            catch (Exception err)
+            {
+
+                System.Diagnostics.Debug.WriteLine("(Subregion): Subregion issue - " + err.ToString());
+
+            }
+
+            //results printed out before historyloader so we can inspect all is well
+            System.Diagnostics.Debug.WriteLine("***Limb Circumference Results***");
+            System.Diagnostics.Debug.WriteLine("Limb chosen: " + limb);
+            System.Diagnostics.Debug.WriteLine("Circumference approx: " + finalCircum);
+            System.Diagnostics.Debug.WriteLine("Number of planes: " + numPlanes);
+
+            return new Tuple<double, double, List<List<Point3D>>>(finalCircum, numPlanes, T.Item1);
+
+        }
+
+        public static Tuple<double,double, double> convertToPCCoords(double x, double y, double z) {
+
+            //centre points
+            int cx = 640 / 2;
+            int cy = 480 / 2;
+
+            //invariant values
+            double fxinv = 1.0 / 476;
+            double fyinv = 1.0 / 476;
+
+            //depth scaling
+            double zz = z;
+
+            double xNew = (cx - x) * zz * fxinv;
+            double yNew = (cy - y) * zz * fyinv;
+
+            return new Tuple<double, double, double>(xNew,yNew,z);
 
         }
 
