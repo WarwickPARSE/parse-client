@@ -643,6 +643,59 @@ namespace PARSE.Tracking
         private void capturePosition()
         {
             Console.WriteLine("Capture position!!!");
+
+            SkeletonPosition skeletonPos = new SkeletonPosition();
+
+            //findArea
+            findArea(skeletonFrame[patientSkeletonID], x, y, angleXY, angleZ, skeletonPos);
+
+            //capture
+            //capture(skeletonFrame[patientSkeletonID], x, y, angleXY, angleZ, skeletonPos);
+        }
+
+        private void findArea(Skeleton pt, int x, int y, double anglexy, double anglez, SkeletonPosition sp)
+        {
+            int pos = 0;
+            String bone = "no bone";
+            SkeletonBones[] allBones = new SkeletonBones[23] { new SkeletonBones(JointType.Head, JointType.ShoulderCenter), new SkeletonBones(JointType.ShoulderCenter, JointType.ShoulderLeft), new SkeletonBones(JointType.ShoulderCenter, JointType.ShoulderRight), new SkeletonBones(JointType.ShoulderCenter, JointType.Spine), new SkeletonBones(JointType.Spine, JointType.ShoulderLeft), new SkeletonBones(JointType.Spine, JointType.ShoulderRight), new SkeletonBones(JointType.Spine, JointType.HipCenter), new SkeletonBones(JointType.Spine, JointType.HipLeft), new SkeletonBones(JointType.Spine, JointType.HipRight), new SkeletonBones(JointType.HipCenter, JointType.HipLeft), new SkeletonBones(JointType.HipCenter, JointType.HipRight), new SkeletonBones(JointType.ShoulderLeft, JointType.ElbowLeft), new SkeletonBones(JointType.ElbowLeft, JointType.WristLeft), new SkeletonBones(JointType.WristLeft, JointType.HandLeft), new SkeletonBones(JointType.ShoulderRight, JointType.ElbowRight), new SkeletonBones(JointType.ElbowRight, JointType.WristRight), new SkeletonBones(JointType.WristRight, JointType.HandRight), new SkeletonBones(JointType.HipRight, JointType.KneeRight), new SkeletonBones(JointType.KneeRight, JointType.AnkleRight), new SkeletonBones(JointType.AnkleRight, JointType.FootRight), new SkeletonBones(JointType.HipLeft, JointType.KneeLeft), new SkeletonBones(JointType.KneeLeft, JointType.AnkleLeft), new SkeletonBones(JointType.AnkleLeft, JointType.FootLeft) };
+            String[] boneNames = new String[23] { "neck", "collarboneLeft", "collarboneRight", "spineTop", "chestLeft", "chestRight", "spineBottom", "stomachLeft", "stomachRight", "waistLeft", "waistRight", "upperarmLeft", "forearmLeft", "handLeft", "upperarmRight", "forearmRight", "handRight", "thighRight", "calfRight", "footRight", "thighLeft", "calfLeft", "footLeft" };
+
+            int i = 0;
+            while ((i < 23) && (pos == 0))
+            {
+                JointType j1 = allBones[i].joint1;
+                JointType j2 = allBones[i].joint2;
+
+                if (((x < pt.Joints[j1].Position.X) && (x > pt.Joints[j2].Position.X) && (y < pt.Joints[j1].Position.Y) && (y > pt.Joints[j2].Position.Y)) || ((x < pt.Joints[j2].Position.X) && (x > pt.Joints[j1].Position.X) && (y < pt.Joints[j2].Position.Y) && (y > pt.Joints[j1].Position.Y)))
+                {
+                    pos = i;
+                    sp.bones = allBones[i];
+                    bone = boneNames[i];
+                    sp.boneName = bone;
+                }
+                i++;
+            }
+
+            if (bone == "no bone")
+            {
+                //if on chest
+            }
+
+            //print bone
+            System.Diagnostics.Debug.WriteLine(bone);
+
+        }
+
+        private void capture(Skeleton pt, int x, int y, double anglexy, double anglez, SkeletonPosition sp)
+        {
+            JointType j1 = sp.bones.joint1;
+            JointType j2 = sp.bones.joint2;
+
+            double dist1x = x - pt.Joints[j1].Position.X;
+            double dist2x = x - pt.Joints[j2].Position.X;
+
+            double dist1y = y - pt.Joints[j1].Position.Y;
+            double dist2y = y - pt.Joints[j2].Position.Y;
         }
 
         /// <summary>

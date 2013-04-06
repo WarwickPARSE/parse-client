@@ -8,6 +8,15 @@ namespace PARSE.Tracking
 {
     class SkeletonPosition
     {
+        public SkeletonBones bones { get; set; }
+        public String boneName { get; set; }
+
+        public SkeletonBones[] horizontal { get; set; }
+        public String[] horNames { get; set; }
+        public SkeletonBones[] vertical { get; set; }
+        public String[] verNames { get; set; }
+
+
         //public SkeletonPoint point1 {get; set;}
         //public SkeletonPoint point2 {get; set;}
         //public SkeletonPoint point3 {get; set;}
@@ -38,6 +47,11 @@ namespace PARSE.Tracking
         /// </summary>
         public SkeletonPosition()
         {
+            horizontal = new SkeletonBones[10] { new SkeletonBones(JointType.ShoulderCenter, JointType.ShoulderLeft), new SkeletonBones(JointType.ShoulderCenter, JointType.ShoulderRight), new SkeletonBones(JointType.Spine, JointType.ShoulderLeft), new SkeletonBones(JointType.Spine, JointType.ShoulderRight), new SkeletonBones(JointType.Spine, JointType.HipLeft), new SkeletonBones(JointType.Spine, JointType.HipRight), new SkeletonBones(JointType.HipCenter, JointType.HipLeft), new SkeletonBones(JointType.HipCenter, JointType.HipRight), new SkeletonBones(JointType.AnkleRight, JointType.FootRight), new SkeletonBones(JointType.AnkleLeft, JointType.FootLeft) };
+            horNames = new String[10] { "collarboneLeft", "collarboneRight", "chestLeft", "chestRight", "stomachLeft", "stomachRight", "waistLeft", "waistRight", "footLeft", "footRight" };
+            vertical = new SkeletonBones[13] { new SkeletonBones(JointType.Head, JointType.ShoulderCenter), new SkeletonBones(JointType.ShoulderCenter, JointType.Spine), new SkeletonBones(JointType.Spine, JointType.HipCenter), new SkeletonBones(JointType.ShoulderLeft, JointType.ElbowLeft), new SkeletonBones(JointType.ElbowLeft, JointType.WristLeft), new SkeletonBones(JointType.WristLeft, JointType.HandLeft), new SkeletonBones(JointType.ShoulderRight, JointType.ElbowRight), new SkeletonBones(JointType.ElbowRight, JointType.WristRight), new SkeletonBones(JointType.WristRight, JointType.HandRight), new SkeletonBones(JointType.HipRight, JointType.KneeRight), new SkeletonBones(JointType.KneeRight, JointType.AnkleRight), new SkeletonBones(JointType.HipLeft, JointType.KneeLeft), new SkeletonBones(JointType.KneeLeft, JointType.AnkleLeft) };
+            verNames = new String[13] { "neck", "spineTop", "spineBottom", "upperarmLeft", "upperarmRight", "forearmLeft", "forearmRight", "handLeft", "handRight", "thighLeft", "thighRight", "calfLeft", "calfRight" };
+            
 
         }
 
@@ -51,6 +65,8 @@ namespace PARSE.Tracking
         public String getJoint1Name()
         {
             String joint1 = "default";
+
+            joint1 = patient.Joints[JointType.ElbowLeft].JointType.ToString();
 
             return joint1;
         }
