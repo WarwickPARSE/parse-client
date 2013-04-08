@@ -20,7 +20,7 @@ namespace PARSE
         private static double zmax;
         public static PointCloud segmentedPointcloud;
 
-        public static Tuple<double,double,List<List<Point3D>>> calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, String limb) {
+        public static Tuple<double,double,List<List<Point3D>>> calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, int limb) {
 
             //Calculate limb bounds based on limb choice
             double finalCircum = 0.0;
@@ -29,8 +29,28 @@ namespace PARSE
 
             switch (limb) 
             {
-                case "ARM_LEFT": 
+                case 1:
+                //SHOULDERS (1)
+                xmin = jointDepths["ShoulderLeft"][1];
+                xmax = jointDepths["ShoulderRight"][1];
+
+                ymax = jointDepths["ShoulderCenter"][2];
+                ymin = jointDepths["ShoulderLeft"][2];
+
+                zmin = pc.getzMin();
+                zmax = pc.getzMax();
+
+                bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
+
+                //translate bounds according to pointcloud data points
+
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                break;
+
+                case 2: 
                 
+                //ARM_LEFT (2)
                 xmin = jointDepths["ShoulderLeft"][1];
                 xmax = jointDepths["HandLeft"][1];
 
@@ -47,8 +67,51 @@ namespace PARSE
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
                 break;
-                
-                case "WAIST":
+
+                case 3:
+
+                //ARM_RIGHT (3)
+                xmin = jointDepths["ShoulderRight"][1];
+                xmax = jointDepths["HandRight"][1];
+
+                ymax = jointDepths["ShoulderRight"][2];
+                ymin = jointDepths["HandRight"][2];
+
+                zmin = pc.getzMin();
+                zmax = pc.getzMax();
+
+                bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
+
+                //translate bounds according to pointcloud data points
+
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                break;
+
+                case 4:
+
+                //CHEST(4)
+
+                xmin = jointDepths["ShoulderRight"][1];
+                xmax = jointDepths["ShoulderLeft"][1];
+
+                ymax = jointDepths["ShoulderCenter"][2];
+                ymin = jointDepths["Spine"][2];
+
+                zmin = pc.getzMin();
+                zmax = pc.getzMax();
+
+                bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
+
+                //translate bounds according to pointcloud data points
+
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                break;
+
+                case 5:
+
+                //WAIST(5)
 
                 xmin = jointDepths["HipRight"][1];
                 xmax = jointDepths["HipLeft"][1];
@@ -60,6 +123,48 @@ namespace PARSE
                 zmax = pc.getzMax();
 
                 bounds = new double[] {xmin, ymin, zmin, xmax, ymax, zmax};
+
+                //translate bounds according to pointcloud data points
+
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                break;
+
+                case 6:
+
+                //LEFT_LEG(6)
+
+                xmin = jointDepths["HipCenter"][1];
+                xmax = jointDepths["HipLeft"][1];
+
+                ymax = jointDepths["HipLeft"][2];
+                ymin = jointDepths["KneeLeft"][2];
+
+                zmin = pc.getzMin();
+                zmax = pc.getzMax();
+
+                bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
+
+                //translate bounds according to pointcloud data points
+
+                System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                break;
+
+                case 7:
+
+                //RIGHT_LEG(7)
+
+                xmin = jointDepths["HipRight"][1];
+                xmax = jointDepths["HipCenter"][1];
+
+                ymax = jointDepths["HipRight"][2];
+                ymin = jointDepths["KneeRight"][2];
+
+                zmin = pc.getzMin();
+                zmax = pc.getzMax();
+
+                bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
 
                 //translate bounds according to pointcloud data points
 

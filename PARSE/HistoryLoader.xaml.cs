@@ -212,7 +212,7 @@ namespace PARSE
                     new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
         }
 
-        public void visualiseLimbs(Tuple<double, double, List<List<Point3D>>> limbData, double planeIndex)
+        public void visualiseLimbs(List<Tuple<double, double, List<List<Point3D>>>> limbData, int limbIndex, double planeIndex)
         {
             System.Diagnostics.Debug.WriteLine("Opening Limb Visualisation Panel");
 
@@ -241,16 +241,16 @@ namespace PARSE
             noresults.Visibility = Visibility.Collapsed;
             newscan.Visibility = Visibility.Collapsed;
 
-            circumoutput.Content = limbData.Item1+"cm"; 
-            totalarea2.Content = limbData.Item2;
-            totalperimiter2.Content = limbData.Item1+"cm";
+            circumoutput.Content = limbData[limbIndex].Item1+"cm"; 
+            totalarea2.Content = limbData[limbIndex].Item2;
+            totalperimiter2.Content = limbData[limbIndex].Item1+"cm";
 
             //visualise planes
             planeNo.Text = "Plane Outline: " + (int) planeIndex;
 
             if (storedLimbPlanes.Count == 0)
             {
-                storedLimbPlanes = limbData.Item3;
+                storedLimbPlanes = limbData[limbIndex].Item3;
                 storedLimbPlanes.Reverse();
                 planeChooser.Maximum = storedLimbPlanes.Count;
             }
@@ -329,6 +329,11 @@ namespace PARSE
             this.totalarea.Content = "Total Area: " + Math.Round(areaList[(int)e.NewValue], 4) + "m\u00B2";
             this.maxarea.Content = "Plane " + (int)e.NewValue;
             this.totalperimiter.Content = "Circumference: " + circum + "m";
+
+        }
+
+        private void limbselect_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
 
         }
     }

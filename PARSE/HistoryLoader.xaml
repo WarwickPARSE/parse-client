@@ -72,15 +72,15 @@
                     <!--"Headline" Labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumlabel" Height="20" Content="Calculated Circumference" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumoutput" Height="20" Content="cm" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
-                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselect" Width="145" Height="20" Margin="325,45,8,8">
+                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselect" Width="145" Height="20" Margin="325,45,8,8" SelectionChanged="limbselect_SelectionChanged">
                         <!--General Event handler for each combo-box to be implemented -->
-                        <ComboBoxItem Content="Shoulders"></ComboBoxItem>
-                        <ComboBoxItem Content="Left Arm"></ComboBoxItem>
-                        <ComboBoxItem Content="Right Arm"></ComboBoxItem>
-                        <ComboBoxItem Content="Chest"></ComboBoxItem>
-                        <ComboBoxItem Content="Waist"></ComboBoxItem>
-                        <ComboBoxItem Content="Left Leg"></ComboBoxItem>
-                        <ComboBoxItem Content="Right Leg"></ComboBoxItem>
+                        <ComboBoxItem Name="shoulderoption" Content="Shoulders"></ComboBoxItem>
+                        <ComboBoxItem Name="leftarmoption" Content="Left Arm"></ComboBoxItem>
+                        <ComboBoxItem Name="rightarmoption" Content="Right Arm"></ComboBoxItem>
+                        <ComboBoxItem Name="chestoption" Content="Chest"></ComboBoxItem>
+                        <ComboBoxItem Name="waistoption" Content="Waist"></ComboBoxItem>
+                        <ComboBoxItem Name="leftlegoption" Content="Left Leg"></ComboBoxItem>
+                        <ComboBoxItem Name="rightlegoption" Content="Right Leg"></ComboBoxItem>
                     </ComboBox>
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselecthdr" Height="20" Content="Limb Selection" Margin="325,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="planelabel" Height="20" Content="Plane Details" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />

@@ -317,6 +317,7 @@ namespace PARSE
             windowHistory.runtimeTab.SelectedIndex = 0;
             windowHistory.visualisePlanes(planes, 1);
             windowHistory.voloutput.Content = volume + "m\u00B3";
+            windowHistory.heightoutput.Content = HeightCalculator.getHeight(pcd) + "m";
             windowHistory.scantime.Content = "Weight (Est): " + VolumeCalculator.calculateApproxWeight(volume) + "kg";
             windowHistory.scanfileref.Content = "BMI Measure: " + VolumeCalculator.calculateBMI(VolumeCalculator.calculateApproxWeight(volume),HeightCalculator.getHeight(pcd));
             windowHistory.scanvoxel.Content = "Siri (%BF): " + VolumeCalculator.calculateSiri(volume, VolumeCalculator.calculateApproxWeight(volume), HeightCalculator.getHeight(pcd)) + "%";
@@ -327,20 +328,26 @@ namespace PARSE
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
+            /*Create an array of type tuple<double,double,List<List<Point3D>>>
+             * as limbs will all be calculated before displaying history loader
+             * results, not partic. efficient but fine given the restriction.*/
 
-            /*gets all the planes by calling volume calculator*/
+            //gets all the planes by calling volume calculator
+
+            //kinect sensor check is here, can't use coord mapper otherwise.
+
             if (KinectSensor.KinectSensors.Count > 0)
             {
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
                 /*Requires generated model, raw depth array and previous*/
-                Tuple<double,double,List<List<Point3D>>> result = windowScanner.determineLimb(pcd);
+                List<Tuple<double,double,List<List<Point3D>>>> result = windowScanner.determineLimb(pcd);
                 /*Then open history loader (limb circum stuff will be set here soon)*/
                 HistoryLoader windowHistory = new HistoryLoader();
                 windowHistory.runtimeTab.SelectedIndex = 1;
                 windowHistory.Owner = this;
                 windowHistory.Show();
-                windowHistory.visualiseLimbs(result, 1);
+                windowHistory.visualiseLimbs(result, 1, 1);
 
             }
             else

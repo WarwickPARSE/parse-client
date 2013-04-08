@@ -430,13 +430,15 @@ namespace PARSE
 
         }
 
-        public Tuple<double,double,List<List<Point3D>>> determineLimb(PointCloud pcdexisting)
+        public List<Tuple<double,double,List<List<Point3D>>>> determineLimb(PointCloud pcdexisting)
         {
          
             //pull in skeleton measures from a temporary file for corbett.parse for now.
             kinectInterp = new KinectInterpreter(skeloutline);
             //temporary tuple for results
             Tuple<double, double, List<List<Point3D>>> T = new Tuple<double, double, List<List<Point3D>>>(0,0,null);
+            //permanent list of tuples for passing back to coreLoader
+            List<Tuple<double, double, List<List<Point3D>>>> limbMeasures = new List<Tuple<double,double,List<List<Point3D>>>>();
 
             if (KinectSensor.KinectSensors.Count > 0)
             {
@@ -468,13 +470,12 @@ namespace PARSE
                     jointDepths.Add(joint[0], jointPos2);
                 }
 
-                foreach (var item in jointDepths.Keys)
+                for (int limbArea = 1; limbArea <= 8; limbArea++)
                 {
-                    System.Diagnostics.Debug.WriteLine(item);
+                    //pass point cloud and correct bounds to Limb Calculator
+                    //shoulders is first option in list so pass first.
+                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, limbArea));
                 }
-
-                //pass point cloud and correct bounds to Limb Calculator
-                T = LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
             else
             {
@@ -486,7 +487,7 @@ namespace PARSE
             gv.setMaterial();
             this.DataContext = gv;
 
-            return T;
+            return limbMeasures;
 
         }
 
