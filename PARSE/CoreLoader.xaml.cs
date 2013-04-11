@@ -163,10 +163,9 @@ namespace PARSE
         }
 
         /// <summary>
-        /// checks to see if there is a sensor connected, polls every 10 seconds
+        /// Returns true iff there is no Kinect connected. If this method returns true, it will spawn a thread to check if a sensor has been connected, polls every 10 seconds
         /// </summary>
-        /// <returns>false if not connected, true otherwise</returns>
-
+        /// <returns>Boolean</returns>
         private Boolean noSensor()
         {
             if (this.kinectInterp.noKinect())
@@ -184,7 +183,6 @@ namespace PARSE
         /// <summary>
         /// Shuts any windows that do not need to be open
         /// </summary>
-        
         private void shutAnyWindows()
         {
             if (windowViewer != null)
