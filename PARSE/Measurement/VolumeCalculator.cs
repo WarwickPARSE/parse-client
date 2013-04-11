@@ -11,9 +11,12 @@ namespace PARSE
 {
     public static class VolumeCalculator
     {
-        
-
-        //only works on an amorphus blob
+        /// <summary>
+        /// calculates volume, only works on an amorphus blob
+        /// </summary>
+        /// <param name="planes">List<List<Point3D>></param>
+        /// <param name="increment">double</param>
+        /// <returns>double</returns>
         public static double volume1stApprox(List<List<Point3D>> planes, double increment)
         {
             
