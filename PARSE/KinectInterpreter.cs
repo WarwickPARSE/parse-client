@@ -225,13 +225,18 @@ namespace PARSE
             return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
         }
 
+        /// <summary>
+        /// Change's the Kinect's angle to oneParseRadian
+        /// </summary>
         public void calibrate()
         {
             
             this.kinectSensor.ElevationAngle = oneParseRadian;
         }
         
-        //Enable depthStream
+        /// <summary>
+        /// Enable depthStream for the first time
+        /// </summary>
         public void startDepthStream()
         {
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
@@ -280,6 +285,10 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        /// <summary>
+        /// Returns true iff there is no Kinect present
+        /// </summary>
+        /// <returns></returns>
         public Boolean noKinect()
         {
             if (KinectSensor.KinectSensors.Count == 0)
@@ -290,7 +299,10 @@ namespace PARSE
             return (this.kinectSensor == null);
         }
 
-        //called when you plug a kinect in to a running PARSE
+        /// <summary>
+        /// Sets the Kinect associated with this Interpreter. Called when you plug a kinect in to a running PARSE
+        /// </summary>
+        /// <param name="c"></param>
         public void setSensor(KinectSensor c)
         {
             this.kinectSensor = c;
