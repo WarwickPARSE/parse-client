@@ -18,6 +18,12 @@ namespace PARSE
             return SubSampler.averageSample(SubSampler.subSample(input, factor), factor);
         }
         
+        /// <summary>
+        /// iterates through the list and subsamples by the factor
+        /// </summary>
+        /// <param name="input">List<Point3D></param>
+        /// <param name="factor">int</param>
+        /// <returns>List<Point3D></returns>
         public static List<Point3D> subSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
@@ -31,6 +37,12 @@ namespace PARSE
             return output;
         }
 
+        /// <summary>
+        /// iterates through the list and averages factor many points into one super point
+        /// </summary>
+        /// <param name="input">List<Point3D></param>
+        /// <param name="factor">int</param>
+        /// <returns>List<Point3D></returns>
         public static List<Point3D> averageSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
