@@ -124,7 +124,7 @@ namespace PARSE
         }
 
         /// <summary>
-        /// Disables the depth stream of the kinect associated with this interpreter.
+        /// Disables the depth stream of the kinect associated with this interpreter
         /// </summary>
         public void disableDepth()
         {
@@ -132,9 +132,9 @@ namespace PARSE
         }
 
         /// <summary>
-        /// Returns true if the depth stream is enabled.
+        /// Returns true if the depth stream is enabled
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Boolean</returns>
         public Boolean isDepthEnabled()
         {
             return this.kinectSensor.DepthStream.IsEnabled;
@@ -148,16 +148,26 @@ namespace PARSE
             this.kinectSensor.DepthStream.Enable();
         }
 
+        /// <summary>
+        /// Disable the colour stream of the Kinect
+        /// </summary>
         public void disableColor()
         {
             this.kinectSensor.ColorStream.Disable();
         }
 
+        /// <summary>
+        /// Returns true iff colour stream is enabled
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean isColorEnabled()
         {
             return this.kinectSensor.ColorStream.IsEnabled;
         }
 
+        /// <summary>
+        /// Enables colour stream
+        /// </summary>
         public void enableColor()
         {
             this.kinectSensor.ColorStream.Enable();
