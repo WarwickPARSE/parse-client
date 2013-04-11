@@ -150,7 +150,6 @@
     <Compile Include="LimbCalculator.cs" />
     <Compile Include="Measurement\AreaCalculator.cs" />
     <Compile Include="Measurement\GiftWrapper.cs" />
-    <Compile Include="Measurement\ConvexHullFinder.cs" />
     <Compile Include="Measurement\HeightCalculator.cs" />
     <Compile Include="Measurement\PlanePuller.cs" />
     <Compile Include="Measurement\SubSampler.cs" />
