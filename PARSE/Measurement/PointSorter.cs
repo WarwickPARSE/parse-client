@@ -31,8 +31,8 @@ namespace PARSE
         /// <summary>
         /// sorts a list of points into a clockwise sorted list
         /// </summary>
-        /// <param name="input">List<Point3D></param>
-        /// <returns>List<Point3D></returns>
+        /// <param name="input">List(Point3D)</param>
+        /// <returns>List(Point3D)</returns>
         public static List<Point3D> clockSort(List<Point3D> input)
         {
             double xmax = double.MinValue;

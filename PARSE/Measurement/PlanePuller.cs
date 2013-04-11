@@ -16,7 +16,7 @@ namespace PARSE
         /// </summary>
         /// <param name="pc">PointCloud</param>
         /// <param name="arbNumber">int</param>
-        /// <returns>Tuple<List<List<Point3D>>,double></returns>
+        /// <returns>Tuple(List(List(Point3D)),double)</returns>
         public static Tuple<List<List<Point3D>>, double> pullAll(PointCloud pc)
         {
             return PlanePuller.pullAll(pc, planeNumber);
@@ -27,7 +27,7 @@ namespace PARSE
         /// </summary>
         /// <param name="pc">PointCloud</param>
         /// <param name="arbNumber">int</param>
-        /// <returns>Tuple<List<List<Point3D>>,double></returns>
+        /// <returns>Tuple(List(List(Point3D)),double)</returns>
         public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc, int arbNumber)
         {
             double xmin = pc.getxMin();

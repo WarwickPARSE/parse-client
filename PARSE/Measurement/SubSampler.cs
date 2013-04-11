@@ -11,9 +11,9 @@ namespace PARSE
         /// <summary>
         /// iterates through the list and subsamples by subSampleFactor and then averages averageFactor many points together. 
         /// </summary>
-        /// <param name="input">List<Point3D></param>
+        /// <param name="input">List(Point3D)</param>
         /// <param name="factor">int</param>
-        /// <returns>List<Point3D></returns>
+        /// <returns>List(Point3D)</returns>
         public static List<Point3D> averageSubSample(List<Point3D> input, int subSampleFactor, int averageFactor)
         {
             return SubSampler.averageSample(SubSampler.subSample(input, subSampleFactor), averageFactor);
@@ -22,9 +22,9 @@ namespace PARSE
         /// <summary>
         /// iterates through the list and subsamples by factor and then averages factor many points together. 
         /// </summary>
-        /// <param name="input">List<Point3D></param>
+        /// <param name="input">List(Point3D)</param>
         /// <param name="factor">int</param>
-        /// <returns>List<Point3D></returns>
+        /// <returns>List(Point3D)</returns>
         public static List<Point3D> averageSubSample(List<Point3D> input, int factor)
         {
             return SubSampler.averageSample(SubSampler.subSample(input, factor), factor);
@@ -35,7 +35,7 @@ namespace PARSE
         /// </summary>
         /// <param name="input">List<Point3D></param>
         /// <param name="factor">int</param>
-        /// <returns>List<Point3D></returns>
+        /// <returns>List(Point3D)</returns>
         public static List<Point3D> subSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
@@ -52,9 +52,9 @@ namespace PARSE
         /// <summary>
         /// iterates through the list and averages factor many points into one super point
         /// </summary>
-        /// <param name="input">List<Point3D></param>
+        /// <param name="input">List(Point3D)</param>
         /// <param name="factor">int</param>
-        /// <returns>List<Point3D></returns>
+        /// <returns>List(Point3D)</returns>
         public static List<Point3D> averageSample(List<Point3D> input, int factor)
         {
             List<Point3D> output = new List<Point3D>();
