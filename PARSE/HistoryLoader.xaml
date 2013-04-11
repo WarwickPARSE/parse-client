@@ -72,7 +72,7 @@
                     <!--"Headline" Labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumlabel" Height="20" Content="Calculated Circumference" Margin="8,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="circumoutput" Height="20" Content="cm" Margin="8,45,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
-                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselect" Width="145" Height="20" Margin="325,45,8,8" SelectionChanged="limbselect_SelectionChanged">
+                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" SelectedItem="0" Name="limbselect" Width="145" Height="20" Margin="325,45,8,8" SelectionChanged="limbselect_SelectionChanged">
                         <!--General Event handler for each combo-box to be implemented -->
                         <ComboBoxItem Name="shoulderoption" Content="Shoulders"></ComboBoxItem>
                         <ComboBoxItem Name="leftarmoption" Content="Left Arm"></ComboBoxItem>
@@ -83,11 +83,10 @@
                         <ComboBoxItem Name="rightlegoption" Content="Right Leg"></ComboBoxItem>
                     </ComboBox>
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limbselecthdr" Height="20" Content="Limb Selection" Margin="325,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="limboptionshdr" Height="20" Content="Limb Options" Margin="525,8,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="20" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="planelabel" Height="20" Content="Plane Details" Margin="8,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanlabel" Height="20" Content="Scan Details" Margin="325,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
                     <Border BorderThickness="0.25" Name="viewborder2" HorizontalAlignment="Right" Width="482" Height="224" BorderBrush="DarkGray" Margin="440,0,33,16"></Border>
-                    <Slider Name="planeChooser2" Orientation="Vertical" Width="21" Minimum="0" Maximum="60" TickPlacement="Both" TickFrequency="1" IsDirectionReversed="True" HorizontalAlignment="Center" ValueChanged="planeChooser_ValueChanged" Margin="750,4,516,31" />
-                    <Image Source="Resources/hb.png" Margin="600,2,534,21" Name="limbimg"/>
                     <TextBlock Text="Results will appear here after loading a scan " HorizontalAlignment="Center" VerticalAlignment="Center" Name="noresults2" TextAlignment="Center" FontFamily="Arial" FontSize="28" FontWeight="Bold" Foreground="LightGray" Height="36"  Width="905"></TextBlock>
                     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="546,130,534,90" Width="200" Height="20" Name="newscan2" TextAlignment="Center">
                     <Hyperlink NavigateUri="http://www.google.com" >
@@ -113,14 +112,27 @@
                         <ModelVisual3D x:Name="planePlot2" Content="{Binding Model}" />
                         <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
                     </h:HelixViewport3D>
-                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="520,145,0,0" Name="btnresults2" VerticalAlignment="Top" Width="75" />
-                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="520,175,0,0" Name="btnrescan2" VerticalAlignment="Top" Width="75" />
-                </Grid>
-                <!--<Canvas Name="VisCanvas" Width="486" Height="216" Background="Aqua" HorizontalAlignment="Right" MouseDown="VisCanvas_MouseDown" MaxWidth="486" MaxHeight="216">
-                    <Canvas.RenderTransform>
-                        <ScaleTransform x:Name="st"/>
-                    </Canvas.RenderTransform>
-                </Canvas>-->
+                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="525,40,0,0" Name="btnresults2" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="610,40,0,0" Name="btnrescan2" VerticalAlignment="Top" Width="75" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanhistory" Height="20" Content="Scan History" Margin="525,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
+                    <ListBox Margin="525,110,0,13" Name="previousScans" HorizontalAlignment="Left"
+                 VerticalAlignment="Top" Width="194" Height="80" />
+                    <Button Content="Apply" Height="23" HorizontalAlignment="Left" Margin="525,195,0,0" Name="btnapply" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Clear" Height="23" HorizontalAlignment="Left" Margin="610,195,0,0" Name="btnclear" VerticalAlignment="Top" Width="75" />
+                    <Canvas Name="VisCanvas" Width="486" Height="216" Background="WhiteSmoke" HorizontalAlignment="Right" MaxWidth="486" MaxHeight="216" Margin="0,0,29,24">
+                        <Canvas.RenderTransform>
+                            <ScaleTransform x:Name="st"/>
+                        </Canvas.RenderTransform>
+                        <Ellipse Height="100" Name="currentEllipse" Width="200" Stroke="Red" Margin="150,50,50,50" Fill="LightGray" />
+                        <Ellipse Height="80" Name="historicEllipse" Width="160" Stroke="Blue" Margin="170,60,50,50" Fill="LightBlue" />
+                        <Line Height="100" Width="10" Stroke="Black" Fill="Black"></Line>
+                        <TextBlock Height="25" FontFamily="Courier New" Margin="5,160" Width="200" FontStyle="Normal" Foreground="Red" Name="limbsel">Limb: ARM_LEFT</TextBlock>
+                        <TextBlock Height="25" FontFamily="Courier New" Margin="5,180" Width="200" FontStyle="Normal" Foreground="Red" Name="circumsel">Circum Approx: 0.00cm</TextBlock>
+                        <TextBlock Height="25" FontFamily="Courier New" Margin="5,200" Width="200" FontStyle="Normal" Foreground="Red" Name="planesel">Plane Count: 1</TextBlock>
+                        <TextBlock Height="25" FontFamily="Courier New" Margin="200,200" Width="200" FontStyle="Normal" Foreground="Red" Name="historysel">Period: 37 Days</TextBlock>
+                        <TextBlock Height="25" FontFamily="Courier New" Margin="200,180" Width="200" FontStyle="Normal" Foreground="Red" Name="changesel">Change: 2cm/5%</TextBlock>
+                    </Canvas>
+                  </Grid>
             </TabItem>
             <TabItem>
                 <TabItem.Header>

@@ -20,6 +20,14 @@ namespace PARSE
         private static double zmax;
         public static PointCloud segmentedPointcloud;
 
+        //Fudge factors for each limb, testing empirically and on the basis of the following papers:
+        private static double ArmFactor;
+        private static double LegFactor;
+        private static double ChestFactor;
+        private static double ShoulderFactor;
+        private static double WaistFactor;
+
+
         public static Tuple<double,double,List<List<Point3D>>> calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, int limb) {
 
             //Calculate limb bounds based on limb choice
@@ -178,11 +186,16 @@ namespace PARSE
             try
             {
 
+                //Calculate circumference
                 segmentedPointcloud = pc.getSubRegion(bounds);
 
                 T = PlanePuller.pullAll(segmentedPointcloud, 2);
                 finalCircum = CircumferenceCalculator.calculate(T.Item1, 1);
                 numPlanes = T.Item2;
+
+                //Premodify the circumference calculation with the fudge factors.
+
+               
 
             }
             catch (Exception err)

@@ -64,8 +64,13 @@ namespace PARSE
                 nodeName = nextName;
                 nodeNHSNo = nextNHSNo;
 
-                var nodes = new { Id = nodeID.Value, Patientname = nodeName.Value, Patientnhsno = nodeNHSNo.Value };
-                listBox1.Items.Add(nodes);
+                //null check when at end of list
+                if (nodeID != null)
+                {
+                    var nodes = new { Id = nodeID.Value, Patientname = nodeName.Value, Patientnhsno = nodeNHSNo.Value };
+                    listBox1.Items.Add(nodes);
+                }
+
             }
 
         }
@@ -91,6 +96,8 @@ namespace PARSE
 
             //close the window
             this.Close();
+
+            (Owner as CoreLoader).LoadPointCloudFromFile(Convert.ToInt32(id));
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)

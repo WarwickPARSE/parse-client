@@ -27,7 +27,8 @@ namespace PARSE
 
         //persistently store our list of planes
         private List<List<Point3D>> storedPlanes;
-        private List<List<Point3D>> storedLimbPlanes; 
+        private List<List<Point3D>> storedLimbPlanes;
+        private List<Tuple<double, double, List<List<Point3D>>>> rawlimbData;
 
         //publicly accessible area list from previous calculations
         public List<double> areaList;
@@ -47,6 +48,8 @@ namespace PARSE
             this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
             this.Height = this.Owner.Width * 0.225;
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
+
+            this.limbselect.SelectedItem = 0;
 
             //check if a scan event is in place
             if (storedPlanes.Count == 0)
@@ -85,8 +88,6 @@ namespace PARSE
                 scanlabel.Visibility = Visibility.Collapsed;
                 viewborder2.Visibility = Visibility.Collapsed;
 
-                planeChooser2.Visibility = Visibility.Collapsed;
-                limbimg.Visibility = Visibility.Collapsed;
                 hvpcanvas2.Visibility = Visibility.Collapsed;
 
                 scanno2.Visibility = Visibility.Collapsed;
@@ -215,6 +216,7 @@ namespace PARSE
         public void visualiseLimbs(List<Tuple<double, double, List<List<Point3D>>>> limbData, int limbIndex, double planeIndex)
         {
             System.Diagnostics.Debug.WriteLine("Opening Limb Visualisation Panel");
+            rawlimbData = limbData;
 
             circumlabel.Visibility = Visibility.Visible;
             circumoutput.Visibility = Visibility.Visible;
@@ -223,8 +225,6 @@ namespace PARSE
             planelabel.Visibility = Visibility.Visible;
             scanlabel.Visibility = Visibility.Visible;
             viewborder2.Visibility = Visibility.Visible;
-            planeChooser2.Visibility = Visibility.Visible;
-            limbimg.Visibility = Visibility.Visible;
             noresults2.Visibility = Visibility.Visible;
             newscan2.Visibility = Visibility.Visible;
             scanno2.Visibility = Visibility.Visible;
@@ -238,12 +238,12 @@ namespace PARSE
             btnresults2.Visibility = Visibility.Visible;
             btnrescan2.Visibility = Visibility.Visible;
             //Set relevant ui components to collapsed
-            noresults.Visibility = Visibility.Collapsed;
-            newscan.Visibility = Visibility.Collapsed;
+            noresults2.Visibility = Visibility.Collapsed;
+            newscan2.Visibility = Visibility.Collapsed;
 
             circumoutput.Content = limbData[limbIndex].Item1+"cm"; 
-            totalarea2.Content = limbData[limbIndex].Item2;
-            totalperimiter2.Content = limbData[limbIndex].Item1+"cm";
+            totalarea2.Content = "Total Area: " + limbData[limbIndex].Item2;
+            totalperimiter2.Content = "Perimeter Approx: " + limbData[limbIndex].Item1+"cm";
 
             //visualise planes
             planeNo.Text = "Plane Outline: " + (int) planeIndex;
@@ -322,19 +322,10 @@ namespace PARSE
 
         }
 
-        private void planeChooser2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            visualisePlanes(storedLimbPlanes, e.NewValue);
-            double circum = CircumferenceCalculator.calculate(storedLimbPlanes, (int)e.NewValue);
-            this.totalarea.Content = "Total Area: " + Math.Round(areaList[(int)e.NewValue], 4) + "m\u00B2";
-            this.maxarea.Content = "Plane " + (int)e.NewValue;
-            this.totalperimiter.Content = "Circumference: " + circum + "m";
-
-        }
 
         private void limbselect_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            visualiseLimbs(rawlimbData, (sender as ComboBox).SelectedIndex, 1);
         }
     }
 }

@@ -61,6 +61,7 @@
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="Debug Console" Click="OpenDebug_Click"/> 
+                <MenuItem Header="Set Working Directory" Click="WorkingDirectory_Click" />
      </MenuItem>
     </Menu>
         

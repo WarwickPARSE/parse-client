@@ -48,6 +48,13 @@ namespace PARSE
         public DebugLoader                 windowDebug;
         public MetaLoader                  windowMeta;
 
+        //Window setup states
+        public enum OperationModes
+        {
+            ShowExistingCloud, ShowExistingPatient, ShowExistingResults,
+            CaptureNewCloud, CaptureNewPatient
+        };
+
         //Modelling specific definitions
         private GeometryModel3D             Model;
         private GeometryModel3D             BaseModel;
@@ -72,6 +79,9 @@ namespace PARSE
 
         //database engine
         DatabaseEngine db;
+
+        //current working directory for parse files
+        private String                      workingDir;
 
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
@@ -140,11 +150,22 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// sets values for pointcloud (stitching) and point cloud list (visualisation)
+        /// </summary>
+        /// <param name="pc">a point cloud</param>
+        /// <param name="pcl">a list of point clouds</param>
+
         public void setPC(PointCloud pc, List<PointCloud> pcl)
         {
             this.pcd = pc;
             this.pcdl = pcl;
         }
+
+        /// <summary>
+        /// checks to see if there is a sensor connected, polls every 10 seconds
+        /// </summary>
+        /// <returns>false if not connected, true otherwise</returns>
 
         private Boolean noSensor()
         {
@@ -160,6 +181,10 @@ namespace PARSE
             
         }
         
+        /// <summary>
+        /// Shuts any windows that do not need to be open
+        /// </summary>
+        
         private void shutAnyWindows()
         {
             if (windowViewer != null)
@@ -172,6 +197,12 @@ namespace PARSE
             }
         }
         
+        /// <summary>
+        /// opens rgb feed for viewing
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void RGB_Click(object sender, RoutedEventArgs e)
         {
             if (this.noSensor())
@@ -183,6 +214,12 @@ namespace PARSE
             windowViewer.Owner = this;
             windowViewer.Show();
         }
+
+        /// <summary>
+        /// opens depth feed for viewing
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void Depth_Click(object sender, RoutedEventArgs e)
         {
@@ -196,6 +233,12 @@ namespace PARSE
             windowViewer.Show();
         }
 
+        /// <summary>
+        /// opens skeleton feed for viewing
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void Skeleton_Click(object sender, RoutedEventArgs e)
         {
             if (this.noSensor())
@@ -207,6 +250,12 @@ namespace PARSE
             windowViewer.Owner = this;
             windowViewer.Show();
         }
+
+        /// <summary>
+        /// opens the depth isolation feed
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void DepthIso_Click(object sender, RoutedEventArgs e)
         {
@@ -220,6 +269,12 @@ namespace PARSE
             windowViewer.Show();
         }
 
+        /// <summary>
+        /// opens the rgb isolation feed
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void RGBIso_Click(object sender, RoutedEventArgs e)
         {
             if (this.noSensor())
@@ -231,6 +286,12 @@ namespace PARSE
             windowViewer.Owner = this;
             windowViewer.Show();
         }
+
+        /// <summary>
+        /// moves the sensor up 5 degrees
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void btnSensorUp_Click(object sender, RoutedEventArgs e)
         {
@@ -246,6 +307,12 @@ namespace PARSE
             kinectMovingLock = false;
         }
 
+        /// <summary>
+        /// moves the sensor down 5 degrees
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void btnSensorDown_Click(object sender, RoutedEventArgs e)
         {
             if (this.noSensor())
@@ -260,6 +327,12 @@ namespace PARSE
             kinectMovingLock = false;
         }
 
+        /// <summary>
+        /// runs clean up upon window closing, stops kinect streams
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (this.kinectInterp.kinectReady)
@@ -272,6 +345,10 @@ namespace PARSE
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// enables particular buttons for measurement and calculation
+        /// </summary>
+
         private void resetButtons()
         {
             this.export1.IsEnabled = false;
@@ -280,6 +357,12 @@ namespace PARSE
             this.removefloor.IsEnabled = false;
             this.calculate.IsEnabled = false;
         }
+
+        /// <summary>
+        /// displays a new scan loader screen 
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
         
         private void NewScan_Click(object sender, RoutedEventArgs e)
         {
@@ -299,6 +382,12 @@ namespace PARSE
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
         }
+
+        /// <summary>
+        /// runs the volume calculation subroutine on an open point cloud/patient
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
@@ -325,6 +414,12 @@ namespace PARSE
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
         }
+
+        /// <summary>
+        /// calculates all limbs as defined by limb calculator
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void LimbOption_Click(object sender, RoutedEventArgs e)
         {
@@ -357,6 +452,12 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// exports a scan into the infamous .PARSE format
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void ExportScan_Click(object sender, RoutedEventArgs e)
         {
 
@@ -376,6 +477,12 @@ namespace PARSE
                 this.export1.IsEnabled = false;
             }
         }
+
+        /// <summary>
+        /// exports a scan into the not so infamous PCD format for debugging with PCL
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void ExportScanPCD_Click(object sender, RoutedEventArgs e)
         {
@@ -430,6 +537,12 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// performs a simple stitch test (deprecated? robin?)
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void SimpleStitchTest_Click(object sender, RoutedEventArgs e)
         {
             List<PointCloud> pc = pcdl;
@@ -450,6 +563,12 @@ namespace PARSE
             windowScanner.Show();
 
         }
+
+        /// <summary>
+        /// fine tunes the point cloud (just removes floor)
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
 
         private void RemoveFeet_Click(object sender, RoutedEventArgs e)
         {
@@ -511,19 +630,25 @@ namespace PARSE
             */
         }
 
+        /// <summary>
+        /// opens the debug window for logging purposes
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void OpenDebug_Click(object sender, RoutedEventArgs e)
         {
             this.windowDebug.Show();
         }
 
+        /// <summary>
+        /// opens the load scan metaloader to few current patients in the database
+        /// </summary>
+        /// <param name="sender">the object</param>
+        /// <param name="e">the routed event</param>
+
         private void LoadScan_Click(object sender, RoutedEventArgs e)
         {
-            /*Automates the following procedure:
-             * 0) kills kinect, closes any viewer, resets buttons
-             * 1) adds selected point cloud to visualiser
-             * 2) groups it
-             * 3) calcs height
-             */
 
             //Load metaloader with list of currently recorded patients provide the option to just load point cloud if required.
 
@@ -534,8 +659,13 @@ namespace PARSE
 
             windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
 
-
         }
+
+        /// <summary>
+        /// opens new record with selected patient in patient loader
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         void windowMeta_Closing(object sender, CancelEventArgs e)
         {
@@ -546,15 +676,17 @@ namespace PARSE
 
             //Load patient loader with new patient information using the existing constructor.
 
-            if (windowPatient != null)
-            {
-                windowPatient = new PatientLoader(activeRecord.Item1);
-                windowPatient.Owner = this;
-                windowPatient.Show();
-                RemoveBlur();
-            }
+            windowPatient = new PatientLoader(activeRecord.Item1);
+            windowPatient.Owner = this;
+            windowPatient.Show();
 
         }
+
+        /// <summary>
+        /// performs scan loading on a thread, child method of load scan.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         private void loadScanThread(Object sender, DoWorkEventArgs e)
         {
@@ -609,6 +741,12 @@ namespace PARSE
             B.ReportProgress(1);
         }
 
+        /// <summary>
+        /// calls the markerless recognition methods with add measurement
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
         private void AddMeasurement_Click(object sender, RoutedEventArgs e)
         {
             if (KinectSensor.KinectSensors.Count != 0)
@@ -627,6 +765,12 @@ namespace PARSE
             }
         }
 
+        /// <summary>
+        /// calls patient loader with blank fields for entering a new patient
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
         private void AddNewPatient_Click(object sender, RoutedEventArgs e)
         {
             //open patient detail viewer
@@ -636,11 +780,21 @@ namespace PARSE
             windowPatient.Show();
         }
 
+        /// <summary>
+        /// checks if the kinect connection
+        /// </summary>
+        /// <param name="state">the state</param>
+
         private void checkKinectConnection(object state)
         {
             Action method = () => this.hasKinectBeenAdded();
             this.Dispatcher.Invoke(method);  
         }
+
+        /// <summary>
+        /// checks if kinect has been added to the sensor list, called by dispatcher checkKinectConnection(state)
+        /// </summary>
+        /// <returns>true if there is a kinect, false otherwise</returns>
 
         private Boolean hasKinectBeenAdded()
         {
@@ -688,39 +842,43 @@ namespace PARSE
             this.LoadPointCloudFromFile();
         }
 
-        public void LoadPointCloudFromFile()
+        /// <summary>
+        /// Loads a pointcloud from a file, if patientid=0 then assume no database record
+        /// </summary>
+        /// <param name="patientid">patient id, 0 if just loading point cloud normally</param>
+
+        public void LoadPointCloudFromFile(int patientid=0)
         {
-            /*
-             *Automates the following procedure:
-             * 0) kills kinect, closes any viewer, resets buttons
-             * 1) adds selected point cloud to visualiser
-             * 2) groups it
-             * 3) calcs height
-            */
 
-            try
+            try 
             {
-                /*0)*/
-                //this.kinectInterp.stopStreams();
 
-                /*1)*/
-                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-                dlg.DefaultExt = ".PARSE";
-                dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
-
-                filename = "";
-
-                if (dlg.ShowDialog() == true)
+                if (patientid.Equals(0))
                 {
-                    filename = dlg.FileName;
-                    this.shutAnyWindows();
-                    this.resetButtons();
+                    //If patient does not exist in database, just load their point cloud
+                    Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                    dlg.DefaultExt = ".PARSE";
+                    dlg.Filter = "PARSE Reference Data (.PARSE)|*.PARSE";
+
+                    filename = "";
+
+                    if (dlg.ShowDialog() == true)
+                    {
+                        filename = dlg.FileName;
+                        this.shutAnyWindows();
+                        this.resetButtons();
+                    }
+
+                    if ((filename == null) || (dlg.FileName.Length == 0))
+                    {
+                        return;
+                    }
+
                 }
-
-                if ((filename == null) || (dlg.FileName.Length == 0))
+                else
                 {
-
-                    return;
+                    //patientid provided, exists in database, find the file reference and load.
+                    
                 }
 
                 // Show the window first - keep UI speedy!
@@ -771,6 +929,20 @@ namespace PARSE
             {
                 System.Diagnostics.Debug.WriteLine(err.ToString());
             }
+        }
+
+        private void WorkingDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            //set working directory using a folderbrowsingdialog
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            dialog.ShowNewFolderButton = true;
+            dialog.Description = "Where do you want your working directory to be?";
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) { 
+                workingDir = dialog.SelectedPath;
+                this.shutAnyWindows();
+            }
+
         }
     }
 }

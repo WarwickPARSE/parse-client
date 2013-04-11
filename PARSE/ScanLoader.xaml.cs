@@ -35,7 +35,12 @@ namespace PARSE
     public partial class ScanLoader : Window
     {
         // Scan Window Operation mode
-        public enum OperationModes { ShowExistingCloud, CaptureNewCloud };
+        public enum OperationModes 
+        { 
+            ShowExistingCloud, ShowExistingPatient, ShowExistingResults, 
+            CaptureNewCloud, CaptureNewPatient 
+        };
+        
         private int mode;
         private Boolean preventClose = false;
 
@@ -73,7 +78,12 @@ namespace PARSE
         {
             InitializeComponent();
 
+            //Window Mode
             this.mode = mode;
+            //Activate mouse down event handler
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            //Instantiate new database instance
+            db = new DatabaseEngine();
 
             if (this.mode == (int)OperationModes.ShowExistingCloud)
             {
@@ -82,6 +92,14 @@ namespace PARSE
                 start_scan.Visibility = Visibility.Collapsed;
                 this.instructionblock.Visibility = Visibility.Collapsed;
                 this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+
+                //center appropriately
+                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                this.Height = 480;
+                this.Width = 640;
+                
+                //instantiate new joint depths dictionary.
+                jointDepths = new Dictionary<JointType, double[]>();
             }
             else
             {
@@ -92,14 +110,8 @@ namespace PARSE
             }
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
-
             this.Show();
 
-            //wantKinect = true; // Nathan changed this
-            
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
-            db = new DatabaseEngine();
-            hitState = 0;
         }
 
         void ScanLoader_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -193,9 +205,6 @@ namespace PARSE
 
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width -20;
 
             if (this.mode == (int)OperationModes.CaptureNewCloud)
             {
@@ -435,46 +444,67 @@ namespace PARSE
          
             //pull in skeleton measures from a temporary file for corbett.parse for now.
             kinectInterp = new KinectInterpreter(skeloutline);
+            Dictionary<String, double[]> jointDepthsStr = new Dictionary<String, double[]>();
+
+
             //temporary tuple for results
             Tuple<double, double, List<List<Point3D>>> T = new Tuple<double, double, List<List<Point3D>>>(0,0,null);
             //permanent list of tuples for passing back to coreLoader
             List<Tuple<double, double, List<List<Point3D>>>> limbMeasures = new List<Tuple<double,double,List<List<Point3D>>>>();
 
+            //Test if we have a kinect otherwise we cannot use coordinate mapper.
             if (KinectSensor.KinectSensors.Count > 0)
             {
-                Dictionary<String, double[]> jointDepths = new Dictionary<String, double[]>();
-                StreamReader sr = new StreamReader("SKEL.ptemp");
-                String line;
+                //test if we have already enumerated joint depths, if so, this has followed a recent scan.
 
-                while ((line = sr.ReadLine()) != null)
+                if (jointDepths.Count == 0)
                 {
-                    String[] joint = Regex.Split(line, ":");
-                    String[] positions = Regex.Split(joint[1], ",");
 
-                    double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2], "\n")[0]) };
+                    StreamReader sr = new StreamReader("SKEL.ptemp");
+                    String line;
 
-                    //convert to depth co-ordinate space
-                    SkeletonPoint sp = new SkeletonPoint();
-                    sp.X = (float)Convert.ToDouble(jointPos[1]);
-                    sp.Y = (float)Convert.ToDouble(jointPos[2]);
-                    sp.Z = (float)Convert.ToDouble(jointPos[0]);
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        String[] joint = Regex.Split(line, ":");
+                        String[] positions = Regex.Split(joint[1], ",");
 
-                    CoordinateMapper cm = new CoordinateMapper(kinectInterp.kinectSensor);
-                    DepthImagePoint dm = cm.MapSkeletonPointToDepthPoint(sp, DepthImageFormat.Resolution640x480Fps30);
+                        double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2], "\n")[0]) };
 
-                    //convert x and y co-ords to arbitrary point cloud space
-                    Tuple<double, double, double> convertedPoints = LimbCalculator.convertToPCCoords(dm.X, dm.Y, sp.Z);
-                    double[] jointPos2 = { convertedPoints.Item3, convertedPoints.Item1, convertedPoints.Item2 };
+                        //convert to depth co-ordinate space
+                        SkeletonPoint sp = new SkeletonPoint();
+                        sp.X = (float)Convert.ToDouble(jointPos[1]);
+                        sp.Y = (float)Convert.ToDouble(jointPos[2]);
+                        sp.Z = (float)Convert.ToDouble(jointPos[0]);
 
-                    //place back into jointDepths array in terms of depth space.
-                    jointDepths.Add(joint[0], jointPos2);
+                        CoordinateMapper cm = new CoordinateMapper(kinectInterp.kinectSensor);
+                        DepthImagePoint dm = cm.MapSkeletonPointToDepthPoint(sp, DepthImageFormat.Resolution640x480Fps30);
+
+                        //convert x and y co-ords to arbitrary point cloud space
+                        Tuple<double, double, double> convertedPoints = LimbCalculator.convertToPCCoords(dm.X, dm.Y, sp.Z);
+                        double[] jointPos2 = { convertedPoints.Item3, convertedPoints.Item1, convertedPoints.Item2 };
+
+                        //place back into jointDepths array in terms of depth space.
+                        jointDepthsStr.Add(joint[0], jointPos2);
+                    }
+
+                }
+                else
+                {
+                    //we have some live skeleton depths, enumerate into strings
+                    foreach(JointType j in jointDepths.Keys) {
+
+                        jointDepthsStr = new Dictionary<String, double[]>();
+                        jointDepthsStr.Add(j.ToString(),jointDepths[j]);
+
+                    }
+
                 }
 
                 for (int limbArea = 1; limbArea <= 8; limbArea++)
                 {
                     //pass point cloud and correct bounds to Limb Calculator
                     //shoulders is first option in list so pass first.
-                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, limbArea));
+                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepthsStr, limbArea));
                 }
             }
             else
@@ -564,7 +594,7 @@ namespace PARSE
         public Dictionary<JointType, double[]> enumerateSkeletonDepths(Skeleton sk)
         {
             //Store double
-            Dictionary<JointType, double[]> jointDepths = new Dictionary<JointType, double[]>();
+            jointDepths = new Dictionary<JointType, double[]>();
 
             //Get depths and x,y locations at joints.
             foreach (Joint j in sk.Joints)
