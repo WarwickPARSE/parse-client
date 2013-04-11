@@ -362,6 +362,12 @@ namespace PARSE
         
         }
         
+        /// <summary>
+        /// Colours pixels based on depth. Used in both normal depth viewing and isolated depth viewing.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns>WriteableBitmap</returns>
         public WriteableBitmap DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
 
@@ -515,6 +521,10 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// Returns a float corresponding to the skeleton's approximate depth
+        /// </summary>
+        /// <returns>Float</returns>
         public float getSkelDepth()
         {
             return skelDepthPublic;
