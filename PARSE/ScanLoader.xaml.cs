@@ -211,19 +211,13 @@ namespace PARSE
                 //start scanning procedure
                 kinectInterp = new KinectInterpreter(skeloutline);
 
-                //if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
                 if (!this.kinectInterp.isSkeletonEnabled())
                 {
                     this.kinectInterp.startSkeletonStream();
                     this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
                 }
             }
-            /*
-            if (!wantKinect)
-            {
-                kinectInterp.stopStreams();
-            }
-            */
+
             System.Diagnostics.Debug.WriteLine("Scan loader loading complete");
           
         }
