@@ -67,11 +67,9 @@ namespace PARSE
         public float                                    skelDepthPublic { get; private set; } 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
         private float skelL; 
-        private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+        private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan really fat people
         private float skelR;
-        private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people
-        private float skelB;
-        private float skelBDelta = -50;
+        private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan really fat people
 
         public String instruction = "Waiting for patient...";
 
@@ -95,8 +93,7 @@ namespace PARSE
             color = blue;
 
             Model = new GeometryModel3D();
-            /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
-
+            
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
             {
