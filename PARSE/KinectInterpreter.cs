@@ -198,16 +198,28 @@ namespace PARSE
             this.kinectSensor.SkeletonStream.Enable();
         }
 
+        /// <summary>
+        /// Returns true iff a skeleton is neither too far forward or too far backward
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean goldilocks()
         {
             return (!(tooFarBack() || tooFarForward()));
         }
         
+        /// <summary>
+        /// Returns true iff the skeleton is too far back
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean tooFarBack()
         {
             return (skelDepthPublic > (oneParseUnit + oneParseUnitDelta));
         }
 
+        /// <summary>
+        /// Returns true iff the skeleton is too far forward
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean tooFarForward()
         {
             return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
