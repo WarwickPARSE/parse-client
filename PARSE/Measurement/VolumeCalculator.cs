@@ -12,7 +12,7 @@ namespace PARSE
     public static class VolumeCalculator
     {
         /// <summary>
-        /// calculates volume, only works on an amorphus blob
+        /// calculates volume, only works on an amorphus blob. Returns a double in real world space.
         /// </summary>
         /// <param name="planes">List<List<Point3D>></param>
         /// <param name="increment">double</param>
