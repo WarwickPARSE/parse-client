@@ -132,7 +132,7 @@ namespace PARSE
         }
 
         /// <summary>
-        /// Returns true if the depth stream is enabled
+        /// Returns true iff the depth stream is enabled
         /// </summary>
         /// <returns>Boolean</returns>
         public Boolean isDepthEnabled()
@@ -173,16 +173,26 @@ namespace PARSE
             this.kinectSensor.ColorStream.Enable();
         }
 
+        /// <summary>
+        /// Disable Skeleton stream
+        /// </summary>
         public void disableSkeleton()
         {
             this.kinectSensor.SkeletonStream.Disable();
         }
 
+        /// <summary>
+        /// Returns true iff the skeleton stream is enabled 
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean isSkeletonEnabled()
         {
             return this.kinectSensor.SkeletonStream.IsEnabled;
         }
 
+        /// <summary>
+        /// Enables the skeleton stream
+        /// </summary>
         public void enableSkeleton()
         {
             this.kinectSensor.SkeletonStream.Enable();
