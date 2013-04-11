@@ -302,7 +302,7 @@ namespace PARSE
         /// <summary>
         /// Sets the Kinect associated with this Interpreter. Called when you plug a kinect in to a running PARSE
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="c">The new Kinect Sensor</param>
         public void setSensor(KinectSensor c)
         {
             this.kinectSensor = c;
@@ -362,12 +362,6 @@ namespace PARSE
         
         }
         
-        /// <summary>
-        /// Colours pixels based on depth. Used in both normal depth viewing and isolated depth viewing.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <returns>WriteableBitmap</returns>
         public WriteableBitmap DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
 
@@ -486,6 +480,7 @@ namespace PARSE
 
                         System.Windows.Media.Brush prevColor = this.color;
 
+                        //change color
                         if (tooFarForward())
                         {
                             this.color = blue;
@@ -498,6 +493,7 @@ namespace PARSE
                         {
                             this.color = green;
                         }
+                        //if color has been changed, change the skel colour
                         if (!(this.color.Equals(prevColor)))
                         {
                             skeletonFigure.setColor(this.color);
