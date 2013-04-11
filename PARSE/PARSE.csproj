@@ -91,9 +91,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft SDKs\Kinect\v1.6\Assemblies\Microsoft.Kinect.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kinect.Toolkit.Fusion">
-      <HintPath>..\..\..\..\Microsoft.Kinect.Toolkit.Fusion\obj\Debug\Microsoft.Kinect.Toolkit.Fusion.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
@@ -149,7 +146,6 @@
     <Compile Include="ICP\SubRegionOutOfBoundsException.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
     <Compile Include="Library\Visualisation\GroupVisualiser.cs" />
-    <Compile Include="Library\Visualisation\KinfuVisualiser.cs" />
     <Compile Include="Library\Visualisation\PlaneVisualisation.cs" />
     <Compile Include="LimbCalculator.cs" />
     <Compile Include="Measurement\AreaCalculator.cs" />
