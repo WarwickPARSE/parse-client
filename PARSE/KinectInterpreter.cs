@@ -123,16 +123,26 @@ namespace PARSE
             
         }
 
+        /// <summary>
+        /// Disables the depth stream of the kinect associated with this interpreter.
+        /// </summary>
         public void disableDepth()
         {
             this.kinectSensor.DepthStream.Disable();
         }
 
+        /// <summary>
+        /// Returns true if the depth stream is enabled.
+        /// </summary>
+        /// <returns></returns>
         public Boolean isDepthEnabled()
         {
             return this.kinectSensor.DepthStream.IsEnabled;
         }
 
+        /// <summary>
+        /// Enables the depth stream
+        /// </summary>
         public void enableDepth()
         {
             this.kinectSensor.DepthStream.Enable();
