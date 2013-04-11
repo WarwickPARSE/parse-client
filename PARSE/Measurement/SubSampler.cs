@@ -8,11 +8,23 @@ namespace PARSE
 {
     static class SubSampler
     {
+        /// <summary>
+        /// iterates through the list and subsamples by subSampleFactor and then averages averageFactor many points together. 
+        /// </summary>
+        /// <param name="input">List<Point3D></param>
+        /// <param name="factor">int</param>
+        /// <returns>List<Point3D></returns>
         public static List<Point3D> averageSubSample(List<Point3D> input, int subSampleFactor, int averageFactor)
         {
             return SubSampler.averageSample(SubSampler.subSample(input, subSampleFactor), averageFactor);
         }
 
+        /// <summary>
+        /// iterates through the list and subsamples by factor and then averages factor many points together. 
+        /// </summary>
+        /// <param name="input">List<Point3D></param>
+        /// <param name="factor">int</param>
+        /// <returns>List<Point3D></returns>
         public static List<Point3D> averageSubSample(List<Point3D> input, int factor)
         {
             return SubSampler.averageSample(SubSampler.subSample(input, factor), factor);
