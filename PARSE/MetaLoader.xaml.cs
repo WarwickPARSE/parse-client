@@ -60,16 +60,16 @@ namespace PARSE
                 patientsList.Item2.Remove(nodeName);
                 patientsList.Item3.Remove(nodeNHSNo);
 
-                nodeID = nextID;
-                nodeName = nextName;
-                nodeNHSNo = nextNHSNo;
-
                 //null check when at end of list
                 if (nodeID != null)
                 {
                     var nodes = new { Id = nodeID.Value, Patientname = nodeName.Value, Patientnhsno = nodeNHSNo.Value };
                     listBox1.Items.Add(nodes);
                 }
+
+                nodeID = nextID;
+                nodeName = nextName;
+                nodeNHSNo = nextNHSNo;
 
             }
 
@@ -104,6 +104,11 @@ namespace PARSE
         {
             this.Hide();
             (Owner as CoreLoader).LoadPointCloudFromFile();            
+        }
+
+        private void button3_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
 

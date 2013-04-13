@@ -219,6 +219,23 @@ namespace PARSE
             return timestamps;
         }
 
+      
+        // 7a) gets scan IDs from patientScans table
+        public Tuple<LinkedList<int>, LinkedList<int>> getScanIDs(int patientID)
+        {
+            Tuple<LinkedList<int>, LinkedList<int>> scanIDs = selectQueries.selectType3("PatientScans", "patientID", patientID.ToString());
+
+            return scanIDs;
+        }
+
+        // 7b) select all timestamps and scan IDs for patient scans
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientScans(int patientID)
+        {
+
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = selectQueries.timestampsForPatientScans(patientID);
+            return timestamps;
+        }
+
         // 8) select patient scans (and value)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> getScanResult(int ScanID)
         {
@@ -519,10 +536,8 @@ namespace PARSE
             LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT * FROM Scans WHERE @ColName LIKE @Criterion";
+            selectQuery.CommandText = "SELECT * FROM Scans WHERE scanID = " + criterion;
             selectQuery.Parameters.Clear();
-            selectQuery.Parameters.Add("@ColName", colName);
-            selectQuery.Parameters.Add("@Criterion", criterion);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
@@ -787,6 +802,32 @@ namespace PARSE
             reader.Close();
 
             return Tuple.Create(scanID, pointCloudFileReference, timestamp, value);
+        }
+
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientScans(int patientID)
+        {
+            LinkedList<int> scanID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "Select Scans.scanID, timestamp from Scans join PatientScans on Scans.scanID = PatientScans.scanID where patientID = @PatientID;";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@PatientID", patientID);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanID.AddLast(reader.GetInt32(0));
+                System.Diagnostics.Debug.WriteLine(reader.GetInt32(0));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(1).ToString()));
+                System.Diagnostics.Debug.WriteLine(reader.GetDateTime(1));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanID, timestamp);
         }
 
         public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientLocScans(int patientID)

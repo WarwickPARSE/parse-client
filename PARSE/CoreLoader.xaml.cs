@@ -653,6 +653,7 @@ namespace PARSE
             windowMeta = new MetaLoader();
             windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             windowMeta.Owner = this;
+            windowMeta.button3.Visibility = Visibility.Collapsed;
             windowMeta.Show();
 
             windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
@@ -674,9 +675,12 @@ namespace PARSE
 
             //Load patient loader with new patient information using the existing constructor.
 
-            windowPatient = new PatientLoader(activeRecord.Item1);
-            windowPatient.Owner = this;
-            windowPatient.Show();
+            if (activeRecord != null)
+            {
+                windowPatient = new PatientLoader(activeRecord.Item1);
+                windowPatient.Owner = this;
+                windowPatient.Show();
+            }
 
         }
 
@@ -847,6 +851,11 @@ namespace PARSE
 
         public void LoadPointCloudFromFile(int patientid=0)
         {
+            
+            LinkedListNode<int> scanID;
+            LinkedListNode<DateTime> timestamp;
+            DateTime latestScanTime = new DateTime();
+            int latestScanTimeID = 0;
 
             try 
             {
@@ -875,11 +884,56 @@ namespace PARSE
                 }
                 else
                 {
-                    //patientid provided, exists in database, find the file reference and load.
+                    //patientid provided, exists. 
+
+                    //select all scans for patient id.
+                    Tuple<LinkedList<int>, LinkedList<DateTime>> scans = db.timestampsForPatientScans(patientid);
+                    
+                    //select most recent scanid based on timestamp
+
+                    if (scans.Item1.Count == 1)
+                    {
+                        latestScanTimeID = scans.Item1.First.Value;
+                        latestScanTime = scans.Item2.First.Value;
+                    }
+                    else
+                    {
+
+                        scanID = scans.Item1.First;
+                        timestamp = scans.Item2.First;
+
+                        while (scanID != null)
+                        {
+                            var nextID = scanID.Next;
+                            var nextTime = timestamp.Next;
+
+                            scans.Item1.Remove(scanID);
+                            scans.Item2.Remove(timestamp);
+
+                            scanID = nextID;
+                            timestamp = nextTime;
+
+                            if (scanID != null)
+                            {
+                                if (latestScanTime.CompareTo(timestamp.Value) < 0)
+                                {
+                                    latestScanTime = timestamp.Value;
+                                    latestScanTimeID = scanID.Value;
+                                }
+                            }
+                        }
+
+                    }
+            
+                    //select pointcloudfilerference based on selected scan id.
+
+                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db.selectQueries.Scans("scanID",latestScanTimeID.ToString());
+
+                    filename = pcScanResults.Item3.First.Value;
                     
                 }
 
-                // Show the window first - keep UI speedy!
+                // Show the window first - keep UI FAST speedy is a stupid word.
                 System.Diagnostics.Debug.WriteLine("Showing window");
                 shutAnyWindows();
                 windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingCloud);
@@ -941,6 +995,22 @@ namespace PARSE
                 this.shutAnyWindows();
             }
 
+        }
+
+        private void SaveScan_Click(object sender, RoutedEventArgs e)
+        {
+            windowMeta = new MetaLoader();
+            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            windowMeta.Owner = this;
+            
+            //save specific actions.
+            windowMeta.Title = "Attribute scan to whom?";
+            windowMeta.button1.Visibility = Visibility.Collapsed;
+            windowMeta.button2.Visibility = Visibility.Collapsed;
+            windowMeta.button3.Visibility = Visibility.Visible;
+            windowMeta.Show();
+
+            windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
         }
     }
 }

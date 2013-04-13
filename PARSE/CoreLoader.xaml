@@ -36,15 +36,23 @@
             <Separator/>
             <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
-        <MenuItem Header="Patient">
+            <MenuItem Header="Patient">
                 <MenuItem Header="New Scan" Name="newscan" IsEnabled="{Binding}" IsCheckable="False" Click="NewScan_Click" />
-                <MenuItem Header="View Previous Scan" Name="oldscan" IsEnabled="{Binding}" IsCheckable="False" Click="LoadScan_Click"/>
-                <MenuItem Header="Export Scan to .PARSE" Name="export1" IsEnabled="{Binding}" IsCheckable="False" Click="ExportScan_Click"/>
-                <MenuItem Header="Export Scan to .PCD" Name="export2" IsEnabled="{Binding}" IsCheckable="False" Click="ExportScanPCD_Click"/>
-                <MenuItem Header="Add Measurement"  Name="measurement" IsEnabled="{Binding}" Click="AddMeasurement_Click"/>
-                <MenuItem Header="Remove Their Feet" Name="removefloor" IsEnabled="{Binding}" IsCheckable="False" Click="RemoveFeet_Click"/>
+                <MenuItem Header="Load Scan" Name="oldscan" IsEnabled="{Binding}" IsCheckable="False" Click="LoadScan_Click" />
+                <MenuItem Header="Save Scan" Name="savescan" IsEnabled="{Binding}" IsCheckable="False" Click="SaveScan_Click" />
+                <Separator/>
+                <MenuItem Header="Add Markerless Scan"  Name="measurement" IsEnabled="{Binding}" Click="AddMeasurement_Click"/>
+                <MenuItem Header="Load Markerless Scan" Name="measurementload" IsEnabled="{Binding}" />
+                <Separator/>
+                <MenuItem Header="Options..." Name="options" IsEnabled="{Binding}">
+                    <MenuItem Header="Remove Their Feet" Name="removefloor" IsEnabled="{Binding}" IsCheckable="False" Click="RemoveFeet_Click"/>
                 </MenuItem>
-            <MenuItem Header="Calculate" Name="calculate" IsEnabled="{Binding}">
+                <MenuItem Header="Export..." Name="export" IsEnabled="{Binding}">
+                    <MenuItem Header="Export Scan to .PARSE" Name="export1" IsEnabled="{Binding}" IsCheckable="False" Click="ExportScan_Click"/>
+                    <MenuItem Header="Export Scan to .PCD" Name="export2" IsEnabled="{Binding}" IsCheckable="False" Click="ExportScanPCD_Click"/>
+                </MenuItem>
+            </MenuItem>
+     <MenuItem Header="Calculate" Name="calculate" IsEnabled="{Binding}">
                     <MenuItem Header="Volume" Click="VolumeOption_Click"/>
                     <MenuItem Header="Limb Circumference" Click="LimbOption_Click"/>
      </MenuItem>
