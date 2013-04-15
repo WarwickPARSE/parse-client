@@ -25,6 +25,7 @@ using System.Windows.Shapes;
 using System.Reflection;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+using System.Windows.Controls.DataVisualization.Charting;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -411,6 +412,15 @@ namespace PARSE
             
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
+
+            //setData
+            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource =
+                new KeyValuePair<DateTime, int>[]{
+                    new KeyValuePair<DateTime,int>(DateTime.Now, 100),
+                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(1), 130),
+                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
+                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(3), 125),
+                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
         }
 
         /// <summary>
@@ -702,7 +712,7 @@ namespace PARSE
             if (filename != null)
             {
                 B.ReportProgress(0, "Loading file: " + filename);
-               
+
                 ScanSerializer.deserialize(filename);
 
                 System.Diagnostics.Debug.WriteLine(e.Argument);
