@@ -43,7 +43,7 @@ namespace PARSE
         //UI definitions for child interfaces
         public ViewLoader                  windowViewer;
         public ScanLoader                  windowScanner;
-        public Window                      windowPatient;
+        public PatientLoader               windowPatient;
         public HistoryLoader               windowHistory;
         public MeasurementLoader           windowMeasurement;
         public DebugLoader                 windowDebug;
