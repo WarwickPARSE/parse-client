@@ -100,6 +100,7 @@ namespace PARSE
             while (scanID.Next != null)
             {
                 outputScans.Add(scanID.Value);
+                scanID = scanID.Next;
             }
             
             List<Tuple<DateTime, int>> outputData = new List<Tuple<DateTime, int>>();
