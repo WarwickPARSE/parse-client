@@ -413,14 +413,16 @@ namespace PARSE
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
 
+            List<Tuple<DateTime, double>> records = windowMeta.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
+            KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[5];
+
+            for (int i = 0; ((i < 5) || (i < records.Count)); i++)
+            {
+                records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
+            }
+            
             //setData
-            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource =
-                new KeyValuePair<DateTime, int>[]{
-                    new KeyValuePair<DateTime,int>(DateTime.Now, 100),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(1), 130),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(3), 125),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
+            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
         }
 
         /// <summary>
