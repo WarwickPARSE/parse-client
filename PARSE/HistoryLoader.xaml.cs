@@ -237,6 +237,7 @@ namespace PARSE
             hvpcanvas2.Visibility = Visibility.Visible;
             btnresults2.Visibility = Visibility.Visible;
             btnrescan2.Visibility = Visibility.Visible;
+
             //Set relevant ui components to collapsed
             noresults2.Visibility = Visibility.Collapsed;
             newscan2.Visibility = Visibility.Collapsed;
@@ -244,6 +245,18 @@ namespace PARSE
             circumoutput.Content = limbData[limbIndex].Item1+"cm"; 
             totalarea2.Content = "Total Area: " + limbData[limbIndex].Item2;
             totalperimiter2.Content = "Perimeter Approx: " + limbData[limbIndex].Item1+"cm";
+
+            //set ellipse visualisation circumference
+            //TODO: add flag for diplaying historic ellipse vis.
+            historicEllipse.Visibility = Visibility.Collapsed;
+            historysel.Visibility = Visibility.Collapsed;
+            changesel.Visibility = Visibility.Collapsed;
+
+            circumsel.Text = "Circum Approx: " + limbData[limbIndex].Item1 + "cm";
+            limbsel.Text = "Limb No: " + limbIndex;
+            currentEllipse.Width = limbData[limbIndex].Item1*100/3;
+            currentEllipse.Height = limbData[limbIndex].Item2*1000;
+            
 
             //visualise planes
             planeNo.Text = "Plane Outline: " + (int) planeIndex;

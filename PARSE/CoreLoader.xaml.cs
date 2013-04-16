@@ -580,7 +580,7 @@ namespace PARSE
 
             this.shutAnyWindows();
 
-            windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingCloud);
+            windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingResults);
             windowScanner.Owner = this;
 
             // Do UI stuff on UI thread
@@ -677,7 +677,7 @@ namespace PARSE
 
             if (activeRecord != null)
             {
-                windowPatient = new PatientLoader(activeRecord.Item1);
+                windowPatient = new PatientLoader(activeRecord.Item1, (int)OperationModes.ShowExistingResults);
                 windowPatient.Owner = this;
                 windowPatient.Show();
             }
@@ -936,7 +936,8 @@ namespace PARSE
                 // Show the window first - keep UI FAST speedy is a stupid word.
                 System.Diagnostics.Debug.WriteLine("Showing window");
                 shutAnyWindows();
-                windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingCloud);
+
+                windowScanner = new ScanLoader((int)ScanLoader.OperationModes.ShowExistingResults);
                 windowScanner.Owner = this;
 
                 // Do UI stuff on UI thread

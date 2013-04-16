@@ -39,11 +39,11 @@ namespace PARSE
             {
                 case 1:
                 //SHOULDERS (1)
-                xmin = jointDepths["ShoulderLeft"][1];
-                xmax = jointDepths["ShoulderRight"][1];
+                xmin = jointDepths["ShoulderRight"][1];
+                xmax = jointDepths["ShoulderLeft"][1];
 
                 ymax = jointDepths["ShoulderCenter"][2];
-                ymin = jointDepths["ShoulderLeft"][2];
+                ymin = jointDepths["Spine"][2];
 
                 zmin = pc.getzMin();
                 zmax = pc.getzMax();
@@ -59,11 +59,11 @@ namespace PARSE
                 case 2: 
                 
                 //ARM_LEFT (2)
-                xmin = jointDepths["ShoulderLeft"][1];
-                xmax = jointDepths["HandLeft"][1];
+                xmin = jointDepths["HipLeft"][1];
+                xmax = jointDepths["WristLeft"][1] + ((jointDepths["WristLeft"][1]-jointDepths["HipLeft"][1])/2);
 
                 ymax = jointDepths["ShoulderLeft"][2];
-                ymin = jointDepths["HandLeft"][2];
+                ymin = jointDepths["WristLeft"][2];
                                 
                 zmin = pc.getzMin();
                 zmax = pc.getzMax();
@@ -79,11 +79,11 @@ namespace PARSE
                 case 3:
 
                 //ARM_RIGHT (3)
-                xmin = jointDepths["ShoulderRight"][1];
-                xmax = jointDepths["HandRight"][1];
+                xmin = jointDepths["WristRight"][1] - ((jointDepths["HipRight"][1]-jointDepths["WristRight"][1])/2);
+                xmax = jointDepths["HipRight"][1];
 
                 ymax = jointDepths["ShoulderRight"][2];
-                ymin = jointDepths["HandRight"][2];
+                ymin = jointDepths["WristRight"][2];
 
                 zmin = pc.getzMin();
                 zmax = pc.getzMax();
@@ -185,18 +185,16 @@ namespace PARSE
 
             try
             {
-
                 //Calculate circumference
                 segmentedPointcloud = pc.getSubRegion(bounds);
 
                 T = PlanePuller.pullAll(segmentedPointcloud, 2);
                 finalCircum = CircumferenceCalculator.calculate(T.Item1, 1);
-                numPlanes = T.Item2;
+                numPlanes = UnitConvertor.convertPCM(T.Item2,1);
 
-                //Premodify the circumference calculation with the fudge factors.
-
+                //Premodify the circumference calculation with the fudge factors. Convert into CM from M.
+                finalCircum = Math.Round(finalCircum * 100,5);
                
-
             }
             catch (Exception err)
             {
