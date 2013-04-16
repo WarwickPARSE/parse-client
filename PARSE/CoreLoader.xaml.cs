@@ -424,9 +424,22 @@ namespace PARSE
             {
                 records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
             }
-            
+
+            //set change in volume... may need refinement
+            if (size != 0)
+            {
+                double change = 0;
+                change = volume / records[0].Item2;
+                windowHistory.volchangeoutput.Content = change+"%";
+            }
+            else
+            {
+                windowHistory.volchangeoutput.Content = "Not Enough Info";
+            }
+
             //setData
             ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
+            
         }
 
         /// <summary>
