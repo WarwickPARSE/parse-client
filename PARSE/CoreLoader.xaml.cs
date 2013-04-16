@@ -414,7 +414,8 @@ namespace PARSE
             windowHistory.Show();
 
             //ignore till Greg talks to Stef
-            /*List<Tuple<DateTime, double>> records = windowMeta.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
+            ///*
+            List<Tuple<DateTime, double>> records = windowMeta.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
             KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[5];
 
             for (int i = 0; ((i < 5) || (i < records.Count)); i++)
@@ -423,7 +424,7 @@ namespace PARSE
             }
             
             //setData
-            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;*/
+            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;//*/
         }
 
         /// <summary>
