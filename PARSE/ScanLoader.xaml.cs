@@ -84,11 +84,8 @@ namespace PARSE
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             //Instantiate new database instance
             db = new DatabaseEngine();
-
-            sandra = new SpeechSynthesizer();
-            sandra.Rate = 2;
-            sandra.Speak("I like the base base base base I like the buttery biscuit base I like the base base biscuit base I like the buttery biscuit base I like the base, I like the buttery base I like the buttery biscuit base I like the buttery base, I like the buttery base B-b-base base base base base knowledge Crunchy base, nutty base I like the buttery biscuit base Acid base, smack around the face I like the buttery biscuit base Hard base, soft base, I like the buttery biscuit base I like the buttery base, I like the buttery base But it needs more oomph That base that base that base, oopmh That toasty nutty base That biscuit base base, that base base That toasty base, that base That rubbery base, slimy base That base base base base base underneath That base, that base That toasty nutty base I like the base base base base I like the buttery biscuit base I like the base base biscuit base I like the buttery biscuit base I like the base, I like the buttery base I like the buttery biscuit base I like the buttery base, I like the buttery base I like the buttery biscuit base But but it but but but but But but it but but but but But but but but but but but But but but but but but but But but it but but but but But but it but but but but But but but but but but but But but but but but but but it needs to be a little bit deeper And then bang in comes the Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble base Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble base Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble base Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble wobble Aah Wobble wobble wobble wobble wobble It overpowers everything That base base that base base That toasty nutty base That base base that base base That toasty base that base Crunchy meaty jammy spongy Gooey nutty rubbery greasy Slimy toasty sticky hard Buttery biscuit base Oomph");
-
+            
+            
             if (this.mode == (int)OperationModes.ShowExistingCloud)
             {
                 //hide buttons from form
