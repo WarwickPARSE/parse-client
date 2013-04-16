@@ -25,6 +25,7 @@ using System.Windows.Shapes;
 using System.Reflection;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+using System.Windows.Controls.DataVisualization.Charting;
 
 //Kinect imports
 using Microsoft.Kinect;
@@ -42,7 +43,7 @@ namespace PARSE
         //UI definitions for child interfaces
         public ViewLoader                  windowViewer;
         public ScanLoader                  windowScanner;
-        public Window                      windowPatient;
+        public PatientLoader               windowPatient;
         public HistoryLoader               windowHistory;
         public MeasurementLoader           windowMeasurement;
         public DebugLoader                 windowDebug;
@@ -412,6 +413,34 @@ namespace PARSE
             
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
+
+            List<Tuple<DateTime, double>> records = windowMeta.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
+
+            int historyLookBack = 5;
+            int size = Math.Min(records.Count, historyLookBack);
+
+            KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[size];
+
+            for (int i = 0; i < size; i++)
+            {
+                records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
+            }
+
+            //set change in volume... may need refinement
+            if (size != 0)
+            {
+                double change = 0;
+                change = volume / records[0].Item2;
+                windowHistory.volchangeoutput.Content = change+"%";
+            }
+            else
+            {
+                windowHistory.volchangeoutput.Content = "Not Enough Info";
+            }
+
+            //setData
+            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
+            
         }
 
         /// <summary>
@@ -703,7 +732,7 @@ namespace PARSE
             if (filename != null)
             {
                 B.ReportProgress(0, "Loading file: " + filename);
-               
+
                 ScanSerializer.deserialize(filename);
 
                 System.Diagnostics.Debug.WriteLine(e.Argument);

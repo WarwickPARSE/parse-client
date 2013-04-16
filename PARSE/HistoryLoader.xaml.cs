@@ -202,15 +202,6 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-
-            //setData
-            ((LineSeries)(volchart.Series[0])).ItemsSource =
-                new KeyValuePair<DateTime, int>[]{
-                    new KeyValuePair<DateTime,int>(DateTime.Now, 100),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(1), 130),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(3), 125),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
         }
 
         public void visualiseLimbs(List<Tuple<double, double, List<List<Point3D>>>> limbData, int limbIndex, double planeIndex)

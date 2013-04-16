@@ -797,7 +797,7 @@ namespace PARSE
                 scanID.AddLast(reader.GetInt32(0));
                 pointCloudFileReference.AddLast(reader.GetString(1));
                 timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(2).ToString()));
-                value.AddLast(reader.GetDouble(3));
+                value.AddLast((double)reader.GetFloat(3));
             }
             reader.Close();
 
