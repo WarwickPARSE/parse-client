@@ -119,6 +119,9 @@ namespace PARSE
                 this.colorToDepthDivisor = colorWidth / 640;
 
                 this.kinectSensor.Start();
+
+                //Skeleton data
+                skeletonData = new Skeleton[6];
             }
             
         }
@@ -222,6 +225,7 @@ namespace PARSE
         /// <returns>Boolean</returns>
         public Boolean tooFarForward()
         {
+            System.Diagnostics.Debug.WriteLine("Actual Skeleton Depth: " + skelDepthPublic);
             return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
         }
 
@@ -239,6 +243,7 @@ namespace PARSE
         /// </summary>
         public void startDepthStream()
         {
+            skeletonData = new Skeleton[6];
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus+", Depth Ready";
@@ -247,6 +252,7 @@ namespace PARSE
         //Enable depthMeshStream
         public void startDepthMeshStream(GeometryModel3D[] pts)
         {
+            skeletonData = new Skeleton[6];
             visMode = 1;
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.pts = pts;
@@ -268,6 +274,7 @@ namespace PARSE
         //Enable rgbStream
         public void startRGBStream()
         {
+            skeletonData = new Skeleton[6];
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", RGB Ready";
@@ -430,6 +437,7 @@ namespace PARSE
             {
                 if (skeletonFrame != null)
                 {
+                    skeletonData = new Skeleton[6];
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state

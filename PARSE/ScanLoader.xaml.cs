@@ -72,7 +72,7 @@ namespace PARSE
         //Database object
         DatabaseEngine db;
 
-        
+        public ScanLoader() { } //parameterless version
 
         public ScanLoader( int mode )
         {
@@ -98,6 +98,24 @@ namespace PARSE
                 this.Height = 480;
                 this.Width = 640;
                 
+                //instantiate new joint depths dictionary.
+                jointDepths = new Dictionary<JointType, double[]>();
+            }
+            else if(this.mode == (int)OperationModes.ShowExistingResults) 
+            {
+                //hide buttons from form
+                cancel_scan.Visibility = Visibility.Collapsed;
+                start_scan.Visibility = Visibility.Collapsed;
+                this.instructionblock.Visibility = Visibility.Collapsed;
+                this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+
+                //center appropriately
+                WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+                this.Top = 60;
+                this.Left = (System.Windows.SystemParameters.PrimaryScreenWidth - this.Width) - 20;
+                this.Height = 400;
+                this.Width = 610;
+
                 //instantiate new joint depths dictionary.
                 jointDepths = new Dictionary<JointType, double[]>();
             }
@@ -240,17 +258,27 @@ namespace PARSE
             //init kinect
 
             //start scanning procedure
-            kinectInterp = new KinectInterpreter(skeloutline);
+           // kinectInterp = new KinectInterpreter(skeloutline);
 
-            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+
+            /*if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
             {
                 this.kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-            if (!wantKinect)
+            } */
+
+            if (!this.kinectInterp.isSkeletonEnabled())
             {
+                System.Diagnostics.Debug.WriteLine("skel enabled");
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            } 
+
+          /*  if (!wantKinect)
+            {
+                System.Diagnostics.Debug.WriteLine("AHH HELP " + kinectInterp.skelDepthPublic);
                 kinectInterp.stopStreams();
-            }
+            } */
 
             if (!this.kinectInterp.isDepthEnabled())
             {
@@ -265,6 +293,8 @@ namespace PARSE
             }
 
             kinectInterp.calibrate();
+
+            System.Diagnostics.Debug.WriteLine("Depth now: " + kinectInterp.skelDepthPublic);
 
             if (kinectInterp.tooFarForward())
             {
