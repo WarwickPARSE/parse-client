@@ -414,9 +414,13 @@ namespace PARSE
             windowHistory.Show();
 
             List<Tuple<DateTime, double>> records = windowMeta.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
-            KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[5];
 
-            for (int i = 0; ((i < 5) && (i < records.Count)); i++)
+            int historyLookBack = 5;
+            int size = Math.Min(records.Count, historyLookBack);
+
+            KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[size];
+
+            for (int i = 0; i < size; i++)
             {
                 records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
             }
