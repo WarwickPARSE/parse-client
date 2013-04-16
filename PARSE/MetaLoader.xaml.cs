@@ -87,20 +87,22 @@ namespace PARSE
 
             LinkedListNode<DateTime> time = times.First;
             if (time == null) return null;
-            while (time.Next != null)
+            while (true)
             {
                 outputTimes.Add(time.Value);
                 time = time.Next;
+                if (time == null) break;
             }
 
             List<int> outputScans = new List<int>();
             
             LinkedListNode<int> scanID = scanIDs.First;
             if (scanID == null) return null;
-            while (scanID.Next != null)
+            while (true)
             {
                 outputScans.Add(scanID.Value);
                 scanID = scanID.Next;
+                if (scanID == null) break;
             }
             
             List<Tuple<DateTime, int>> outputData = new List<Tuple<DateTime, int>>();
