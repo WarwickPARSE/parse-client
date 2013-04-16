@@ -357,6 +357,7 @@
     <Resource Include="App_Readme\MathNet.Numerics.readme.txt" />
     <Resource Include="App_Readme\MathNet.Numerics.copyright.txt" />
     <Resource Include="App_Readme\MathNet.Numerics.authors.txt" />
+    <Content Include="Base.wav" />
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
