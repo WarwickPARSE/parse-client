@@ -85,6 +85,10 @@ namespace PARSE
             //Instantiate new database instance
             db = new DatabaseEngine();
 
+            sandra = new SpeechSynthesizer();
+            sandra.Rate = 2;
+            sandra.Speak("I like the base base base base I like the buttery biscuit base I like the base base biscuit base I like the buttery biscuit base I like the base, I like the buttery base I like the buttery biscuit base I like the buttery base, I like the buttery base B-b-base base base base base knowledge Crunchy base, nutty base I like the buttery biscuit base Acid base, smack around the face I like the buttery biscuit base Hard base, soft base, I like the buttery biscuit base I like the buttery base, I like the buttery base But it needs more oomph That base that base that base, oopmh That toasty nutty base That biscuit base base, that base base That toasty base, that base That rubbery base, slimy base That base base base base base underneath That base, that base That toasty nutty base I like the base base base base I like the buttery biscuit base I like the base base biscuit base I like the buttery biscuit base I like the base, I like the buttery base I like the buttery biscuit base I like the buttery base, I like the buttery base I like the buttery biscuit base But but it but but but but But but it but but but but But but but but but but but But but but but but but but But but it but but but but But but it but but but but But but but but but but but But but but but but but but it needs to be a little bit deeper And then bang in comes the Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble base Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble base Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble base Wobble base wobble base wobble wobble wobble base Wobble wobble wobble wobble wobble wobble wobble Aah Wobble wobble wobble wobble wobble It overpowers everything That base base that base base That toasty nutty base That base base that base base That toasty base that base Crunchy meaty jammy spongy Gooey nutty rubbery greasy Slimy toasty sticky hard Buttery biscuit base Oomph");
+
             if (this.mode == (int)OperationModes.ShowExistingCloud)
             {
                 //hide buttons from form
@@ -100,6 +104,8 @@ namespace PARSE
                 
                 //instantiate new joint depths dictionary.
                 jointDepths = new Dictionary<JointType, double[]>();
+
+                
             }
             else if(this.mode == (int)OperationModes.ShowExistingResults) 
             {
@@ -394,19 +400,10 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                //stitch me
-                //instantiate the stitcher 
-                BoundingBox stitcher = new BoundingBox();
-
-                //jam points into stitcher
-                stitcher.add(fincloud);
-                stitcher.stitch();
-
-                pcd = stitcher.getResult();
-                fincloud = stitcher.getResultList();
-
                 ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
-                
+                ((CoreLoader)(this.Owner)).LoadPointCloud();
+
+                /*
                 double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
                 ((CoreLoader)(this.Owner)).windowHistory.heightoutput.Content = height + "m";
 
@@ -421,6 +418,7 @@ namespace PARSE
                 ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
+                 */
                 pcTimer.Stop();
 
                 //TODO: write all these results to the database; sql insertion clauses.

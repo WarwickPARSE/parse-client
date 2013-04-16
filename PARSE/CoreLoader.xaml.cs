@@ -160,6 +160,7 @@ namespace PARSE
         {
             this.pcd = pc;
             this.pcdl = pcl;
+            filename = null;
         }
 
         /// <summary>
@@ -933,6 +934,18 @@ namespace PARSE
                     
                 }
 
+                LoadPointCloud();
+
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.ToString());
+            }
+
+        }
+
+        public void LoadPointCloud() {
+
                 // Show the window first - keep UI FAST speedy is a stupid word.
                 System.Diagnostics.Debug.WriteLine("Showing window");
                 shutAnyWindows();
@@ -977,11 +990,7 @@ namespace PARSE
 
                 // GOOO!!! Pass the file name so it can be loaded
                 B.RunWorkerAsync(filename);
-            }
-            catch (Exception err)
-            {
-                System.Diagnostics.Debug.WriteLine(err.ToString());
-            }
+        
         }
 
         private void WorkingDirectory_Click(object sender, RoutedEventArgs e)

@@ -225,7 +225,6 @@ namespace PARSE
         /// <returns>Boolean</returns>
         public Boolean tooFarForward()
         {
-            System.Diagnostics.Debug.WriteLine("Actual Skeleton Depth: " + skelDepthPublic);
             return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
         }
 
