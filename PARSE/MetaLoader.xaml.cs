@@ -109,6 +109,7 @@ namespace PARSE
                         
             for (int i = 0; i < outputTimes.Count; i++)
             {
+                //if this crashes, talk to Bernard cause it works on my machine :p
                 double value = db.getScanResult(outputScans[i]).Item4.First.Value;
                 output.Add(Tuple.Create(outputTimes[i], value));
             }
