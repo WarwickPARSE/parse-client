@@ -75,48 +75,6 @@ namespace PARSE
 
         }
 
-        public List<Tuple<DateTime,double>> getTimeStampsAndVals(int patientID)
-        {
-            Tuple<LinkedList<int>, LinkedList<DateTime>> data = db.timestampsForPatientScans(patientID);
-            LinkedList<int> scanIDs = data.Item1;
-            LinkedList<DateTime> times = data.Item2;
-
-            List<Tuple<DateTime, double>> output = new List<Tuple<DateTime, double>>();
-
-            List<DateTime> outputTimes = new List<DateTime>();
-
-            LinkedListNode<DateTime> time = times.First;
-            if (time == null) return null;
-            while (true)
-            {
-                outputTimes.Add(time.Value);
-                time = time.Next;
-                if (time == null) break;
-            }
-
-            List<int> outputScans = new List<int>();
-            
-            LinkedListNode<int> scanID = scanIDs.First;
-            if (scanID == null) return null;
-            while (true)
-            {
-                outputScans.Add(scanID.Value);
-                scanID = scanID.Next;
-                if (scanID == null) break;
-            }
-            
-            List<Tuple<DateTime, int>> outputData = new List<Tuple<DateTime, int>>();
-                        
-            for (int i = 0; i < outputTimes.Count; i++)
-            {
-                //if this crashes, talk to Bernard cause it works on my machine :p
-                double value = db.getScanResult(outputScans[i]).Item4.First.Value;
-                output.Add(Tuple.Create(outputTimes[i], value));
-            }
-            
-            return output;
-        }
-        
         public Tuple<int, String, String> returnSelectedRecord()
         {
             return selectedRecord;
