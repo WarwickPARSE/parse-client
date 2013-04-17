@@ -397,8 +397,16 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
-                ((CoreLoader)(this.Owner)).LoadPointCloud();
+                if(this.Owner is CoreLoader)
+                {
+                    ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
+                    ((CoreLoader)(this.Owner)).LoadPointCloud();
+                }
+                else if(this.Owner is OptionLoader)
+                {
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).setPC(pcd, fincloud);
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).LoadPointCloud();
+                }
 
                 /*
                 double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
