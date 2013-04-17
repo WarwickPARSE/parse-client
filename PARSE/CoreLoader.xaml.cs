@@ -602,6 +602,7 @@ namespace PARSE
         {
             System.Media.SoundPlayer player = new System.Media.SoundPlayer(); player.SoundLocation = "Base.wav";
             player.Play();
+
             for (int i = 0; i < pcdl.Count; i++)
                 {
                     pcdl[i].deleteFloor();
