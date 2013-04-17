@@ -414,32 +414,40 @@ namespace PARSE
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
 
-            List<Tuple<DateTime, double>> records = this.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
+            List<Tuple<DateTime, double>> records = this.getTimeStampsAndVals((int) Convert.ToInt64(windowPatient.patientIDExisting.Content));
 
             int historyLookBack = 5;
-            int size = Math.Min(records.Count, historyLookBack);
 
-            KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[size];
-
-            for (int i = 0; i < size; i++)
+            if ((records != null) && (records.Count > 0))
             {
-                records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
-            }
+                int size = Math.Min(records.Count, historyLookBack);
 
-            //set change in volume... may need refinement
-            if (size != 0)
-            {
-                double change = 0;
-                change = volume / records[0].Item2;
-                windowHistory.volchangeoutput.Content = change+"%";
+                KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[size];
+
+                for (int i = 0; i < size; i++)
+                {
+                    records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
+                }
+
+                //set change in volume... may need refinement
+                if (size != 0)
+                {
+                    double change = 0;
+                    change = volume / records[0].Item2;
+                    windowHistory.volchangeoutput.Content = change + "%";
+                }
+                else
+                {
+                    windowHistory.volchangeoutput.Content = "Not Enough Info";
+                }
+                //setData
+                ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
             }
             else
             {
                 windowHistory.volchangeoutput.Content = "Not Enough Info";
+                windowHistory.volchart.Visibility = Visibility.Collapsed;
             }
-
-            //setData
-            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
 
             System.Media.SoundPlayer player = new System.Media.SoundPlayer();
             player.SoundLocation = "Base.wav";
