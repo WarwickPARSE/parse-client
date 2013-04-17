@@ -433,8 +433,8 @@ namespace PARSE
                 if (size != 0)
                 {
                     double change = 0;
-                    change = volume / records[0].Item2;
-                    windowHistory.volchangeoutput.Content = change + "%";
+                    change = volume - records[records.Count - 1].Item2;//may need to become volume - records[records.Count-2].Item2 later
+                    windowHistory.volchangeoutput.Content = Math.Round(100 * change / volume, 2) + "m\u00B3";
                 }
                 else
                 {
