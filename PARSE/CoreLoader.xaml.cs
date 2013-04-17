@@ -439,6 +439,10 @@ namespace PARSE
 
             //setData
             ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
+
+            System.Media.SoundPlayer player = new System.Media.SoundPlayer();
+            player.SoundLocation = "Base.wav";
+            player.Play();
             
         }
 
@@ -599,8 +603,6 @@ namespace PARSE
 
         private void RemoveFeet_Click(object sender, RoutedEventArgs e)
         {
-            System.Media.SoundPlayer player = new System.Media.SoundPlayer(); player.SoundLocation = "Base.wav";
-            player.Play();
             for (int i = 0; i < pcdl.Count; i++)
                 {
                     pcdl[i].deleteFloor();
