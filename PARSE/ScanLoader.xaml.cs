@@ -299,7 +299,7 @@ namespace PARSE
 
             System.Diagnostics.Debug.WriteLine("Depth now: " + kinectInterp.skelDepthPublic);
 
-            /*if (kinectInterp.tooFarForward())
+            if (kinectInterp.tooFarForward())
             {
                 sandra.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
@@ -310,7 +310,7 @@ namespace PARSE
                 Console.Write("Step Forward");
             }
             else
-            {*/
+            {
                 sandra.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
@@ -333,7 +333,7 @@ namespace PARSE
                 pcTimer.Interval = 10000;
                 countdown = 3;
                 pcTimer.Start();
-            //}
+            }
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
