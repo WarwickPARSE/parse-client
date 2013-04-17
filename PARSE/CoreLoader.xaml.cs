@@ -433,12 +433,13 @@ namespace PARSE
                 if (size != 0)
                 {
                     double change = 0;
-                    change = volume - records[records.Count - 1].Item2;//may need to become volume - records[records.Count-2].Item2 later
-                    windowHistory.volchangeoutput.Content = Math.Round(100 * change / volume, 2) + "m\u00B3";
+                    change = (volume - records[records.Count - 1].Item2)/records[records.Count - 1].Item2;//may need to become records[records.Count-2].Item2 later
+                    windowHistory.volchangeoutput.Content = Math.Round(100 * change, 2) + "%";
                 }
                 else
                 {
                     windowHistory.volchangeoutput.Content = "Not Enough Info";
+                    windowHistory.volchart.Visibility = Visibility.Collapsed;
                 }
                 //setData
                 ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
