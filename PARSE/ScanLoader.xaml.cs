@@ -84,7 +84,8 @@ namespace PARSE
             this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
             //Instantiate new database instance
             db = new DatabaseEngine();
-
+            
+            
             if (this.mode == (int)OperationModes.ShowExistingCloud)
             {
                 //hide buttons from form
@@ -100,6 +101,8 @@ namespace PARSE
                 
                 //instantiate new joint depths dictionary.
                 jointDepths = new Dictionary<JointType, double[]>();
+
+                
             }
             else if(this.mode == (int)OperationModes.ShowExistingResults) 
             {
@@ -394,19 +397,10 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                //stitch me
-                //instantiate the stitcher 
-                BoundingBox stitcher = new BoundingBox();
-
-                //jam points into stitcher
-                stitcher.add(fincloud);
-                stitcher.stitch();
-
-                pcd = stitcher.getResult();
-                fincloud = stitcher.getResultList();
-
                 ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
-                
+                ((CoreLoader)(this.Owner)).LoadPointCloud();
+
+                /*
                 double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
                 ((CoreLoader)(this.Owner)).windowHistory.heightoutput.Content = height + "m";
 
@@ -421,6 +415,7 @@ namespace PARSE
                 ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
+                 */
                 pcTimer.Stop();
 
                 //TODO: write all these results to the database; sql insertion clauses.
