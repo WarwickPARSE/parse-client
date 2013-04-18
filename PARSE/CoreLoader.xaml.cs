@@ -98,6 +98,8 @@ namespace PARSE
             //Initialize KinectInterpreter
 
             sandra = new SpeechSynthesizer();
+            sandra.Rate = 1;
+            sandra.Volume = 100;
             
             kinectInterp = new KinectInterpreter(vpcanvas2);
 
