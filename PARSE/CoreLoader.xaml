@@ -63,6 +63,10 @@
                     <MenuItem Header="Skeleton" Click="Skeleton_Click"/>
                     <MenuItem Header="RGB Isolation" Click="RGBIso_Click"/>
                     <MenuItem Header="Depth Isolation" Click="DepthIso_Click"/>
+                    <MenuItem Header="Calibration">
+                        <MenuItem Header="RGB" Click="RGB_Calibration_Click" />
+                        <MenuItem Header="HSL" Click="HSL_Calibration_Click" />
+                    </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_Adjust Sensor Up" IsCheckable="False" Click="btnSensorUp_Click"/>
                 <MenuItem Header="_Adjust Sensor Down" IsCheckable="False" Click="btnSensorDown_Click"/>

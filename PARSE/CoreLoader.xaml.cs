@@ -1134,5 +1134,17 @@ namespace PARSE
 
             return output;
         }
+
+        private void RGB_Calibration_Click(object sender, RoutedEventArgs e)
+        {
+            PARSE.Tracking.Calib.BasicTracker RGB_Calibrator = new PARSE.Tracking.Calib.BasicTracker();
+            RGB_Calibrator.Show();
+        }
+
+        private void HSL_Calibration_Click(object sender, RoutedEventArgs e)
+        {
+            PARSE.Tracking.Calib.HSLTracker HSL_Calibrator = new PARSE.Tracking.Calib.HSLTracker();
+            HSL_Calibrator.Show();
+        }
     }
 }

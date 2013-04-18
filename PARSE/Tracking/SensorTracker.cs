@@ -30,11 +30,14 @@ namespace PARSE.Tracking
         bool tracking = false;                          // Should the system be tracking?
     
         // Tracking & frame processing
-        private int gapBetweenFrames = 8;               // How many frames to skip between processed frames?
+        private int gapBetweenFrames = 9;               // How many frames to skip between processed frames?
         private volatile int frameCounter = 0;          // frameCounter % gapbetweenframes ==0  -> process frame
                                                         // TODO Use this to cancel frame processing if getting behind.
         RGBTracker tracker;                             // Reference to RGBTracker
-        Color SensorHighlightColor = Brushes.Aquamarine.Color; // The colour to highlight the sensor with
+        Color SensorHighlightColor = Brushes.OrangeRed.Color; // The colour to highlight the sensor with
+        int FramesWithoutScanner = 0;                   // For how many frames has there been no sensor found?
+        int NoFramesThreshold = 5;                      // For how many frames should we ignore the fact that no sensor has been found, 
+                                                        // and continue to display a sensor highlight?
 
         // Position matching
         SkeletonPosition PositionTarget = new SkeletonPosition();   // The target position for capture
@@ -261,11 +264,33 @@ namespace PARSE.Tracking
                     // Get the values
                     byte[] colorFrame2 = (byte[])thisColorFrame.Clone();
 
-                    new Thread(() =>
-                        tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle)
-                    ).Start();
+                    //new Thread(() =>
+                    tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle);
+                    //).Start();
 
-                    Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
+                    //Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
+
+                    if (tempX == 0)
+                    {
+                        FramesWithoutScanner++;
+                        if (! (FramesWithoutScanner > NoFramesThreshold))
+                            tempX = this.prevX;
+                    }
+                    else
+                    {
+                        FramesWithoutScanner = 0;
+                    }
+
+                    if (tempY == 0)
+                    {
+                        FramesWithoutScanner++;
+                        if (!(FramesWithoutScanner > NoFramesThreshold))
+                        tempY = this.prevY;
+                    }
+                    else
+                    {
+                        FramesWithoutScanner = 0;
+                    }
 
                     lock (this)
                     {
@@ -275,8 +300,9 @@ namespace PARSE.Tracking
                         this.x = tempX;
 
                         this.prevY = this.y;
-                        this.y = tempY;
                         this.dy = this.prevY - tempY;
+                        this.y = tempY;
+
                         this.angleXY = tempAngle;
 
                         this.colorFrame = thisColorFrame;
@@ -315,20 +341,15 @@ namespace PARSE.Tracking
             // Ensure skeletons are identified, get the current skeleton-relative position of the sensor
             HandleSkeletons();
 
-            // Put the most recent colour frame up
-            updateVisualisation();
-
             // Update timer
             updateCaptureTimer();
-
-            // Identify skeletons if not done yet
-            if (!skeletonsIdentified)
-                identifySkeletons();
 
             // Capture at end of timer
             if (this.captureTimer == capture_timer_length)
                 capture();
-                
+
+            // Put the most recent colour frame up
+            updateVisualisation();
         }
 
         /// <summary>
@@ -336,7 +357,16 @@ namespace PARSE.Tracking
         /// </summary>
         private void HandleSkeletons()
         {
-             CurrentPosition.updatePosition(this.x, this.y, this.angleXY, this.angleZ, skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID).First() );
+            // Identify skeletons if not done yet
+            if (!skeletonsIdentified)
+                identifySkeletons();
+
+            // Update patient position
+            IEnumerable<Skeleton> temp = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
+            if (temp.Count() == 1)
+            {
+                CurrentPosition.updatePosition(this.x, this.y, this.angleXY, this.angleZ, temp.First());
+            }
         }
 
         /// <summary>
@@ -347,25 +377,35 @@ namespace PARSE.Tracking
             bool display = true;
             lock (this)
             {
-                if (tracking)
+                if (tracking == true)
                     display = true;
                 else
                     display = false;
             }
 
+            //System.Diagnostics.Debug.WriteLine("Display = " + display + "X/Y: " + x + ", " + y);
+
             if (display)
             {
+                // Highlight target position, if in Capture_At_Position mode
                 if (this.Capture_Mode == (int)Capture_Modes.Capture_At_Position)
                 {
                     highlight(this.CurrentPosition.getXinRGBCoords(), this.CurrentPosition.getYinRGBCoords(), 5, this.TargetHighlightColor);
                 }
-                // Apply sensor highlight after highlighting the target, so it appears on top
+
+                // Highlight sensor. Apply after highlighting the target, so it appears on top!
                 highlightSensor(this.x, this.y);
             }
 
 
-            // Update text!
 
+            /* TODO REMOVE THIS AWFUL HACK OR NOTHING WILL WORK PROPERLY */
+                                //activeSkeletons = 2;
+            /* Alternatively, use it to force-feed the system skeletons  */
+            /*                                                           */
+
+
+            // Update text!
             // If not enough skeletons, not enough people. Wait for them!
             if (activeSkeletons < 2)
             {
@@ -383,13 +423,13 @@ namespace PARSE.Tracking
                 // Display timer as all is going so well
                 else
                 {
-                    if ((capture_timer_length - captureTimer) < 11)
+                    if ((capture_timer_length - captureTimer) < 0)
                     {
                         this.displayText.Text = (capture_timer_length - captureTimer).ToString();
                     }
                     else
                     {
-                        this.displayText.Text = "Waiting...";
+                        this.displayText.Text = "Hold scanner still to capture";
                     }
                 }
             }
@@ -431,10 +471,12 @@ namespace PARSE.Tracking
                 {
                     this.captureTimer++;
                     int remaining = this.capture_timer_length - this.captureTimer;
+                    /*
                     if (remaining < 10)
                         this.displayText.Text = "Capture in: " + remaining;
                     else
                         this.displayText.Text = "Hold sensor still to capture";
+                     */
                 }
                 else
                 {
@@ -534,7 +576,6 @@ namespace PARSE.Tracking
                     {
                         lock (this)
                         {
-                            this.displayText.Text = "Doctor and patient identified!";
                             System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID + ", and patient as ID: " + patientID);
 
                             // Hurrah!
@@ -575,7 +616,7 @@ namespace PARSE.Tracking
             }
             else
             {
-                this.displayText.Text = "Waiting for doctor and patient - there are not 2 people in the frame";
+                //this.displayText.Text = "Waiting for doctor and patient - there are not 2 people in the frame";
                 System.Diagnostics.Debug.WriteLine("There are not 2 skeletons in the frame.");
                 return;
             }
