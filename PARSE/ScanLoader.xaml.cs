@@ -391,6 +391,8 @@ namespace PARSE
                 //leftCloud.deleteFloor();
                 fincloud.Add(leftCloud);
 
+                this.instructionblock.Text = "You have now been captured. Thank you for your time.";
+
                 sandra.Speak("Scan Added.");
                 sandra.Speak("You have now been captured. Thank you for your time.");
 
