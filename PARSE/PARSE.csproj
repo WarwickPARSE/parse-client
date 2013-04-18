@@ -192,6 +192,13 @@
     <Compile Include="HistoryLoader.xaml.cs">
       <DependentUpon>HistoryLoader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Prototyping\Nathan\HSLTracker.xaml.cs">
+      <DependentUpon>HSLTracker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Prototyping\Nathan\Matrix.cs" />
     <Compile Include="ScanLoader.xaml.cs">
       <DependentUpon>ScanLoader.xaml</DependentUpon>
     </Compile>
@@ -254,6 +261,14 @@
     <Page Include="OptionLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Prototyping\Nathan\HSLTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ScanLoader.xaml">
       <SubType>Designer</SubType>
@@ -353,6 +368,7 @@
   <ItemGroup>
     <Folder Include="ICP\Stitchers\Exceptions\" />
     <Folder Include="Library\PointCloud\" />
+    <Folder Include="Prototyping\Stefania\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App_Readme\MathNet.Numerics.readme.txt" />

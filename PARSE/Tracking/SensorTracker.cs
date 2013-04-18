@@ -265,7 +265,7 @@ namespace PARSE.Tracking
                         tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle)
                     ).Start();
 
-                    Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
+                    System.Diagnostics.Debug.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
                     lock (this)
                     {
