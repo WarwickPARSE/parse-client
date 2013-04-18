@@ -67,11 +67,9 @@ namespace PARSE
         public float                                    skelDepthPublic { get; private set; } 
         private float skelDepthDelta = 400;//to be used if we ever implement sliders so we can scan fat people
         private float skelL; 
-        private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan fat people
+        private float skelLDelta = 0;//to be used if we ever implement sliders so we can scan really fat people
         private float skelR;
-        private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan fat people
-        private float skelB;
-        private float skelBDelta = -50;
+        private float skelRDelta = 0;//to be used if we ever implement sliders so we can scan really fat people
 
         public String instruction = "Waiting for patient...";
 
@@ -95,8 +93,7 @@ namespace PARSE
             color = blue;
 
             Model = new GeometryModel3D();
-            /*CompositionTarget.Rendering += this.CompositionTarget_Rendering;*/
-
+            
             //Only try to use the Kinect sensor if there is one connected
             if (KinectSensor.KinectSensors.Count != 0)
             {
@@ -122,79 +119,130 @@ namespace PARSE
                 this.colorToDepthDivisor = colorWidth / 640;
 
                 this.kinectSensor.Start();
+
+                //Skeleton data
+                skeletonData = new Skeleton[6];
             }
             
         }
 
+        /// <summary>
+        /// Disables the depth stream of the kinect associated with this interpreter
+        /// </summary>
         public void disableDepth()
         {
             this.kinectSensor.DepthStream.Disable();
         }
 
+        /// <summary>
+        /// Returns true iff the depth stream is enabled
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean isDepthEnabled()
         {
             return this.kinectSensor.DepthStream.IsEnabled;
         }
 
+        /// <summary>
+        /// Enables the depth stream
+        /// </summary>
         public void enableDepth()
         {
             this.kinectSensor.DepthStream.Enable();
         }
 
+        /// <summary>
+        /// Disable the colour stream of the Kinect
+        /// </summary>
         public void disableColor()
         {
             this.kinectSensor.ColorStream.Disable();
         }
 
+        /// <summary>
+        /// Returns true iff colour stream is enabled
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean isColorEnabled()
         {
             return this.kinectSensor.ColorStream.IsEnabled;
         }
 
+        /// <summary>
+        /// Enables colour stream
+        /// </summary>
         public void enableColor()
         {
             this.kinectSensor.ColorStream.Enable();
         }
 
+        /// <summary>
+        /// Disable Skeleton stream
+        /// </summary>
         public void disableSkeleton()
         {
             this.kinectSensor.SkeletonStream.Disable();
         }
 
+        /// <summary>
+        /// Returns true iff the skeleton stream is enabled 
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean isSkeletonEnabled()
         {
             return this.kinectSensor.SkeletonStream.IsEnabled;
         }
 
+        /// <summary>
+        /// Enables the skeleton stream
+        /// </summary>
         public void enableSkeleton()
         {
             this.kinectSensor.SkeletonStream.Enable();
         }
 
+        /// <summary>
+        /// Returns true iff a skeleton is neither too far forward or too far backward
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean goldilocks()
         {
             return (!(tooFarBack() || tooFarForward()));
         }
         
+        /// <summary>
+        /// Returns true iff the skeleton is too far back
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean tooFarBack()
         {
             return (skelDepthPublic > (oneParseUnit + oneParseUnitDelta));
         }
 
+        /// <summary>
+        /// Returns true iff the skeleton is too far forward
+        /// </summary>
+        /// <returns>Boolean</returns>
         public Boolean tooFarForward()
         {
             return (skelDepthPublic < (oneParseUnit - oneParseUnitDelta));
         }
 
+        /// <summary>
+        /// Change's the Kinect's angle to oneParseRadian
+        /// </summary>
         public void calibrate()
         {
             
             this.kinectSensor.ElevationAngle = oneParseRadian;
         }
         
-        //Enable depthStream
+        /// <summary>
+        /// Enable depthStream for the first time
+        /// </summary>
         public void startDepthStream()
         {
+            skeletonData = new Skeleton[6];
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus+", Depth Ready";
@@ -203,6 +251,7 @@ namespace PARSE
         //Enable depthMeshStream
         public void startDepthMeshStream(GeometryModel3D[] pts)
         {
+            skeletonData = new Skeleton[6];
             visMode = 1;
             this.kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             this.pts = pts;
@@ -224,6 +273,7 @@ namespace PARSE
         //Enable rgbStream
         public void startRGBStream()
         {
+            skeletonData = new Skeleton[6];
             this.kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
             this.kinectSensor.Start();
             this.kinectStatus = this.kinectStatus + ", RGB Ready";
@@ -241,6 +291,10 @@ namespace PARSE
             this.kinectStatus = this.kinectStatus + ", Skeleton Ready";
         }
 
+        /// <summary>
+        /// Returns true iff there is no Kinect present
+        /// </summary>
+        /// <returns></returns>
         public Boolean noKinect()
         {
             if (KinectSensor.KinectSensors.Count == 0)
@@ -251,7 +305,10 @@ namespace PARSE
             return (this.kinectSensor == null);
         }
 
-        //called when you plug a kinect in to a running PARSE
+        /// <summary>
+        /// Sets the Kinect associated with this Interpreter. Called when you plug a kinect in to a running PARSE
+        /// </summary>
+        /// <param name="c">The new Kinect Sensor</param>
         public void setSensor(KinectSensor c)
         {
             this.kinectSensor = c;
@@ -379,6 +436,7 @@ namespace PARSE
             {
                 if (skeletonFrame != null)
                 {
+                    skeletonData = new Skeleton[6];
                     skeletonFrame.CopySkeletonDataTo(skeletonData);
 
                     // Retrieves Skeleton objects with Tracked state
@@ -429,6 +487,7 @@ namespace PARSE
 
                         System.Windows.Media.Brush prevColor = this.color;
 
+                        //change color
                         if (tooFarForward())
                         {
                             this.color = blue;
@@ -441,6 +500,7 @@ namespace PARSE
                         {
                             this.color = green;
                         }
+                        //if color has been changed, change the skel colour
                         if (!(this.color.Equals(prevColor)))
                         {
                             skeletonFigure.setColor(this.color);
@@ -464,6 +524,10 @@ namespace PARSE
 
         }
 
+        /// <summary>
+        /// Returns a float corresponding to the skeleton's approximate depth
+        /// </summary>
+        /// <returns>Float</returns>
         public float getSkelDepth()
         {
             return skelDepthPublic;

@@ -57,6 +57,8 @@ namespace PARSE.Tracking
             x = this.x;
             y = this.y;
             angle = this.angle;
+
+            //Console.WriteLine("RGBScanner returning: " + this.x + ", " + this.y);
         }
 
         private byte[] RGBProcessor(byte[] image)

@@ -8,7 +8,11 @@ namespace PARSE
 {
     static class AreaCalculator
     {
-        //return REAL WORLD AREAS, NOT POINT CLOUD AREAS
+        /// <summary>
+        /// returns one area for every plane fed. returns real world areas not point cloud areas
+        /// </summary>
+        /// <param name="planes">List(List(Point3D))</param>
+        /// <returns>List(double)</returns>
         public static List<double> getAllAreas(List<List<Point3D>> planes)
         {
             List<double> output = new List<double>();
@@ -19,7 +23,11 @@ namespace PARSE
             return output;
         }
 
-        //return POINT CLOUD AREAS, NOT REAL WORLD AREAS
+        /// <summary>
+        /// Returns an area for the given plane
+        /// </summary>
+        /// <param name="plane">List(Point3D)</param>
+        /// <returns>double</returns>
         public static double calculateArea(List<Point3D> plane)
         {
             double area = 0;

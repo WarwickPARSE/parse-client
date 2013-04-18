@@ -11,11 +11,23 @@ namespace PARSE
         public const int planeNumber = 60;
         public const int sampleNumber = 7;
 
+        /// <summary>
+        /// returns an arbitary number (60) of planes, sliced height wise, which have been averaged, subsampled and clock sorted.
+        /// </summary>
+        /// <param name="pc">PointCloud</param>
+        /// <param name="arbNumber">int</param>
+        /// <returns>Tuple(List(List(Point3D)),double)</returns>
         public static Tuple<List<List<Point3D>>, double> pullAll(PointCloud pc)
         {
             return PlanePuller.pullAll(pc, planeNumber);
         }
 
+        /// <summary>
+        /// returns arbNumber many planes, sliced height wise, which have been averaged, subsampled and clock sorted.
+        /// </summary>
+        /// <param name="pc">PointCloud</param>
+        /// <param name="arbNumber">int</param>
+        /// <returns>Tuple(List(List(Point3D)),double)</returns>
         public static Tuple<List<List<Point3D>>,double> pullAll(PointCloud pc, int arbNumber)
         {
             double xmin = pc.getxMin();

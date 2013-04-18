@@ -31,6 +31,7 @@ namespace PARSE
         private void volumeBtn_Click(object sender, RoutedEventArgs e)
         {
             ScanLoader newScanWindow = new ScanLoader((int)ScanLoader.OperationModes.CaptureNewCloud);
+            newScanWindow.Owner = this;
             newScanWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             newScanWindow.Show();
         }

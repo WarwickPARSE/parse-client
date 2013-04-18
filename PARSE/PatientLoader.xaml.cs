@@ -23,6 +23,14 @@ namespace PARSE
         private bool runtimeExisting;
         public int activeID;
 
+        //Window setup states
+        public enum OperationModes
+        {
+            ShowExistingCloud, ShowExistingPatient, ShowExistingResults,
+            CaptureNewCloud, CaptureNewPatient
+        };
+
+
         //For new or already open patient records
 
         public PatientLoader(bool existing)
@@ -45,12 +53,19 @@ namespace PARSE
 
        //For patient records that need to be loaded at runtime.
 
-        public PatientLoader(int recordid)
+        public PatientLoader(int recordid, int mode)
         {
             InitializeComponent();
 
             this.activeID = recordid;
             runtimeExisting = true;
+
+            if (mode == (int)OperationModes.ShowExistingResults)
+            {
+                WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+                this.Top = 60;
+                this.Left = 20;
+            }
 
             this.Loaded += new RoutedEventHandler(PatientLoaderExisting_Loaded);
 
@@ -81,6 +96,7 @@ namespace PARSE
             {
                 this.activeID = db.getAllPatients().Item1.Last();
                 this.patientIDText.Text = (activeID + 1).ToString();
+                this.patientIDExisting.Content = this.patientIDText.Text;
             }
             else
             {
@@ -93,7 +109,7 @@ namespace PARSE
         private void PatientLoaderExisting_Loaded(object Sender, RoutedEventArgs e)
         {
             //TODO: This will eventually be given the relevant select query from the database call.
-            this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            //this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             Selection select = db.selectQueries;
             //currentID = select.getLastPatientID();
 
@@ -211,10 +227,10 @@ namespace PARSE
             if (!existing)
             {
                 OptionLoader windowOption = new OptionLoader();
+                windowOption.Owner = this;
                 windowOption.Show();
             }
 
-            this.Close();
         }
     }
 }

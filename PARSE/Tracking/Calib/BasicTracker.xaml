@@ -1,0 +1,59 @@
+<Window x:Class="PARSE.Tracking.Calib.BasicTracker"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Basic Tracker" Name="BasicTrackerWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" Height="768" Width="1366" WindowState="Maximized" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="992*" />
+            <ColumnDefinition Width="352*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="694*" />
+        </Grid.RowDefinitions>
+        <GroupBox Header="Image from RGB feed" Height="222" HorizontalAlignment="Left" Margin="301,293,0,0" Name="groupBox1" VerticalAlignment="Top" Width="277" Grid.Row="1">
+            <Grid>
+                <Image Height="187" HorizontalAlignment="Left" Margin="6,6,0,0" Name="frameGrab" Stretch="Fill" VerticalAlignment="Top" Width="253" ImageFailed="frameGrab_ImageFailed" MouseUp="frameGrab_MouseUp" />
+            </Grid>
+        </GroupBox>
+        <StatusBar Height="46" HorizontalAlignment="Left" Margin="0,683,0,0" Name="statusBar1" VerticalAlignment="Top" Width="578" Grid.Row="1">
+            <StatusBarItem Content="Status:" Name="statusbarStatus" />
+            <StatusBarItem Content="FPS:" Name="statusbarFPS" />
+        </StatusBar>
+        <Slider Height="23" HorizontalAlignment="Left" Margin="24,243,0,0" Name="rgbSlider_RED" VerticalAlignment="Top" Width="253" Maximum="255" SmallChange="1" ValueChanged="rgbSlider_RED_ValueChanged" Grid.Row="1" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="24,518,0,0" Name="rgbSlider_GREEN" VerticalAlignment="Top" Width="253" ValueChanged="RGBSlider_GREEN_ValueChanged" SmallChange="1" Maximum="255" Grid.Row="1" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="313,243,0,0" Name="rgbSlider_BLUE" VerticalAlignment="Top" Width="253" Maximum="255" SmallChange="1" ValueChanged="rgbSlider_BLUE_ValueChanged" Grid.Row="1" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="810,587,0,0" Name="rgbSlider_range" VerticalAlignment="Top" Width="100" Maximum="100" SmallChange="1" Grid.Row="1" />
+        <GroupBox Header="Processed Image" Height="500" HorizontalAlignment="Left" Margin="592,23,0,0" Name="groupBox2" VerticalAlignment="Top" Width="740" Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid Width="640" Height="480">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="260*" />
+                    <ColumnDefinition Width="281*" />
+                </Grid.ColumnDefinitions>
+                <Image Height="480" HorizontalAlignment="Center" Margin="6,6,0,0" Name="procImage" Stretch="None" VerticalAlignment="Center" Width="640" Grid.ColumnSpan="2" MaxWidth="640" MaxHeight="480" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="RED Image" Height="222" HorizontalAlignment="Left" Margin="12,6,0,0" Name="groupBox3" VerticalAlignment="Top" Width="277" Grid.Row="1">
+            <Grid>
+                <Image Height="187" HorizontalAlignment="Left" ImageFailed="procImage_ImageFailed" Margin="6,6,0,0" Name="rgbImage_RED" Stretch="Fill" VerticalAlignment="Top" Width="253" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="GREEN Image" Height="222" HorizontalAlignment="Left" Margin="12,290,0,0" Name="groupBox4" VerticalAlignment="Top" Width="277" Grid.Row="1">
+            <Grid>
+                <Image Height="187" HorizontalAlignment="Left" ImageFailed="procImage_ImageFailed" Margin="6,6,0,0" Name="rgbImage_GREEN" Stretch="Fill" VerticalAlignment="Top" Width="253" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="BLUE Image" Height="222" HorizontalAlignment="Left" Margin="301,6,0,0" Name="groupBox5" VerticalAlignment="Top" Width="277" Grid.Row="1">
+            <Grid>
+                <Image Height="187" HorizontalAlignment="Left" ImageFailed="procImage_ImageFailed" Margin="6,6,0,0" Name="rgbImage_BLUE" Stretch="Fill" VerticalAlignment="Top" Width="253" />
+            </Grid>
+        </GroupBox>
+        <Label Content="Target Colour:" Grid.Row="1" Height="30" HorizontalAlignment="Left" Margin="684,539,0,0" Name="label1" VerticalAlignment="Top" Width="98" />
+        <Label Content="Label" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="810,539,0,0" Name="rgbLabel_Target" VerticalAlignment="Top" Width="181" />
+        <Label Content="Spread (+/- 0:100)" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="684,582,0,0" Name="label2" VerticalAlignment="Top" />
+        <Label Content="Click image to get RGB" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="307,518,0,0" Name="rgbLabel_GET" VerticalAlignment="Top" Width="143" />
+        <Button Content="Find Colour" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="406,552,0,0" Name="btn_FindColour" VerticalAlignment="Top" Width="75" Click="btn_FindColour_Click" />
+        <Label Content="Target found at:" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,539,0,0" Name="Target_Coordinate_Label" VerticalAlignment="Top" Width="294" Grid.Column="1" />
+        <Label Content="Pixels: " Grid.Column="1" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,573,0,0" Name="lbl_pixelsfound" VerticalAlignment="Top" Width="290" VerticalContentAlignment="Center" />
+    </Grid>
+</Window>

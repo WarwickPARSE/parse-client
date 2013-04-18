@@ -60,12 +60,17 @@ namespace PARSE
                 patientsList.Item2.Remove(nodeName);
                 patientsList.Item3.Remove(nodeNHSNo);
 
+                //null check when at end of list
+                if (nodeID != null)
+                {
+                    var nodes = new { Id = nodeID.Value, Patientname = nodeName.Value, Patientnhsno = nodeNHSNo.Value };
+                    listBox1.Items.Add(nodes);
+                }
+
                 nodeID = nextID;
                 nodeName = nextName;
                 nodeNHSNo = nextNHSNo;
 
-                var nodes = new { Id = nodeID.Value, Patientname = nodeName.Value, Patientnhsno = nodeNHSNo.Value };
-                listBox1.Items.Add(nodes);
             }
 
         }
@@ -91,6 +96,8 @@ namespace PARSE
 
             //close the window
             this.Close();
+
+            (Owner as CoreLoader).LoadPointCloudFromFile(Convert.ToInt32(id));
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -99,6 +106,9 @@ namespace PARSE
             (Owner as CoreLoader).LoadPointCloudFromFile();            
         }
 
+        private void button3_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
 }

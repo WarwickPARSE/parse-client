@@ -150,7 +150,6 @@
     <Compile Include="LimbCalculator.cs" />
     <Compile Include="Measurement\AreaCalculator.cs" />
     <Compile Include="Measurement\GiftWrapper.cs" />
-    <Compile Include="Measurement\ConvexHullFinder.cs" />
     <Compile Include="Measurement\HeightCalculator.cs" />
     <Compile Include="Measurement\PlanePuller.cs" />
     <Compile Include="Measurement\SubSampler.cs" />
@@ -201,6 +200,12 @@
     <Compile Include="Prototyping\Nathan\Matrix.cs" />
     <Compile Include="ScanLoader.xaml.cs">
       <DependentUpon>ScanLoader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tracking\Calib\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tracking\Calib\HSLTracker.xaml.cs">
+      <DependentUpon>HSLTracker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tracking\Matrix.cs" />
     <Compile Include="Tracking\MeasurementRecord.xaml.cs">
@@ -273,6 +278,14 @@
     <Page Include="ScanLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tracking\Calib\BasicTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tracking\Calib\HSLTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tracking\MeasurementLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -374,6 +387,9 @@
     <Resource Include="App_Readme\MathNet.Numerics.readme.txt" />
     <Resource Include="App_Readme\MathNet.Numerics.copyright.txt" />
     <Resource Include="App_Readme\MathNet.Numerics.authors.txt" />
+    <Content Include="Base.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Patients.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

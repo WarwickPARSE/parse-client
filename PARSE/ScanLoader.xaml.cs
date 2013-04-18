@@ -35,7 +35,12 @@ namespace PARSE
     public partial class ScanLoader : Window
     {
         // Scan Window Operation mode
-        public enum OperationModes { ShowExistingCloud, CaptureNewCloud };
+        public enum OperationModes 
+        { 
+            ShowExistingCloud, ShowExistingPatient, ShowExistingResults, 
+            CaptureNewCloud, CaptureNewPatient 
+        };
+        
         private int mode;
         private Boolean preventClose = false;
 
@@ -67,14 +72,20 @@ namespace PARSE
         //Database object
         DatabaseEngine db;
 
-        
+        public ScanLoader() { } //parameterless version
 
         public ScanLoader( int mode )
         {
             InitializeComponent();
 
+            //Window Mode
             this.mode = mode;
-
+            //Activate mouse down event handler
+            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
+            //Instantiate new database instance
+            db = new DatabaseEngine();
+            
+            
             if (this.mode == (int)OperationModes.ShowExistingCloud)
             {
                 //hide buttons from form
@@ -82,6 +93,34 @@ namespace PARSE
                 start_scan.Visibility = Visibility.Collapsed;
                 this.instructionblock.Visibility = Visibility.Collapsed;
                 this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+
+                //center appropriately
+                WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                this.Height = 480;
+                this.Width = 640;
+                
+                //instantiate new joint depths dictionary.
+                jointDepths = new Dictionary<JointType, double[]>();
+
+                
+            }
+            else if(this.mode == (int)OperationModes.ShowExistingResults) 
+            {
+                //hide buttons from form
+                cancel_scan.Visibility = Visibility.Collapsed;
+                start_scan.Visibility = Visibility.Collapsed;
+                this.instructionblock.Visibility = Visibility.Collapsed;
+                this.loadingwidgetcontrol.Visibility = Visibility.Visible;
+
+                //center appropriately
+                WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
+                this.Top = 60;
+                this.Left = (System.Windows.SystemParameters.PrimaryScreenWidth - this.Width) - 20;
+                this.Height = 400;
+                this.Width = 610;
+
+                //instantiate new joint depths dictionary.
+                jointDepths = new Dictionary<JointType, double[]>();
             }
             else
             {
@@ -92,14 +131,8 @@ namespace PARSE
             }
 
             this.Loaded += new RoutedEventHandler(ScanLoader_Loaded);
-
             this.Show();
 
-            //wantKinect = true; // Nathan changed this
-            
-            this.hvpcanvas.MouseDown += new MouseButtonEventHandler(hvpcanvas_MouseDown);
-            db = new DatabaseEngine();
-            hitState = 0;
         }
 
         void ScanLoader_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -193,28 +226,19 @@ namespace PARSE
 
         private void ScanLoader_Loaded(object Sender, RoutedEventArgs e)
         {
-            //place relative to coreloader
-            this.Top = this.Owner.Top + 70;
-            this.Left = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Right - this.Width -20;
 
             if (this.mode == (int)OperationModes.CaptureNewCloud)
             {
                 //start scanning procedure
                 kinectInterp = new KinectInterpreter(skeloutline);
 
-                //if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
                 if (!this.kinectInterp.isSkeletonEnabled())
                 {
                     this.kinectInterp.startSkeletonStream();
                     this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
                 }
             }
-            /*
-            if (!wantKinect)
-            {
-                kinectInterp.stopStreams();
-            }
-            */
+
             System.Diagnostics.Debug.WriteLine("Scan loader loading complete");
           
         }
@@ -237,17 +261,27 @@ namespace PARSE
             //init kinect
 
             //start scanning procedure
-            kinectInterp = new KinectInterpreter(skeloutline);
+           // kinectInterp = new KinectInterpreter(skeloutline);
 
-            if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
+
+            /*if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
             {
                 this.kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-            if (!wantKinect)
+            } */
+
+            if (!this.kinectInterp.isSkeletonEnabled())
             {
+                System.Diagnostics.Debug.WriteLine("skel enabled");
+                this.kinectInterp.startSkeletonStream();
+                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+            } 
+
+          /*  if (!wantKinect)
+            {
+                System.Diagnostics.Debug.WriteLine("AHH HELP " + kinectInterp.skelDepthPublic);
                 kinectInterp.stopStreams();
-            }
+            } */
 
             if (!this.kinectInterp.isDepthEnabled())
             {
@@ -262,6 +296,8 @@ namespace PARSE
             }
 
             kinectInterp.calibrate();
+
+            System.Diagnostics.Debug.WriteLine("Depth now: " + kinectInterp.skelDepthPublic);
 
             if (kinectInterp.tooFarForward())
             {
@@ -361,19 +397,18 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                //stitch me
-                //instantiate the stitcher 
-                BoundingBox stitcher = new BoundingBox();
+                if(this.Owner is CoreLoader)
+                {
+                    ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
+                    ((CoreLoader)(this.Owner)).LoadPointCloud();
+                }
+                else if(this.Owner is OptionLoader)
+                {
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).setPC(pcd, fincloud);
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).LoadPointCloud();
+                }
 
-                //jam points into stitcher
-                stitcher.add(fincloud);
-                stitcher.stitch();
-
-                pcd = stitcher.getResult();
-                fincloud = stitcher.getResultList();
-
-                ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
-                
+                /*
                 double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
                 ((CoreLoader)(this.Owner)).windowHistory.heightoutput.Content = height + "m";
 
@@ -388,6 +423,7 @@ namespace PARSE
                 ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
                 ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
+                 */
                 pcTimer.Stop();
 
                 //TODO: write all these results to the database; sql insertion clauses.
@@ -430,50 +466,73 @@ namespace PARSE
 
         }
 
-        public Tuple<double,double,List<List<Point3D>>> determineLimb(PointCloud pcdexisting)
+        public List<Tuple<double,double,List<List<Point3D>>>> determineLimb(PointCloud pcdexisting)
         {
          
             //pull in skeleton measures from a temporary file for corbett.parse for now.
             kinectInterp = new KinectInterpreter(skeloutline);
+            Dictionary<String, double[]> jointDepthsStr = new Dictionary<String, double[]>();
+
+
             //temporary tuple for results
             Tuple<double, double, List<List<Point3D>>> T = new Tuple<double, double, List<List<Point3D>>>(0,0,null);
+            //permanent list of tuples for passing back to coreLoader
+            List<Tuple<double, double, List<List<Point3D>>>> limbMeasures = new List<Tuple<double,double,List<List<Point3D>>>>();
 
-            if (this.mode == (int)OperationModes.ShowExistingCloud)
+            //Test if we have a kinect otherwise we cannot use coordinate mapper.
+            if (KinectSensor.KinectSensors.Count > 0)
             {
-                Dictionary<String, double[]> jointDepths = new Dictionary<String, double[]>();
-                StreamReader sr = new StreamReader("SKEL.ptemp");
-                String line;
+                //test if we have already enumerated joint depths, if so, this has followed a recent scan.
 
-                while ((line = sr.ReadLine()) != null)
+                if (jointDepths.Count == 0)
                 {
-                    String[] joint = Regex.Split(line, ":");
-                    String[] positions = Regex.Split(joint[1], ",");
 
-                    double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2], "\n")[0]) };
+                    StreamReader sr = new StreamReader("SKEL.ptemp");
+                    String line;
 
-                    //convert to depth co-ordinate space
-                    SkeletonPoint sp = new SkeletonPoint();
-                    sp.X = (float)Convert.ToDouble(jointPos[1]);
-                    sp.Y = (float)Convert.ToDouble(jointPos[2]);
-                    sp.Z = (float)Convert.ToDouble(jointPos[0]);
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        String[] joint = Regex.Split(line, ":");
+                        String[] positions = Regex.Split(joint[1], ",");
 
-                    CoordinateMapper cm = new CoordinateMapper(kinectInterp.kinectSensor);
-                    DepthImagePoint dm = cm.MapSkeletonPointToDepthPoint(sp, DepthImageFormat.Resolution640x480Fps30);
+                        double[] jointPos = { Convert.ToDouble(positions[0]), Convert.ToDouble(positions[1]), Convert.ToDouble(Regex.Split(positions[2], "\n")[0]) };
 
-                    //convert x and y co-ords to arbitrary point cloud space
-                    Tuple<double, double, double> convertedPoints = LimbCalculator.convertToPCCoords(dm.X, dm.Y, sp.Z);
-                    double[] jointPos2 = { convertedPoints.Item3, convertedPoints.Item1, convertedPoints.Item2 };
+                        //convert to depth co-ordinate space
+                        SkeletonPoint sp = new SkeletonPoint();
+                        sp.X = (float)Convert.ToDouble(jointPos[1]);
+                        sp.Y = (float)Convert.ToDouble(jointPos[2]);
+                        sp.Z = (float)Convert.ToDouble(jointPos[0]);
 
-                    //place back into jointDepths array in terms of depth space.
-                    jointDepths.Add(joint[0], jointPos2);
+                        CoordinateMapper cm = new CoordinateMapper(kinectInterp.kinectSensor);
+                        DepthImagePoint dm = cm.MapSkeletonPointToDepthPoint(sp, DepthImageFormat.Resolution640x480Fps30);
+
+                        //convert x and y co-ords to arbitrary point cloud space
+                        Tuple<double, double, double> convertedPoints = LimbCalculator.convertToPCCoords(dm.X, dm.Y, sp.Z);
+                        double[] jointPos2 = { convertedPoints.Item3, convertedPoints.Item1, convertedPoints.Item2 };
+
+                        //place back into jointDepths array in terms of depth space.
+                        jointDepthsStr.Add(joint[0], jointPos2);
+                    }
+
+                }
+                else
+                {
+                    //we have some live skeleton depths, enumerate into strings
+                    foreach(JointType j in jointDepths.Keys) {
+
+                        jointDepthsStr = new Dictionary<String, double[]>();
+                        jointDepthsStr.Add(j.ToString(),jointDepths[j]);
+
+                    }
+
                 }
 
-                foreach (var item in jointDepths.Keys)
+                for (int limbArea = 1; limbArea <= 8; limbArea++)
                 {
-                    System.Diagnostics.Debug.WriteLine(item);
+                    //pass point cloud and correct bounds to Limb Calculator
+                    //shoulders is first option in list so pass first.
+                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepthsStr, limbArea));
                 }
-
-                T = LimbCalculator.calculateLimbBounds(pcdexisting, jointDepths, "ARM_LEFT");
             }
             else
             {
@@ -485,7 +544,7 @@ namespace PARSE
             gv.setMaterial();
             this.DataContext = gv;
 
-            return T;
+            return limbMeasures;
 
         }
 
@@ -562,7 +621,7 @@ namespace PARSE
         public Dictionary<JointType, double[]> enumerateSkeletonDepths(Skeleton sk)
         {
             //Store double
-            Dictionary<JointType, double[]> jointDepths = new Dictionary<JointType, double[]>();
+            jointDepths = new Dictionary<JointType, double[]>();
 
             //Get depths and x,y locations at joints.
             foreach (Joint j in sk.Joints)

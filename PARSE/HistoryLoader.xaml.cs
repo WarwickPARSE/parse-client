@@ -27,6 +27,8 @@ namespace PARSE
 
         //persistently store our list of planes
         private List<List<Point3D>> storedPlanes;
+        private List<List<Point3D>> storedLimbPlanes;
+        private List<Tuple<double, double, List<List<Point3D>>>> rawlimbData;
 
         //publicly accessible area list from previous calculations
         public List<double> areaList;
@@ -35,6 +37,7 @@ namespace PARSE
         {
             InitializeComponent();
             storedPlanes = new List<List<Point3D>>();
+            storedLimbPlanes = new List<List<Point3D>>();
             this.Loaded += new RoutedEventHandler(HistoryLoader_Loaded);
         }
 
@@ -45,6 +48,8 @@ namespace PARSE
             this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
             this.Height = this.Owner.Width * 0.225;
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
+
+            this.limbselect.SelectedItem = 0;
 
             //check if a scan event is in place
             if (storedPlanes.Count == 0)
@@ -83,9 +88,7 @@ namespace PARSE
                 scanlabel.Visibility = Visibility.Collapsed;
                 viewborder2.Visibility = Visibility.Collapsed;
 
-                planeChooser2.Visibility = Visibility.Collapsed;
-                limbimg.Visibility = Visibility.Collapsed;
-                limbrender.Visibility = Visibility.Collapsed;
+                hvpcanvas2.Visibility = Visibility.Collapsed;
 
                 scanno2.Visibility = Visibility.Collapsed;
                 scantime2.Visibility = Visibility.Collapsed;
@@ -199,20 +202,12 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
-
-            //setData
-            ((LineSeries)(volchart.Series[0])).ItemsSource =
-                new KeyValuePair<DateTime, int>[]{
-                    new KeyValuePair<DateTime,int>(DateTime.Now, 100),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(1), 130),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(3), 125),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
         }
 
-        public void visualiseLimbs(Tuple<double, double, List<List<Point3D>>> limbData)
+        public void visualiseLimbs(List<Tuple<double, double, List<List<Point3D>>>> limbData, int limbIndex, double planeIndex)
         {
             System.Diagnostics.Debug.WriteLine("Opening Limb Visualisation Panel");
+            rawlimbData = limbData;
 
             circumlabel.Visibility = Visibility.Visible;
             circumoutput.Visibility = Visibility.Visible;
@@ -221,8 +216,6 @@ namespace PARSE
             planelabel.Visibility = Visibility.Visible;
             scanlabel.Visibility = Visibility.Visible;
             viewborder2.Visibility = Visibility.Visible;
-            planeChooser2.Visibility = Visibility.Visible;
-            limbimg.Visibility = Visibility.Visible;
             noresults2.Visibility = Visibility.Visible;
             newscan2.Visibility = Visibility.Visible;
             scanno2.Visibility = Visibility.Visible;
@@ -232,16 +225,90 @@ namespace PARSE
             maxarea2.Visibility = Visibility.Visible;
             totalarea2.Visibility = Visibility.Visible;
             totalperimiter2.Visibility = Visibility.Visible;
-            limbrender.Visibility = Visibility.Visible;
+            hvpcanvas2.Visibility = Visibility.Visible;
             btnresults2.Visibility = Visibility.Visible;
             btnrescan2.Visibility = Visibility.Visible;
-            //Set relevant ui components to collapsed
-            noresults.Visibility = Visibility.Collapsed;
-            newscan.Visibility = Visibility.Collapsed;
 
-            circumoutput.Content = limbData.Item1+"cm"; 
-            totalarea2.Content = limbData.Item2;
-            totalperimiter2.Content = limbData.Item1+"cm";
+            //Set relevant ui components to collapsed
+            noresults2.Visibility = Visibility.Collapsed;
+            newscan2.Visibility = Visibility.Collapsed;
+
+            circumoutput.Content = limbData[limbIndex].Item1+"cm"; 
+            totalarea2.Content = "Total Area: " + limbData[limbIndex].Item2;
+            totalperimiter2.Content = "Perimeter Approx: " + limbData[limbIndex].Item1+"cm";
+
+            //set ellipse visualisation circumference
+            //TODO: add flag for diplaying historic ellipse vis.
+            historicEllipse.Visibility = Visibility.Collapsed;
+            historysel.Visibility = Visibility.Collapsed;
+            changesel.Visibility = Visibility.Collapsed;
+
+            circumsel.Text = "Circum Approx: " + limbData[limbIndex].Item1 + "cm";
+            limbsel.Text = "Limb No: " + limbIndex;
+            currentEllipse.Width = limbData[limbIndex].Item1*100/3;
+            currentEllipse.Height = limbData[limbIndex].Item2*1000;
+            
+
+            //visualise planes
+            planeNo.Text = "Plane Outline: " + (int) planeIndex;
+
+            if (storedLimbPlanes.Count == 0)
+            {
+                storedLimbPlanes = limbData[limbIndex].Item3;
+                storedLimbPlanes.Reverse();
+                planeChooser.Maximum = storedLimbPlanes.Count;
+            }
+
+            double xmin = 0;
+            double xmax = 0;
+            double zmin = 0;
+            double zmax = 0;
+
+            int i = (int)planeIndex;
+
+            double[] x = new double[storedLimbPlanes[i].Count];
+            double[] z = new double[storedLimbPlanes[i].Count];
+
+            for (int j = 0; j < storedLimbPlanes[i].Count; j++)
+            {
+
+                //Boundary check of points.
+                if (storedLimbPlanes[i][j].X > xmax)
+                {
+                    xmax = storedLimbPlanes[i][j].X;
+                }
+
+                if (storedLimbPlanes[i][j].Z > zmax)
+                {
+                    zmax = storedLimbPlanes[i][j].Z;
+                }
+
+                if (storedLimbPlanes[i][0].X < xmin)
+                {
+                    xmin = storedLimbPlanes[i][0].X;
+                }
+                if (storedLimbPlanes[i][j].X < xmin)
+                {
+                    xmin = storedLimbPlanes[i][j].X;
+                }
+
+                if (storedLimbPlanes[i][0].Z < zmin)
+                {
+                    zmin = storedLimbPlanes[i][0].Z;
+                }
+                if (storedLimbPlanes[i][j].Z < zmin)
+                {
+                    zmin = storedLimbPlanes[i][j].Z;
+                }
+
+                //assign to arrays
+                x[j] = storedLimbPlanes[i][j].X;
+                z[j] = storedLimbPlanes[i][j].Z;
+
+            }
+
+            //write points to plane renderer class for visualisation.
+            this.DataContext = new PlaneVisualisation(x, z);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -257,6 +324,12 @@ namespace PARSE
             this.maxarea.Content = "Plane " + (int) e.NewValue;
             this.totalperimiter.Content = "Circumference: " + circum + "m";
 
+        }
+
+
+        private void limbselect_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            visualiseLimbs(rawlimbData, (sender as ComboBox).SelectedIndex, 1);
         }
     }
 }

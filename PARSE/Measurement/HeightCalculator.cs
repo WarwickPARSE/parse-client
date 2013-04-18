@@ -7,6 +7,11 @@ namespace PARSE
 {
     static class HeightCalculator
     {
+        /// <summary>
+        /// Returns the height of a point cloud in real world measurements, aka metres
+        /// </summary>
+        /// <param name="pc">PointCloud</param>
+        /// <returns>double</returns>
         public static double getHeight(PointCloud pc)
         {
             double ymin = pc.getyMin();
