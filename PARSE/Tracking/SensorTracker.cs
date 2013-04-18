@@ -34,7 +34,10 @@ namespace PARSE.Tracking
         private volatile int frameCounter = 0;          // frameCounter % gapbetweenframes ==0  -> process frame
                                                         // TODO Use this to cancel frame processing if getting behind.
         RGBTracker tracker;                             // Reference to RGBTracker
-        Color SensorHighlightColor = Brushes.Aquamarine.Color; // The colour to highlight the sensor with
+        Color SensorHighlightColor = Brushes.OrangeRed.Color; // The colour to highlight the sensor with
+        int FramesWithoutScanner = 0;                   // For how many frames has there been no sensor found?
+        int NoFramesThreshold = 5;                      // For how many frames should we ignore the fact that no sensor has been found, 
+                                                        // and continue to display a sensor highlight?
 
         // Position matching
         SkeletonPosition PositionTarget = new SkeletonPosition();   // The target position for capture
@@ -267,6 +270,28 @@ namespace PARSE.Tracking
 
                     //Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
+                    if (tempX == 0)
+                    {
+                        FramesWithoutScanner++;
+                        if (! (FramesWithoutScanner > NoFramesThreshold))
+                            tempX = this.prevX;
+                    }
+                    else
+                    {
+                        FramesWithoutScanner = 0;
+                    }
+
+                    if (tempY == 0)
+                    {
+                        FramesWithoutScanner++;
+                        if (!(FramesWithoutScanner > NoFramesThreshold))
+                        tempY = this.prevY;
+                    }
+                    else
+                    {
+                        FramesWithoutScanner = 0;
+                    }
+
                     lock (this)
                     {
                         // Set the position & angle
@@ -275,8 +300,9 @@ namespace PARSE.Tracking
                         this.x = tempX;
 
                         this.prevY = this.y;
-                        this.y = tempY;
                         this.dy = this.prevY - tempY;
+                        this.y = tempY;
+
                         this.angleXY = tempAngle;
 
                         this.colorFrame = thisColorFrame;
