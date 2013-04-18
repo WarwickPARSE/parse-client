@@ -403,11 +403,17 @@ namespace PARSE
                 {
                     ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
                     ((CoreLoader)(this.Owner)).LoadPointCloud();
+                    ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
+                    ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
+                    ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
                 }
                 else if(this.Owner is OptionLoader)
                 {
                     ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).setPC(pcd, fincloud);
                     ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).LoadPointCloud();
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).export1.IsEnabled = true;
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).export2.IsEnabled = true;
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).removefloor.IsEnabled = true;
                 }
 
                 /*
@@ -422,9 +428,7 @@ namespace PARSE
                 this.instructionblock.Text = "Scanning complete.";
                 this.instructionblock.Visibility = Visibility.Collapsed;
 
-                ((CoreLoader)(this.Owner)).export1.IsEnabled = true;
-                ((CoreLoader)(this.Owner)).export2.IsEnabled = true;
-                ((CoreLoader)(this.Owner)).removefloor.IsEnabled = true;
+                
                  */
                 pcTimer.Stop();
 
