@@ -21,6 +21,9 @@ namespace PARSE
         public static PointCloud segmentedPointcloud;
 
         //Fudge factors for each limb, testing empirically and on the basis of the following papers:
+        //This is because of the inferred skeletal limb positioning based on the inferrence algorithms
+        //detailed by Microsoft Research.
+
         private static double ArmFactor;
         private static double LegFactor;
         private static double ChestFactor;
@@ -60,7 +63,7 @@ namespace PARSE
                 
                 //ARM_LEFT (2)
                 xmin = jointDepths["HipLeft"][1];
-                xmax = jointDepths["WristLeft"][1] + ((jointDepths["WristLeft"][1]-jointDepths["HipLeft"][1])/2);
+                xmax = jointDepths["WristLeft"][1] + ((jointDepths["WristLeft"][1]-jointDepths["HipLeft"][1])/4);
 
                 ymax = jointDepths["ShoulderLeft"][2];
                 ymin = jointDepths["WristLeft"][2];
@@ -79,7 +82,7 @@ namespace PARSE
                 case 3:
 
                 //ARM_RIGHT (3)
-                xmin = jointDepths["WristRight"][1] - ((jointDepths["HipRight"][1]-jointDepths["WristRight"][1])/2);
+                xmin = jointDepths["WristRight"][1] - ((jointDepths["HipRight"][1]-jointDepths["WristRight"][1])/4);
                 xmax = jointDepths["HipRight"][1];
 
                 ymax = jointDepths["ShoulderRight"][2];
