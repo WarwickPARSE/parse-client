@@ -414,32 +414,44 @@ namespace PARSE
             //show Runtime viewer (aka results,history)
             windowHistory.Show();
 
-            List<Tuple<DateTime, double>> records = windowMeta.getTimeStampsAndVals((int) windowPatient.patientIDExisting.Content);
+            List<Tuple<DateTime, double>> records = this.getTimeStampsAndVals((int) Convert.ToInt64(windowPatient.patientIDExisting.Content));
 
             int historyLookBack = 5;
-            int size = Math.Min(records.Count, historyLookBack);
 
-            KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[size];
-
-            for (int i = 0; i < size; i++)
+            if ((records != null) && (records.Count > 0))
             {
-                records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
-            }
+                int size = Math.Min(records.Count, historyLookBack);
 
-            //set change in volume... may need refinement
-            if (size != 0)
-            {
-                double change = 0;
-                change = volume / records[0].Item2;
-                windowHistory.volchangeoutput.Content = change+"%";
+                KeyValuePair<DateTime, double>[] records2 = new KeyValuePair<DateTime, double>[size];
+
+                for (int i = 0; i < size; i++)
+                {
+                    records2[i] = new KeyValuePair<DateTime, double>(records[i].Item1, records[i].Item2);
+                }
+
+                //set change in volume... may need refinement
+                if (size != 0)
+                {
+                    double change = 0;
+                    change = volume - records[records.Count - 1].Item2;//may need to become volume - records[records.Count-2].Item2 later
+                    windowHistory.volchangeoutput.Content = Math.Round(100 * change / volume, 2) + "m\u00B3";
+                }
+                else
+                {
+                    windowHistory.volchangeoutput.Content = "Not Enough Info";
+                }
+                //setData
+                ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
             }
             else
             {
                 windowHistory.volchangeoutput.Content = "Not Enough Info";
+                windowHistory.volchart.Visibility = Visibility.Collapsed;
             }
 
-            //setData
-            ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;
+            System.Media.SoundPlayer player = new System.Media.SoundPlayer();
+            player.SoundLocation = "Base.wav";
+            player.Play();
             
         }
 
@@ -600,8 +612,6 @@ namespace PARSE
 
         private void RemoveFeet_Click(object sender, RoutedEventArgs e)
         {
-            System.Media.SoundPlayer player = new System.Media.SoundPlayer(); player.SoundLocation = "Base.wav";
-            player.Play();
 
             for (int i = 0; i < pcdl.Count; i++)
                 {
@@ -1053,6 +1063,60 @@ namespace PARSE
             windowMeta.Show();
 
             windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
+        }
+
+        public List<Tuple<DateTime, double>> getTimeStampsAndVals(int patientID)
+        {
+            Tuple<LinkedList<int>, LinkedList<DateTime>> data = db.timestampsForPatientScans(patientID);
+            LinkedList<int> scanIDs = data.Item1;
+            LinkedList<DateTime> times = data.Item2;
+
+            List<Tuple<DateTime, double>> output = new List<Tuple<DateTime, double>>();
+
+            List<DateTime> outputTimes = new List<DateTime>();
+
+            LinkedListNode<DateTime> time = times.First;
+            if (time == null) return null;
+            while (true)
+            {
+                outputTimes.Add(time.Value);
+                time = time.Next;
+                if (time == null) break;
+            }
+
+            List<int> outputScans = new List<int>();
+
+            LinkedListNode<int> scanID = scanIDs.First;
+            if (scanID == null) return null;
+            while (true)
+            {
+                outputScans.Add(scanID.Value);
+                scanID = scanID.Next;
+                if (scanID == null) break;
+            }
+
+            List<Tuple<DateTime, int>> outputData = new List<Tuple<DateTime, int>>();
+
+            for (int i = 0; i < outputTimes.Count; i++)
+            {
+                //if this crashes, talk to Bernard cause it works on my machine :p
+                double value = db.getScanResult(outputScans[i]).Item4.First.Value;
+                output.Add(Tuple.Create(outputTimes[i], value));
+            }
+
+            return output;
+        }
+
+        private void RGB_Calibration_Click(object sender, RoutedEventArgs e)
+        {
+            PARSE.Tracking.Calib.BasicTracker RGB_Calibrator = new PARSE.Tracking.Calib.BasicTracker();
+            RGB_Calibrator.Show();
+        }
+
+        private void HSL_Calibration_Click(object sender, RoutedEventArgs e)
+        {
+            PARSE.Tracking.Calib.HSLTracker HSL_Calibrator = new PARSE.Tracking.Calib.HSLTracker();
+            HSL_Calibrator.Show();
         }
     }
 }

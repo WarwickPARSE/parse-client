@@ -96,6 +96,7 @@ namespace PARSE
             {
                 this.activeID = db.getAllPatients().Item1.Last();
                 this.patientIDText.Text = (activeID + 1).ToString();
+                this.patientIDExisting.Content = this.patientIDText.Text;
             }
             else
             {
@@ -226,10 +227,10 @@ namespace PARSE
             if (!existing)
             {
                 OptionLoader windowOption = new OptionLoader();
+                windowOption.Owner = this;
                 windowOption.Show();
             }
 
-            this.Close();
         }
     }
 }

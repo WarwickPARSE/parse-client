@@ -194,6 +194,12 @@
     <Compile Include="ScanLoader.xaml.cs">
       <DependentUpon>ScanLoader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tracking\Calib\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tracking\Calib\HSLTracker.xaml.cs">
+      <DependentUpon>HSLTracker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tracking\Matrix.cs" />
     <Compile Include="Tracking\MeasurementRecord.xaml.cs">
       <DependentUpon>MeasurementRecord.xaml</DependentUpon>
@@ -257,6 +263,14 @@
     <Page Include="ScanLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tracking\Calib\BasicTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tracking\Calib\HSLTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tracking\MeasurementLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
