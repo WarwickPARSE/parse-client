@@ -96,14 +96,33 @@ namespace PARSE
             db = new DatabaseEngine();
 
             //Initialize KinectInterpreter
+
+            sandra = new SpeechSynthesizer();
+            
             kinectInterp = new KinectInterpreter(vpcanvas2);
+
+            if (kinectInterp.errorFlag)
+            {
+                switch (kinectInterp.kinectSensor.Status)
+                {
+                    case KinectStatus.DeviceNotGenuine: sandra.Speak("Your Kinect is not genuine"); break;
+                    case KinectStatus.DeviceNotSupported: sandra.Speak("Your Kinect is not supported"); break;
+                    case KinectStatus.InsufficientBandwidth: sandra.Speak("Your USB connection has insufficient Bandwidth "); break;
+                    case KinectStatus.NotPowered: sandra.Speak("Your Kinect is not powered"); break;
+                    case KinectStatus.NotReady: sandra.Speak("Your Kinect is not ready"); break;
+                    case KinectStatus.Error: sandra.Speak("Your Kinect is has errored in some way"); break;
+                    case KinectStatus.Undefined: sandra.Speak("Your Kinect is has errored in an undefined way"); break;
+                    default: sandra.Speak("Call Technical Support."); break;
+                }	
+            Environment.Exit(1);
+            }
+
             this.kinectmenu.IsEnabled = false;
             this.newscan.IsEnabled = false;
 
             //ui initialization
             this.WindowState = WindowState.Maximized;
-            sandra = new SpeechSynthesizer();
-
+            
             //Miscellaneous modelling definitions
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
