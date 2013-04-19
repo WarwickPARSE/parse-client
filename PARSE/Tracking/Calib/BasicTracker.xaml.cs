@@ -52,7 +52,10 @@ namespace PARSE.Tracking.Calib
 
         // Frame counter
         //public Thread frameProcessorThread;
-        public int frames = 0;
+        private static volatile int frames = 0;
+        public int gap = 5;
+        private int pixels = 0;
+        short depth = 0;
 
         //Kinect sensor
         KinectSensor kinectSensor;
@@ -92,8 +95,6 @@ namespace PARSE.Tracking.Calib
 
                 statusbarStatus.Content = "Status: Device connected";
 
-                //frameProcessorThread = new Thread(fpsCounter);
-                //frameProcessorThread.Start();
             }
             else
             {
@@ -106,7 +107,7 @@ namespace PARSE.Tracking.Calib
         //private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
         private void ProcessFrame(byte[] byteFrame)
         {
-            Console.WriteLine("Color image ready!!");
+            //Console.WriteLine("Color image ready!!");
 
             //using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
@@ -123,65 +124,73 @@ namespace PARSE.Tracking.Calib
                         this.colorpixelData = new byte[byteFrame.Length];
                         this.colorFrameRGB = new byte[this.width * this.height * Bgr32BytesPerPixel];
 
+                        //colorFrame.CopyPixelDataTo(this.colorpixelData)
+                        colorpixelData = byteFrame;
+
+                        // PROCESS THE DATA //
+                        processedcolorpixelData = frameProcessor(colorpixelData);
+                        processedcolorpixelData = findFeatures(processedcolorpixelData);
+                        //targetFinder(colorpixelData);
+
                         this.outputColorBitmap = new WriteableBitmap(this.width, this.height, 96, 96, PixelFormats.Bgr32, null);
-                        this.frameGrab.Source = this.outputColorBitmap;
+                        
                         //this.frameGrab.OpacityMask = new ImageBrush { ImageSource = 
 
                         this.processedBitmap = new WriteableBitmap(this.width, this.height, 96, 96, PixelFormats.Bgr32, null);
-                        this.procImage.Source = this.processedBitmap;
+                        
 
                         this.redBitmap = new WriteableBitmap(this.width, this.height, 96, 96, PixelFormats.Gray8, null);
-                        this.rgbImage_RED.Source = this.redBitmap;
+                        
 
                         this.greenBitmap = new WriteableBitmap(this.width, this.height, 96, 96, PixelFormats.Gray8, null);
-                        this.rgbImage_GREEN.Source = this.greenBitmap;
+                        
 
                         this.blueBitmap = new WriteableBitmap(this.width, this.height, 96, 96, PixelFormats.Gray8, null);
+
+
+                        // Output raw image
+                        this.outputColorBitmap.WritePixels(
+                            (new Int32Rect(0, 0, width, height)),
+                            colorpixelData,
+                            width * Bgr32BytesPerPixel,
+                            0);
+                        this.frameGrab.Source = this.outputColorBitmap;
+
+                        // Output processed image
+                        this.processedBitmap.WritePixels(
+                            new Int32Rect(0, 0, width, height),
+                            processedcolorpixelData,
+                            width * Bgr32BytesPerPixel,
+                            0);
+                        this.procImage.Source = this.processedBitmap;
+
+                        // Output component images
+                        this.redBitmap.WritePixels(
+                            new Int32Rect(0, 0, width, height),
+                            redComponent,
+                            width * 1,
+                            0);
+                        this.rgbImage_RED.Source = this.redBitmap;
+                        this.greenBitmap.WritePixels(
+                            new Int32Rect(0, 0, width, height),
+                            greenComponent,
+                            width * 1,
+                            0);
+                        this.rgbImage_GREEN.Source = this.greenBitmap;
+                        this.blueBitmap.WritePixels(
+                            new Int32Rect(0, 0, width, height),
+                            blueComponent,
+                            width * 1,
+                            0);
                         this.rgbImage_BLUE.Source = this.blueBitmap;
 
+
+                        lbl_pixelsfound.Content = "Pixels: " + pixels;
                         Console.WriteLine("Frame written?");
+
                     }
 
-                    //colorFrame.CopyPixelDataTo(this.colorpixelData)
-                    colorpixelData = byteFrame;
 
-                    // PROCESS THE DATA //
-                    processedcolorpixelData = frameProcessor(colorpixelData);
-                    processedcolorpixelData = findFeatures(processedcolorpixelData);
-                    //targetFinder(colorpixelData);
-
-                    // Output raw image
-                    this.outputColorBitmap.WritePixels(
-                        (new Int32Rect(0, 0, width, height)),
-                        colorpixelData,
-                        width * Bgr32BytesPerPixel,
-                        0 );
-
-                    // Output processed image
-                    this.processedBitmap.WritePixels(
-                        new Int32Rect(0, 0, width, height),
-                        processedcolorpixelData,
-                        width * Bgr32BytesPerPixel,
-                        0);
-
-                    // Output component images
-                    this.redBitmap.WritePixels(
-                        new Int32Rect(0, 0, width, height),
-                        redComponent,
-                        width * 1,
-                        0);
-                    this.greenBitmap.WritePixels(
-                        new Int32Rect(0, 0, width, height),
-                        greenComponent,
-                        width * 1,
-                        0);
-                    this.blueBitmap.WritePixels(
-                        new Int32Rect(0, 0, width, height),
-                        blueComponent,
-                        width * 1,
-                        0);
-                 
-                    frames++;
                 }
             }
         }
@@ -211,7 +220,7 @@ namespace PARSE.Tracking.Calib
             greenComponent = new byte[width * height];
             blueComponent = new byte[width * height];
 
-            int pixels = 0;
+            pixels = 0;
 
             double range = rgbSlider_range.Value;
             double redMin    = rgbSlider_RED.Value - range;
@@ -230,11 +239,11 @@ namespace PARSE.Tracking.Calib
                     image[i*4] > blueMin & image[i*4] < blueMax
                     )
                 {
+                    pixels++;
                     processedcolorpixelData[i*4] = 255;
                     processedcolorpixelData[i*4 + 1] = 255;
                     processedcolorpixelData[1*4 + 2] = 255;
-                    processedcolorpixelData[i*4 + 3] = image[i*4 + 3];
-                    pixels++;
+                    processedcolorpixelData[i * 4 + 3] = 255; // image[i * 4 + 3];
                 }
 
                 //RED
@@ -243,8 +252,6 @@ namespace PARSE.Tracking.Calib
                 greenComponent[i] = image[i*4 + 1];
                 //BLUE
                 blueComponent[i] = image[i*4];
-
-                lbl_pixelsfound.Content = "Pixels: " + pixels;
             }
 
             return processedcolorpixelData;
@@ -333,45 +340,86 @@ namespace PARSE.Tracking.Calib
         private void run(object sender, AllFramesReadyEventArgs e)
         {
 
-            if (!takeFrame)
+            //if (!takeFrame)
+            using(ColorImageFrame frame_colour = e.OpenColorImageFrame() )
+            using(DepthImageFrame frame_depth = e.OpenDepthImageFrame() )
             {
-                try { e.OpenColorImageFrame().Dispose(); }
-                catch (Exception noFrameException) { };
-                takeFrame = true;
-                return;
-            }
-            else
-            {
-                takeFrame = false;
-            }
-
-            byte[][] RGBWithMask = SensorAllFramesReady(sender, e);
-            if (RGBWithMask[0] == null | RGBWithMask[1] == null)
-                return;
-
-            // Apply the mask
-            byte[] MaskedRGB = new byte[RGBWithMask[1].Length];
-            for (int i = 0; i < RGBWithMask[0].Length; i++)
-            {
-                if (RGBWithMask[0][i] == 0)
+                frames++;
+                if (frames % gap != 0)
                 {
-                    int index = i * 4;
-                    MaskedRGB[index] = RGBWithMask[1][index];
-                    MaskedRGB[index + 1] = RGBWithMask[1][index + 1];
-                    MaskedRGB[index + 2] = RGBWithMask[1][index + 2];
-                    MaskedRGB[index + 3] = 0;
+                    //try { e.OpenColorImageFrame().Dispose(); }
+                    //catch (Exception noFrameException) { };
+                    takeFrame = true;
+                    return;
                 }
                 else
                 {
-                    int index = i * 4;
-                    MaskedRGB[index] = 0;
-                    MaskedRGB[index + 1] = 0;
-                    MaskedRGB[index + 2] = 0;
-                    MaskedRGB[index + 3] = 0;
+                    takeFrame = false;
                 }
-            }
+                /*
+                byte[][] RGBWithMask = SensorAllFramesReady(sender, e);
+                if (RGBWithMask[0] == null | RGBWithMask[1] == null)
+                    return;
 
-            ProcessFrame(MaskedRGB);
+                // Apply the mask
+                byte[] MaskedRGB = new byte[RGBWithMask[1].Length];
+                for (int i = 0; i < RGBWithMask[0].Length; i++)
+                {
+                    if (RGBWithMask[0][i] == 0)
+                    {
+                        int index = i * 4;
+                        MaskedRGB[index] = RGBWithMask[1][index];
+                        MaskedRGB[index + 1] = RGBWithMask[1][index + 1];
+                        MaskedRGB[index + 2] = RGBWithMask[1][index + 2];
+                        MaskedRGB[index + 3] = 0;
+                    }
+                    else
+                    {
+                        int index = i * 4;
+                        MaskedRGB[index] = 0;
+                        MaskedRGB[index + 1] = 0;
+                        MaskedRGB[index + 2] = 0;
+                        MaskedRGB[index + 3] = 0;
+                    }
+                }*/
+                if (null != frame_colour)
+                {
+                    byte[] rawColorImage = new byte[frame_colour.PixelDataLength];
+                    frame_colour.CopyPixelDataTo(rawColorImage);
+                    ProcessFrame(rawColorImage);
+
+                    if (null != frame_depth)
+                    {
+                        DepthImagePixel[] depthImage = new DepthImagePixel[frame_depth.PixelDataLength];
+                        frame_depth.CopyDepthImagePixelDataTo(depthImage);
+                        int newX = Math.Max(x - 150, 0);
+                        depth = depthImage[x + (y * 640)].Depth;
+                        lbl_depth.Content = depth;
+
+                        /*
+                        DepthImagePoint testDepthPoint = new DepthImagePoint();
+                        testDepthPoint.X = 320;
+                        testDepthPoint.Y = 240;
+                        ColorImagePoint newC = kinectSensor.CoordinateMapper.MapDepthPointToColorPoint(DepthImageFormat.Resolution640x480Fps30, testDepthPoint, ColorImageFormat.RgbResolution640x480Fps30);
+                        Console.WriteLine("depth point " + testDepthPoint.X + ", " + testDepthPoint.Y + " - maps to  " + newC.X + ", " + newC.Y);
+                        kinectSensor.Stop();
+                        this.Close();
+                         * */
+
+                        double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * this.x)/ 640,    4);
+                        double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (this.y - 240) * -1) / 480, 4);
+                        double y_pos2 = (y_pos * -1) + 1.05;
+                        //Console.WriteLine("Depth: " + depth + ", " + 
+                        label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
+
+                        double actual_y_skel = (y_pos2 - 1.6) * 1000;
+                        double actual_x_skel = (x_pos - 2.2) * 1000;
+                    }
+                }
+
+
+                //ProcessFrame(MaskedRGB);
+            }
         }
 
         private byte[][] SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
@@ -692,7 +740,9 @@ namespace PARSE.Tracking.Calib
                 Console.WriteLine("Right");
             }
             Target_Coordinate_Label.Content = "hasAngle: " + hasAngle + "  angle: " + angle;
-            Console.WriteLine("Eigen:  " + eigenMatrix.ToString() + "  -> e1: " + eigenvalue1 + ", e2: " + eigenvalue2 + " -> top: " + top + ", bottom: " + bottom);
+            this.x = centroidX;
+            this.y = centroidY;
+            //Console.WriteLine("Eigen:  " + eigenMatrix.ToString() + "  -> e1: " + eigenvalue1 + ", e2: " + eigenvalue2 + " -> top: " + top + ", bottom: " + bottom);
         }
         else
         {

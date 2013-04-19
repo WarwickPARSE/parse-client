@@ -25,6 +25,7 @@ namespace PARSE.Tracking.Calib
             private WriteableBitmap outputColorBitmap;
             private WriteableBitmap processedBitmap; 
             private ColorImageFormat rgbImageFormat;
+            private int pixels = 0;
 
             //RGB Constants
             private const int RedIndex = 2;
@@ -171,6 +172,8 @@ namespace PARSE.Tracking.Calib
                       frameProcessor(colorpixelData);
                       //processedcolorpixelData = colorpixelData;
 
+                      lbl_Pixels.Content = "Pixels: " + pixels;
+
                       // Output processed image
                       this.processedBitmap.WritePixels(
                           new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height),
@@ -275,7 +278,7 @@ namespace PARSE.Tracking.Calib
             {
                 Console.WriteLine("Processing frame");
 
-                int pixels = 0;
+                pixels = 0;
                 processedcolorpixelData = new byte [width * height * 4];
 
                 int hSlider = (int)slider1.Value;
@@ -315,8 +318,6 @@ namespace PARSE.Tracking.Calib
                         pixels++;
                     }                
                 }
-
-                lbl_Pixels.Content = "Pixels: " + pixels;
             }
 
             private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
