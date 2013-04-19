@@ -96,20 +96,46 @@ namespace PARSE
             db = new DatabaseEngine();
 
             //Initialize KinectInterpreter
+
+            sandra = new SpeechSynthesizer();
+            sandra.Rate = 1;
+            sandra.Volume = 100;
+            
             kinectInterp = new KinectInterpreter(vpcanvas2);
+
+            this.checkKinectIsOkay();
+
             this.kinectmenu.IsEnabled = false;
             this.newscan.IsEnabled = false;
 
             //ui initialization
             this.WindowState = WindowState.Maximized;
-            sandra = new SpeechSynthesizer();
-
+            
             //Miscellaneous modelling definitions
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
             this.resetButtons();
 
+        }
+
+        private void checkKinectIsOkay()
+        {
+            if (kinectInterp.errorFlag)
+            {
+                switch (kinectInterp.kinectSensor.Status)
+                {
+                    case KinectStatus.DeviceNotGenuine: sandra.Speak("Your Kinect is not genuine"); break;
+                    case KinectStatus.DeviceNotSupported: sandra.Speak("Your Kinect is not supported"); break;
+                    case KinectStatus.InsufficientBandwidth: sandra.Speak("Your USB connection has insufficient Bandwidth "); break;
+                    case KinectStatus.NotPowered: sandra.Speak("Your Kinect is not powered"); break;
+                    case KinectStatus.NotReady: sandra.Speak("Your Kinect is not ready"); break;
+                    case KinectStatus.Error: sandra.Speak("Your Kinect is has errored in some way"); break;
+                    case KinectStatus.Undefined: sandra.Speak("Your Kinect is has errored in an undefined way"); break;
+                    default: sandra.Speak("Call Technical Support."); break;
+                }
+                Environment.Exit(1);
+            }
         }
 
         /// <summary>
@@ -374,7 +400,8 @@ namespace PARSE
             this.shutAnyWindows();
 
             this.resetButtons();
-            
+
+            this.kinectInterp.calibrate();
             windowScanner = new ScanLoader((int)ScanLoader.OperationModes.CaptureNewCloud);
             windowScanner.Owner = this;
             windowScanner.Show();
@@ -433,12 +460,13 @@ namespace PARSE
                 if (size != 0)
                 {
                     double change = 0;
-                    change = volume - records[records.Count - 1].Item2;//may need to become volume - records[records.Count-2].Item2 later
-                    windowHistory.volchangeoutput.Content = Math.Round(100 * change / volume, 2) + "m\u00B3";
+                    change = (volume - records[records.Count - 1].Item2)/records[records.Count - 1].Item2;//may need to become records[records.Count-2].Item2 later
+                    windowHistory.volchangeoutput.Content = Math.Round(100 * change, 2) + "%";
                 }
                 else
                 {
                     windowHistory.volchangeoutput.Content = "Not Enough Info";
+                    windowHistory.volchart.Visibility = Visibility.Collapsed;
                 }
                 //setData
                 ((LineSeries)(windowHistory.volchart.Series[0])).ItemsSource = records2;

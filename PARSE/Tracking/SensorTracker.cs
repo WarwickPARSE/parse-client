@@ -34,7 +34,10 @@ namespace PARSE.Tracking
         private volatile int frameCounter = 0;          // frameCounter % gapbetweenframes ==0  -> process frame
                                                         // TODO Use this to cancel frame processing if getting behind.
         RGBTracker tracker;                             // Reference to RGBTracker
-        Color SensorHighlightColor = Brushes.Aquamarine.Color; // The colour to highlight the sensor with
+        Color SensorHighlightColor = Brushes.OrangeRed.Color; // The colour to highlight the sensor with
+        int FramesWithoutScanner = 0;                   // For how many frames has there been no sensor found?
+        int NoFramesThreshold = 5;                      // For how many frames should we ignore the fact that no sensor has been found, 
+                                                        // and continue to display a sensor highlight?
 
         // Position matching
         SkeletonPosition PositionTarget = new SkeletonPosition();   // The target position for capture
@@ -75,6 +78,8 @@ namespace PARSE.Tracking
         // Sensor position
         public int x = 0;                               // current x coordinate of sensor
         public int y = 0;                               // current y coordinate of sensor
+        private double x_actual_skel = 0;               // current x position in skel coordinates
+        private double y_actual_skel = 0;               // current y position in skel coordinates
         private int prevX = 0;                          // previous x coordinate of sensor
         private int prevY = 0;                          // previous y coordinate of sensor
         private int dx = 0;                             // change in x between frames
@@ -267,6 +272,28 @@ namespace PARSE.Tracking
 
                     //Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
+                    if (tempX == 0)
+                    {
+                        FramesWithoutScanner++;
+                        if (! (FramesWithoutScanner > NoFramesThreshold))
+                            tempX = this.prevX;
+                    }
+                    else
+                    {
+                        FramesWithoutScanner = 0;
+                    }
+
+                    if (tempY == 0)
+                    {
+                        FramesWithoutScanner++;
+                        if (!(FramesWithoutScanner > NoFramesThreshold))
+                        tempY = this.prevY;
+                    }
+                    else
+                    {
+                        FramesWithoutScanner = 0;
+                    }
+
                     lock (this)
                     {
                         // Set the position & angle
@@ -275,9 +302,19 @@ namespace PARSE.Tracking
                         this.x = tempX;
 
                         this.prevY = this.y;
-                        this.y = tempY;
                         this.dy = this.prevY - tempY;
+                        this.y = tempY;
+
                         this.angleXY = tempAngle;
+                        
+
+                        double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * tempX) / 640, 4);
+                        double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (tempY - 240) * -1) / 480, 4);
+                        double y_pos2 = (y_pos * -1) + 1.05;
+                        //label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
+                        this.y_actual_skel= (y_pos2 - 1.6) * 1000;
+                        this.x_actual_skel = (x_pos - 2.2) * 1000;
+
 
                         this.colorFrame = thisColorFrame;
                     }
@@ -383,7 +420,6 @@ namespace PARSE.Tracking
             // If not enough skeletons, not enough people. Wait for them!
             if (activeSkeletons < 2)
             {
-            if (!this.displayText.Text.Contains("Waiting for doctor and patient"))
                 this.displayText.Text = "Waiting for doctor and patient";
             }
             // If enough people (exactly)...
@@ -392,7 +428,7 @@ namespace PARSE.Tracking
                 // Wait to identify the doctor/patient by finding the scanner
                 if (!skeletonsIdentified)
                 {
-                    this.displayText.Text = "Identifying doctor & searching for scanner";
+                    this.displayText.Text = "Identifying patient & searching for scanner";
                 }
                 // Display timer as all is going so well
                 else
@@ -407,6 +443,9 @@ namespace PARSE.Tracking
                     }
                 }
             }
+
+            if (this.capture_timer_running && (this.capture_timer_length - this.captureTimer) < 10)
+                this.displayText.Text += (this.capture_timer_length - this.captureTimer);
 
             // Output processed image
             if (VisualisationOutput == null)
@@ -476,13 +515,13 @@ namespace PARSE.Tracking
                         this.captureTimer++;
                         int remaining = this.capture_timer_length - this.captureTimer;
                         if (remaining < 10)
-                            this.displayText.Text = "Capture in: " + remaining;
+                            this.displayText.Text += "Capture in: " + remaining;
                     }
                     // If distance > threshold, need to display guidance to target position
                     else
                     {
                         this.captureTimer = 0;
-                        this.displayText.Text = "Move the sensor closer, silly!";
+                        this.displayText.Text = "Move the sensor closer";
                         // TODO display instructions for moving the sensor closer?
                     }
                 }
