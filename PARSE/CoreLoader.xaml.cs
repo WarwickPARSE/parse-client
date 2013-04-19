@@ -368,7 +368,6 @@ namespace PARSE
                 this.kinectInterp.kinectSensor.Stop();
             }
             Console.WriteLine("Main Window Closed - Exiting (0)");
-            //sandra.Speak("In order to create a point cloud of a person, the tool kit must be able to isolate the person being scanned from the background environment. The act of removing the background environment is known as Background Subtraction and is a well researched problem for many applications in the computer vision field such as surveillance. Even though many background subtraction algorithms have been proposed in the literature, the problem of identifying moving objects in complex environment is still far from being completely solved.");
             Environment.Exit(0);
         }
 
@@ -401,7 +400,8 @@ namespace PARSE
             this.shutAnyWindows();
 
             this.resetButtons();
-            
+
+            this.kinectInterp.calibrate();
             windowScanner = new ScanLoader((int)ScanLoader.OperationModes.CaptureNewCloud);
             windowScanner.Owner = this;
             windowScanner.Show();
