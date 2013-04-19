@@ -661,47 +661,84 @@ namespace PARSE.Tracking
 
             SkeletonPosition skeletonPos = new SkeletonPosition();
 
-            //findArea
-            findArea(skeletonFrame[patientSkeletonID], x, y, angleXY, angleZ, skeletonPos);
+            // Update patient position
+            IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
+            if (patient.Count() == 1)
+            {
+                //findArea
+                String name = findPosition(patient.First(), skeletonPos);
+                //System.Diagnostics.Debug.WriteLine("Joint: " + name);
+            }
 
             //capture
             //capture(skeletonFrame[patientSkeletonID], x, y, angleXY, angleZ, skeletonPos);
         }
 
-        private void findArea(Skeleton pt, int x, int y, double anglexy, double anglez, SkeletonPosition sp)
+        //experiment
+        private String findPosition(Skeleton pt, SkeletonPosition sp)
         {
-            int pos = 0;
-            String bone = "no bone";
-            SkeletonBones[] allBones = new SkeletonBones[23] { new SkeletonBones(JointType.Head, JointType.ShoulderCenter), new SkeletonBones(JointType.ShoulderCenter, JointType.ShoulderLeft), new SkeletonBones(JointType.ShoulderCenter, JointType.ShoulderRight), new SkeletonBones(JointType.ShoulderCenter, JointType.Spine), new SkeletonBones(JointType.Spine, JointType.ShoulderLeft), new SkeletonBones(JointType.Spine, JointType.ShoulderRight), new SkeletonBones(JointType.Spine, JointType.HipCenter), new SkeletonBones(JointType.Spine, JointType.HipLeft), new SkeletonBones(JointType.Spine, JointType.HipRight), new SkeletonBones(JointType.HipCenter, JointType.HipLeft), new SkeletonBones(JointType.HipCenter, JointType.HipRight), new SkeletonBones(JointType.ShoulderLeft, JointType.ElbowLeft), new SkeletonBones(JointType.ElbowLeft, JointType.WristLeft), new SkeletonBones(JointType.WristLeft, JointType.HandLeft), new SkeletonBones(JointType.ShoulderRight, JointType.ElbowRight), new SkeletonBones(JointType.ElbowRight, JointType.WristRight), new SkeletonBones(JointType.WristRight, JointType.HandRight), new SkeletonBones(JointType.HipRight, JointType.KneeRight), new SkeletonBones(JointType.KneeRight, JointType.AnkleRight), new SkeletonBones(JointType.AnkleRight, JointType.FootRight), new SkeletonBones(JointType.HipLeft, JointType.KneeLeft), new SkeletonBones(JointType.KneeLeft, JointType.AnkleLeft), new SkeletonBones(JointType.AnkleLeft, JointType.FootLeft) };
-            String[] boneNames = new String[23] { "neck", "collarboneLeft", "collarboneRight", "spineTop", "chestLeft", "chestRight", "spineBottom", "stomachLeft", "stomachRight", "waistLeft", "waistRight", "upperarmLeft", "forearmLeft", "handLeft", "upperarmRight", "forearmRight", "handRight", "thighRight", "calfRight", "footRight", "thighLeft", "calfLeft", "footLeft" };
+            SkeletonPoint scannerPos = new SkeletonPoint();
 
-            int i = 0;
-            while ((i < 23) && (pos == 0))
+            System.Diagnostics.Debug.WriteLine("Finding position");
+
+            scannerPos.X = (float) -0.23765;
+            scannerPos.Y = (float) 0.36887;
+            scannerPos.Z = (float) 2.7542;
+
+            double minDist = 10;
+            String jointName = "no joint";
+
+            foreach (Joint j in pt.Joints)
             {
-                JointType j1 = allBones[i].joint1;
-                JointType j2 = allBones[i].joint2;
-
-                if (((x < pt.Joints[j1].Position.X) && (x > pt.Joints[j2].Position.X) && (y < pt.Joints[j1].Position.Y) && (y > pt.Joints[j2].Position.Y)) || ((x < pt.Joints[j2].Position.X) && (x > pt.Joints[j1].Position.X) && (y < pt.Joints[j2].Position.Y) && (y > pt.Joints[j1].Position.Y)))
+                double dist = Math.Sqrt(Math.Pow(Math.Abs(scannerPos.X - j.Position.X), 2) + Math.Pow(Math.Abs(scannerPos.Y - j.Position.Y), 2));
+                if (dist < minDist)
                 {
-                    pos = i;
-                    sp.bones = allBones[i];
-                    bone = boneNames[i];
-                    sp.boneName = bone;
+                    minDist = dist;
+                    jointName = j.JointType.ToString();
                 }
-                i++;
             }
 
-            if (bone == "no bone")
-            {
-                //if on chest
-            }
+            System.Diagnostics.Debug.WriteLine("Joint name: " + jointName);
+            System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
 
-            //print bone
-            System.Diagnostics.Debug.WriteLine(bone);
-
+            return jointName;
+            
+            
+            /**
+             * Implementation of Capture Position
+             * 
+             * *determine rotation of skeleton (only consider front and back)*
+             * 
+             * find Area
+             * convert the 3 hip joints to color point coordinates
+             * check if the scan is under the lowest one (the middle one?)
+             * if not, check if above the highest one
+             * => This divides the body into two areas: legs and upper body
+             * Problem: hands usually reach as far as half way between the waist and the knees
+             * Solution: check whether the x coordinate is further on the left and right of the hips
+             * Also, maybe request that scans on the forearms/hands are done with the hands not reaching under the waist
+             * 
+             * Legs:
+             * Determine bone - two possible methods
+             * 1) Find y and x compared to each joint. They should comply to the same color point. Store together with angle.
+             * 2) Find y (for legs or x for feet) and then use z (and x or y for feet) to determine how far back the scanner is. Store together with angle.
+             * 
+             * Upper body:
+             * 
+             * Determine whether the point is on the arms:
+             * Check if point is further than the x of each shoulder (to determine which arm if on any).
+             * Check if point is between the x (and then y) of the arm: hand-wrist, wrist-elbow, elbow-shoulder.
+             * ... should just scan with arms up?
+             * 
+             * Point not on arms:
+             * All measurements based on spine and hip centre/shoulder centre (all three or one of the last two cutting body in half based on spine).
+             * This way when scan is recalled, the measurements will first be used to make sure the person is standing in the correct way.
+             * If one of the hip/shoulder is not fixed based on the way the person is standing, it will be eliminated.
+             * Then, the other two be used to get the exact point in a similar way to the arms and legs.
+             **/
         }
 
-        private void capture(Skeleton pt, int x, int y, double anglexy, double anglez, SkeletonPosition sp)
+        /*private void capture(Skeleton pt, int x, int y, double anglexy, double anglez, SkeletonPosition sp)
         {
             JointType j1 = sp.bones.joint1;
             JointType j2 = sp.bones.joint2;
@@ -711,7 +748,7 @@ namespace PARSE.Tracking
 
             double dist1y = y - pt.Joints[j1].Position.Y;
             double dist2y = y - pt.Joints[j2].Position.Y;
-        }
+        }*/
 
         /// <summary>
         /// Call whatever is supposed to happen on the capture event
@@ -721,7 +758,7 @@ namespace PARSE.Tracking
             // TODO remove old code
 
             // old code
-            //capturePosition();
+            capturePosition();
             //this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
 
             // new code!
