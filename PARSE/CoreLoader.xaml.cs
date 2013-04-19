@@ -401,7 +401,8 @@ namespace PARSE
             this.shutAnyWindows();
 
             this.resetButtons();
-            
+
+            this.kinectInterp.calibrate();
             windowScanner = new ScanLoader((int)ScanLoader.OperationModes.CaptureNewCloud);
             windowScanner.Owner = this;
             windowScanner.Show();
