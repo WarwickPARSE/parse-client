@@ -307,14 +307,21 @@ namespace PARSE.Tracking
 
                         this.angleXY = tempAngle;
                         
-
                         double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * tempX) / 640, 4);
                         double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (tempY - 240) * -1) / 480, 4);
                         double y_pos2 = (y_pos * -1) + 1.05;
-                        //label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
-                        this.y_actual_skel= (y_pos2 - 1.6) * 1000;
-                        this.x_actual_skel = (x_pos - 2.2) * 1000;
 
+                        CoordinateMapper cm = new CoordinateMapper(kinectSensor);
+                        DepthImagePoint dp = new DepthImagePoint();
+
+                        dp.X = tempX;
+                        dp.Y = tempY;
+                        dp.Depth = 1900;
+
+                        SkeletonPoint sp = cm.MapDepthPointToSkeletonPoint(DepthImageFormat.Resolution640x480Fps30,dp);
+
+                        this.y_actual_skel = sp.Y;
+                        this.x_actual_skel = sp.X;
 
                         this.colorFrame = thisColorFrame;
                     }
@@ -704,58 +711,62 @@ namespace PARSE.Tracking
             IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
             if (patient.Count() == 1)
             {
-                //findArea
-                String name = findPosition(patient.First(), skeletonPos);
-                //System.Diagnostics.Debug.WriteLine("Joint: " + name);
+                skeletonPos.patient = patient.First();
+                findPosition(skeletonPos);
+                skeletonPos.angleXY = angleXY;
+                skeletonPos.angleZ = angleZ;
             }
-
-            //capture
-            //capture(skeletonFrame[patientSkeletonID], x, y, angleXY, angleZ, skeletonPos);
         }
 
         //experiment
-        private String findPosition(Skeleton pt, SkeletonPosition sp)
+        private void findPosition(SkeletonPosition sp)
         {
             SkeletonPoint scannerPos = new SkeletonPoint();
 
             System.Diagnostics.Debug.WriteLine("Finding position");
 
-            scannerPos.X = (float) -0.23765;
-            scannerPos.Y = (float) 0.36887;
+            scannerPos.X = (float) Math.Abs(x_actual_skel/100);
+            scannerPos.Y = (float) Math.Abs(y_actual_skel/100);
             scannerPos.Z = (float) 2.7542;
 
-            double minDist = 10;
-            String jointName = "no joint";
+            double minDist = 20;
+            Joint closestJoint = new Joint();
 
-            foreach (Joint j in pt.Joints)
+            foreach (Joint j in sp.patient.Joints)
             {
                 double dist = Math.Sqrt(Math.Pow(Math.Abs(scannerPos.X - j.Position.X), 2) + Math.Pow(Math.Abs(scannerPos.Y - j.Position.Y), 2));
+                System.Diagnostics.Debug.WriteLine(j.JointType.ToString() + " distance from sensor:" + dist);
                 if (dist < minDist)
                 {
                     minDist = dist;
-                    jointName = j.JointType.ToString();
+                    closestJoint = j;
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine("Joint name: " + jointName);
-            System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
+            sp.joint1 = closestJoint;
+            sp.jointName1 = closestJoint.JointType.ToString();
+            sp.distanceJ1 = minDist;
+            sp.offsetXJ1 = scannerPos.X - closestJoint.Position.X;
+            sp.offsetYJ1 = scannerPos.Y - closestJoint.Position.Y;
+            sp.offsetZJ1 = scannerPos.Z - closestJoint.Position.Z;
 
-            return jointName;
+            System.Diagnostics.Debug.WriteLine("Joint name: " + sp.jointName1);
+            System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
+            System.Diagnostics.Debug.WriteLine("Scanner Position: ("+x_actual_skel+","+y_actual_skel+")");
+        }
             
             
             /**
-             * Implementation of Capture Position
+             * More complicated implementation of Capture Position
              * 
              * *determine rotation of skeleton (only consider front and back)*
+             * *the scan should be done with the arms up*
              * 
              * find Area
              * convert the 3 hip joints to color point coordinates
              * check if the scan is under the lowest one (the middle one?)
              * if not, check if above the highest one
              * => This divides the body into two areas: legs and upper body
-             * Problem: hands usually reach as far as half way between the waist and the knees
-             * Solution: check whether the x coordinate is further on the left and right of the hips
-             * Also, maybe request that scans on the forearms/hands are done with the hands not reaching under the waist
              * 
              * Legs:
              * Determine bone - two possible methods
@@ -766,8 +777,8 @@ namespace PARSE.Tracking
              * 
              * Determine whether the point is on the arms:
              * Check if point is further than the x of each shoulder (to determine which arm if on any).
-             * Check if point is between the x (and then y) of the arm: hand-wrist, wrist-elbow, elbow-shoulder.
-             * ... should just scan with arms up?
+             * Check if point is between the x of the arm: hand-wrist, wrist-elbow, elbow-shoulder.
+             * Use y to make sure that the point is not on the chest area (fat people)
              * 
              * Point not on arms:
              * All measurements based on spine and hip centre/shoulder centre (all three or one of the last two cutting body in half based on spine).
@@ -775,19 +786,6 @@ namespace PARSE.Tracking
              * If one of the hip/shoulder is not fixed based on the way the person is standing, it will be eliminated.
              * Then, the other two be used to get the exact point in a similar way to the arms and legs.
              **/
-        }
-
-        /*private void capture(Skeleton pt, int x, int y, double anglexy, double anglez, SkeletonPosition sp)
-        {
-            JointType j1 = sp.bones.joint1;
-            JointType j2 = sp.bones.joint2;
-
-            double dist1x = x - pt.Joints[j1].Position.X;
-            double dist2x = x - pt.Joints[j2].Position.X;
-
-            double dist1y = y - pt.Joints[j1].Position.Y;
-            double dist2y = y - pt.Joints[j2].Position.Y;
-        }*/
 
         /// <summary>
         /// Call whatever is supposed to happen on the capture event
