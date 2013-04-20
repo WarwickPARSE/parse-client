@@ -108,6 +108,13 @@ namespace PARSE
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
 
+            //Set default working directory
+            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\PARSE"))
+            {
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\PARSE");
+            }
+            workingDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\PARSE";
+
             this.resetButtons();
 
         }
@@ -149,6 +156,73 @@ namespace PARSE
 
             verno.Content = "Version no: " + version;
 
+            //populate recent patients area if there are any
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> recentPatients = db.getAllPatients();
+
+            //use string list for representing more sensibly
+            List<String> patientInfo = new List<String>();
+
+            LinkedListNode<int> nodeID = recentPatients.Item1.First;
+            LinkedListNode<String> nodeName = recentPatients.Item2.First;
+
+            //populate datagrid
+
+            while (nodeID != null)
+            {
+                var nextID = nodeID.Next;
+                var nextName = nodeName.Next;
+
+                recentPatients.Item1.Remove(nodeID);
+                recentPatients.Item2.Remove(nodeName);
+
+                //null check when at end of list
+                if (nodeID != null)
+                {
+                    patientInfo.Add(nodeID.Value + " - " + nodeName.Value); 
+                }
+
+                nodeID = nextID;
+                nodeName = nextName;
+
+            }
+
+            //add up to 5 recent patients
+            if (patientInfo.Count != 0)
+            {
+                foreach (String p in patientInfo)
+                {
+                    System.Windows.Controls.Label linklabel = new System.Windows.Controls.Label();
+                    Run linktext = new Run(p);
+                    Hyperlink link = new Hyperlink(linktext);
+
+                    link.Click += new RoutedEventHandler(recentpatientlink_Click);
+                    linklabel.Content = link;
+
+                    sp1.Children.Add(linklabel);
+                }
+
+                recentpatients.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+
+                recentpatients.Visibility = Visibility.Visible;
+
+            }
+
+        }
+
+        void recentpatientlink_Click(object sender, RoutedEventArgs e)
+        {
+            windowMeta = new MetaLoader();
+            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            windowMeta.Owner = this;
+            windowMeta.button3.Visibility = Visibility.Collapsed;
+            windowMeta.Show();
+
+            this.export2.IsEnabled = true;
+
+            windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
         }
 
         /// <summary>
@@ -408,7 +482,7 @@ namespace PARSE
             windowHistory.voloutput.Content = volume + "m\u00B3";
             windowHistory.heightoutput.Content = HeightCalculator.getHeight(pcd) + "m";
             windowHistory.scantime.Content = "Weight (Est): " + VolumeCalculator.calculateApproxWeight(volume) + "kg";
-            windowHistory.scanfileref.Content = "BMI Measure: " + VolumeCalculator.calculateBMI(VolumeCalculator.calculateApproxWeight(volume),HeightCalculator.getHeight(pcd));
+            windowHistory.scanfileref.Content = "BMI Measure: " + VolumeCalculator.calculateBMI(HeightCalculator.getHeight(pcd), VolumeCalculator.calculateApproxWeight(volume));
             windowHistory.scanvoxel.Content = "Siri (%BF): " + VolumeCalculator.calculateSiri(volume, VolumeCalculator.calculateApproxWeight(volume), HeightCalculator.getHeight(pcd)) + "%";
             
             //show Runtime viewer (aka results,history)
@@ -698,6 +772,8 @@ namespace PARSE
             windowMeta.Owner = this;
             windowMeta.button3.Visibility = Visibility.Collapsed;
             windowMeta.Show();
+
+            this.export2.IsEnabled = true;
 
             windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
 
@@ -1051,18 +1127,45 @@ namespace PARSE
 
         private void SaveScan_Click(object sender, RoutedEventArgs e)
         {
-            windowMeta = new MetaLoader();
-            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            windowMeta.Owner = this;
-            
-            //save specific actions.
-            windowMeta.Title = "Attribute scan to whom?";
-            windowMeta.button1.Visibility = Visibility.Collapsed;
-            windowMeta.button2.Visibility = Visibility.Collapsed;
-            windowMeta.button3.Visibility = Visibility.Visible;
-            windowMeta.Show();
 
-            windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
+            //Test if patientloader is currently active and then attribute the scan to them.
+            //Otherwise if this is not the case, we need to manually attribute the scan to 
+            //a patient.
+
+            DateTime curTime = DateTime.Now;
+
+            if (windowPatient == null)
+            {
+
+                windowMeta = new MetaLoader();
+                windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                windowMeta.Owner = this;
+
+                //save specific actions.
+                windowMeta.setWorkingDir(workingDir);
+                windowMeta.setPC(pcdl);
+                windowMeta.Title = "Attribute scan to whom?";
+                windowMeta.button1.Visibility = Visibility.Collapsed;
+                windowMeta.button2.Visibility = Visibility.Collapsed;
+                windowMeta.button3.Visibility = Visibility.Visible;
+                windowMeta.Show(); 
+            
+            }
+            else
+            {
+                int currentPatient = Convert.ToInt32(windowPatient.patientIDExisting.Content);
+
+                //save to db and workingdirectory with appropriate id.
+
+                db.insertScans(1, currentPatient, System.IO.Path.Combine(workingDir,currentPatient + "-" + curTime.ToString("ddMMyyyyHHMM") + ".PARSE"), "",curTime);
+
+                //save scan to .parse file in the working directory
+                ScanSerializer.serialize(System.IO.Path.Combine(workingDir, currentPatient + "-" + curTime.ToString("ddMMyyyyHHMM") + ".PARSE"), pcdl);
+
+                MessageBoxResult result = System.Windows.MessageBox.Show(this, "Patient saved to database", "Patient Scan Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            }
+
         }
 
         public List<Tuple<DateTime, double>> getTimeStampsAndVals(int patientID)
@@ -1100,8 +1203,15 @@ namespace PARSE
             for (int i = 0; i < outputTimes.Count; i++)
             {
                 //if this crashes, talk to Bernard cause it works on my machine :p
-                double value = db.getScanResult(outputScans[i]).Item4.First.Value;
-                output.Add(Tuple.Create(outputTimes[i], value));
+                try
+                {
+                    double value = db.getScanResult(outputScans[i]).Item4.First.Value;
+                    output.Add(Tuple.Create(outputTimes[i], value));
+                }
+                catch (Exception err)
+                {
+                    //Shh
+                }
             }
 
             return output;

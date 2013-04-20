@@ -32,7 +32,7 @@
         <MenuItem Header="_File">
             <MenuItem Header="_New Patient" IsCheckable="false"/>
             <MenuItem Header="_Open Patient" Click="OpenPatient_Click" />
-            <MenuItem Header="_Save Patient" />
+            <MenuItem Header="_Save Patient" Click="SaveScan_Click"/>
             <Separator/>
             <MenuItem Header="Exit" Click="MenuItem_Exit"/>
         </MenuItem>
@@ -130,9 +130,11 @@
             <!-- Recent patients text block -->
             <Label Content="Recent Patients" Height="28" Name="label1" Width="109" FontWeight="Bold" FontSize="14" Grid.Row="0" Grid.Column="1"  />
 
-            <TextBlock Margin="0" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"  Name="recentpatients" HorizontalAlignment="Center">
-                <Label Content="No recent patients" FontStyle="Italic" />
-            </TextBlock>
+            <StackPanel Name="sp1" Margin="65,0,10,10" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" HorizontalAlignment="Left">
+                <TextBlock Margin="0" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"  Name="recentpatients" HorizontalAlignment="Center">
+                    <Label Content="No recent patients" FontStyle="Italic"  />
+                </TextBlock>
+            </StackPanel>
             
       </Grid>
         <!-- Version Number -->
