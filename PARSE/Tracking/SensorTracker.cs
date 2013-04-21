@@ -307,14 +307,21 @@ namespace PARSE.Tracking
 
                         this.angleXY = tempAngle;
                         
-
                         double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * tempX) / 640, 4);
                         double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (tempY - 240) * -1) / 480, 4);
                         double y_pos2 = (y_pos * -1) + 1.05;
-                        //label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
-                        this.y_actual_skel= (y_pos2 - 1.6) * 1000;
-                        this.x_actual_skel = (x_pos - 2.2) * 1000;
 
+                        CoordinateMapper cm = new CoordinateMapper(kinectSensor);
+                        DepthImagePoint dp = new DepthImagePoint();
+
+                        dp.X = tempX;
+                        dp.Y = tempY;
+                        dp.Depth = 1900;
+
+                        SkeletonPoint sp = cm.MapDepthPointToSkeletonPoint(DepthImageFormat.Resolution640x480Fps30,dp);
+
+                        this.y_actual_skel = sp.Y;
+                        this.x_actual_skel = sp.X;
 
                         this.colorFrame = thisColorFrame;
                     }
@@ -697,7 +704,88 @@ namespace PARSE.Tracking
         private void capturePosition()
         {
             Console.WriteLine("Capture position!!!");
+
+            SkeletonPosition skeletonPos = new SkeletonPosition();
+
+            // Update patient position
+            IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
+            if (patient.Count() == 1)
+            {
+                skeletonPos.patient = patient.First();
+                findPosition(skeletonPos);
+                skeletonPos.angleXY = angleXY;
+                skeletonPos.angleZ = angleZ;
+            }
         }
+
+        //experiment
+        private void findPosition(SkeletonPosition sp)
+        {
+            SkeletonPoint scannerPos = new SkeletonPoint();
+
+            System.Diagnostics.Debug.WriteLine("Finding position");
+
+            scannerPos.X = (float) Math.Abs(x_actual_skel/100);
+            scannerPos.Y = (float) Math.Abs(y_actual_skel/100);
+            scannerPos.Z = (float) 2.7542;
+
+            double minDist = 20;
+            Joint closestJoint = new Joint();
+
+            foreach (Joint j in sp.patient.Joints)
+            {
+                double dist = Math.Sqrt(Math.Pow(Math.Abs(scannerPos.X - j.Position.X), 2) + Math.Pow(Math.Abs(scannerPos.Y - j.Position.Y), 2));
+                System.Diagnostics.Debug.WriteLine(j.JointType.ToString() + " distance from sensor:" + dist);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closestJoint = j;
+                }
+            }
+
+            sp.joint1 = closestJoint;
+            sp.jointName1 = closestJoint.JointType.ToString();
+            sp.distanceJ1 = minDist;
+            sp.offsetXJ1 = scannerPos.X - closestJoint.Position.X;
+            sp.offsetYJ1 = scannerPos.Y - closestJoint.Position.Y;
+            sp.offsetZJ1 = scannerPos.Z - closestJoint.Position.Z;
+
+            System.Diagnostics.Debug.WriteLine("Joint name: " + sp.jointName1);
+            System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
+            System.Diagnostics.Debug.WriteLine("Scanner Position: ("+x_actual_skel+","+y_actual_skel+")");
+        }
+            
+            
+            /**
+             * More complicated implementation of Capture Position
+             * 
+             * *determine rotation of skeleton (only consider front and back)*
+             * *the scan should be done with the arms up*
+             * 
+             * find Area
+             * convert the 3 hip joints to color point coordinates
+             * check if the scan is under the lowest one (the middle one?)
+             * if not, check if above the highest one
+             * => This divides the body into two areas: legs and upper body
+             * 
+             * Legs:
+             * Determine bone - two possible methods
+             * 1) Find y and x compared to each joint. They should comply to the same color point. Store together with angle.
+             * 2) Find y (for legs or x for feet) and then use z (and x or y for feet) to determine how far back the scanner is. Store together with angle.
+             * 
+             * Upper body:
+             * 
+             * Determine whether the point is on the arms:
+             * Check if point is further than the x of each shoulder (to determine which arm if on any).
+             * Check if point is between the x of the arm: hand-wrist, wrist-elbow, elbow-shoulder.
+             * Use y to make sure that the point is not on the chest area (fat people)
+             * 
+             * Point not on arms:
+             * All measurements based on spine and hip centre/shoulder centre (all three or one of the last two cutting body in half based on spine).
+             * This way when scan is recalled, the measurements will first be used to make sure the person is standing in the correct way.
+             * If one of the hip/shoulder is not fixed based on the way the person is standing, it will be eliminated.
+             * Then, the other two be used to get the exact point in a similar way to the arms and legs.
+             **/
 
         /// <summary>
         /// Call whatever is supposed to happen on the capture event
@@ -707,7 +795,7 @@ namespace PARSE.Tracking
             // TODO remove old code
 
             // old code
-            //capturePosition();
+            capturePosition();
             //this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
 
             // new code!
