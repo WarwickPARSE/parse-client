@@ -120,6 +120,12 @@ namespace PARSE.ICP.Stitchers
             double radius = spacingDistance * Math.Sqrt(3);
 
             //sort the points into groups
+            DenseMatrix[] cell_group_static = cell(points_group);
+
+            for (int i = 0; i < points_group.GetLength(1); i++) { 
+                
+            }
+
         }
         
 
@@ -395,6 +401,7 @@ namespace PARSE.ICP.Stitchers
             
             return res; 
         }
+
     }
 
 }
