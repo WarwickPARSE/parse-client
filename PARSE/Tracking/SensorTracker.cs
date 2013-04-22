@@ -487,6 +487,8 @@ namespace PARSE.Tracking
                 if ((this.dx < 10 & this.dy < 10 & this.x != 0 & this.y != 0)
                     &&
                      (temp_activeSkeletons == 2)
+                    &&
+                    skeletonsIdentified == true
                     )
                 {
                     this.captureTimer++;
@@ -542,7 +544,7 @@ namespace PARSE.Tracking
         {
             System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
 
-            if (skeletonFrame != null & activeSkeletons == 2)
+            if (skeletonFrame != null & activeSkeletons == 2 & x!=0 & y!=0)
             {
                 Skeleton[] frame;
 
@@ -553,7 +555,14 @@ namespace PARSE.Tracking
 
                 int doctorID = -1;
                 int patientID = -1;
-                float distance = float.MaxValue;
+                double distance = 1.9;
+
+                double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * x) / 640, 4);
+                double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (y - 240) * -1) / 480, 4);
+                double y_pos2 = (y_pos * -1) + 1.05;
+
+                Console.WriteLine("Sensor position in real = " + x_pos + ", " + y_pos2);
+
                 for (int person = 0; person < frame.Length; person++)
                 {
                     if (frame[person].TrackingState == SkeletonTrackingState.Tracked)
@@ -561,7 +570,8 @@ namespace PARSE.Tracking
                         float left_hand_X = frame[person].Joints[JointType.HandLeft].Position.X;
                         float left_hand_Y = frame[person].Joints[JointType.HandLeft].Position.Y;
 
-                        float left_hand_distance = (float)Math.Pow((Math.Pow(((double)(left_hand_X - x)), 2) + Math.Pow(((double)(left_hand_Y - y)), 2)), 0.5);
+                        float left_hand_distance = (float)Math.Pow((Math.Pow(((double)(left_hand_X - x_pos)), 2) + Math.Pow(((double)(left_hand_Y - y_pos2)), 2)), 0.5);
+                        Console.WriteLine("Found Lhand on skeleton " + frame[person].TrackingId + " hand position = " + frame[person].Joints.Where(Joint => Joint.JointType == JointType.HandLeft).First().Position.X + " -> distance = " + left_hand_distance);
                         if (left_hand_distance < distance)
                         {
                             distance = left_hand_distance;
@@ -571,7 +581,8 @@ namespace PARSE.Tracking
                         float right_hand_X = frame[person].Joints[JointType.HandRight].Position.X;
                         float right_hand_Y = frame[person].Joints[JointType.HandRight].Position.Y;
 
-                        float right_hand_distance = (float)Math.Pow((Math.Pow(((double)(right_hand_X - x)), 2) + Math.Pow(((double)(right_hand_Y - y)), 2)), 0.5);
+                        float right_hand_distance = (float)Math.Pow((Math.Pow(((double)(right_hand_X - x_pos)), 2) + Math.Pow(((double)(right_hand_Y - y_pos2)), 2)), 0.5);
+                        Console.WriteLine("Found Rhand on skeleton " + frame[person].TrackingId + " hand position = " + frame[person].Joints.Where(Joint => Joint.JointType == JointType.HandRight).First().Position.X + " -> distance = " + right_hand_distance);
                         if (right_hand_distance < distance)
                         {
                             distance = right_hand_distance;
@@ -581,7 +592,7 @@ namespace PARSE.Tracking
                 }
 
                 // Found a doctor!
-                if (distance < 30 & doctorID != -1)
+                if (distance < 10 & doctorID != -1)
                 {
                     //  Try to find the patient
                     for (int index = 0; index < frame.Length; index++)

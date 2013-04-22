@@ -23,7 +23,7 @@
         <Slider Height="23" HorizontalAlignment="Left" Margin="24,243,0,0" Name="rgbSlider_RED" VerticalAlignment="Top" Width="253" Maximum="255" SmallChange="1" ValueChanged="rgbSlider_RED_ValueChanged" Grid.Row="1" />
         <Slider Height="23" HorizontalAlignment="Left" Margin="24,518,0,0" Name="rgbSlider_GREEN" VerticalAlignment="Top" Width="253" ValueChanged="RGBSlider_GREEN_ValueChanged" SmallChange="1" Maximum="255" Grid.Row="1" />
         <Slider Height="23" HorizontalAlignment="Left" Margin="313,243,0,0" Name="rgbSlider_BLUE" VerticalAlignment="Top" Width="253" Maximum="255" SmallChange="1" ValueChanged="rgbSlider_BLUE_ValueChanged" Grid.Row="1" />
-        <Slider Height="23" HorizontalAlignment="Left" Margin="810,587,0,0" Name="rgbSlider_range" VerticalAlignment="Top" Width="100" Maximum="100" SmallChange="1" Grid.Row="1" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="810,587,0,0" Name="rgbSlider_range" VerticalAlignment="Top" Width="100" Maximum="100" SmallChange="1" Grid.Row="1" LargeChange="10" Minimum="1" />
         <GroupBox Header="Processed Image" Height="500" HorizontalAlignment="Left" Margin="592,23,0,0" Name="groupBox2" VerticalAlignment="Top" Width="740" Grid.Row="1" Grid.ColumnSpan="2">
             <Grid Width="640" Height="480">
                 <Grid.ColumnDefinitions>
@@ -56,6 +56,6 @@
         <Label Content="Target found at:" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,539,0,0" Name="Target_Coordinate_Label" VerticalAlignment="Top" Width="294" Grid.Column="1" />
         <Label Content="Pixels: " Grid.Column="1" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,573,0,0" Name="lbl_pixelsfound" VerticalAlignment="Top" Width="290" VerticalContentAlignment="Center" />
         <Label Content="Depth" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,607,0,0" Name="lbl_depth" VerticalAlignment="Top" Grid.Column="1" Width="215" />
-        <Label Content="Position" Grid.Row="1" Height="84" HorizontalAlignment="Left" Margin="12,607,0,0" Name="label3" VerticalAlignment="Top" Width="957" FontSize="60" />
+        <Label Content="Position" Grid.Row="1" Height="84" HorizontalAlignment="Left" Margin="12,607,0,0" Name="label3" VerticalAlignment="Top" Width="957" FontSize="16" />
     </Grid>
 </Window>
