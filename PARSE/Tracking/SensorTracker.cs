@@ -555,9 +555,11 @@ namespace PARSE.Tracking
 
                 int doctorID = -1;
                 int patientID = -1;
-                double distance = 1.9;
+                double distance = 0.5;
 
-                double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * x) / 640, 4);
+                //double x_pos = Math.Round((2.2 * 2 * Math.Tan(28.5) * (x - 320)) / 640, 4);
+                double x_pos = 0.00425 * (this.x - 320);
+
                 double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (y - 240) * -1) / 480, 4);
                 double y_pos2 = (y_pos * -1) + 1.05;
 

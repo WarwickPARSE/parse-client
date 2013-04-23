@@ -406,14 +406,16 @@ namespace PARSE.Tracking.Calib
                         this.Close();
                          * */
 
-                        double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * this.x)/ 640,    4);
+                        //double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * (this.x - 320))/ 640,    4);
+                        double x_pos = 0.00425 * (this.x - 320);
+
                         double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (this.y - 240) * -1) / 480, 4);
                         double y_pos2 = (y_pos * -1) + 1.05;
                         //Console.WriteLine("Depth: " + depth + ", " + 
                         label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
 
                         double actual_y_skel = (y_pos2 - 1.6) * 1000;
-                        double actual_x_skel = (x_pos - 2.2) * 1000;
+                        //double actual_x_skel = (x_pos - 2.2) * 1000;
                     }
                 }
 
