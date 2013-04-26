@@ -522,10 +522,6 @@ namespace PARSE
                 windowHistory.volchangeoutput.Content = "Not Enough Info";
                 windowHistory.volchart.Visibility = Visibility.Collapsed;
             }
-
-            System.Media.SoundPlayer player = new System.Media.SoundPlayer();
-            player.SoundLocation = "Base.wav";
-            player.Play();
             
         }
 
@@ -615,25 +611,28 @@ namespace PARSE
                 this.export2.IsEnabled = false;
             }
 
+            int numPoints = pcdl[0].getAllPoints().Length + pcdl[1].getAllPoints().Length + pcdl[2].getAllPoints().Length + pcdl[3].getAllPoints().Length;
+
+            //start subroutine to save to the PCD File's in a new directory
+            TextWriter tw = new StreamWriter(filename);
+
+            //write versioning info
+            tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
+            tw.WriteLine("VERSION 1.6");
+
+            //write metadata
+            tw.WriteLine("FIELDS x y z rgb");
+            tw.WriteLine("SIZE 4 4 4 4");
+            tw.WriteLine("TYPE F F F F");
+            tw.WriteLine("COUNT 1 1 1 1");
+            tw.WriteLine("WIDTH " + numPoints);
+            tw.WriteLine("HEIGHT 1");
+            tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
+            tw.WriteLine("POINTS " + numPoints);
+            tw.WriteLine("DATA ascii");
+
             for (int j = 0; j < pcdl.Count; j++)
             {
-                //start subroutine to save to the PCD File's in a new directory
-                TextWriter tw = new StreamWriter(filename+"_"+j);
-
-                //write versioning info
-                tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
-                tw.WriteLine("VERSION 1.6");
-
-                //write metadata
-                tw.WriteLine("FIELDS x y z rgb");
-                tw.WriteLine("SIZE 4 4 4 4");
-                tw.WriteLine("TYPE F F F F");
-                tw.WriteLine("COUNT 1 1 1 1");
-                tw.WriteLine("WIDTH " + pcdl[j].getAllPoints().Length);
-                tw.WriteLine("HEIGHT 1");
-                tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
-                tw.WriteLine("POINTS " + pcdl[j].getAllPoints().Length);
-                tw.WriteLine("DATA ascii");
 
                 //store all points.
                 //pc.rotate(new double[] { 0, 1, 0 }, -90);
@@ -646,8 +645,11 @@ namespace PARSE
                     tw.WriteLine(point[i].point.X + " " + point[i].point.Y + " " + point[i].point.Z + " 4.2108e+06");
                 }
 
-                tw.Close();
             }
+
+            tw.Close();
+
+            MessageBoxResult result = System.Windows.MessageBox.Show(this, "Patient scan exported to .PCD ("+filename+")", "Scan successfully exported", MessageBoxButton.OK, MessageBoxImage.Information);
 
         }
 
@@ -766,6 +768,9 @@ namespace PARSE
         {
 
             //Load metaloader with list of currently recorded patients provide the option to just load point cloud if required.
+
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = true;
 
             windowMeta = new MetaLoader();
             windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -961,6 +966,7 @@ namespace PARSE
         private void OpenPatient_Click(object sender, RoutedEventArgs e)
         {
             this.LoadPointCloudFromFile();
+
         }
 
         /// <summary>
@@ -970,7 +976,9 @@ namespace PARSE
 
         public void LoadPointCloudFromFile(int patientid=0)
         {
-            
+
+            //set active point cloud controls.
+
             LinkedListNode<int> scanID;
             LinkedListNode<DateTime> timestamp;
             DateTime latestScanTime = new DateTime();
@@ -1073,7 +1081,7 @@ namespace PARSE
 
                 // Do UI stuff on UI thread
                 this.export1.IsEnabled = false;
-                this.export2.IsEnabled = false;
+                this.export2.IsEnabled = true;
                 this.removefloor.IsEnabled = true;
 
                 //define
