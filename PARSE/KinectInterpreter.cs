@@ -73,6 +73,9 @@ namespace PARSE
 
         public String instruction = "Waiting for patient...";
 
+        //used to pass the fact an error has occured
+        public Boolean errorFlag { get; private set; }
+
         //Visualisation definitions
         private int                                     visMode;
 
@@ -89,6 +92,7 @@ namespace PARSE
 
         public KinectInterpreter(Canvas c)
         {
+            errorFlag = false;
             kinectReady = false;
             color = blue;
 
@@ -104,8 +108,9 @@ namespace PARSE
                 this.kinectSensor = KinectSensor.KinectSensors[0];
                 this.kinectStatus = "Initialized";
 
-                this.depthPixels = new DepthImagePixel[this.kinectSensor.DepthStream.FramePixelDataLength];
-
+                try
+                {
+                    this.depthPixels = new DepthImagePixel[this.kinectSensor.DepthStream.FramePixelDataLength];
                 // Allocate space to put the color pixels we'll create
                 this.colorPixels = new byte[this.kinectSensor.ColorStream.FramePixelDataLength];
 
@@ -122,6 +127,13 @@ namespace PARSE
 
                 //Skeleton data
                 skeletonData = new Skeleton[6];
+
+                }
+                catch (Exception sillyState)
+                {
+                    errorFlag = true;
+                }
+                
             }
             
         }
@@ -190,6 +202,7 @@ namespace PARSE
         /// <returns>Boolean</returns>
         public Boolean isSkeletonEnabled()
         {
+            //random 4am commit :p
             return this.kinectSensor.SkeletonStream.IsEnabled;
         }
 

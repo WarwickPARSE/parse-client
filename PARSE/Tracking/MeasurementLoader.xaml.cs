@@ -62,6 +62,9 @@ namespace PARSE
             instructionblock.Visibility = Visibility.Collapsed;
             instructionblock2.Text = "Loading...";
             instructionblock2.Visibility = Visibility.Visible;
+
+            // TODO move the button to the edge but keep it visible
+            cancel_scan.Visibility = Visibility.Hidden;
             
             System.Diagnostics.Debug.WriteLine("Starting measurement window...");
 

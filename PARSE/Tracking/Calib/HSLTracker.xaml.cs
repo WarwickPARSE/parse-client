@@ -25,6 +25,9 @@ namespace PARSE.Tracking.Calib
             private WriteableBitmap outputColorBitmap;
             private WriteableBitmap processedBitmap; 
             private ColorImageFormat rgbImageFormat;
+            private int pixels = 0;
+
+            int[] rowHeaders;
 
             //RGB Constants
             private const int RedIndex = 2;
@@ -92,17 +95,11 @@ namespace PARSE.Tracking.Calib
 
                     Console.WriteLine("Done! Waiting for frames...");
 
-                    //while (true)
+                    // Get row pointers
+                    rowHeaders = new int[480];
+                    for (int row = 0; row < 480; row++)
                     {
-                        //BitmapSource nextFrameBS = interpreter.getRGBTexture();
-                        //if (nextFrameBS != null)
-                        //procImage.Source = nextFrame;
-                        /*
-                        System.Threading.Thread.BeginCriticalRegion();
-                        ColorImageFrame currentFrame = nextFrame;
-                        processFrame(currentFrame);
-                        System.Threading.Thread.EndCriticalRegion();
-                        */
+                        rowHeaders[row] = row * 640 * 4;
                     }
                 }
                 else
@@ -115,20 +112,25 @@ namespace PARSE.Tracking.Calib
           private void ColorImageReady(object sender, ColorImageFrameReadyEventArgs e)
           {
               //Console.WriteLine("frame ready!");
-
-              if(this.nextFrame != null)
+              frames += 1;
+              
+              /*if(this.nextFrame != null)
               {
                   this.nextFrame.Dispose();
               }
+              */
 
-              ColorImageFrame nextFrame = e.OpenColorImageFrame();
-
-              //processFrame(e.OpenColorImageFrame());
-              processFrame(nextFrame);
+              if (frames % 10 == 0)
+              {
+                  ColorImageFrame nextFrame = e.OpenColorImageFrame();
+                  //processFrame(e.OpenColorImageFrame());
+                  processFrame(nextFrame);
+              }
           }
 
           private void processFrame(ColorImageFrame colorFrame)
           {
+              //Console.WriteLine("Processing frame");
               //using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
               {
                   if (colorFrame != null)
@@ -150,6 +152,8 @@ namespace PARSE.Tracking.Calib
                           //Console.WriteLine("Frame written");
                       }
 
+                      
+
                       colorFrame.CopyPixelDataTo(this.colorpixelData);
 
                       // Output raw image
@@ -166,6 +170,11 @@ namespace PARSE.Tracking.Calib
                       frameProcessor(colorpixelData);
                       //processedcolorpixelData = colorpixelData;
 
+                      lbl_Pixels.Content = "Pixels: " + pixels;
+
+                     
+
+
                       // Output processed image
                       this.processedBitmap.WritePixels(
                           new Int32Rect(0, 0, colorFrame.Width, colorFrame.Height),
@@ -176,7 +185,7 @@ namespace PARSE.Tracking.Calib
                       this.rgbImageFormat = colorFrame.Format;
 
                       this.procImage.Source = this.processedBitmap;
-                      //Console.WriteLine("Frame written");
+                      Console.WriteLine("Frame written");
 
                       colorFrame.Dispose();
                   }
@@ -237,31 +246,6 @@ namespace PARSE.Tracking.Calib
 
                 }
 
-                /*
-                int HIndex = 0;
-                int SIndex = 1;
-                int LIndex = 2;
-                
-                //for (int i = 0; i < (rgbImage.Length / 4); i += 1)
-                int i = 0;
-                {
-                    int index = i * 4;
-
-                    byte r = rgbImage[(index + RedIndex)];
-                    byte g = rgbImage[(index + GreenIndex)];
-                    byte b = rgbImage[(index + BlueIndex)];
-
-                    System.Drawing.Color drawColor = System.Drawing.Color.FromArgb(r, g, b);
-                    hslImage[(index + HIndex)] = (byte)(drawColor.GetHue()*255);
-                    hslImage[(index + SIndex)] = (byte)(drawColor.GetSaturation()*255);
-                    hslImage[(index + LIndex)] = (byte)(drawColor.GetBrightness()*255);
-
-                    hslImage[(index + HIndex)] = 128;
-                    hslImage[(index + SIndex)] = 128;
-                    hslImage[(index + LIndex)] = 128;
-
-                }
-                */
                 return hslImage;
                 //return rgbImage;
             }
@@ -270,6 +254,7 @@ namespace PARSE.Tracking.Calib
             {
                 //Console.WriteLine("Processing frame");
 
+                pixels = 0;
                 processedcolorpixelData = new byte [width * height * 4];
 
                 int hSlider = (int)slider1.Value;
@@ -290,22 +275,54 @@ namespace PARSE.Tracking.Calib
                 double lMax = lSlider + range;// + 10;// *1 + range;
                 lMax = Math.Min(lMax, 255);
                 lMin = Math.Max(lMin, 0);
-            
 
-                for (int i = 0; i < (image.Length / 4); i+=1)
-                {
-                    // See where things are!
-                    if (
-                        image[i*4] > hMin & image[i*4] < hMax &
-                        image[i*4 + 1] > sMin & image[i*4 + 1] < sMax &
-                        image[i*4 + 2] > lMin & image[i*4 + 2] < lMax
-                        )
+                //Console.WriteLine("Hmin/max:  " + hMin + ", " + hMax + " - S: " + sMin + ", " + sMax + " -L: " + lMin + ", " + lMax);
+
+                int centroidX = 0;
+                int centroidY = 0;
+                int ind = 0;
+
+                //for (int i = 0; i < (image.Length / 4); i+=1)
+
+                for (int x = 0; x < 640; x++)
+                    for (int y = 0; y < 480; y++)
                     {
-                        processedcolorpixelData[i*4] = 255;
-                        processedcolorpixelData[i*4 + 1] = 255;
-                        processedcolorpixelData[1*4 + 2] = 255;
-                        processedcolorpixelData[i*4 + 3] = image[i*4 + 3];
-                    }                
+                        ind = 640 * 4 * y + 4 * x;
+                        if (
+                            image[ind] > hMin & image[ind] < hMax &
+                            image[ind + 1] > sMin & image[ind + 1] < sMax &
+                            image[ind + 2] > lMin & image[ind + 2] < lMax
+                        )
+                        {
+                            processedcolorpixelData[ind] = 255;
+                            processedcolorpixelData[ind +1] = 255;
+                            processedcolorpixelData[ind + 2] = 255;
+                            processedcolorpixelData[ind + 3] = 255;
+                            pixels++;
+                            centroidX += x;
+                            centroidY += y;
+                        }
+
+                    }
+
+                if (pixels > 0)
+                {
+                    centroidX = (int)Math.Floor((double)(centroidX / pixels));
+                    centroidY = (int)Math.Floor((double)(centroidY / pixels));
+
+                    for (int row = centroidY - 4; row < centroidY + 4; row++)
+                        for (int col = centroidX - 4; col < centroidX + 4; col++)
+                        {
+                            if (row > 0 & col > 0 & row < 480 & col < 640)
+                            {
+                                int index = rowHeaders[row] + col * 4;
+                                processedcolorpixelData[index] = 0;
+                                processedcolorpixelData[index + 1] = 255;
+                                processedcolorpixelData[index + 2] = 0;
+                                processedcolorpixelData[index + 3] = 0;
+                                Console.WriteLine("Index = " + index + " - coords = " + centroidX + ", " + centroidY);
+                            }
+                        }
                 }
             }
 
