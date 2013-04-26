@@ -45,7 +45,7 @@
                 <MenuItem Header="Load Markerless Scan" Name="measurementload" IsEnabled="{Binding}" />
                 <Separator/>
                 <MenuItem Header="Options..." Name="options" IsEnabled="{Binding}">
-                    <MenuItem Header="Remove Their Feet" Name="removefloor" IsEnabled="{Binding}" IsCheckable="False" Click="RemoveFeet_Click"/>
+                    <MenuItem Header="Remove Ground Plane" Name="removefloor" IsEnabled="{Binding}" IsCheckable="False" Click="RemoveFeet_Click"/>
                 </MenuItem>
                 <MenuItem Header="Export..." Name="export" IsEnabled="True">
                     <MenuItem Header="Export Scan to .PARSE" Name="export1" IsEnabled="True" IsCheckable="False" Click="ExportScan_Click"/>
