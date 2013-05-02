@@ -68,9 +68,9 @@ namespace PARSE.Tracking
             for (int i = 0; i < (image.Length / 4); i += 1)
             {
                 if (
-                    image[i * 4 + 2] > 155 & image[i * 4 + 2] < 225 &     // RED
-                    image[i * 4 + 1] > 155 & image[i * 4 + 1] < 225 &   // GREEN
-                    image[i * 4] > 0 & image[i * 4] < 70             // BLUE
+                    image[i * 4 + 2] > 150 & image[i * 4 + 2] < 210 &     // RED
+                    image[i * 4 + 1] > 150 & image[i * 4 + 1] < 210 &   // GREEN
+                    image[i * 4] > 25 & image[i * 4] < 80             // BLUE
                     )
                 {
                     processedcolorpixelData[i * 4] = 255;
@@ -78,6 +78,9 @@ namespace PARSE.Tracking
                     processedcolorpixelData[1 * 4 + 2] = 255;
                     processedcolorpixelData[i * 4 + 3] = image[i * 4 + 3];
                 }
+
+                // was 190, 190, 35 +- 35
+                // Try 160, 160, 30 +- 30
             }
 
             return processedcolorpixelData;
