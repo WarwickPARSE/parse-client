@@ -1,6 +1,7 @@
 //System imports
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -45,6 +46,8 @@ namespace PARSE.Tracking.Calib
         public int realDepth;
         public int x;
         public int y;
+        private double x_actual;
+        private double y_actual;
         public int s = 4;
         public bool pc = false;
 
@@ -81,6 +84,7 @@ namespace PARSE.Tracking.Calib
                 //Enable streams
                 kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+                kinectSensor.SkeletonStream.Enable();
 
                 Console.WriteLine("Starting kinect");
 
@@ -186,7 +190,7 @@ namespace PARSE.Tracking.Calib
 
 
                         lbl_pixelsfound.Content = "Pixels: " + pixels;
-                        Console.WriteLine("Frame written?");
+                        //Console.WriteLine("Frame written?");
 
                     }
 
@@ -343,6 +347,7 @@ namespace PARSE.Tracking.Calib
             //if (!takeFrame)
             using(ColorImageFrame frame_colour = e.OpenColorImageFrame() )
             using(DepthImageFrame frame_depth = e.OpenDepthImageFrame() )
+            using(SkeletonFrame frame_skel = e.OpenSkeletonFrame() )
             {
                 frames++;
                 if (frames % gap != 0)
@@ -356,32 +361,7 @@ namespace PARSE.Tracking.Calib
                 {
                     takeFrame = false;
                 }
-                /*
-                byte[][] RGBWithMask = SensorAllFramesReady(sender, e);
-                if (RGBWithMask[0] == null | RGBWithMask[1] == null)
-                    return;
-
-                // Apply the mask
-                byte[] MaskedRGB = new byte[RGBWithMask[1].Length];
-                for (int i = 0; i < RGBWithMask[0].Length; i++)
-                {
-                    if (RGBWithMask[0][i] == 0)
-                    {
-                        int index = i * 4;
-                        MaskedRGB[index] = RGBWithMask[1][index];
-                        MaskedRGB[index + 1] = RGBWithMask[1][index + 1];
-                        MaskedRGB[index + 2] = RGBWithMask[1][index + 2];
-                        MaskedRGB[index + 3] = 0;
-                    }
-                    else
-                    {
-                        int index = i * 4;
-                        MaskedRGB[index] = 0;
-                        MaskedRGB[index + 1] = 0;
-                        MaskedRGB[index + 2] = 0;
-                        MaskedRGB[index + 3] = 0;
-                    }
-                }*/
+                
                 if (null != frame_colour)
                 {
                     byte[] rawColorImage = new byte[frame_colour.PixelDataLength];
@@ -397,27 +377,32 @@ namespace PARSE.Tracking.Calib
                         lbl_depth.Content = depth;
 
                         /*
-                        DepthImagePoint testDepthPoint = new DepthImagePoint();
-                        testDepthPoint.X = 320;
-                        testDepthPoint.Y = 240;
-                        ColorImagePoint newC = kinectSensor.CoordinateMapper.MapDepthPointToColorPoint(DepthImageFormat.Resolution640x480Fps30, testDepthPoint, ColorImageFormat.RgbResolution640x480Fps30);
-                        Console.WriteLine("depth point " + testDepthPoint.X + ", " + testDepthPoint.Y + " - maps to  " + newC.X + ", " + newC.Y);
-                        kinectSensor.Stop();
-                        this.Close();
-                         * */
-
                         //double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * (this.x - 320))/ 640,    4);
                         double x_pos = 0.00425 * (this.x - 320);
 
                         double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (this.y - 240) * -1) / 480, 4);
-                        double y_pos2 = (y_pos * -1) + 1.05;
+                        double y_pos2 = (y_pos * -1) -0.45;
+                        // +1.05
                         //Console.WriteLine("Depth: " + depth + ", " + 
-                        label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
+                        //label3.Content = "X/Y = " + x_pos + ", " + y_pos + " (" + y_pos2 + ")";
 
-                        double actual_y_skel = (y_pos2 - 1.6) * 1000;
+                        double actual_y_skel = (y_pos2) * 1000; // -1.6
+                        this.y_actual = actual_y_skel;
+                        this.x_actual = x_pos;
                         //double actual_x_skel = (x_pos - 2.2) * 1000;
+                        */
+                        //double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * tempX) / 640, 4);
+                        double x_pos = 0.00425 * (this.x - 320);
+
+                        double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (this.y - 240) * -1) / 480, 4);
+                        //double y_pos2 = (y_pos * -1) + 1.05;
+                        double y_pos2 = (y_pos * -1) - 0.155;
+                        this.x_actual = x_pos;
+                        this.y_actual = y_pos2;
                     }
                 }
+
+                processSkeleton(frame_skel);
 
 
                 //ProcessFrame(MaskedRGB);
@@ -731,7 +716,7 @@ namespace PARSE.Tracking.Calib
                     angle += Math.PI / 2;
                 else
                     angle -= Math.PI / 2;
-                Console.WriteLine("Left");
+                //Console.WriteLine("Left");
             }
             else
             {
@@ -739,7 +724,7 @@ namespace PARSE.Tracking.Calib
                 // Angle = tan^-1 y/x
                 angle = Math.Atan(eigenMatrix.value[0,1]/eigenMatrix.value[1,1]);
                 
-                Console.WriteLine("Right");
+                //Console.WriteLine("Right");
             }
             Target_Coordinate_Label.Content = "hasAngle: " + hasAngle + "  angle: " + angle;
             this.x = centroidX;
@@ -752,5 +737,42 @@ namespace PARSE.Tracking.Calib
         }
         return featureMap; 
     }
+
+    private void processSkeleton(SkeletonFrame frame)
+    {
+        Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
+        frame.CopySkeletonDataTo(skeletons);
+
+//      Console.WriteLine("Skeletons:  " + skeletons.Where(S => S.TrackingState == SkeletonTrackingState.Tracked).Count() );
+
+        Skeleton person = null;
+        if ( (person = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).FirstOrDefault()) != null)
+        {
+            Console.WriteLine("Doing it, doing it!!");
+            double person_core_x = Math.Round(person.Position.X, 1);
+            double person_core_y = Math.Round(person.Position.Y, 1);
+            double person_hand_l_x = Math.Round(person.Joints.Where(Joint => Joint.JointType == JointType.HandLeft).First().Position.X, 2);
+            double person_hand_l_y = Math.Round(person.Joints.Where(Joint => Joint.JointType == JointType.HandLeft).First().Position.Y, 2);
+            double person_hand_r_x = Math.Round(person.Joints.Where(Joint => Joint.JointType == JointType.HandRight).First().Position.X, 2);
+            double person_hand_r_y = Math.Round(person.Joints.Where(Joint => Joint.JointType == JointType.HandRight).First().Position.Y, 2);
+
+
+            label3.Content = (
+                "Sensor: " + Math.Round(this.x_actual,2) + ", " + Math.Round(this.y_actual,2) +
+                " Core: " + person_core_x + ", " + person_core_y +
+                " LH: " + person_hand_l_x + ", " + person_hand_l_y +
+                " RH: " + person_hand_r_x + ", " + person_hand_r_y
+                );
+        }
+        else
+        {
+            Console.WriteLine("Totally gone wrong.");
+            this.label3.Content = (
+                "Sensor: " + Math.Round(this.x_actual,1) + ", " + Math.Round(this.y_actual,1) + " - no skeletons found"
+                );
+        }
+    }
+    
+    
     }
 }

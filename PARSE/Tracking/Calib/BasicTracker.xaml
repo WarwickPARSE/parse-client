@@ -56,6 +56,6 @@
         <Label Content="Target found at:" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,539,0,0" Name="Target_Coordinate_Label" VerticalAlignment="Top" Width="294" Grid.Column="1" />
         <Label Content="Pixels: " Grid.Column="1" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,573,0,0" Name="lbl_pixelsfound" VerticalAlignment="Top" Width="290" VerticalContentAlignment="Center" />
         <Label Content="Depth" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="0,607,0,0" Name="lbl_depth" VerticalAlignment="Top" Grid.Column="1" Width="215" />
-        <Label Content="Position" Grid.Row="1" Height="84" HorizontalAlignment="Left" Margin="12,607,0,0" Name="label3" VerticalAlignment="Top" Width="957" FontSize="64" />
+        <Label Content="Position" Grid.Row="1" Height="84" HorizontalAlignment="Left" Margin="12,607,0,0" Name="label3" VerticalAlignment="Top" Width="957" FontSize="24" />
     </Grid>
 </Window>
