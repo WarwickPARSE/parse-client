@@ -645,11 +645,6 @@ namespace PARSE
             return fincloud;
         }
 
-        public PointCloud getYourMum()
-        {
-            return gCloud;
-        }
-
 
         public Dictionary<JointType, double[]> getJointMeasurements()
         {
