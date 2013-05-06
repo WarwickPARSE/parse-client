@@ -754,38 +754,6 @@ namespace PARSE.Tracking
             System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
             System.Diagnostics.Debug.WriteLine("Scanner Position: ("+x_actual_skel+","+y_actual_skel+")");
         }
-            
-            
-            /**
-             * More complicated implementation of Capture Position
-             * 
-             * *determine rotation of skeleton (only consider front and back)*
-             * *the scan should be done with the arms up*
-             * 
-             * find Area
-             * convert the 3 hip joints to color point coordinates
-             * check if the scan is under the lowest one (the middle one?)
-             * if not, check if above the highest one
-             * => This divides the body into two areas: legs and upper body
-             * 
-             * Legs:
-             * Determine bone - two possible methods
-             * 1) Find y and x compared to each joint. They should comply to the same color point. Store together with angle.
-             * 2) Find y (for legs or x for feet) and then use z (and x or y for feet) to determine how far back the scanner is. Store together with angle.
-             * 
-             * Upper body:
-             * 
-             * Determine whether the point is on the arms:
-             * Check if point is further than the x of each shoulder (to determine which arm if on any).
-             * Check if point is between the x of the arm: hand-wrist, wrist-elbow, elbow-shoulder.
-             * Use y to make sure that the point is not on the chest area (fat people)
-             * 
-             * Point not on arms:
-             * All measurements based on spine and hip centre/shoulder centre (all three or one of the last two cutting body in half based on spine).
-             * This way when scan is recalled, the measurements will first be used to make sure the person is standing in the correct way.
-             * If one of the hip/shoulder is not fixed based on the way the person is standing, it will be eliminated.
-             * Then, the other two be used to get the exact point in a similar way to the arms and legs.
-             **/
 
         /// <summary>
         /// Call whatever is supposed to happen on the capture event

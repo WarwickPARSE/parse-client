@@ -32,12 +32,6 @@ namespace PARSE.Tracking
         {
         }
 
-        public void addToDatabase()
-        {
-            //initialise database class
-            //add record to database
-        }
-
         /// <summary>
         /// Returns a distance metric, which describes the distance between this SP and the provided SP.
         /// </summary>
