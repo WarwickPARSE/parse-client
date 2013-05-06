@@ -373,9 +373,9 @@ namespace PARSE
         {
             int rowsAffected = 0;
 
-           // this.con = new SqlCeConnection();
-           // this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
-           // this.con.Open();
+           this.con = new SqlCeConnection();
+           this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+           this.con.Open();
 
             SqlCeCommand insertQuery = this.con.CreateCommand();
 
@@ -745,22 +745,6 @@ namespace PARSE
             LinkedList<String> pointCloudFileReference = new LinkedList<String>();
             LinkedList<String> description = new LinkedList<String>();
             LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
-
-            this.con = new SqlCeConnection();
-            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
-            this.con.Open();
-
-            this.con = new SqlCeConnection();
-            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
-            this.con.Open();
-
-            this.con = new SqlCeConnection();
-            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
-            this.con.Open();
-
-            this.con = new SqlCeConnection();
-            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
-            this.con.Open();
 
             this.con = new SqlCeConnection();
             this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
