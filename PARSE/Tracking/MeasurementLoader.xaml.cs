@@ -60,6 +60,7 @@ namespace PARSE
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
+            rescanButton.Visibility = Visibility.Collapsed;
                         
             // show image & instructions
             Visualisation.Visibility = Visibility.Visible;
@@ -101,7 +102,7 @@ namespace PARSE
                 DateTime timestamp = DateTime.Now;
                 
                 //add record to database
-                db.insertScanLocations(null, skel.jointName1, null, skel.offsetXJ1, skel.offsetYJ1, null, timestamp);
+                db.insertScanLocations("null", skel.jointName1, "null", skel.offsetXJ1, skel.offsetYJ1, "0", timestamp);
             }
 
             
@@ -130,6 +131,7 @@ namespace PARSE
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
+            rescanButton.Visibility = Visibility.Collapsed;
 
             // show image & instructions
             Visualisation.Visibility = Visibility.Visible;

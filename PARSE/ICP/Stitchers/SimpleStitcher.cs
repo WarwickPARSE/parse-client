@@ -7,7 +7,7 @@ using System.Windows.Media.Media3D;
 namespace PARSE.ICP
 {
     /// <summary>
-    /// This is basically ripped from bernie's code
+    /// A simple stitcher for performing basic alignment on point clouds
     /// </summary>
     public class SimpleStitcher : Stitcher
     {
