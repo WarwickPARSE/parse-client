@@ -13,7 +13,7 @@
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <Image Canvas.Left="0" Canvas.Top="0" Height="Auto" Name="Visualisation" Stretch="Fill" Width="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="1" />
+        <Image Canvas.Left="0" Canvas.Top="0" Height="Auto" Name="Visualisation" Stretch="Fill" Width="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5"/>
         
         <Button Name="start_scan" Content="Register New Location" Width="166" Height="25" Margin="0" 
                 HorizontalAlignment="Center" Click="start_scan_Click" VerticalAlignment="Center"

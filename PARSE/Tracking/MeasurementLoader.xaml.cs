@@ -60,6 +60,7 @@ namespace PARSE
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
+            rescanButton.Visibility = Visibility.Collapsed;
                         
             // show image & instructions
             Visualisation.Visibility = Visibility.Visible;
@@ -122,6 +123,7 @@ namespace PARSE
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
+            rescanButton.Visibility = Visibility.Collapsed;
 
             // show image & instructions
             Visualisation.Visibility = Visibility.Visible;
