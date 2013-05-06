@@ -94,13 +94,12 @@ namespace PARSE
             if (this.CaptureMode == (int)CaptureModes.Capture_New)
             {
                 // Write location and timestamp to the database
-            }
                 
                 //initialise database class
                 DatabaseEngine db = new DatabaseEngine();
 
-                DateTime timestamp = new DateTime();
-
+                DateTime timestamp = DateTime.Now;
+                
                 //add record to database
                 db.insertScanLocations(null, skel.jointName1, null, skel.offsetXJ1, skel.offsetYJ1, null, timestamp);
             }

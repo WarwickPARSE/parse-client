@@ -61,7 +61,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.scanLocations(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+            Insertion ins = new Insertion(con);
+
+            ins.scanLocations(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
 
             dbClose();
         }
@@ -70,7 +72,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.scans(scanTypeID, pointCloudFileReference, timestamp);
+            Insertion ins = new Insertion(con);
+
+            ins.scans(scanTypeID, pointCloudFileReference, timestamp);
 
             dbClose();
         }
@@ -79,7 +83,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.records(scanID, scanTypeID, value);
+            Insertion ins = new Insertion(con);
+
+            ins.records(scanID, scanTypeID, value);
 
             dbClose();
         }
@@ -88,7 +94,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.LimbCoordinates(scanID, joint1, joint2, joint3, joint4);
+            Insertion ins = new Insertion(con);
+
+            ins.LimbCoordinates(scanID, joint1, joint2, joint3, joint4);
 
             dbClose();
         }
@@ -100,7 +108,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.type2("Conditions", "condition", "description", condition, description);
+            Insertion ins = new Insertion(con);
+
+            ins.type2("Conditions", "condition", "description", condition, description);
 
             dbClose();
         }
@@ -110,7 +120,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.type2("ScanTypes", "scanType", "description", scanType, description);
+            Insertion ins = new Insertion(con);
+
+            ins.type2("ScanTypes", "scanType", "description", scanType, description);
 
             dbClose();
         }
@@ -121,7 +133,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.type3("PatientCondition", "patientID", "conditionID", patientID, conditionID);
+            Insertion ins = new Insertion(con);
+
+            ins.type3("PatientCondition", "patientID", "conditionID", patientID, conditionID);
 
             dbClose();
         }
@@ -130,7 +144,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.type3("PatientScans", "patientID", "scanID", patientID, scanID);
+            Insertion ins = new Insertion(con);
+
+            ins.type3("PatientScans", "patientID", "scanID", patientID, scanID);
 
             dbClose();
         }
@@ -139,7 +155,9 @@ namespace PARSE
         {
             dbOpen();
 
-            insertQueries.type3("PointRecognitionScans", "patientID", "scanLocID", patientID, scanLocID);
+            Insertion ins = new Insertion(con);
+
+            ins.type3("PointRecognitionScans", "patientID", "scanLocID", patientID, scanLocID);
 
             dbClose();
         }
@@ -178,6 +196,42 @@ namespace PARSE
             return patients;
         }
 
+        //select latest scan location timestamp
+        public Tuple<int, String, double, double, DateTime> getLatestScanLoc()
+        {
+            Tuple<int, String, double, double, DateTime> scan = null;
+            Selection sr = new Selection(con);
+
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> patients = getPatientsWithScanLocations();
+
+            LinkedList<int> id = patients.Item3;
+            LinkedList<DateTime> times = patients.Item4;
+
+            int scanLoc = id.Last();
+            DateTime last = times.Last();
+
+            for (int i = 0; i < times.Count(); i++)
+            {
+                if (DateTime.Compare(times.First(), last) > 0)
+                {
+                    scanLoc = id.First();
+                    last = times.First();
+
+                    id.RemoveFirst();
+                    times.RemoveFirst();
+                }
+                else
+                {
+                    id.RemoveFirst();
+                    times.RemoveFirst();
+                }
+            }
+
+            scan = sr.ScanLocationsCut(scanLoc, last);
+
+            return scan;
+        }
+
         // 2) select patient information
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
         {
@@ -192,7 +246,8 @@ namespace PARSE
         // 3) select all conditions
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllConditions()
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> conditions = selectQueries.AllConditions();
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> conditions = sr.AllConditions();
 
             return conditions;
         }
@@ -200,7 +255,8 @@ namespace PARSE
         // 4) select patient condition (and information about it)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getPatientConditionInformation(int patientID)
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patientConditions = selectQueries.patientConditions(patientID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patientConditions = sr.patientConditions(patientID);
 
             return patientConditions;
         }
@@ -208,7 +264,8 @@ namespace PARSE
         // 5) select limb coordinates
         public Tuple<LinkedList<int>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<String[]>, LinkedList<String[]>> getLimbCoordinates(int scanID)
         {
-           /* Tuple<LinkedList<int>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<double[]>> limbCoords = selectQueries.limbCoordinates(scanID);
+            Selection sr = new Selection(con);
+           /* Tuple<LinkedList<int>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<double[]>> limbCoords = sr.limbCoordinates(scanID);
 
             return limbCoords;*/
 
@@ -218,7 +275,8 @@ namespace PARSE
         // 6) select all scan types for patient
         public Tuple<LinkedList<int>, LinkedList<String>> getPatientScanTypes(int patientID)
         {
-            Tuple<LinkedList<int>, LinkedList<String>> patientScanTypes = selectQueries.scanTypesForPatient(patientID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>> patientScanTypes = sr.scanTypesForPatient(patientID);
 
             return patientScanTypes;
         }
@@ -226,7 +284,8 @@ namespace PARSE
         // 7) select all timestamps for patient scan type
         public Tuple<LinkedList<int>, LinkedList<DateTime>> getScanTimestamps(int scanTypeID)
         {
-            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = selectQueries.timestampsForPatient(scanTypeID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = sr.timestampsForPatient(scanTypeID);
 
             return timestamps;
         }
@@ -235,7 +294,8 @@ namespace PARSE
         // 7a) gets scan IDs from patientScans table
         public Tuple<LinkedList<int>, LinkedList<int>> getScanIDs(int patientID)
         {
-            Tuple<LinkedList<int>, LinkedList<int>> scanIDs = selectQueries.selectType3("PatientScans", "patientID", patientID.ToString());
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<int>> scanIDs = sr.selectType3("PatientScans", "patientID", patientID.ToString());
 
             return scanIDs;
         }
@@ -243,15 +303,16 @@ namespace PARSE
         // 7b) select all timestamps and scan IDs for patient scans
         public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientScans(int patientID)
         {
-
-            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = selectQueries.timestampsForPatientScans(patientID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = sr.timestampsForPatientScans(patientID);
             return timestamps;
         }
 
         // 8) select patient scans (and value)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> getScanResult(int ScanID)
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> result = selectQueries.scanValueForPatient(ScanID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> result = sr.scanValueForPatient(ScanID);
 
             return result;
         }
@@ -259,7 +320,8 @@ namespace PARSE
         // 9) select all timestamps for patient point recognition scans
         public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientLocScans(int patientID)
         {
-            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = selectQueries.timestampsForPatientLocScans(patientID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = sr.timestampsForPatientLocScans(patientID);
 
             return timestamps;
         }
@@ -267,7 +329,8 @@ namespace PARSE
         // 10) select patient point recognition scans (and location)
         public Tuple<LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<double>, LinkedList<double>, LinkedList<double>, LinkedList<DateTime>> getScanLocation(int scanLocID)
         {
-            Tuple<LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<double>, LinkedList<double>, LinkedList<double>, LinkedList<DateTime>> locations = selectQueries.ScanLocations("patientID", scanLocID.ToString());
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<double>, LinkedList<double>, LinkedList<double>, LinkedList<DateTime>> locations = sr.ScanLocations("patientID", scanLocID.ToString());
 
             return locations;
         }
@@ -538,12 +601,22 @@ namespace PARSE
                 try
                 {
                     b = reader.GetString(1);
-                } catch(Exception e) {
+                } catch(Exception e)
+                {
                     b = "null";
                 }
                 boneName.AddLast(b);
                 jointName1.AddLast(reader.GetString(2));
-                jointName2.AddLast(reader.GetString(3));
+                String j2;
+                try
+                {
+                    j2 = reader.GetString(3);
+                }
+                catch (Exception e)
+                {
+                    j2 = "null";
+                }
+                jointName2.AddLast(j2);
                 distJoint1.AddLast(reader.GetDouble(4));
                 distJoint2.AddLast(reader.GetDouble(5));
                 double d;
@@ -562,6 +635,34 @@ namespace PARSE
 
             //scanLocID not returned (to keep it under 8) !!!
             return Tuple.Create(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+        }
+
+        //scan location cut
+        public Tuple<int, String, double, double, DateTime> ScanLocationsCut(int id, DateTime time)
+        {
+            int scanLocID = id;
+            String jointName1 = "default";
+            double distJoint1 = 0;
+            double distJoint2 = 0;
+            DateTime timestamp = new DateTime();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT scanLocID, jointName1, distJoint1, distJoint2, timestamp FROM ScanLocations WHERE scanLocID LIKE @ID AND timestamp LIKE @Time";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ID", id);
+            selectQuery.Parameters.Add("@Time", time.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanLocID = reader.GetInt32(0);
+                jointName1 = reader.GetString(1);
+                distJoint1 = reader.GetDouble(2);
+                distJoint2 = reader.GetDouble(3);
+                timestamp = Convert.ToDateTime(reader.GetDateTime(4).ToString());
+            }
+            reader.Close();
+
+            return Tuple.Create(scanLocID, jointName1, distJoint1, distJoint2, timestamp);
         }
 
         //scans
