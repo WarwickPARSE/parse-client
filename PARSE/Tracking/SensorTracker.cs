@@ -698,17 +698,15 @@ namespace PARSE.Tracking
         {
             Console.WriteLine("Capture position!!!");
 
-            SkeletonPosition skeletonPos = new SkeletonPosition();
-
             // Update patient position
             IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
             Console.WriteLine("Patient ID:  " + this.patientSkeletonID);
             if (patient.Count() == 1)
             {
-                skeletonPos.patient = patient.First();
-                findPosition(skeletonPos);
-                skeletonPos.angleXY = angleXY;
-                skeletonPos.angleZ = angleZ;
+                CurrentPosition.patient = patient.First();
+                findPosition(CurrentPosition);
+                CurrentPosition.angleXY = angleXY;
+                CurrentPosition.angleZ = angleZ;
 
                 return true;
             }

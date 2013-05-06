@@ -103,7 +103,7 @@ namespace PARSE
                 DateTime timestamp = new DateTime();
 
                 //add record to database
-                db.insertScanLocations(null, skel.jointName1, null, skel.offsetXJ1, skel.offsetYJ1, null, timestamp);
+                db.insertScanLocations("null", skel.jointName1, "null", skel.offsetXJ1, skel.offsetYJ1, "0", timestamp);
             }
 
             
