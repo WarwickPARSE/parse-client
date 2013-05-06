@@ -1271,12 +1271,9 @@ namespace PARSE
                 {
                     //Shh
                 }
-                }
-                catch (Exception err)
-                {
-                    //Shh
-                }
-            }
+             }
+
+            
 
             return output;
         }
