@@ -166,6 +166,18 @@ namespace PARSE
             return patients;
         }
 
+
+        //select all patients that have scanLocation scans
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> getPatientsWithScanLocations()
+        {
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> patients = null;
+            Selection sr = new Selection(con);
+
+            patients = sr.AllPatientsWithLocTimestamps();
+
+            return patients;
+        }
+
         // 2) select patient information
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
         {
@@ -417,6 +429,32 @@ namespace PARSE
             reader.Close();
 
             return Tuple.Create(ids, names, nhsNos);
+        }
+
+        //selecting all patients with location timestamps
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> AllPatientsWithLocTimestamps()
+        {
+
+            LinkedList<int> ids = new LinkedList<int>();
+            LinkedList<String> names = new LinkedList<String>();
+            LinkedList<int> scanLocID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT PatientInformation.patientID, name, ScanLocations.scanLocID, timestamp FROM PatientInformation join PointRecognitionScans on PatientInformation.patientID=PointRecognitionScans.patientID join ScanLocations on PointRecognitionScans.scanLocID=ScanLocations.scanLocID";
+            selectQuery.Parameters.Clear();
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+
+            while (reader.Read())
+            {
+                ids.AddLast(reader.GetInt32(0));
+                names.AddLast(reader.GetString(1));
+                scanLocID.AddLast(reader.GetInt32(2));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(3).ToString()));
+            }
+            reader.Close();
+
+            return Tuple.Create(ids, names,scanLocID, timestamp);
         }
 
         //selecting all conditions

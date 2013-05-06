@@ -1146,5 +1146,28 @@ namespace PARSE
             PARSE.Tracking.Calib.HSLTracker HSL_Calibrator = new PARSE.Tracking.Calib.HSLTracker();
             HSL_Calibrator.Show();
         }
+
+        private void measurementload_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void LoadMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            if (KinectSensor.KinectSensors.Count != 0)
+            {
+                this.shutAnyWindows();
+                //Definition of window viewer seems to get lost somewhere
+                this.OwnedWindows[0].Close();
+
+                windowMeasurement = new MeasurementLoader();
+                windowMeasurement.Owner = this;
+                windowMeasurement.Show();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Please connect a Kinect Device");
+            }
+        }
     }
 }

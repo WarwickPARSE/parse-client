@@ -78,6 +78,8 @@ namespace PARSE.Tracking
         // Sensor position
         public int x = 0;                               // current x coordinate of sensor
         public int y = 0;                               // current y coordinate of sensor
+        private int[] x_array;
+        private int[] y_array;
         private double x_actual_skel = 0;               // current x position in skel coordinates
         private double y_actual_skel = 0;               // current y position in skel coordinates
         private int prevX = 0;                          // previous x coordinate of sensor
@@ -160,6 +162,9 @@ namespace PARSE.Tracking
             {
                 rowHeaders[row] = row * 640 * 4;
             }
+
+            x_array = new int[3];
+            y_array = new int[3];
         }
 
         private void prepare()
@@ -269,60 +274,13 @@ namespace PARSE.Tracking
                     //new Thread(() =>
                     tracker.ProcessFrame(colorFrame2, out tempX, out tempY, out tempAngle);
                     //).Start();
-
                     //Console.WriteLine("Valz: " + tempX + ", " + tempY + ", " + tempAngle);
 
-                    if (tempX == 0)
-                    {
-                        FramesWithoutScanner++;
-                        if (! (FramesWithoutScanner > NoFramesThreshold))
-                            tempX = this.prevX;
-                    }
-                    else
-                    {
-                        FramesWithoutScanner = 0;
-                    }
-
-                    if (tempY == 0)
-                    {
-                        FramesWithoutScanner++;
-                        if (!(FramesWithoutScanner > NoFramesThreshold))
-                        tempY = this.prevY;
-                    }
-                    else
-                    {
-                        FramesWithoutScanner = 0;
-                    }
+                    // Perform motion smoothing in a function rather than having it all here
+                    UpdateCoordinates(tempX, tempY, tempAngle);
 
                     lock (this)
                     {
-                        // Set the position & angle
-                        this.prevX = this.x;
-                        this.dx = this.prevX - tempX;
-                        this.x = tempX;
-
-                        this.prevY = this.y;
-                        this.dy = this.prevY - tempY;
-                        this.y = tempY;
-
-                        this.angleXY = tempAngle;
-                        
-                        double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * tempX) / 640, 4);
-                        double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (tempY - 240) * -1) / 480, 4);
-                        double y_pos2 = (y_pos * -1) + 1.05;
-
-                        CoordinateMapper cm = new CoordinateMapper(kinectSensor);
-                        DepthImagePoint dp = new DepthImagePoint();
-
-                        dp.X = tempX;
-                        dp.Y = tempY;
-                        dp.Depth = 1900;
-
-                        SkeletonPoint sp = cm.MapDepthPointToSkeletonPoint(DepthImageFormat.Resolution640x480Fps30,dp);
-
-                        this.y_actual_skel = sp.Y;
-                        this.x_actual_skel = sp.X;
-
                         this.colorFrame = thisColorFrame;
                     }
 
@@ -339,13 +297,82 @@ namespace PARSE.Tracking
                 using (DepthImageFrame DIF = frames.OpenDepthImageFrame())
                 using (SkeletonFrame SF = frames.OpenSkeletonFrame())
                 {
-                    // But, get the latest colour frame for display, first!
-                    if (frames.OpenColorImageFrame() != null)
-                        frames.OpenColorImageFrame().CopyPixelDataTo(colorFrame);
-
+                    try
+                    {
+                        // But, get the latest colour frame for display, first!
+                        if (frames.OpenColorImageFrame() != null)
+                            frames.OpenColorImageFrame().CopyPixelDataTo(colorFrame);
+                    }
+                    catch (NullReferenceException Frame_Is_Empty)
+                    {
+                        // Try to ignore it?
+                    }
                 }
 
                 updateVisualisation();
+            }
+        }
+
+        private void UpdateCoordinates(int tempX, int tempY, double tempAngle)
+        {
+            
+            if (tempX == 0 || tempY == 0)
+            {
+                this.FramesWithoutScanner++;
+                if (this.FramesWithoutScanner <= NoFramesThreshold)
+                {
+                    tempX = this.prevX;
+                    tempY = this.prevY;
+                }
+            }
+            else
+            {
+                this.FramesWithoutScanner = 0;
+            }
+
+            this.x_array[2] = this.x_array[1];
+            this.x_array[1] = this.x_array[0];
+            this.x_array[0] = tempX;
+
+            this.y_array[2] = this.y_array[1];
+            this.y_array[1] = this.y_array[0];
+            this.y_array[0] = tempY;
+
+
+            /* Use the median values to smooth the motion */
+            /* Particularly important because it can move all over the place! */
+            int[] x_array_sorted = (int[])x_array.Clone();
+            Array.Sort(x_array_sorted);
+            tempX = x_array_sorted[1];
+
+            int[] y_array_sorted = (int[])y_array.Clone();
+            Array.Sort(y_array_sorted);
+            tempY = y_array_sorted[1];
+                    
+
+            lock (this)
+            {
+                // Set the position & angle
+                this.prevX = this.x;
+                this.dx = this.prevX - tempX;
+                this.x = tempX;
+
+                this.prevY = this.y;
+                this.dy = this.prevY - tempY;
+                this.y = tempY;
+
+                this.angleXY = tempAngle;
+
+                //double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * tempX) / 640, 4);
+                double x_pos = 0.00425 * (this.x - 320);
+
+                double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (tempY - 240) * -1) / 480, 4);
+                //double y_pos2 = (y_pos * -1) + 1.05;
+                double y_pos2 = (y_pos * -1) - 0.15;
+                // WAS double y_pos2 = (y_pos * -1) - 0.45;
+                this.x_actual_skel = x_pos;
+                this.y_actual_skel = y_pos2;
+
             }
         }
 
@@ -415,44 +442,47 @@ namespace PARSE.Tracking
                 highlightSensor(this.x, this.y);
             }
 
-
-
-            /* TODO REMOVE THIS AWFUL HACK OR NOTHING WILL WORK PROPERLY */
-                                //activeSkeletons = 2;
-            /* Alternatively, use it to force-feed the system skeletons  */
-            /*                                                           */
-
-
-            // Update text!
-            // If not enough skeletons, not enough people. Wait for them!
-            if (activeSkeletons < 2)
+            if (this.Capture_Mode == (int)Capture_Modes.Capture_On_Still)
             {
-                this.displayText.Text = "Waiting for doctor and patient";
-            }
-            // If enough people (exactly)...
-            else if (activeSkeletons == 2)
-            {
-                // Wait to identify the doctor/patient by finding the scanner
-                if (!skeletonsIdentified)
+
+                // Update text!
+                // If not enough skeletons, not enough people. Wait for them!
+                if (activeSkeletons < 2)
                 {
-                    this.displayText.Text = "Identifying patient & searching for scanner";
+                    this.displayText.Text = "Waiting for doctor and patient";
                 }
-                // Display timer as all is going so well
-                else
+                // If enough people (exactly)...
+                else if (activeSkeletons == 2)
                 {
-                    if ((capture_timer_length - captureTimer) < 0)
+                    // Wait to identify the doctor/patient by finding the scanner
+                    if (!skeletonsIdentified)
                     {
-                        this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        this.displayText.Text = "Identifying patient & searching for scanner";
                     }
+                    // Display timer as all is going so well
                     else
                     {
-                        this.displayText.Text = "Hold scanner still to capture";
+                        if ((capture_timer_length - captureTimer) < 10)
+                        {
+                            this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        }
+                        else
+                        {
+                            this.displayText.Text = "Hold scanner still to capture";
+                        }
                     }
                 }
             }
+            else if (Capture_Mode == (int)Capture_Modes.Capture_At_Position)
+            {
+                this.displayText.Text = "Distance to target: " + CurrentPosition.distanceTo(PositionTarget).ToString();
 
-            if (this.capture_timer_running && (this.capture_timer_length - this.captureTimer) < 10)
-                this.displayText.Text += (this.capture_timer_length - this.captureTimer);
+
+            }
+
+
+            //if (this.capture_timer_running && (this.capture_timer_length - this.captureTimer) < 10)
+                //this.displayText.Text += (this.capture_timer_length - this.captureTimer);
 
             // Output processed image
             if (VisualisationOutput == null)
@@ -525,12 +555,17 @@ namespace PARSE.Tracking
                         int remaining = this.capture_timer_length - this.captureTimer;
                         if (remaining < 10)
                             this.displayText.Text += "Capture in: " + remaining;
+                        if (remaining < 0)
+                        {
+                            remaining = 0;
+                            captureTimer--;
+                        }
                     }
                     // If distance > threshold, need to display guidance to target position
                     else
                     {
                         this.captureTimer = 0;
-                        this.displayText.Text = "Move the sensor closer";
+                        this.displayText.Text = "Move the sensor closer to the target position";
                         // TODO display instructions for moving the sensor closer?
                     }
                 }
@@ -544,7 +579,7 @@ namespace PARSE.Tracking
         {
             System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
 
-            if (skeletonFrame != null & activeSkeletons == 2 & x!=0 & y!=0)
+            if (skeletonFrame != null & activeSkeletons == 2 & x != 0 & y != 0)
             {
                 Skeleton[] frame;
 
@@ -555,95 +590,42 @@ namespace PARSE.Tracking
 
                 int doctorID = -1;
                 int patientID = -1;
-                double distance = 1.9;
 
-                double x_pos = Math.Round((2.2 * 2 * Math.Tan(57) * x) / 640, 4);
-                double y_pos = Math.Round((2.2 * 2 * Math.Tan(21.5) * (y - 240) * -1) / 480, 4);
-                double y_pos2 = (y_pos * -1) + 1.05;
-
-                Console.WriteLine("Sensor position in real = " + x_pos + ", " + y_pos2);
-
-                for (int person = 0; person < frame.Length; person++)
+                // Get the people in the frame
+                int personID_1 = -1;
+                int personID_2 = -1;
+                foreach (Skeleton person in frame)
                 {
-                    if (frame[person].TrackingState == SkeletonTrackingState.Tracked)
-                    {
-                        float left_hand_X = frame[person].Joints[JointType.HandLeft].Position.X;
-                        float left_hand_Y = frame[person].Joints[JointType.HandLeft].Position.Y;
-
-                        float left_hand_distance = (float)Math.Pow((Math.Pow(((double)(left_hand_X - x_pos)), 2) + Math.Pow(((double)(left_hand_Y - y_pos2)), 2)), 0.5);
-                        Console.WriteLine("Found Lhand on skeleton " + frame[person].TrackingId + " hand position = " + frame[person].Joints.Where(Joint => Joint.JointType == JointType.HandLeft).First().Position.X + " -> distance = " + left_hand_distance);
-                        if (left_hand_distance < distance)
-                        {
-                            distance = left_hand_distance;
-                            doctorID = frame[person].TrackingId;
-                        }
-
-                        float right_hand_X = frame[person].Joints[JointType.HandRight].Position.X;
-                        float right_hand_Y = frame[person].Joints[JointType.HandRight].Position.Y;
-
-                        float right_hand_distance = (float)Math.Pow((Math.Pow(((double)(right_hand_X - x_pos)), 2) + Math.Pow(((double)(right_hand_Y - y_pos2)), 2)), 0.5);
-                        Console.WriteLine("Found Rhand on skeleton " + frame[person].TrackingId + " hand position = " + frame[person].Joints.Where(Joint => Joint.JointType == JointType.HandRight).First().Position.X + " -> distance = " + right_hand_distance);
-                        if (right_hand_distance < distance)
-                        {
-                            distance = right_hand_distance;
-                            doctorID = frame[person].TrackingId;
-                        }
-                    }
+                    if (person.TrackingState == SkeletonTrackingState.Tracked)
+                        if (personID_1 == -1)
+                            personID_1 = person.TrackingId;
+                        else
+                            personID_2 = person.TrackingId;
                 }
 
-                // Found a doctor!
-                if (distance < 10 & doctorID != -1)
-                {
-                    //  Try to find the patient
-                    for (int index = 0; index < frame.Length; index++)
-                        if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
-                        {
-                            if (frame[index].TrackingId != doctorID)
-                                patientID = (byte)frame[index].TrackingId;
-                        }
+                double person1_position = frame.Where(Skeleton => Skeleton.TrackingId == personID_1).First().Position.X;
+                double person2_position = frame.Where(Skeleton => Skeleton.TrackingId == personID_2).First().Position.X;
 
-                    // If we find a patient, set skeletonsIdentified
-                    if (patientID != -1)
-                    {
-                        lock (this)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Doctor identified as skeleton ID " + doctorID + ", and patient as ID: " + patientID);
-
-                            // Hurrah!
-                            skeletonsIdentified = true;
-
-                            // Put the skeleton inside the SkeletonPosition object CurrentPosition, so it can track positions relative to the patient's skeleton
-                            for (int index = 0; index < frame.Length; index++)
-                                if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
-                                {
-                                    if (frame[index].TrackingId == patientSkeletonID)
-                                        CurrentPosition.setSkeleton(frame[index]);
-                                }
-                            
-                            // Store the skeleton IDs
-                            doctorSkeletonID = (byte)doctorID;
-                            patientSkeletonID = (byte)patientID;
-                        }
-                    }
-                }
-                else if (doctorID == -1)
+                // Operator stands on the left (negative position value)
+                if (person1_position < person2_position)
                 {
-                    System.Diagnostics.Debug.WriteLine("Sensor tracker could not identify the doctor");
-                    if (x == 0 || y == 0)
-                    {
-                        //this.displayText.Text = "The sensor tracker is looking for the sensor...";
-                        System.Diagnostics.Debug.WriteLine("This could be because the sensor has not yet been located");
-                    }
+                    doctorID = personID_1;
+                    patientID = personID_2;
                 }
-                else if (distance >= 30)
-                for (int index = 0; index < frame.Length; index ++)
-                    if (frame[index].TrackingState == SkeletonTrackingState.Tracked)
-                        if (frame[index].TrackingId != doctorID)
-                            patientSkeletonID = (byte)frame[index].TrackingId;
+                else
                 {
-                    //this.displayText.Text = "Sensor found, but not close enough to a hand";
-                    System.Diagnostics.Debug.WriteLine("Sensor found, but not close enough to a hand");
+                    doctorID = personID_2;
+                    patientID = personID_1;
                 }
+
+                // Check they've both been set
+                if ((doctorID + patientID) > 0)
+                {
+                    doctorSkeletonID = (byte)doctorID;
+                    patientSkeletonID = (byte)patientID;
+                    skeletonsIdentified = true;
+                }
+
             }
             else
             {
@@ -712,7 +694,7 @@ namespace PARSE.Tracking
         /// <summary>
         /// Take the x, y, z, angles, depthframe & skeletonframe and convert to a skeleton-relative position.
         /// </summary>
-        private void capturePosition()
+        private Boolean capturePosition()
         {
             Console.WriteLine("Capture position!!!");
 
@@ -720,12 +702,22 @@ namespace PARSE.Tracking
 
             // Update patient position
             IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
+            Console.WriteLine("Patient ID:  " + this.patientSkeletonID);
             if (patient.Count() == 1)
             {
                 skeletonPos.patient = patient.First();
                 findPosition(skeletonPos);
                 skeletonPos.angleXY = angleXY;
                 skeletonPos.angleZ = angleZ;
+
+                return true;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Capture Position: patient count != 1. It's " + patient.Count());
+                captureTimer--;
+
+                return false;
             }
         }
 
@@ -736,8 +728,8 @@ namespace PARSE.Tracking
 
             System.Diagnostics.Debug.WriteLine("Finding position");
 
-            scannerPos.X = (float) Math.Abs(x_actual_skel/100);
-            scannerPos.Y = (float) Math.Abs(y_actual_skel/100);
+            scannerPos.X = (float) (x_actual_skel); // divide by 100??
+            scannerPos.Y = (float) (y_actual_skel);
             scannerPos.Z = (float) 2.7542;
 
             double minDist = 20;
@@ -745,8 +737,8 @@ namespace PARSE.Tracking
 
             foreach (Joint j in sp.patient.Joints)
             {
-                double dist = Math.Sqrt(Math.Pow(Math.Abs(scannerPos.X - j.Position.X), 2) + Math.Pow(Math.Abs(scannerPos.Y - j.Position.Y), 2));
-                System.Diagnostics.Debug.WriteLine(j.JointType.ToString() + " distance from sensor:" + dist);
+                double dist = Math.Sqrt(Math.Pow((scannerPos.X - j.Position.X), 2) + Math.Pow((scannerPos.Y - j.Position.Y), 2));
+                System.Diagnostics.Debug.WriteLine(j.JointType.ToString() + " distance from sensor:" + dist + " Position: " + j.Position.X + ", " + j.Position.Y);
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -765,52 +757,16 @@ namespace PARSE.Tracking
             System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
             System.Diagnostics.Debug.WriteLine("Scanner Position: ("+x_actual_skel+","+y_actual_skel+")");
         }
-            
-            
-            /**
-             * More complicated implementation of Capture Position
-             * 
-             * *determine rotation of skeleton (only consider front and back)*
-             * *the scan should be done with the arms up*
-             * 
-             * find Area
-             * convert the 3 hip joints to color point coordinates
-             * check if the scan is under the lowest one (the middle one?)
-             * if not, check if above the highest one
-             * => This divides the body into two areas: legs and upper body
-             * 
-             * Legs:
-             * Determine bone - two possible methods
-             * 1) Find y and x compared to each joint. They should comply to the same color point. Store together with angle.
-             * 2) Find y (for legs or x for feet) and then use z (and x or y for feet) to determine how far back the scanner is. Store together with angle.
-             * 
-             * Upper body:
-             * 
-             * Determine whether the point is on the arms:
-             * Check if point is further than the x of each shoulder (to determine which arm if on any).
-             * Check if point is between the x of the arm: hand-wrist, wrist-elbow, elbow-shoulder.
-             * Use y to make sure that the point is not on the chest area (fat people)
-             * 
-             * Point not on arms:
-             * All measurements based on spine and hip centre/shoulder centre (all three or one of the last two cutting body in half based on spine).
-             * This way when scan is recalled, the measurements will first be used to make sure the person is standing in the correct way.
-             * If one of the hip/shoulder is not fixed based on the way the person is standing, it will be eliminated.
-             * Then, the other two be used to get the exact point in a similar way to the arms and legs.
-             **/
 
         /// <summary>
         /// Call whatever is supposed to happen on the capture event
         /// </summary>
         private void capture()
         {
-            // TODO remove old code
+            if (capturePosition() == true)
+                RaiseCaptureEvent();
 
-            // old code
-            capturePosition();
             //this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
-
-            // new code!
-            RaiseCaptureEvent();
         }
 
         private void RaiseCaptureEvent()
