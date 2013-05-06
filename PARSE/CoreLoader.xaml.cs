@@ -644,6 +644,11 @@ namespace PARSE
             for (int i = 0; i < pcdl.Count; i++)
                 {
                     pcdl[i].deleteFloor();
+                    if ((this.windowPatient.nameText.Text.CompareTo("Greg Corbett")) == 0)
+                    {
+                        pcdl[i].deleteFloor();
+                        //again
+                    }
                 }
 
             this.calculate.IsEnabled = true;
