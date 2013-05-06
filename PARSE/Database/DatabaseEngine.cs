@@ -74,7 +74,7 @@ namespace PARSE
 
             Insertion ins = new Insertion(con);
 
-            ins.scans(scanTypeID, pointCloudFileReference, timestamp);
+            ins.scans(scanTypeID, pointCloudFileReference, description, timestamp);
             ins.patientscans(patientID);
 
             dbClose();
@@ -190,12 +190,12 @@ namespace PARSE
 
 
         //select all patients that have scanLocation scans
-        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> getPatientsWithScanLocations()
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> getScanLocationTimestamps()
         {
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> patients = null;
+            Tuple<LinkedList<int>, LinkedList<DateTime>> patients = null;
             Selection sr = new Selection(con);
 
-            patients = sr.AllPatientsWithLocTimestamps();
+            patients = sr.locTimestamps();
 
             return patients;
         }
@@ -206,10 +206,10 @@ namespace PARSE
             Tuple<int, String, double, double, DateTime> scan = null;
             Selection sr = new Selection(con);
 
-            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> patients = getPatientsWithScanLocations();
+            Tuple<LinkedList<int>, LinkedList<DateTime>> patients = getScanLocationTimestamps();
 
-            LinkedList<int> id = patients.Item3;
-            LinkedList<DateTime> times = patients.Item4;
+            LinkedList<int> id = patients.Item1;
+            LinkedList<DateTime> times = patients.Item2;
 
             int scanLoc = id.Last();
             DateTime last = times.Last();
@@ -374,7 +374,7 @@ namespace PARSE
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO ScanLocations ((boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations (boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@BoneName", boneName);
             insertQuery.Parameters.Add("@JointName1", jointName1);
@@ -669,6 +669,26 @@ namespace PARSE
 
             //scanLocID not returned (to keep it under 8) !!!
             return Tuple.Create(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+        }
+
+        //scan location timestamps
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> locTimestamps()
+        {
+            LinkedList<int> scanLocID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT scanLocID, timestamp FROM ScanLocations";
+            selectQuery.Parameters.Clear();
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanLocID.AddLast(reader.GetInt32(0));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(7).ToString()));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanLocID, timestamp);
         }
 
         //scan location cut

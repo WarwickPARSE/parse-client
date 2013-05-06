@@ -103,6 +103,8 @@ namespace PARSE
                 
                 //add record to database
                 db.insertScanLocations("null", skel.jointName1, "null", skel.offsetXJ1, skel.offsetYJ1, "0", timestamp);
+
+                Console.WriteLine("Writing to database! Values = " + skel.jointName1 + ", " + skel.offsetXJ1 + ", " + skel.offsetYJ1);
             }
 
             
