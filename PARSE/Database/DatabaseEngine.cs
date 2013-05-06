@@ -758,6 +758,10 @@ namespace PARSE
             this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
             this.con.Open();
 
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT * FROM Scans WHERE scanID = " + criterion;
             selectQuery.Parameters.Clear();
