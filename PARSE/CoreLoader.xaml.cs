@@ -1262,6 +1262,7 @@ namespace PARSE
             for (int i = 0; i < outputTimes.Count; i++)
             {
                 //if this crashes, talk to Bernard cause it works on my machine :p
+                //faf
                 try
                 {
                     double value = db.getScanResult(outputScans[i]).Item4.First.Value;
