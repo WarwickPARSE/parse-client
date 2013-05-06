@@ -410,7 +410,8 @@ namespace PARSE.Tracking
             IEnumerable<Skeleton> temp = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
             if (temp.Count() == 1)
             {
-                CurrentPosition.updatePosition(this.x, this.y, this.angleXY, this.angleZ, temp.First());
+
+                //CurrentPosition.updatePosition(this.x, this.y, this.angleXY, this.angleZ, temp.First());
             }
         }
 

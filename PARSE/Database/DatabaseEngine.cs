@@ -379,20 +379,20 @@ namespace PARSE
 
             SqlCeCommand insertQuery = this.con.CreateCommand();
 
-            insertQuery.CommandText = "INSERT INTO ScanLocations (boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations (jointName1, distJoint1, distJoint2, timestamp) VALUES (@JointName1, @DistJoint1, @DistJoint2, @Timestamp)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@BoneName", boneName);
+            //insertQuery.Parameters.Add("@BoneName", boneName);
             insertQuery.Parameters.Add("@JointName1", jointName1);
-            insertQuery.Parameters.Add("@JointName2", jointName2);
+            //insertQuery.Parameters.Add("@JointName2", jointName2);
             insertQuery.Parameters.Add("@DistJoint1", distJoint1);
             insertQuery.Parameters.Add("@DistJoint2", distJoint2);
-            insertQuery.Parameters.Add("@JointsDist", jointsDist);
+            //insertQuery.Parameters.Add("@JointsDist", jointsDist);
             insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
             rowsAffected = insertQuery.ExecuteNonQuery();
 
             this.con.Close();
 
-            System.Diagnostics.Debug.WriteLine(rowsAffected);
+            System.Diagnostics.Debug.WriteLine(insertQuery.CommandText);
         }
 
         public void scans(int scanTypeID, String pointCloudFileReference, String description, DateTime timestamp)

@@ -48,6 +48,7 @@ namespace PARSE
         public MeasurementLoader           windowMeasurement;
         public DebugLoader                 windowDebug;
         public MetaLoader                  windowMeta;
+        public SkeletonPosition            savedLocation;
 
         //Window setup states
         public enum OperationModes

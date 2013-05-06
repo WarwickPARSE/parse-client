@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.Kinect;
 
-namespace PARSE.Tracking
+namespace PARSE
 {
-    class SkeletonPosition
+    public class SkeletonPosition
     {
         public Skeleton patient { get; set; }
 
@@ -44,6 +44,8 @@ namespace PARSE.Tracking
         internal double distanceTo(SkeletonPosition skeletonPosition)
         {
             double distance = 50;
+            System.Diagnostics.Debug.WriteLine("JN1 " + this.jointName1);
+            System.Diagnostics.Debug.WriteLine("SPJN1 " + skeletonPosition.jointName1);
 
             if (this.jointName1 != skeletonPosition.jointName1)
                 return 100;
@@ -102,9 +104,9 @@ namespace PARSE.Tracking
         /// <param name="angleXY"></param>
         /// <param name="angleZ"></param>
         /// <param name="skeleton"></param>
-        internal void updatePosition(int x, int y, double angleXY, double angleZ, Skeleton skeleton)
+        /*internal void updatePosition(int x, int y, double angleXY, double angleZ, Skeleton skeleton)
         {
             // Update the position?
-        }
+        }*/
     }
 }
