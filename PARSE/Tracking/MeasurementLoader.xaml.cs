@@ -15,6 +15,8 @@ namespace PARSE
     {
         // Reference to the tracking class.
         SensorTracker tracker;
+        private enum CaptureModes {Capture_New, Capture_Existing};
+        private int CaptureMode = 0;
 
         public MeasurementLoader()
         {
@@ -53,6 +55,8 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
+            this.CaptureMode = (int)CaptureModes.Capture_New;
+
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
@@ -87,10 +91,17 @@ namespace PARSE
         {
             System.Diagnostics.Debug.WriteLine("Scan captured! END");
 
-            // Capture data from the scanner....
+            if (this.CaptureMode == (int)CaptureModes.Capture_New)
+            {
+                // Write location and timestamp to the database
+            }
 
-            // TODO write to the database
 
+            if (this.CaptureMode == (int)CaptureModes.Capture_Existing)
+            {
+                // Capture data from the scanner....
+            }
+           
             tracker.stop();
             this.Close();
         }
@@ -102,6 +113,37 @@ namespace PARSE
                 tracker.stop();
                 tracker.close();
             }
+        }
+
+        private void scan_existing_Click(object sender, RoutedEventArgs e)
+        {
+            this.CaptureMode = (int)CaptureModes.Capture_Existing;
+
+            // hide buttons from form
+            //cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
+
+            // show image & instructions
+            Visualisation.Visibility = Visibility.Visible;
+            instructionblock.Visibility = Visibility.Collapsed;
+            instructionblock2.Text = "Loading...";
+            instructionblock2.Visibility = Visibility.Visible;
+
+            // TODO move the button to the edge but keep it visible
+            cancel_scan.Visibility = Visibility.Hidden;
+
+            System.Diagnostics.Debug.WriteLine("Starting measurement window...");
+
+            // Start tracking
+            tracker = new SensorTracker(Visualisation, this, instructionblock2);
+            //tracker.captureNewLocation();
+
+            // Get a position from the database
+            SkeletonPosition targetLocation = null;
+            tracker.captureAtLocation(targetLocation);
+
+            // Hook up to the capture event, fired by the tracker.
+            tracker.Capture += new SensorTracker.CaptureEventHandler(capture);
         }
     }
 }

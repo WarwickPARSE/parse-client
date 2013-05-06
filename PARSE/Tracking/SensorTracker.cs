@@ -442,41 +442,44 @@ namespace PARSE.Tracking
                 highlightSensor(this.x, this.y);
             }
 
-
-
-            /* TODO REMOVE THIS AWFUL HACK OR NOTHING WILL WORK PROPERLY */
-                                //activeSkeletons = 2;
-            /* Alternatively, use it to force-feed the system skeletons  */
-            /*                                                           */
-
-
-            // Update text!
-            // If not enough skeletons, not enough people. Wait for them!
-            if (activeSkeletons < 2)
+            if (this.Capture_Mode == (int)Capture_Modes.Capture_On_Still)
             {
-                this.displayText.Text = "Waiting for doctor and patient";
-            }
-            // If enough people (exactly)...
-            else if (activeSkeletons == 2)
-            {
-                // Wait to identify the doctor/patient by finding the scanner
-                if (!skeletonsIdentified)
+
+                // Update text!
+                // If not enough skeletons, not enough people. Wait for them!
+                if (activeSkeletons < 2)
                 {
-                    this.displayText.Text = "Identifying patient & searching for scanner";
+                    this.displayText.Text = "Waiting for doctor and patient";
                 }
-                // Display timer as all is going so well
-                else
+                // If enough people (exactly)...
+                else if (activeSkeletons == 2)
                 {
-                    if ((capture_timer_length - captureTimer) < 10)
+                    // Wait to identify the doctor/patient by finding the scanner
+                    if (!skeletonsIdentified)
                     {
-                        this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        this.displayText.Text = "Identifying patient & searching for scanner";
                     }
+                    // Display timer as all is going so well
                     else
                     {
-                        this.displayText.Text = "Hold scanner still to capture";
+                        if ((capture_timer_length - captureTimer) < 10)
+                        {
+                            this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        }
+                        else
+                        {
+                            this.displayText.Text = "Hold scanner still to capture";
+                        }
                     }
                 }
             }
+            else if (Capture_Mode == (int)Capture_Modes.Capture_At_Position)
+            {
+                this.displayText.Text = "Distance to target: " + CurrentPosition.distanceTo(PositionTarget).ToString();
+
+
+            }
+
 
             //if (this.capture_timer_running && (this.capture_timer_length - this.captureTimer) < 10)
                 //this.displayText.Text += (this.capture_timer_length - this.captureTimer);
@@ -562,7 +565,7 @@ namespace PARSE.Tracking
                     else
                     {
                         this.captureTimer = 0;
-                        this.displayText.Text = "Move the sensor closer";
+                        this.displayText.Text = "Move the sensor closer to the target position";
                         // TODO display instructions for moving the sensor closer?
                     }
                 }
