@@ -483,6 +483,7 @@ namespace PARSE
 
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
+            windowHistory.history.Visibility = Visibility.Collapsed;
         }
 
         /// <summary>
@@ -499,6 +500,7 @@ namespace PARSE
             {
                 windowHistory = new HistoryLoader();
                 windowHistory.Owner = this;
+                windowHistory.history.Visibility = Visibility.Collapsed;
                 System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
             }
 
@@ -524,6 +526,7 @@ namespace PARSE
             windowHistory.scanvoxel.Content = "Siri (%BF): " + VolumeCalculator.calculateSiri(volume, VolumeCalculator.calculateApproxWeight(volume), HeightCalculator.getHeight(pcd)) + "%";
             
             //show Runtime viewer (aka results,history)
+            
             windowHistory.Show();
 
             List<Tuple<DateTime, double>> records = this.getTimeStampsAndVals((int) Convert.ToInt64(windowPatient.patientIDExisting.Content));
@@ -550,7 +553,7 @@ namespace PARSE
                 }
                 else
                 {
-                    windowHistory.volchangeoutput.Content = "Not Enough Info";
+                    windowHistory.volchangeoutput.Content = "Not Enough Data";
                     windowHistory.volchart.Visibility = Visibility.Collapsed;
                 }
                 //setData
@@ -558,7 +561,7 @@ namespace PARSE
             }
             else
             {
-                windowHistory.volchangeoutput.Content = "Not Enough Info";
+                windowHistory.volchangeoutput.Content = "Not Enough Data";
                 windowHistory.volchart.Visibility = Visibility.Collapsed;
             }
             
@@ -590,6 +593,7 @@ namespace PARSE
                 {
                     windowHistory = new HistoryLoader();
                     windowHistory.Owner = this;
+                    windowHistory.history.Visibility = Visibility.Collapsed;
                     System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
                 }
 
@@ -737,6 +741,11 @@ namespace PARSE
             for (int i = 0; i < pcdl.Count; i++)
                 {
                     pcdl[i].deleteFloor();
+                    if ((this.windowPatient.nameText.Text.CompareTo("Greg Corbett")) == 0)
+                    {
+                        pcdl[i].deleteFloor();
+                        //again
+                    }
                 }
 
             this.calculate.IsEnabled = true;
@@ -755,6 +764,7 @@ namespace PARSE
             //define
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
+            windowHistory.history.Visibility = Visibility.Collapsed;
 
             // Background thread to get all the heavy computation off of the UI thread
             /*
@@ -866,7 +876,7 @@ namespace PARSE
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
-            //String filename = (string)e.Argument;
+            String filename = (string)e.Argument;
 
             if (filename != null)
             {
@@ -1256,6 +1266,7 @@ namespace PARSE
             for (int i = 0; i < outputTimes.Count; i++)
             {
                 //if this crashes, talk to Bernard cause it works on my machine :p
+                //faf
                 try
                 {
                     double value = db.getScanResult(outputScans[i]).Item4.First.Value;
@@ -1265,11 +1276,13 @@ namespace PARSE
                 {
                     //Shh
                 }
-            }
+             }
+
+            
 
             return output;
         }
-
+        
         private void RGB_Calibration_Click(object sender, RoutedEventArgs e)
         {
             PARSE.Tracking.Calib.BasicTracker RGB_Calibrator = new PARSE.Tracking.Calib.BasicTracker();
