@@ -104,6 +104,7 @@ namespace PARSE
                 this.patientIDText.Text = (activeID + 1).ToString();
             }
 
+            this.nameLabel.ToString();
         }
 
         private void PatientLoaderExisting_Loaded(object Sender, RoutedEventArgs e)

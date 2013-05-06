@@ -202,7 +202,6 @@ namespace PARSE
         /// <returns>Boolean</returns>
         public Boolean isSkeletonEnabled()
         {
-            //random 4am commit :p
             return this.kinectSensor.SkeletonStream.IsEnabled;
         }
 

@@ -32,12 +32,6 @@ namespace PARSE.Tracking
         {
         }
 
-        public void addToDatabase()
-        {
-            //initialise database class
-            //add record to database
-        }
-
         /// <summary>
         /// Returns a distance metric, which describes the distance between this SP and the provided SP.
         /// </summary>
@@ -48,8 +42,21 @@ namespace PARSE.Tracking
         /// <returns></returns>
         internal double distanceTo(SkeletonPosition skeletonPosition)
         {
-            // Return 100 for now.
-            return 100;
+            double distance = 50;
+
+            if (this.jointName1 != skeletonPosition.jointName1)
+                return 100;
+
+            else
+            {
+                double dx = this.offsetXJ1 - skeletonPosition.offsetXJ1;
+                double dy = this.offsetYJ1 - skeletonPosition.offsetYJ1;
+
+                distance = Math.Pow(dx, 2) + Math.Pow(dy, 2);
+                distance = Math.Pow(distance, -2);
+            }
+
+            return distance;
         }
 
         
