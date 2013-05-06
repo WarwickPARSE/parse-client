@@ -151,7 +151,15 @@ namespace PARSE
             //tracker.captureNewLocation();
 
             // Get a position from the database
-            SkeletonPosition targetLocation = null;
+            SkeletonPosition targetLocation = new SkeletonPosition();
+
+            DatabaseEngine db = new DatabaseEngine();
+            Tuple<int, String, double, double, DateTime> scanloc = db.getLatestScanLoc();
+
+            targetLocation.jointName1 = scanloc.Item2;
+            targetLocation.offsetXJ1 = scanloc.Item3;
+            targetLocation.offsetYJ1 = scanloc.Item4;
+
             tracker.captureAtLocation(targetLocation);
 
             // Hook up to the capture event, fired by the tracker.

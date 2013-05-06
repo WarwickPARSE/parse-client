@@ -203,7 +203,6 @@ namespace PARSE
         //select latest scan location timestamp
         public Tuple<int, String, double, double, DateTime> getLatestScanLoc()
         {
-            Tuple<int, String, double, double, DateTime> scan = null;
             Selection sr = new Selection(con);
 
             Tuple<LinkedList<int>, LinkedList<DateTime>> patients = getScanLocationTimestamps();
@@ -231,7 +230,7 @@ namespace PARSE
                 }
             }
 
-            scan = sr.ScanLocationsCut(scanLoc, last);
+            Tuple<int, String, double, double, DateTime> scan = sr.ScanLocationsCut(scanLoc, last);
 
             return scan;
         }
@@ -373,7 +372,13 @@ namespace PARSE
         public void scanLocations(String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, String jointsDist, DateTime timestamp)
         {
             int rowsAffected = 0;
+
+           // this.con = new SqlCeConnection();
+           // this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+           // this.con.Open();
+
             SqlCeCommand insertQuery = this.con.CreateCommand();
+
             insertQuery.CommandText = "INSERT INTO ScanLocations (boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@BoneName", boneName);
@@ -384,6 +389,10 @@ namespace PARSE
             insertQuery.Parameters.Add("@JointsDist", jointsDist);
             insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
             rowsAffected = insertQuery.ExecuteNonQuery();
+
+            this.con.Close();
+
+            System.Diagnostics.Debug.WriteLine(rowsAffected);
         }
 
         public void scans(int scanTypeID, String pointCloudFileReference, String description, DateTime timestamp)
@@ -677,6 +686,10 @@ namespace PARSE
             LinkedList<int> scanLocID = new LinkedList<int>();
             LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
 
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT scanLocID, timestamp FROM ScanLocations";
             selectQuery.Parameters.Clear();
@@ -684,7 +697,7 @@ namespace PARSE
             while (reader.Read())
             {
                 scanLocID.AddLast(reader.GetInt32(0));
-                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(7).ToString()));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(1).ToString()));
             }
             reader.Close();
 
@@ -699,6 +712,10 @@ namespace PARSE
             double distJoint1 = 0;
             double distJoint2 = 0;
             DateTime timestamp = new DateTime();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT scanLocID, jointName1, distJoint1, distJoint2, timestamp FROM ScanLocations WHERE scanLocID LIKE @ID AND timestamp LIKE @Time";

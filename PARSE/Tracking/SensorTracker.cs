@@ -719,7 +719,6 @@ namespace PARSE.Tracking
             }
         }
 
-        //experiment
         private void findPosition(SkeletonPosition sp)
         {
             SkeletonPoint scannerPos = new SkeletonPoint();
@@ -745,6 +744,7 @@ namespace PARSE.Tracking
             }
 
             sp.joint1 = closestJoint;
+            sp.jointType1 = closestJoint.JointType;
             sp.jointName1 = closestJoint.JointType.ToString();
             sp.distanceJ1 = minDist;
             sp.offsetXJ1 = scannerPos.X - closestJoint.Position.X;

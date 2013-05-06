@@ -11,6 +11,7 @@ namespace PARSE.Tracking
         public Skeleton patient { get; set; }
 
         public Joint joint1 { get; set; }
+        public JointType jointType1 { get; set; }
         public String jointName1 { get; set; }
         public double distanceJ1 { get; set; }
         public double offsetXJ1 { get; set; } //if (-) then position of scanner smaller than position of joint
