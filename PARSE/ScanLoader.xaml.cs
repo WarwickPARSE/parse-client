@@ -399,9 +399,6 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                //Console.WriteLine(((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).windowPatient.nameLabel.Content.ToString());
-                //Environment.Exit(1);
-
                 if ((((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).windowPatient.nameText.Text.CompareTo("Greg Corbett")) == 0)
                 {
                     CloudVisualisation fudge = ScanSerializer.deserialize("./Corbett.PARSE");
