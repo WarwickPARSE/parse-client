@@ -1098,8 +1098,8 @@ namespace PARSE
                     }
             
                     //select pointcloudfilerference based on selected scan id.
-                    DatabaseEngine db1 = new DatabaseEngine();
-                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db1.selectQueries.Scans("scanID",latestScanTimeID.ToString());
+
+                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db.selectQueries.Scans("scanID",latestScanTimeID.ToString());
 
                     filename = pcScanResults.Item3.First.Value;
                     
