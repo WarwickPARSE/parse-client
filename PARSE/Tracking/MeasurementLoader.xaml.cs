@@ -95,7 +95,7 @@ namespace PARSE
             if (this.CaptureMode == (int)CaptureModes.Capture_New)
             {
                 // Write location and timestamp to the database
-            }
+            
                 
                 //initialise database class
                 DatabaseEngine db = new DatabaseEngine();
