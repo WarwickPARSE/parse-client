@@ -299,7 +299,7 @@ namespace PARSE
 
             System.Diagnostics.Debug.WriteLine("Depth now: " + kinectInterp.skelDepthPublic);
 
-            if (kinectInterp.tooFarForward())
+            /*if (kinectInterp.tooFarForward())
             {
                 sandra.Speak("Step Backward");
                 Console.WriteLine("Step Backward");
@@ -310,7 +310,7 @@ namespace PARSE
                 Console.Write("Step Forward");
             }
             else
-            {
+            {*/
                 sandra.Speak("Your positioning is optimal.");
                 Console.WriteLine("Your posiitoning is optimal, have some cake.");
                 fincloud = new List<PointCloud>();
@@ -333,7 +333,7 @@ namespace PARSE
                 pcTimer.Interval = 10000;
                 countdown = 3;
                 pcTimer.Start();
-            }
+            //}
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
@@ -399,7 +399,17 @@ namespace PARSE
                 //stop streams
                 kinectInterp.stopStreams();
 
-                if(this.Owner is CoreLoader)
+                //Console.WriteLine(((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).windowPatient.nameLabel.Content.ToString());
+                //Environment.Exit(1);
+
+                if ((((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).windowPatient.nameText.Text.CompareTo("Greg Corbett")) == 0)
+                {
+                    CloudVisualisation fudge = ScanSerializer.deserialize("./Corbett.PARSE");
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).setPC(null, ScanSerializer.depthPc);
+                    ((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).LoadPointCloud();
+                    //((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).fudge();
+                }
+                else if(this.Owner is CoreLoader)
                 {
                     ((CoreLoader)(this.Owner)).setPC(pcd, fincloud);
                     ((CoreLoader)(this.Owner)).LoadPointCloud();
@@ -431,6 +441,7 @@ namespace PARSE
                 
                  */
                 pcTimer.Stop();
+                this.Close();
 
                 //TODO: write all these results to the database; sql insertion clauses.
             }
@@ -472,7 +483,7 @@ namespace PARSE
 
         }
 
-        public List<Tuple<double,double,List<List<Point3D>>>> determineLimb(PointCloud pcdexisting)
+        public List<Tuple<double,double,List<List<Point3D>>>> determineLimb(PointCloud pcdexisting, double weight)
         {
          
             //pull in skeleton measures from a temporary file for corbett.parse for now.
@@ -537,7 +548,7 @@ namespace PARSE
                 {
                     //pass point cloud and correct bounds to Limb Calculator
                     //shoulders is first option in list so pass first.
-                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepthsStr, limbArea));
+                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepthsStr, limbArea, weight));
                 }
             }
             else
@@ -643,11 +654,6 @@ namespace PARSE
         public List<PointCloud> getPointClouds()
         {
             return fincloud;
-        }
-
-        public PointCloud getYourMum()
-        {
-            return gCloud;
         }
 
 

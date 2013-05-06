@@ -21,19 +21,57 @@ namespace PARSE
         public static PointCloud segmentedPointcloud;
 
         //Fudge factors for each limb, testing empirically and on the basis of the following papers:
-        private static double ArmFactor;
-        private static double LegFactor;
+        //This is because of the inferred skeletal limb positioning based on the inferrence algorithms
+        //detailed by Microsoft Research.
+
+        private static double ArmFactorL;
+        private static double LegFactorL;
+        private static double ArmFactorR;
+        private static double LegFactorR;
         private static double ChestFactor;
         private static double ShoulderFactor;
         private static double WaistFactor;
+        private static double premodifier;
 
 
-        public static Tuple<double,double,List<List<Point3D>>> calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, int limb) {
+        public static Tuple<double,double,List<List<Point3D>>> calculateLimbBounds(PointCloud pc, Dictionary<String, double[]> jointDepths, int limb, double weight) {
 
             //Calculate limb bounds based on limb choice
             double finalCircum = 0.0;
             double numPlanes = 0.0;
             Tuple<List<List<Point3D>>, double> T = new Tuple<List<List<Point3D>>, double>(null, 0);
+
+            //premodify limb circum factors with discovered weight
+            if (weight < 60)
+            {
+                ArmFactorL = 1.21;
+                LegFactorL = 3.89;
+                ArmFactorR = 1.02;
+                LegFactorR = 2.96;
+                ChestFactor = 1.62;
+                ShoulderFactor = 1.43;
+                WaistFactor = 6.63;
+            }
+            else if (weight >= 60 && weight < 90)
+            {
+                ArmFactorL = 1.07;
+                LegFactorL = 3.10;
+                ArmFactorR = 1.05;
+                LegFactorR = 2.95;
+                ChestFactor = 1.42;
+                ShoulderFactor = 1.41;
+                WaistFactor = 5.94;
+            }
+            else if (weight >= 90)
+            {
+                ArmFactorL = 0.91;
+                LegFactorL = 3.39;
+                ArmFactorR = 0.89;
+                LegFactorR = 3.51;
+                ChestFactor = 1.46;
+                ShoulderFactor = 1.53;
+                WaistFactor = 4.529;
+            }
 
             switch (limb) 
             {
@@ -50,6 +88,8 @@ namespace PARSE
 
                 bounds = new double[] { xmin, ymin, zmin, xmax, ymax, zmax };
 
+                premodifier = ShoulderFactor;
+
                 //translate bounds according to pointcloud data points
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
@@ -60,7 +100,7 @@ namespace PARSE
                 
                 //ARM_LEFT (2)
                 xmin = jointDepths["HipLeft"][1];
-                xmax = jointDepths["WristLeft"][1] + ((jointDepths["WristLeft"][1]-jointDepths["HipLeft"][1])/2);
+                xmax = jointDepths["WristLeft"][1] + ((jointDepths["WristLeft"][1]-jointDepths["HipLeft"][1])/4);
 
                 ymax = jointDepths["ShoulderLeft"][2];
                 ymin = jointDepths["WristLeft"][2];
@@ -72,6 +112,8 @@ namespace PARSE
 
                 //translate bounds according to pointcloud data points
 
+                premodifier = ArmFactorL;
+
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
                 break;
@@ -79,7 +121,7 @@ namespace PARSE
                 case 3:
 
                 //ARM_RIGHT (3)
-                xmin = jointDepths["WristRight"][1] - ((jointDepths["HipRight"][1]-jointDepths["WristRight"][1])/2);
+                xmin = jointDepths["WristRight"][1] - ((jointDepths["HipRight"][1]-jointDepths["WristRight"][1])/4);
                 xmax = jointDepths["HipRight"][1];
 
                 ymax = jointDepths["ShoulderRight"][2];
@@ -93,6 +135,8 @@ namespace PARSE
                 //translate bounds according to pointcloud data points
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                premodifier = ArmFactorR;
 
                 break;
 
@@ -115,6 +159,8 @@ namespace PARSE
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
+                premodifier = ChestFactor;
+
                 break;
 
                 case 5:
@@ -135,6 +181,8 @@ namespace PARSE
                 //translate bounds according to pointcloud data points
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
+
+                premodifier = WaistFactor;
 
                 break;
 
@@ -157,6 +205,8 @@ namespace PARSE
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
+                premodifier = LegFactorL;
+
                 break;
 
                 case 7:
@@ -178,6 +228,8 @@ namespace PARSE
 
                 System.Diagnostics.Debug.WriteLine("Bounds:" + xmin + ", " + ymin + ", " + zmin + ", " + xmax + ", " + ymax + ", " + zmax);
 
+                premodifier = LegFactorR;
+
                 break;
                 
                 default: break;
@@ -194,6 +246,7 @@ namespace PARSE
 
                 //Premodify the circumference calculation with the fudge factors. Convert into CM from M.
                 finalCircum = Math.Round(finalCircum * 100,5);
+                finalCircum = premodifier * finalCircum;
                
             }
             catch (Exception err)

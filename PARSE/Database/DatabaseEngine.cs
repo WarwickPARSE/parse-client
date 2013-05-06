@@ -66,11 +66,14 @@ namespace PARSE
             dbClose();
         }
 
-        public void insertScans(int scanTypeID, String pointCloudFileReference, DateTime timestamp)
+        public void insertScans(int scanTypeID, int patientID, String pointCloudFileReference, String description, DateTime timestamp)
         {
             dbOpen();
 
-            insertQueries.scans(scanTypeID, pointCloudFileReference, timestamp);
+            Insertion ins = new Insertion(con);
+
+            ins.scans(scanTypeID, pointCloudFileReference, description, timestamp);
+            ins.patientscans(patientID);
 
             dbClose();
         }
@@ -151,6 +154,7 @@ namespace PARSE
         // 1) select all patients (patientID and name)
         public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllPatients()
         {
+            dbOpen();
             Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patients = null;
             Selection sr = new Selection(con);
 
@@ -162,6 +166,8 @@ namespace PARSE
             {
                 System.Diagnostics.Debug.WriteLine("Error is occuring here");
             }
+
+            dbClose();
 
             return patients;
         }
@@ -307,7 +313,7 @@ namespace PARSE
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO ScanLocations ((boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES ('@BoneName', '@JointName1', '@JointName2', @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
+            insertQuery.CommandText = "INSERT INTO ScanLocations ((boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp) VALUES (@BoneName, @JointName1, @JointName2, @DistJoint1, @DistJoint2, @JointsDist, @Timestamp)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@BoneName", boneName);
             insertQuery.Parameters.Add("@JointName1", jointName1);
@@ -319,16 +325,46 @@ namespace PARSE
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void scans(int scanTypeID, String pointCloudFileReference, DateTime timestamp)
+        public void scans(int scanTypeID, String pointCloudFileReference, String description, DateTime timestamp)
         {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO ScanLocations ((scanTypeID, pointCloudFileReference, timestamp) VALUES (@ScanTypeID, '@pointCloudFileReference', @Timestamp)";
+            insertQuery.CommandText = "INSERT INTO Scans (scanTypeID, pointCloudFileReference, description, timestamp) VALUES (@ScanTypeID, @PointCloudFileReference, @Description, @Timestamp)";
             insertQuery.Parameters.Clear();
             insertQuery.Parameters.Add("@ScanTypeID", scanTypeID);
             insertQuery.Parameters.Add("@PointCloudFileReference", pointCloudFileReference);
+            insertQuery.Parameters.Add("@Description", description);
             insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
             rowsAffected = insertQuery.ExecuteNonQuery();
+
+            System.Diagnostics.Debug.WriteLine(rowsAffected);
+        }
+
+        public void patientscans(int patientID)
+        {
+            int rowsAffected = 0;
+            int scanId = 0;
+
+            //select query for getting last added scan
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT MAX(scanID) FROM Scans";
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanId = reader.GetInt32(0);
+            }
+            reader.Close();
+
+            //insert query for adding latest scan to the patientscans table
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO PatientScans (patientID, scanID) VALUES (@patientID, @scanID)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@patientID", patientID);
+            insertQuery.Parameters.Add("@scanID", scanId);
+            rowsAffected = insertQuery.ExecuteNonQuery();
+            
+                  
         }
 
         public void records(int scanID, int scanTypeID, double value)

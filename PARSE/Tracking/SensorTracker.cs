@@ -755,7 +755,7 @@ namespace PARSE.Tracking
             System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
             System.Diagnostics.Debug.WriteLine("Scanner Position: ("+x_actual_skel+","+y_actual_skel+")");
         }
-
+           
         /// <summary>
         /// Call whatever is supposed to happen on the capture event
         /// </summary>
