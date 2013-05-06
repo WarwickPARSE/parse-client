@@ -483,6 +483,7 @@ namespace PARSE
 
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
+            windowHistory.history.Visibility = Visibility.Collapsed;
         }
 
         /// <summary>
@@ -499,6 +500,7 @@ namespace PARSE
             {
                 windowHistory = new HistoryLoader();
                 windowHistory.Owner = this;
+                windowHistory.history.Visibility = Visibility.Collapsed;
                 System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
             }
 
@@ -591,6 +593,7 @@ namespace PARSE
                 {
                     windowHistory = new HistoryLoader();
                     windowHistory.Owner = this;
+                    windowHistory.history.Visibility = Visibility.Collapsed;
                     System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
                 }
 
@@ -761,6 +764,7 @@ namespace PARSE
             //define
             windowHistory = new HistoryLoader();
             windowHistory.Owner = this;
+            windowHistory.history.Visibility = Visibility.Collapsed;
 
             // Background thread to get all the heavy computation off of the UI thread
             /*
@@ -1278,7 +1282,7 @@ namespace PARSE
 
             return output;
         }
-
+        
         private void RGB_Calibration_Click(object sender, RoutedEventArgs e)
         {
             PARSE.Tracking.Calib.BasicTracker RGB_Calibrator = new PARSE.Tracking.Calib.BasicTracker();
