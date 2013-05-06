@@ -698,17 +698,15 @@ namespace PARSE.Tracking
         {
             Console.WriteLine("Capture position!!!");
 
-            SkeletonPosition skeletonPos = new SkeletonPosition();
-
             // Update patient position
             IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
             Console.WriteLine("Patient ID:  " + this.patientSkeletonID);
             if (patient.Count() == 1)
             {
-                skeletonPos.patient = patient.First();
-                findPosition(skeletonPos);
-                skeletonPos.angleXY = angleXY;
-                skeletonPos.angleZ = angleZ;
+                CurrentPosition.patient = patient.First();
+                findPosition(CurrentPosition);
+                CurrentPosition.angleXY = angleXY;
+                CurrentPosition.angleZ = angleZ;
 
                 return true;
             }
@@ -757,7 +755,7 @@ namespace PARSE.Tracking
             System.Diagnostics.Debug.WriteLine("Distance: " + minDist);
             System.Diagnostics.Debug.WriteLine("Scanner Position: ("+x_actual_skel+","+y_actual_skel+")");
         }
-
+           
         /// <summary>
         /// Call whatever is supposed to happen on the capture event
         /// </summary>

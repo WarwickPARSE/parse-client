@@ -86,6 +86,7 @@ namespace PARSE
 
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
+        private double volume;
 
         public CoreLoader()
         {
@@ -114,6 +115,13 @@ namespace PARSE
             //Miscellaneous modelling definitions
             Model = new GeometryModel3D();
             BaseModel = new GeometryModel3D();
+
+            //Set default working directory
+            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\PARSE"))
+            {
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\PARSE");
+            }
+            workingDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\PARSE";
 
             this.resetButtons();
 
@@ -175,6 +183,73 @@ namespace PARSE
 
             verno.Content = "Version no: " + version;
 
+            //populate recent patients area if there are any
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> recentPatients = db.getAllPatients();
+
+            //use string list for representing more sensibly
+            List<String> patientInfo = new List<String>();
+
+            LinkedListNode<int> nodeID = recentPatients.Item1.First;
+            LinkedListNode<String> nodeName = recentPatients.Item2.First;
+
+            //populate datagrid
+
+            while (nodeID != null)
+            {
+                var nextID = nodeID.Next;
+                var nextName = nodeName.Next;
+
+                recentPatients.Item1.Remove(nodeID);
+                recentPatients.Item2.Remove(nodeName);
+
+                //null check when at end of list
+                if (nodeID != null)
+                {
+                    patientInfo.Add(nodeID.Value + " - " + nodeName.Value); 
+                }
+
+                nodeID = nextID;
+                nodeName = nextName;
+
+            }
+
+            //add up to 5 recent patients
+            if (patientInfo.Count != 0)
+            {
+                foreach (String p in patientInfo)
+                {
+                    System.Windows.Controls.Label linklabel = new System.Windows.Controls.Label();
+                    Run linktext = new Run(p);
+                    Hyperlink link = new Hyperlink(linktext);
+
+                    link.Click += new RoutedEventHandler(recentpatientlink_Click);
+                    linklabel.Content = link;
+
+                    sp1.Children.Add(linklabel);
+                }
+
+                recentpatients.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+
+                recentpatients.Visibility = Visibility.Visible;
+
+            }
+
+        }
+
+        void recentpatientlink_Click(object sender, RoutedEventArgs e)
+        {
+            windowMeta = new MetaLoader();
+            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            windowMeta.Owner = this;
+            windowMeta.button3.Visibility = Visibility.Collapsed;
+            windowMeta.Show();
+
+            this.export2.IsEnabled = true;
+
+            windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
         }
 
         /// <summary>
@@ -419,12 +494,22 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
+
+            if (windowHistory == null)
+            {
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+                System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
+            }
+
+            windowHistory.limbcircum.Visibility = Visibility.Collapsed;
+
             Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
             
             List<List<Point3D>> planes = T.Item1;
             double increment = T.Item2;
             
-            double volume = VolumeCalculator.volume1stApprox(planes,increment);
+            volume = VolumeCalculator.volume1stApprox(planes,increment);
             volume = Math.Round(volume,4);
 
             List<double> areaList = AreaCalculator.getAllAreas(planes);
@@ -435,7 +520,7 @@ namespace PARSE
             windowHistory.voloutput.Content = volume + "m\u00B3";
             windowHistory.heightoutput.Content = HeightCalculator.getHeight(pcd) + "m";
             windowHistory.scantime.Content = "Weight (Est): " + VolumeCalculator.calculateApproxWeight(volume) + "kg";
-            windowHistory.scanfileref.Content = "BMI Measure: " + VolumeCalculator.calculateBMI(VolumeCalculator.calculateApproxWeight(volume),HeightCalculator.getHeight(pcd));
+            windowHistory.scanfileref.Content = "BMI Measure: " + VolumeCalculator.calculateBMI(HeightCalculator.getHeight(pcd), VolumeCalculator.calculateApproxWeight(volume));
             windowHistory.scanvoxel.Content = "Siri (%BF): " + VolumeCalculator.calculateSiri(volume, VolumeCalculator.calculateApproxWeight(volume), HeightCalculator.getHeight(pcd)) + "%";
             
             //show Runtime viewer (aka results,history)
@@ -476,10 +561,6 @@ namespace PARSE
                 windowHistory.volchangeoutput.Content = "Not Enough Info";
                 windowHistory.volchart.Visibility = Visibility.Collapsed;
             }
-
-            System.Media.SoundPlayer player = new System.Media.SoundPlayer();
-            player.SoundLocation = "Base.wav";
-            player.Play();
             
         }
 
@@ -504,11 +585,17 @@ namespace PARSE
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
                 /*Requires generated model, raw depth array and previous*/
-                List<Tuple<double,double,List<List<Point3D>>>> result = windowScanner.determineLimb(pcd);
-                /*Then open history loader (limb circum stuff will be set here soon)*/
-                HistoryLoader windowHistory = new HistoryLoader();
+                List<Tuple<double,double,List<List<Point3D>>>> result = windowScanner.determineLimb(pcd, VolumeCalculator.calculateApproxWeight(volume));
+                if (windowHistory == null)
+                {
+                    windowHistory = new HistoryLoader();
+                    windowHistory.Owner = this;
+                    System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
+                }
+
+                windowHistory.limbcircum.Visibility = Visibility.Visible;
+                windowHistory.history.Visibility = Visibility.Visible;
                 windowHistory.runtimeTab.SelectedIndex = 1;
-                windowHistory.Owner = this;
                 windowHistory.Show();
                 windowHistory.visualiseLimbs(result, 1, 1);
 
@@ -569,25 +656,28 @@ namespace PARSE
                 this.export2.IsEnabled = false;
             }
 
+            int numPoints = pcdl[0].getAllPoints().Length + pcdl[1].getAllPoints().Length + pcdl[2].getAllPoints().Length + pcdl[3].getAllPoints().Length;
+
+            //start subroutine to save to the PCD File's in a new directory
+            TextWriter tw = new StreamWriter(filename);
+
+            //write versioning info
+            tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
+            tw.WriteLine("VERSION 1.6");
+
+            //write metadata
+            tw.WriteLine("FIELDS x y z rgb");
+            tw.WriteLine("SIZE 4 4 4 4");
+            tw.WriteLine("TYPE F F F F");
+            tw.WriteLine("COUNT 1 1 1 1");
+            tw.WriteLine("WIDTH " + numPoints);
+            tw.WriteLine("HEIGHT 1");
+            tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
+            tw.WriteLine("POINTS " + numPoints);
+            tw.WriteLine("DATA ascii");
+
             for (int j = 0; j < pcdl.Count; j++)
             {
-                //start subroutine to save to the PCD File's in a new directory
-                TextWriter tw = new StreamWriter(filename+"_"+j);
-
-                //write versioning info
-                tw.WriteLine("# .PCD v1.6 - Point Cloud Data file format");
-                tw.WriteLine("VERSION 1.6");
-
-                //write metadata
-                tw.WriteLine("FIELDS x y z rgb");
-                tw.WriteLine("SIZE 4 4 4 4");
-                tw.WriteLine("TYPE F F F F");
-                tw.WriteLine("COUNT 1 1 1 1");
-                tw.WriteLine("WIDTH " + pcdl[j].getAllPoints().Length);
-                tw.WriteLine("HEIGHT 1");
-                tw.WriteLine("VIEWPOINT 0 0 0 1 0 0 0");
-                tw.WriteLine("POINTS " + pcdl[j].getAllPoints().Length);
-                tw.WriteLine("DATA ascii");
 
                 //store all points.
                 //pc.rotate(new double[] { 0, 1, 0 }, -90);
@@ -600,8 +690,11 @@ namespace PARSE
                     tw.WriteLine(point[i].point.X + " " + point[i].point.Y + " " + point[i].point.Z + " 4.2108e+06");
                 }
 
-                tw.Close();
             }
+
+            tw.Close();
+
+            MessageBoxResult result = System.Windows.MessageBox.Show(this, "Patient scan exported to .PCD ("+filename+")", "Scan successfully exported", MessageBoxButton.OK, MessageBoxImage.Information);
 
         }
 
@@ -726,11 +819,16 @@ namespace PARSE
 
             //Load metaloader with list of currently recorded patients provide the option to just load point cloud if required.
 
+            this.export1.IsEnabled = false;
+            this.export2.IsEnabled = true;
+
             windowMeta = new MetaLoader();
             windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             windowMeta.Owner = this;
             windowMeta.button3.Visibility = Visibility.Collapsed;
             windowMeta.Show();
+
+            this.export2.IsEnabled = true;
 
             windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
 
@@ -773,7 +871,7 @@ namespace PARSE
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
-            //String filename = (string)e.Argument;
+            String filename = (string)e.Argument;
 
             if (filename != null)
             {
@@ -815,7 +913,7 @@ namespace PARSE
 
             // Get the height
             double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
-            Dispatcher.BeginInvoke((Action)(() => { windowHistory.heightoutput.Content = height + "m"; }));
+            Dispatcher.BeginInvoke((Action)(() => { int progress = 1; }));
             B.ReportProgress(1);
         }
 
@@ -918,6 +1016,7 @@ namespace PARSE
         private void OpenPatient_Click(object sender, RoutedEventArgs e)
         {
             this.LoadPointCloudFromFile();
+
         }
 
         /// <summary>
@@ -927,7 +1026,9 @@ namespace PARSE
 
         public void LoadPointCloudFromFile(int patientid=0)
         {
-            
+
+            //set active point cloud controls.
+
             LinkedListNode<int> scanID;
             LinkedListNode<DateTime> timestamp;
             DateTime latestScanTime = new DateTime();
@@ -1002,8 +1103,8 @@ namespace PARSE
                     }
             
                     //select pointcloudfilerference based on selected scan id.
-
-                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db.selectQueries.Scans("scanID",latestScanTimeID.ToString());
+                    DatabaseEngine db1 = new DatabaseEngine();
+                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db1.selectQueries.Scans("scanID",latestScanTimeID.ToString());
 
                     filename = pcScanResults.Item3.First.Value;
                     
@@ -1030,12 +1131,12 @@ namespace PARSE
 
                 // Do UI stuff on UI thread
                 this.export1.IsEnabled = false;
-                this.export2.IsEnabled = false;
+                this.export2.IsEnabled = true;
                 this.removefloor.IsEnabled = true;
 
                 //define
-                windowHistory = new HistoryLoader();
-                windowHistory.Owner = this;
+                //windowHistory = new HistoryLoader();
+                //windowHistory.Owner = this;
 
                 // Background thread to get all the heavy computation off of the UI thread
                 BackgroundWorker B = new BackgroundWorker();
@@ -1084,18 +1185,45 @@ namespace PARSE
 
         private void SaveScan_Click(object sender, RoutedEventArgs e)
         {
-            windowMeta = new MetaLoader();
-            windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            windowMeta.Owner = this;
-            
-            //save specific actions.
-            windowMeta.Title = "Attribute scan to whom?";
-            windowMeta.button1.Visibility = Visibility.Collapsed;
-            windowMeta.button2.Visibility = Visibility.Collapsed;
-            windowMeta.button3.Visibility = Visibility.Visible;
-            windowMeta.Show();
 
-            windowMeta.Closing += new CancelEventHandler(windowMeta_Closing);
+            //Test if patientloader is currently active and then attribute the scan to them.
+            //Otherwise if this is not the case, we need to manually attribute the scan to 
+            //a patient.
+
+            DateTime curTime = DateTime.Now;
+
+            if (windowPatient == null)
+            {
+
+                windowMeta = new MetaLoader();
+                windowMeta.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                windowMeta.Owner = this;
+
+                //save specific actions.
+                windowMeta.setWorkingDir(workingDir);
+                windowMeta.setPC(pcdl);
+                windowMeta.Title = "Attribute scan to whom?";
+                windowMeta.button1.Visibility = Visibility.Collapsed;
+                windowMeta.button2.Visibility = Visibility.Collapsed;
+                windowMeta.button3.Visibility = Visibility.Visible;
+                windowMeta.Show(); 
+            
+            }
+            else
+            {
+                int currentPatient = Convert.ToInt32(windowPatient.patientIDExisting.Content);
+
+                //save to db and workingdirectory with appropriate id.
+
+                db.insertScans(1, currentPatient, System.IO.Path.Combine(workingDir,currentPatient + "-" + curTime.ToString("ddMMyyyyHHMM") + ".PARSE"), "",curTime);
+
+                //save scan to .parse file in the working directory
+                ScanSerializer.serialize(System.IO.Path.Combine(workingDir, currentPatient + "-" + curTime.ToString("ddMMyyyyHHMM") + ".PARSE"), pcdl);
+
+                MessageBoxResult result = System.Windows.MessageBox.Show(this, "Patient saved to database", "Patient Scan Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            }
+
         }
 
         public List<Tuple<DateTime, double>> getTimeStampsAndVals(int patientID)
@@ -1133,8 +1261,15 @@ namespace PARSE
             for (int i = 0; i < outputTimes.Count; i++)
             {
                 //if this crashes, talk to Bernard cause it works on my machine :p
-                double value = db.getScanResult(outputScans[i]).Item4.First.Value;
-                output.Add(Tuple.Create(outputTimes[i], value));
+                try
+                {
+                    double value = db.getScanResult(outputScans[i]).Item4.First.Value;
+                    output.Add(Tuple.Create(outputTimes[i], value));
+                }
+                catch (Exception err)
+                {
+                    //Shh
+                }
             }
 
             return output;

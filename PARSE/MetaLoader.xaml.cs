@@ -9,7 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.IO;
 
 namespace PARSE
 {
@@ -21,6 +21,8 @@ namespace PARSE
     {
 
         private DatabaseEngine db = new DatabaseEngine();
+        private String workingDir;
+        private List<PointCloud> pcdl;
         Tuple<int, String, String> selectedRecord;
         LinkedListNode<int> nodeID;
         LinkedListNode<String> nodeName;
@@ -108,7 +110,39 @@ namespace PARSE
 
         private void button3_Click(object sender, RoutedEventArgs e)
         {
+            this.Hide();
 
+            DateTime curTime = DateTime.Now;
+
+            //retrieve as an anonymous object type
+            Object activeRecord = listBox1.SelectedItems[0];
+
+            //access attributes through reflection
+            dynamic d = activeRecord;
+            object id = d.Id;
+            object nm = d.Patientname;
+            object nhs = d.Patientnhsno;
+
+            int patientID = Convert.ToInt32(id);
+
+            db.insertScans(1, patientID, System.IO.Path.Combine(workingDir, patientID + "-" + curTime.ToString("ddMMyyyyHHMM") + ".PARSE"), "", curTime);
+
+            //save scan to .parse file in the working directory
+            ScanSerializer.serialize(Path.Combine(workingDir,patientID + "-" + curTime.ToString("ddMMyyyyHHMM") + ".PARSE"), pcdl);
+            
+            //confirm save
+            MessageBoxResult result = System.Windows.MessageBox.Show(this, "Patient saved to database", "Patient Scan Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+          
+        }
+
+        public void setWorkingDir(String wd)
+        {
+           workingDir = wd;
+        }
+
+        public void setPC(List<PointCloud> pc)
+        {
+            pcdl = pc;
         }
     }
 }

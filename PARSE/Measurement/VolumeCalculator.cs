@@ -43,14 +43,11 @@ namespace PARSE
             return volume;
         }
 
-        public static double calculateSiri(double volume, double weight, double height)
+        public static double calculateSiri(double bmi, double weight, double height)
         {
-            //For white people
-            //% Body Fat = (495 / Body Density) - 450.
+            //Uses BMI BF Currently
 
-            double density = weight / volume*100;
-
-            return ((4.95 / density) - 4.50)*100;
+            return Math.Abs(Math.Round(((((1.20*bmi) + (0.23*22)) - (10.8*1)) - 5.4),4));
         }
 
         public static double calculateBrozek(double volume, double weight, double height)
@@ -58,14 +55,18 @@ namespace PARSE
             //For black people
             // %fat = (457 / Body Density) – 414.2
 
-            double density = weight / volume*100;
+            //Body density = mass/volume
 
-            return ((4.57 / density) - 4.142)*100;
+            double density = weight / volume;
+
+            return ((457 / density) - 414.2);
         }
 
         public static double calculateBMI(double height, double weight)
         {
-            return (weight / height)*1000;
+            double heightSq = Math.Pow(height, 2);
+
+            return Math.Round((weight / heightSq),4);
         }
 
         public static double calculateApproxWeight(double volume)

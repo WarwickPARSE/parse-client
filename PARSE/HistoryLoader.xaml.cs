@@ -29,9 +29,12 @@ namespace PARSE
         private List<List<Point3D>> storedPlanes;
         private List<List<Point3D>> storedLimbPlanes;
         private List<Tuple<double, double, List<List<Point3D>>>> rawlimbData;
-
+        private String persistentBMI;
+        private String persistentSiri;
+   
         //publicly accessible area list from previous calculations
         public List<double> areaList;
+        public System.Windows.Shapes.Path path;
         
         public HistoryLoader()
         {
@@ -50,6 +53,10 @@ namespace PARSE
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
 
             this.limbselect.SelectedItem = 0;
+
+            //set persistent variables
+            persistentBMI = scanfileref.Content.ToString();
+            persistentSiri = scanvoxel.Content.ToString();
 
             //check if a scan event is in place
             if (storedPlanes.Count == 0)
@@ -109,6 +116,7 @@ namespace PARSE
 
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
+
             //Set relevant UI components to visisble
             bodyimg.Visibility = Visibility.Visible;
             planeNo.Visibility = Visibility.Visible;
@@ -134,6 +142,7 @@ namespace PARSE
             //Set relevant ui components to collapsed
             noresults.Visibility = Visibility.Collapsed;
             newscan.Visibility = Visibility.Collapsed;
+            scanno.Content = "Scan No: 1";
 
             planeNo.Text = "Plane Outline: " + (int)planeIndex;
 
@@ -208,6 +217,7 @@ namespace PARSE
         {
             System.Diagnostics.Debug.WriteLine("Opening Limb Visualisation Panel");
             rawlimbData = limbData;
+            maxarea2.Content = "Plane Region: " + planeIndex;
 
             circumlabel.Visibility = Visibility.Visible;
             circumoutput.Visibility = Visibility.Visible;
@@ -239,14 +249,31 @@ namespace PARSE
 
             //set ellipse visualisation circumference
             //TODO: add flag for diplaying historic ellipse vis.
-            historicEllipse.Visibility = Visibility.Collapsed;
+            //historicEllipse.Visibility = Visibility.Collapsed;
             historysel.Visibility = Visibility.Collapsed;
             changesel.Visibility = Visibility.Collapsed;
 
+            /*Current Limb Visualisation Code */
+
             circumsel.Text = "Circum Approx: " + limbData[limbIndex].Item1 + "cm";
             limbsel.Text = "Limb No: " + limbIndex;
-            currentEllipse.Width = limbData[limbIndex].Item1*100/3;
-            currentEllipse.Height = limbData[limbIndex].Item2*1000;
+
+            //Set limb view
+            limbView.Height = 486 * (limbData[limbIndex].Item1 / 100);
+            limbView.Width = 216 * (limbData[limbIndex].Item1 / 100);
+
+            //Set limb visualisation centre
+            EllipseGeometry eg = new EllipseGeometry();
+            eg.Center = new Point(limbView.Width / 2, limbView.Height / 2);
+            
+            scantime2.Content = "Scan Time: " + DateTime.Now.ToString("dd/MM/yy HH:mm");
+            scanvoxel2.Content = persistentSiri;
+            scanfileref2.Content = persistentBMI;
+
+            //VisCanvas.SetTop(currentEllipse, (VisCanvas.Height/2) - currentEllipse.Height / 2);
+            //Canvas.SetLeft(currentEllipse, (VisCanvas.Width/2) - currentEllipse.Width / 2);
+
+            /*End of current limb visualisation code */
             
 
             //visualise planes
@@ -329,7 +356,7 @@ namespace PARSE
 
         private void limbselect_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            visualiseLimbs(rawlimbData, (sender as ComboBox).SelectedIndex, 1);
+            visualiseLimbs(rawlimbData, (sender as ComboBox).SelectedIndex, 0);
         }
     }
 }
