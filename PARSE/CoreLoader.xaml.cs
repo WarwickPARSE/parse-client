@@ -551,7 +551,7 @@ namespace PARSE
                 }
                 else
                 {
-                    windowHistory.volchangeoutput.Content = "Not Enough Info";
+                    windowHistory.volchangeoutput.Content = "Not Enough Data";
                     windowHistory.volchart.Visibility = Visibility.Collapsed;
                 }
                 //setData
@@ -559,7 +559,7 @@ namespace PARSE
             }
             else
             {
-                windowHistory.volchangeoutput.Content = "Not Enough Info";
+                windowHistory.volchangeoutput.Content = "Not Enough Data";
                 windowHistory.volchart.Visibility = Visibility.Collapsed;
             }
             
