@@ -768,7 +768,7 @@ namespace PARSE
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
-            String filename = (string)e.Argument;
+            //String filename = (string)e.Argument;
 
             if (filename != null)
             {
