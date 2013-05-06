@@ -96,8 +96,17 @@ namespace PARSE
             {
                 // Write location and timestamp to the database
             }
+                
+                //initialise database class
+                DatabaseEngine db = new DatabaseEngine();
 
+                DateTime timestamp = new DateTime();
 
+                //add record to database
+                db.insertScanLocations(null, skel.jointName1, null, skel.offsetXJ1, skel.offsetYJ1, null, timestamp);
+            }
+
+            
             if (this.CaptureMode == (int)CaptureModes.Capture_Existing)
             {
                 // Capture data from the scanner....
