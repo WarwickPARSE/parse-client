@@ -86,6 +86,7 @@ namespace PARSE
 
         private const double oneParseUnit = 2642.5;
         private const double oneParseUnitDelta = 7.5;
+        private double volume;
 
         public CoreLoader()
         {
@@ -493,12 +494,22 @@ namespace PARSE
         private void VolumeOption_Click(object sender, RoutedEventArgs e)
         {
             //Static call to volume calculation method, pass persistent point cloud object
+
+            if (windowHistory == null)
+            {
+                windowHistory = new HistoryLoader();
+                windowHistory.Owner = this;
+                System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
+            }
+
+            windowHistory.limbcircum.Visibility = Visibility.Collapsed;
+
             Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
             
             List<List<Point3D>> planes = T.Item1;
             double increment = T.Item2;
             
-            double volume = VolumeCalculator.volume1stApprox(planes,increment);
+            volume = VolumeCalculator.volume1stApprox(planes,increment);
             volume = Math.Round(volume,4);
 
             List<double> areaList = AreaCalculator.getAllAreas(planes);
@@ -574,11 +585,17 @@ namespace PARSE
                 Tuple<List<List<Point3D>>, double> T = PlanePuller.pullAll(pcd);
                 List<List<Point3D>> planes = T.Item1;
                 /*Requires generated model, raw depth array and previous*/
-                List<Tuple<double,double,List<List<Point3D>>>> result = windowScanner.determineLimb(pcd);
-                /*Then open history loader (limb circum stuff will be set here soon)*/
-                HistoryLoader windowHistory = new HistoryLoader();
+                List<Tuple<double,double,List<List<Point3D>>>> result = windowScanner.determineLimb(pcd, VolumeCalculator.calculateApproxWeight(volume));
+                if (windowHistory == null)
+                {
+                    windowHistory = new HistoryLoader();
+                    windowHistory.Owner = this;
+                    System.Diagnostics.Debug.WriteLine("History loader was null, now set.");
+                }
+
+                windowHistory.limbcircum.Visibility = Visibility.Visible;
+                windowHistory.history.Visibility = Visibility.Visible;
                 windowHistory.runtimeTab.SelectedIndex = 1;
-                windowHistory.Owner = this;
                 windowHistory.Show();
                 windowHistory.visualiseLimbs(result, 1, 1);
 
@@ -891,7 +908,7 @@ namespace PARSE
 
             // Get the height
             double height = Math.Round(HeightCalculator.getHeight(pcd), 3);
-            Dispatcher.BeginInvoke((Action)(() => { windowHistory.heightoutput.Content = height + "m"; }));
+            Dispatcher.BeginInvoke((Action)(() => { int progress = 1; }));
             B.ReportProgress(1);
         }
 
@@ -1113,8 +1130,8 @@ namespace PARSE
                 this.removefloor.IsEnabled = true;
 
                 //define
-                windowHistory = new HistoryLoader();
-                windowHistory.Owner = this;
+                //windowHistory = new HistoryLoader();
+                //windowHistory.Owner = this;
 
                 // Background thread to get all the heavy computation off of the UI thread
                 BackgroundWorker B = new BackgroundWorker();

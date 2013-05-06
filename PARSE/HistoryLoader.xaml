@@ -34,7 +34,7 @@
                     </Hyperlink>
                     </TextBlock>
                     <!--Secondary "headline" labels-->
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno" Height="20" Content="Scan No: 1" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime" Height="20" Content="Weight (Est):" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel" Height="20" Content="Siri (%BF):" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
@@ -95,9 +95,9 @@
                     </TextBlock>
                     <!--Secondary "headline" labels-->
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanno2" Height="20" Content="Scan No:" Margin="325,110,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime2" Height="20" Content="Scan Time" Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scantime2" Height="20" Content="Scan Time: " Margin="325,130,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanfileref2" Height="20" Content="BMI Measure:" Margin="325,150,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
-                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel2" Height="20" Content="VH Ratio:" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanvoxel2" Height="20" Content="Siri (%BF):" Margin="325,170,8,8" Foreground="Black" FontFamily="Arial" FontSize="14" />
 
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="maxarea2" Height="20" Content="Plane {x}: {region}" Margin="8,118,8,8" Foreground="Black" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
 
@@ -120,21 +120,33 @@
                     <Button Content="Apply" Height="23" HorizontalAlignment="Left" Margin="525,195,0,0" Name="btnapply" VerticalAlignment="Top" Width="75" />
                     <Button Content="Clear" Height="23" HorizontalAlignment="Left" Margin="610,195,0,0" Name="btnclear" VerticalAlignment="Top" Width="75" />
                     <Canvas Name="VisCanvas" Width="486" Height="216" Background="WhiteSmoke" HorizontalAlignment="Right" MaxWidth="486" MaxHeight="216" Margin="0,0,29,24">
-                        <Canvas.RenderTransform>
-                            <ScaleTransform x:Name="st"/>
-                        </Canvas.RenderTransform>
-                        <Ellipse Height="100" Name="currentEllipse" Width="200" Stroke="Red" Margin="150,50,50,50" Fill="LightGray" />
+                    <!--    <Ellipse Height="100" Name="currentEllipse" Width="200" Stroke="Red" Margin="150,50,50,50" Fill="LightGray" />
                         <Ellipse Height="80" Name="historicEllipse" Width="160" Stroke="Blue" Margin="170,60,50,50" Fill="LightBlue" />
-                        <Line Height="100" Width="10" Stroke="Black" Fill="Black"></Line>
+                    --> <Line Height="100" Width="10" Stroke="Black" Fill="Black"></Line>
                         <TextBlock Height="25" FontFamily="Courier New" Margin="5,160" Width="200" FontStyle="Normal" Foreground="Red" Name="limbsel">Limb: ARM_LEFT</TextBlock>
                         <TextBlock Height="25" FontFamily="Courier New" Margin="5,180" Width="200" FontStyle="Normal" Foreground="Red" Name="circumsel">Circum Approx: 0.00cm</TextBlock>
                         <TextBlock Height="25" FontFamily="Courier New" Margin="5,200" Width="200" FontStyle="Normal" Foreground="Red" Name="planesel">Plane Count: 1</TextBlock>
                         <TextBlock Height="25" FontFamily="Courier New" Margin="200,200" Width="200" FontStyle="Normal" Foreground="Red" Name="historysel">Period: 37 Days</TextBlock>
                         <TextBlock Height="25" FontFamily="Courier New" Margin="200,180" Width="200" FontStyle="Normal" Foreground="Red" Name="changesel">Change: 2cm/5%</TextBlock>
                     </Canvas>
-                  </Grid>
+                    <Image Name="limbView" Width="486" Height="216" HorizontalAlignment="Right" Margin="0,0,150,24">
+                        <Image.Source>
+                            <DrawingImage>
+                                <DrawingImage.Drawing>
+                                    <DrawingGroup x:Name="House">
+                                        <GeometryDrawing Brush="Red">
+                                            <GeometryDrawing.Geometry>
+                                                <EllipseGeometry Center="243,108" RadiusX="1" RadiusY="1" />
+                                            </GeometryDrawing.Geometry>
+                                        </GeometryDrawing>
+                                    </DrawingGroup>
+                                </DrawingImage.Drawing>
+                            </DrawingImage>
+                        </Image.Source>
+                    </Image>
+                </Grid>
             </TabItem>
-            <TabItem>
+            <TabItem Name="history">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Height="18" Source="Resources/op3.png" />

@@ -472,7 +472,7 @@ namespace PARSE
 
         }
 
-        public List<Tuple<double,double,List<List<Point3D>>>> determineLimb(PointCloud pcdexisting)
+        public List<Tuple<double,double,List<List<Point3D>>>> determineLimb(PointCloud pcdexisting, double weight)
         {
          
             //pull in skeleton measures from a temporary file for corbett.parse for now.
@@ -537,7 +537,7 @@ namespace PARSE
                 {
                     //pass point cloud and correct bounds to Limb Calculator
                     //shoulders is first option in list so pass first.
-                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepthsStr, limbArea));
+                    limbMeasures.Add(LimbCalculator.calculateLimbBounds(pcdexisting, jointDepthsStr, limbArea, weight));
                 }
             }
             else
