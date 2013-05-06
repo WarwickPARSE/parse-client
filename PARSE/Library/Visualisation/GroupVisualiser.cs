@@ -159,7 +159,15 @@ namespace PARSE
             }
             else
             {
-                int progressPerCloud = (int)Math.Round((30 / (decimal)this.cloudList.Count), 0);
+                int progressPerCloud = 0;
+                if (this.cloudList.Count == 0)
+                {
+                    progressPerCloud = 0; 
+                }
+                else
+                {
+                    progressPerCloud = (int)Math.Round((30 / (decimal)this.cloudList.Count), 0);
+                }
 
                 runDemoModel();
 

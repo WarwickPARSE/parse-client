@@ -866,7 +866,7 @@ namespace PARSE
             BackgroundWorker B = (BackgroundWorker)sender;
             B.ReportProgress(1, "Background worker running");
 
-            //String filename = (string)e.Argument;
+            String filename = (string)e.Argument;
 
             if (filename != null)
             {
@@ -1098,8 +1098,8 @@ namespace PARSE
                     }
             
                     //select pointcloudfilerference based on selected scan id.
-
-                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db.selectQueries.Scans("scanID",latestScanTimeID.ToString());
+                    DatabaseEngine db1 = new DatabaseEngine();
+                    Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> pcScanResults = db1.selectQueries.Scans("scanID",latestScanTimeID.ToString());
 
                     filename = pcScanResults.Item3.First.Value;
                     

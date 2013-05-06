@@ -388,6 +388,7 @@ namespace PARSE
 
         public void scans(int scanTypeID, String pointCloudFileReference, String description, DateTime timestamp)
         {
+
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
             insertQuery.CommandText = "INSERT INTO Scans (scanTypeID, pointCloudFileReference, description, timestamp) VALUES (@ScanTypeID, @PointCloudFileReference, @Description, @Timestamp)";
@@ -727,6 +728,10 @@ namespace PARSE
             LinkedList<String> pointCloudFileReference = new LinkedList<String>();
             LinkedList<String> description = new LinkedList<String>();
             LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT * FROM Scans WHERE scanID = " + criterion;
