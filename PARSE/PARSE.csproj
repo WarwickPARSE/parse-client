@@ -134,6 +134,7 @@
     <Compile Include="DebugLoader.xaml.cs">
       <DependentUpon>DebugLoader.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ICP\DenseMatrix3D.cs" />
     <Compile Include="ICP\Downsampler.cs" />
     <Compile Include="ICP\Stitchers\AffineICP.cs" />
     <Compile Include="ICP\Stitchers\BoundingBox.cs" />

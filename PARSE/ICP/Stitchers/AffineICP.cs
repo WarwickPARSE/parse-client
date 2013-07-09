@@ -198,6 +198,8 @@ namespace PARSE.ICP.Stitchers
             return txpointClouds;
         }
 
+        #region Matlab ported methods (semi-implementations)
+
         /// <summary>
         /// Finds the maximal column values for a matrix 
         /// </summary>
@@ -264,7 +266,12 @@ namespace PARSE.ICP.Stitchers
         /// <param name="v3"></param>
         /// <returns></returns>
         public DenseMatrix ndgrid(DenseVector v1, DenseVector v2, DenseVector v3) {
+            //init a grid of points
+            double[, ,] grid = new double[v1.Count, v2.Count, v3.Count];
+
+
             return null; 
         }
     }
+        #endregion 
 }
