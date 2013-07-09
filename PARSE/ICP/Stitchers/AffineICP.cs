@@ -75,6 +75,7 @@ namespace PARSE.ICP.Stitchers
             //get the max and min points of the static points (operator divides only works over vectors for some reason >:( )
             DenseVector maxP = this.maxP(m1);
             DenseVector minP = this.minP(m1);
+            int noEntries = maxP.Count;                         //for ease of code readability, a waste of four bytes tbh 
 
             DenseVector tolX = (maxP - minP) / 1000;
 
@@ -105,7 +106,25 @@ namespace PARSE.ICP.Stitchers
             }
 
             //create a bunch of three dimensional matrices to hold the correspondence data - values gathered through empirical analysis
-             
+            double[, ,] x, y, z;
+
+            Tuple<double[, ,], double[, ,], double[, ,]> res = grid3d(xa, xb, xc);
+            x = res.Item1;
+            y = res.Item2;
+            z = res.Item3;
+
+            //group the values into one big (horrible, dirty) structure
+            double[,] points_group = groupPoints(x, y, z);
+
+            //calculate the radius of a point to the uniform grid
+            double radius = spacingDistance * Math.Sqrt(3);
+
+            //sort the points into groups
+            DenseMatrix[] cell_group_static = cell(points_group);
+
+            for (int i = 0; i < points_group.GetLength(1); i++) { 
+                
+            }
 
         }
         
@@ -272,6 +291,124 @@ namespace PARSE.ICP.Stitchers
 
             return null; 
         }
-    }
+
+        /// <summary>
+        /// Generates a 3d grid representation out of a set of three 
+        /// same-sized vectors. A watered down version of ndgrid.
+        /// </summary>
+        /// <param name="m1">The first matrix</param>
+        /// <param name="m2">The second matrix</param>
+        /// <param name="m3">The third matrix</param>
+        /// <returns>A tuple of three dimensional matrices</returns>
+        private Tuple<double[, ,], double[, ,], double[, ,]> grid3d(DenseVector m1, DenseVector m2, DenseVector m3)
+        {
+            //hopefully the matrices are all the same size, otherwise this has already fallen over
+
+            if (m1.Count == m2.Count && m2.Count == m3.Count) {
+                //calculate dimensions of the matrix (this only works because they are dense!)
+                int xDim, yDim, zDim;
+
+                xDim = m1.Count;
+                yDim = m2.Count;
+                zDim = m3.Count;
+
+                //generate three double "matrices" to hold our results
+                double[, ,] x = new double[xDim, yDim, zDim];
+                double[, ,] y = new double[xDim, yDim, zDim];
+                double[, ,] z = new double[xDim, yDim, zDim];
+
+                //the values have a gap and this depends on the number of rows (future use)
+                int xGap, yGap, zGap;
+
+                // x series. In this case the y value remains constant to the value of the position in the array
+                for (int alpha = 0; alpha < m1.Count; alpha++) { 
+                    //stick into all x and y indices
+                    for (int i = 0; i < xDim; i++) {
+                        for (int k = 0; k < zDim; k++) {
+                            x[i, alpha, k] = m1[alpha];
+                        }
+                    }
         #endregion 
+                }
+
+                // y series. For this the row value remains constant to the value of the position in the array
+                for (int beta = 0; beta < m2.Count; beta++) { 
+                    //stick into all y and z indices
+                    for (int j = 0; j < yDim; j++) {
+                        for (int k = 0; k < zDim; k++) {
+                            y[beta, j, k] = m2[beta];
+                        }
+                    }
+                }
+
+                // z series. For this the depth value remains static (surprise)
+                for (int gamma = 0; gamma < zDim; gamma++) { 
+                    //stick in all x and y indices
+                    for (int i = 0; i < xDim; i++) {
+                        for (int j = 0; j < yDim; j++) {
+                            z[i, j, gamma] = m3[gamma];
+                        }
+                    }
+                }
+
+                return new Tuple<double[, ,], double[, ,], double[, ,]>(x, y, z);
+            }
+            else { 
+                //something terrible has happened! 
+            }
+
+            //pointless error double that will never be returned, if all goes to plan... else ahhh :(
+            double[,,] e = new double[0,0,0];
+            return new Tuple<double[, ,], double[, ,], double[, ,]>(e,e,e);
+        }
+
+        /// <summary>
+        /// Joins the column representation of three matrices
+        /// </summary>
+        /// <param name="x">An n x n x n matrix</param>
+        /// <param name="y">An n x n x n matrix</param>
+        /// <param name="z">An n x n x n matrix</param>
+        /// <returns></returns>
+        private double[,] groupPoints(double[,,] x, double[,,] y, double[,,] z) {
+            //instantiate the result matrix
+            double[,] res = new double[3,x.Length];
+            
+            //determine dimensions of array
+            int xDim = x.GetLength(0);
+            int yDim = x.GetLength(1);
+            int zDim = x.GetLength(2);
+
+            //go over each matrix, column by column in each dimension
+            int itr = 0;
+
+            for (int k = 0; k < zDim; k++) {
+                for (int i = 0; i < xDim; i++) {
+                    for (int j = 0; j < yDim; j++) {
+                        res[0, itr] = x[i, j, k];
+                        res[1, itr] = y[i, j, k];
+                        res[2, itr] = z[i, j, k];
+                        itr++;
+                    }
+                }
+            }
+
+            return res; 
+        }
+
+        /// <summary>
+        /// Generates an array of empty matrices equal to the number of grouped points
+        /// </summary>
+        /// <param name="pt">The grouped point list</param>
+        /// <returns></returns>
+        private DenseMatrix[] cell(double[,] pt) {
+            int size = pt.GetLength(1);
+
+            //generate array
+            DenseMatrix[] res = new DenseMatrix[size];
+            
+            return res; 
+        }
+
+    }
+
 }
