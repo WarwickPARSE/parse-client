@@ -87,7 +87,10 @@
     <Reference Include="MathNet.Numerics.IO">
       <HintPath>..\packages\MathNet.Numerics.2.4.0\lib\net40\MathNet.Numerics.IO.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kinect, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Kinect, Version=1.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft SDKs\Kinect\v1.6\Assemblies\Microsoft.Kinect.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
@@ -141,13 +144,13 @@
     <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
+    <Compile Include="ICP\SubRegionOutOfBoundsException.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
     <Compile Include="Library\Visualisation\GroupVisualiser.cs" />
     <Compile Include="Library\Visualisation\PlaneVisualisation.cs" />
     <Compile Include="LimbCalculator.cs" />
     <Compile Include="Measurement\AreaCalculator.cs" />
     <Compile Include="Measurement\GiftWrapper.cs" />
-    <Compile Include="Measurement\ConvexHullFinder.cs" />
     <Compile Include="Measurement\HeightCalculator.cs" />
     <Compile Include="Measurement\PlanePuller.cs" />
     <Compile Include="Measurement\SubSampler.cs" />
@@ -171,12 +174,24 @@
     <Compile Include="Library\Visualisation\CloudVisualisation.cs" />
     <Compile Include="Library\Visualisation\TriangularPointCloud.cs" />
     <Compile Include="Library\Visualisation\ViewportCalibrator.cs" />
+    <Compile Include="MetaLoader.xaml.cs">
+      <DependentUpon>MetaLoader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OptionLoader.xaml.cs">
+      <DependentUpon>OptionLoader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Patients.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Patients.xsd</DependentUpon>
     </Compile>
+    <Compile Include="PointCloudException.cs" />
     <Compile Include="PointCloudHandler.cs" />
+    <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
+    <Compile Include="Library\ScanSerializer.cs" />
+    <Compile Include="HistoryLoader.xaml.cs">
+      <DependentUpon>HistoryLoader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Prototyping\Nathan\BasicTracker.xaml.cs">
       <DependentUpon>BasicTracker.xaml</DependentUpon>
     </Compile>
@@ -184,16 +199,14 @@
       <DependentUpon>HSLTracker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Prototyping\Nathan\Matrix.cs" />
-    <Compile Include="Library\Skeletal\SkeletonFigure.cs" />
-    <Compile Include="Recognition\SurfDetector.cs" />
-    <Compile Include="Recognition\SurfResults.cs" />
-    <Compile Include="Recognition\MultiSurf.cs" />
-    <Compile Include="Library\ScanSerializer.cs" />
-    <Compile Include="HistoryLoader.xaml.cs">
-      <DependentUpon>HistoryLoader.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ScanLoader.xaml.cs">
       <DependentUpon>ScanLoader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tracking\Calib\BasicTracker.xaml.cs">
+      <DependentUpon>BasicTracker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tracking\Calib\HSLTracker.xaml.cs">
+      <DependentUpon>HSLTracker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tracking\Matrix.cs" />
     <Compile Include="Tracking\MeasurementRecord.xaml.cs">
@@ -205,13 +218,16 @@
     </Compile>
     <Compile Include="Tracking\SensorTracker.cs" />
     <Compile Include="Tracking\SkeletonPosition.cs" />
+    <Compile Include="UserControl1.xaml.cs">
+      <DependentUpon>UserControl1.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewLoader.xaml.cs">
       <DependentUpon>ViewLoader.xaml</DependentUpon>
     </Compile>
     <Compile Include="PatientLoader.xaml.cs">
       <DependentUpon>PatientLoader.xaml</DependentUpon>
     </Compile>
-    <None Include="app.config" />
+    <None Include="Resources\app.config" />
     <None Include="packages.config" />
     <None Include="Patients.xsc">
       <DependentUpon>Patients.xsd</DependentUpon>
@@ -244,9 +260,33 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MetaLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OptionLoader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Prototyping\Nathan\HSLTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ScanLoader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tracking\Calib\BasicTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tracking\Calib\HSLTracker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tracking\MeasurementLoader.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -256,15 +296,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControl1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ViewLoader.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Prototyping\Nathan\HSLTracker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Prototyping\Nathan\BasicTracker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -294,6 +330,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -345,9 +382,7 @@
   <ItemGroup>
     <Folder Include="ICP\Stitchers\Exceptions\" />
     <Folder Include="Library\PointCloud\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Recognition\Classifiers\cascade.xml" />
+    <Folder Include="Prototyping\Stefania\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App_Readme\MathNet.Numerics.readme.txt" />

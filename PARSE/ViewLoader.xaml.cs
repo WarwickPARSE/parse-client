@@ -26,49 +26,54 @@ namespace PARSE
         public ViewLoader(String tmp)
         {
             InitializeComponent();
+            //Console.WriteLine("Widget width: " + Loadingwidget.ActualWidth);
+
             this.Loaded += new RoutedEventHandler(ViewLoader_Loaded);
 
             //start kinectinterpreter
             kinectInterp = new KinectInterpreter(vpcanvas2);
 
-            if (tmp == "RGB")
+            if (kinectInterp.kinectReady)
             {
-                kinectInterp.stopStreams();
-                kinectInterp.startRGBStream();
-                this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
-            }
-            else if (tmp == "RGB Isolation")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startRGBStream();
-                kinectInterp.startDepthStream();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
-            }
-            else if (tmp == "Depth Isolation")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-            else if (tmp == "Skeleton")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            }
-            else if (tmp == "Depth")
-            {
-                kinectInterp.stopStreams();
-                kinectInterp.startDepthStream();
-                this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
-            }
-            else
-            {
-                //not sure if this will break
-                this.Close();
+                if (tmp == "RGB")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startRGBStream();
+                    this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
+                }
+                else if (tmp == "RGB Isolation")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startRGBStream();
+                    kinectInterp.startDepthStream();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(SensorAllFramesReady);
+                }
+                else if (tmp == "Depth Isolation")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startDepthStream();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                }
+                else if (tmp == "Skeleton")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startSkeletonStream();
+                    this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
+                }
+                else if (tmp == "Depth")
+                {
+                    kinectInterp.stopStreams();
+                    kinectInterp.startDepthStream();
+                    this.kinectInterp.kinectSensor.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
+                }
+                else
+                {
+                    //not sure if this will break
+                    this.Close();
+                }
             }
         }
 

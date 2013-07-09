@@ -1,18 +1,48 @@
 ﻿<Window x:Class="PARSE.MeasurementLoader"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="New Measurement Viewer" Height="400" Width="600" Closing="Window_Closing" ShowInTaskbar="False">
-    <Grid>
-        <Image Canvas.Left="0" Canvas.Top="0" Height="Auto" Name="Visualisation" Stretch="Fill" Width="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="1" />
+        Title="New Measurement Viewer" Height="400" Width="600" Closing="Window_Closing" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    <Grid Height="Auto" Width="Auto" VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="80"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+            
+        </Grid.RowDefinitions>
         
-        <Button Name="start_scan" Content="Start Scan Process" Width="120" Height="25" Margin="-130,150,0,0" HorizontalAlignment="Center" Click="start_scan_Click" VerticalAlignment="Center" />
-        <Button Name="cancel_scan" Content="Cancel Scan Process" Width="120" Height="25" Margin="130,150,0,0" Click="cancel_scan_Click" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <TextBlock Text="Instruction Text 2" Height="45" Name="instructionblock2" Width="450" 
-                   HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="White" Foreground="Black" FontSize="24" Visibility="Hidden" 
-                   TextAlignment="Center" TextWrapping="WrapWithOverflow" />
+        <Image Height="Auto" Name="Visualisation" Stretch="Fill" Width="Auto" HorizontalAlignment="Center" VerticalAlignment="Center"
+               Grid.Row="0" Grid.RowSpan="7"/>
+
         <TextBlock Height="93" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Name="instructionblock" 
-                   Text="Please prepare patient for scanning " VerticalAlignment="Center" FontSize="32" Width="451" Foreground="Black" />
+                   Text="Please prepare patient for scanning " VerticalAlignment="Center" FontSize="32" Width="Auto" Foreground="Black" 
+                   Grid.Row="1"
+                   />
+
+        <Button Name="start_scan" Content="Register New Location" Width="166" Height="25" Margin="-180,0,0,0" 
+                HorizontalAlignment="Center" Click="start_scan_Click" VerticalAlignment="Center"
+                Grid.Row="2"
+                />
+
+        <Button Content="Scan Existing Location" Height="25" HorizontalAlignment="Center" Margin="180,0,0,0" Name="rescanButton" VerticalAlignment="Center" Width="166"
+                Grid.Row="2" Click="scan_existing_Click"/>
         
+        <Button Name="cancel_scan" Content="Cancel Scan Process" Width="160" Height="25" Margin="0" 
+                Click="cancel_scan_Click" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Grid.Row="3"
+                />
+        
+        <TextBlock Text="Instruction Text 2" Height="45" Name="instructionblock2" 
+                   HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" Foreground="Black" FontSize="24" Visibility="Hidden"
+                   TextAlignment="Center" TextWrapping="WrapWithOverflow"
+                   Grid.Row="6"/>
         
     </Grid>
 </Window>

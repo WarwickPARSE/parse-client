@@ -11,22 +11,16 @@ namespace PARSE
     {
         public SqlCeConnection con;
 
-        Insertion insertQueries;
-        Selection selectQueries;
+        public Insertion insertQueries;
+        public Selection selectQueries;
 
         public DatabaseEngine()
         {
-            dbOpen();
-
-            insertQueries = new Insertion(this.con);
-            selectQueries = new Selection(this.con);
-
-            //Object[] patients = getAllPatients();
-
-            //dbClose();
+            this.insertQueries = new Insertion(this.con);
+            this.selectQueries = new Selection(this.con);
         }
 
-        private void dbOpen()
+        public void dbOpen()
         {
             try
             {
@@ -42,40 +36,306 @@ namespace PARSE
             }
         }
 
-        private void dbClose()
+        public void dbClose()
         {
             con.Close();
 
             Console.WriteLine("closed");
         }
 
-        public Object[] getAllPatients()
+        //Insert methods for all tables
+
+        //Type 1 = tables that need a specialised query
+        public void insertPatientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
         {
-            Object[] patients = selectQueries.SelectAllPatients();
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.patientInformation(name, dateOfBirth, nationality, nhsNo, address, weight);
+
+            dbClose();
+        }
+
+        public void insertScanLocations(String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, String jointsDist, DateTime timestamp)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.scanLocations(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+
+            dbClose();
+        }
+
+        public void insertScans(int scanTypeID, int patientID, String pointCloudFileReference, String description, DateTime timestamp)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.scans(scanTypeID, pointCloudFileReference, description, timestamp);
+            ins.patientscans(patientID);
+
+            dbClose();
+        }
+
+        public void insertRecords(int scanID, int scanTypeID, double value)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.records(scanID, scanTypeID, value);
+
+            dbClose();
+        }
+
+        public void insertLimbCoordinates(int scanID, double[] joint1, double[] joint2, String[] joint3, String[] joint4)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.LimbCoordinates(scanID, joint1, joint2, joint3, joint4);
+
+            dbClose();
+        }
+
+        //Type 2 = tables containing 1 identifier and 2 text fields
+
+        //contains the different types of conditions
+        public void insertConditions(String condition, String description)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.type2("Conditions", "condition", "description", condition, description);
+
+            dbClose();
+        }
+
+        //contains the different types of scans
+        public void insertScanTypes(String scanType, String description)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.type2("ScanTypes", "scanType", "description", scanType, description);
+
+            dbClose();
+        }
+
+        //Type 3 = tables containing 3 identifiers
+
+        public void insertPatientCondition(int patientID, int conditionID)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.type3("PatientCondition", "patientID", "conditionID", patientID, conditionID);
+
+            dbClose();
+        }
+
+        public void insertPatientScans(int patientID, int scanID)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.type3("PatientScans", "patientID", "scanID", patientID, scanID);
+
+            dbClose();
+        }
+
+        public void insertPointRecognitionScans(int patientID, int scanLocID)
+        {
+            dbOpen();
+
+            Insertion ins = new Insertion(con);
+
+            ins.type3("PointRecognitionScans", "patientID", "scanLocID", patientID, scanLocID);
+
+            dbClose();
+        }
+
+
+        //Select methods
+
+
+        // 1) select all patients (patientID and name)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllPatients()
+        {
+            dbOpen();
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patients = null;
+            Selection sr = new Selection(con);
+
+            try
+            {
+                patients = sr.AllPatients();
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine("Error is occuring here");
+            }
+
+            dbClose();
 
             return patients;
         }
 
-        public Object[] getAllConditions()
-        {
-            Object[] conditions = selectQueries.SelectAllConditions();
 
-            return conditions;
+        //select all patients that have scanLocation scans
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> getScanLocationTimestamps()
+        {
+            Tuple<LinkedList<int>, LinkedList<DateTime>> patients = null;
+            Selection sr = new Selection(con);
+
+            patients = sr.locTimestamps();
+
+            return patients;
         }
 
-        public Object[] getPatientInformation(int patientID)
+        //select latest scan location timestamp
+        public Tuple<int, String, double, double, DateTime> getLatestScanLoc()
         {
-            object[] patientInfo = selectQueries.SelectPatientInformation(patientID);
+            Selection sr = new Selection(con);
+
+            Tuple<LinkedList<int>, LinkedList<DateTime>> patients = getScanLocationTimestamps();
+
+            LinkedList<int> id = patients.Item1;
+            LinkedList<DateTime> times = patients.Item2;
+
+            int scanLoc = id.Last();
+            DateTime last = times.Last();
+
+            for (int i = 0; i < times.Count(); i++)
+            {
+                if (DateTime.Compare(times.First(), last) > 0)
+                {
+                    scanLoc = id.First();
+                    last = times.First();
+
+                    id.RemoveFirst();
+                    times.RemoveFirst();
+                }
+                else
+                {
+                    id.RemoveFirst();
+                    times.RemoveFirst();
+                }
+            }
+
+            Tuple<int, String, double, double, DateTime> scan = sr.ScanLocationsCut(scanLoc, last);
+
+            return scan;
+        }
+
+        // 2) select patient information
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> getPatientInformation(int patientID)
+        {
+
+            Selection sr = new Selection(con);
+
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> patientInfo = sr.PatientInformation("patientID", patientID.ToString());
 
             return patientInfo;
         }
 
-        public String[] getPatientCondition(int patientID)
+        // 3) select all conditions
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getAllConditions()
         {
-            int conditionID = selectQueries.SelectID("conditionID", "PatientCondition", "patientID", patientID);
-            String[] conditionInfo = selectQueries.SelectStringTableData("Conditions", "conditionID", conditionID);
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> conditions = sr.AllConditions();
 
-            return conditionInfo;
+            return conditions;
+        }
+
+        // 4) select patient condition (and information about it)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> getPatientConditionInformation(int patientID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patientConditions = sr.patientConditions(patientID);
+
+            return patientConditions;
+        }
+
+        // 5) select limb coordinates
+        public Tuple<LinkedList<int>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<String[]>, LinkedList<String[]>> getLimbCoordinates(int scanID)
+        {
+            Selection sr = new Selection(con);
+           /* Tuple<LinkedList<int>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<double[]>> limbCoords = sr.limbCoordinates(scanID);
+
+            return limbCoords;*/
+
+            return null;
+        }
+
+        // 6) select all scan types for patient
+        public Tuple<LinkedList<int>, LinkedList<String>> getPatientScanTypes(int patientID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>> patientScanTypes = sr.scanTypesForPatient(patientID);
+
+            return patientScanTypes;
+        }
+
+        // 7) select all timestamps for patient scan type
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> getScanTimestamps(int scanTypeID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = sr.timestampsForPatient(scanTypeID);
+
+            return timestamps;
+        }
+
+      
+        // 7a) gets scan IDs from patientScans table
+        public Tuple<LinkedList<int>, LinkedList<int>> getScanIDs(int patientID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<int>> scanIDs = sr.selectType3("PatientScans", "patientID", patientID.ToString());
+
+            return scanIDs;
+        }
+
+        // 7b) select all timestamps and scan IDs for patient scans
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientScans(int patientID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = sr.timestampsForPatientScans(patientID);
+            return timestamps;
+        }
+
+        // 8) select patient scans (and value)
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> getScanResult(int ScanID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> result = sr.scanValueForPatient(ScanID);
+
+            return result;
+        }
+
+        // 9) select all timestamps for patient point recognition scans
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientLocScans(int patientID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<int>, LinkedList<DateTime>> timestamps = sr.timestampsForPatientLocScans(patientID);
+
+            return timestamps;
+        }
+
+        // 10) select patient point recognition scans (and location)
+        public Tuple<LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<double>, LinkedList<double>, LinkedList<double>, LinkedList<DateTime>> getScanLocation(int scanLocID)
+        {
+            Selection sr = new Selection(con);
+            Tuple<LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<double>, LinkedList<double>, LinkedList<double>, LinkedList<DateTime>> locations = sr.ScanLocations("patientID", scanLocID.ToString());
+
+            return locations;
         }
     }
 
@@ -89,52 +349,157 @@ namespace PARSE
             con = connection;
         }
 
-        public void InsertPatientInformation(int patientID, String name, String dateOfBirth, String nationality, int nhsNo, String address)
-        {
-            //check what number is the previous patientID and increment by 1?
+        //Insertion Queries for Type 1 tables
 
+        public void patientInformation(String name, String dateOfBirth, String nationality, int nhsNo, String address, String weight)
+        {
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientInformation (patientID, name, dateofbirth, nationality, nhsNo, address) VALUES (@PatientID, @Name, @DateOfBirth, @Nationality, @NhsNo, @Address)";
+            insertQuery.CommandText = "INSERT INTO PatientInformation (name, dateofbirth, nationality, nhsNo, address, weight) VALUES (@Name, @DateOfBirth, @Nationality, @NhsNo, @Address, @Weight)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@PatientID", patientID);
             insertQuery.Parameters.Add("@Name", name);
-            insertQuery.Parameters.Add("@DateOfBirth", dateOfBirth);
+            insertQuery.Parameters.Add("@DateOfBirth", Convert.ToDateTime(dateOfBirth));
             insertQuery.Parameters.Add("@Nationality", nationality);
             insertQuery.Parameters.Add("@NhsNo", nhsNo);
             insertQuery.Parameters.Add("@Address", address);
+            insertQuery.Parameters.Add("@Weight", weight);
             rowsAffected = insertQuery.ExecuteNonQuery();
+
+            System.Diagnostics.Debug.WriteLine("Rows affected: " + rowsAffected);
+
         }
 
-        public void InsertPatientCondition(int patientConditionID, int patientID, int conditionID, String condition)
+        public void scanLocations(String boneName, String jointName1, String jointName2, double distJoint1, double distJoint2, String jointsDist, DateTime timestamp)
         {
-            //should have already incremented latest patientConditionID by 1
-            //patientID is the ID of the patient currently on the form
-            //condition should have been selected from a dropdown list - this here should happen when clicking on Save Changes
+            int rowsAffected = 0;
+
+           this.con = new SqlCeConnection();
+           this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+           this.con.Open();
+
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+
+            insertQuery.CommandText = "INSERT INTO ScanLocations (jointName1, distJoint1, distJoint2, timestamp) VALUES (@JointName1, @DistJoint1, @DistJoint2, @Timestamp)";
+            insertQuery.Parameters.Clear();
+            //insertQuery.Parameters.Add("@BoneName", boneName);
+            insertQuery.Parameters.Add("@JointName1", jointName1);
+            //insertQuery.Parameters.Add("@JointName2", jointName2);
+            insertQuery.Parameters.Add("@DistJoint1", distJoint1);
+            insertQuery.Parameters.Add("@DistJoint2", distJoint2);
+            //insertQuery.Parameters.Add("@JointsDist", jointsDist);
+            insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+            rowsAffected = insertQuery.ExecuteNonQuery();
+
+            this.con.Close();
+
+            System.Diagnostics.Debug.WriteLine(insertQuery.CommandText);
+        }
+
+        public void scans(int scanTypeID, String pointCloudFileReference, String description, DateTime timestamp)
+        {
 
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientCondition (patientConditionID, patientID, conditionID, condition) VALUES (PatientConditionID, PatientID, ConditionID, Condition)";
+            insertQuery.CommandText = "INSERT INTO Scans (scanTypeID, pointCloudFileReference, description, timestamp) VALUES (@ScanTypeID, @PointCloudFileReference, @Description, @Timestamp)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@PatientConditionID", patientConditionID);
-            insertQuery.Parameters.Add("@PatientID", patientID);
-            insertQuery.Parameters.Add("@ConditionID", conditionID);
-            insertQuery.Parameters.Add("@Condition", condition);
+            insertQuery.Parameters.Add("@ScanTypeID", scanTypeID);
+            insertQuery.Parameters.Add("@PointCloudFileReference", pointCloudFileReference);
+            insertQuery.Parameters.Add("@Description", description);
+            insertQuery.Parameters.Add("@Timestamp", timestamp.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+            rowsAffected = insertQuery.ExecuteNonQuery();
+
+            System.Diagnostics.Debug.WriteLine(rowsAffected);
+        }
+
+        public void patientscans(int patientID)
+        {
+            int rowsAffected = 0;
+            int scanId = 0;
+
+            //select query for getting last added scan
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT MAX(scanID) FROM Scans";
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanId = reader.GetInt32(0);
+            }
+            reader.Close();
+
+            //insert query for adding latest scan to the patientscans table
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO PatientScans (patientID, scanID) VALUES (@patientID, @scanID)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@patientID", patientID);
+            insertQuery.Parameters.Add("@scanID", scanId);
+            rowsAffected = insertQuery.ExecuteNonQuery();
+            
+                  
+        }
+
+        public void records(int scanID, int scanTypeID, double value)
+        {
+            int rowsAffected = 0;
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO Records (scanID, scanTypeID, value) VALUES (@ScanID, @ScanTypeID, @Value)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@ScanID", scanID);
+            insertQuery.Parameters.Add("@ScanTypeID", scanTypeID);
+            insertQuery.Parameters.Add("@Value", value);
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
 
-        public void InsertCondition(int conditionID, String condition, string description)
+        public void LimbCoordinates(int scanID, double[] joint1, double[] joint2, String[] joint3, String[] joint4)
         {
-            //should have already incremented latest conditionID by 1
-            //this is for the insertion of known conditions (in general - not related to a patient)
-
             int rowsAffected = 0;
             SqlCeCommand insertQuery = this.con.CreateCommand();
-            insertQuery.CommandText = "INSERT INTO PatientCondition (conditionID, condition, description) VALUES (ConditionID, Condition, Description)";
+            insertQuery.CommandText = "INSERT INTO LimbCoordinates (scanID, joint1x, joint1y, joint1z, joint2x, joint2y, joint2z, joint3x, joint3y, joint3z, joint4x, joint4y, joint4z) VALUES (@ScanID, @Joint1x, @Joint1y, @Joint1z, @Joint2x, @Joint2y, @Joint2z, @Joint3x, @Joint3y, @Joint3z, @Joint4x, @Joint4y, @Joint4z)";
             insertQuery.Parameters.Clear();
-            insertQuery.Parameters.Add("@ConditionID", conditionID);
-            insertQuery.Parameters.Add("@Condition", condition);
-            insertQuery.Parameters.Add("@Condition", description);
+            insertQuery.Parameters.Add("@ScanID", scanID);
+            insertQuery.Parameters.Add("@Joint1x", joint1[0]);
+            insertQuery.Parameters.Add("@Joint1y", joint1[1]);
+            insertQuery.Parameters.Add("@Joint1z", joint1[2]);
+            insertQuery.Parameters.Add("@Joint2x", joint2[0]);
+            insertQuery.Parameters.Add("@Joint2y", joint2[1]);
+            insertQuery.Parameters.Add("@Joint2z", joint2[2]);
+            insertQuery.Parameters.Add("@Joint3x", joint3[0]);
+            insertQuery.Parameters.Add("@Joint3y", joint3[1]);
+            insertQuery.Parameters.Add("@Joint3z", joint3[2]);
+            insertQuery.Parameters.Add("@Joint4x", joint4[0]);
+            insertQuery.Parameters.Add("@Joint4y", joint4[1]);
+            insertQuery.Parameters.Add("@Joint4z", joint4[2]);
+            rowsAffected = insertQuery.ExecuteNonQuery();
+        }
+
+        //Insertion Query for Type 2 tables
+
+        public void type2(String tableName, String textCol1, String textCol2, String text1, String text2)
+        {
+            int rowsAffected = 0;
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO @TableName (@TextCol1, @TextCol2) VALUES ('@Text1', '@Text2')";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@TableName", tableName);
+            insertQuery.Parameters.Add("@TextCol1", textCol1);
+            insertQuery.Parameters.Add("@TextCol2", textCol2);
+            insertQuery.Parameters.Add("@Text1", text1);
+            insertQuery.Parameters.Add("@Text2", text2);
+            rowsAffected = insertQuery.ExecuteNonQuery();
+        }
+        //Insertion Query for Type 3 tables
+
+        public void type3(String tableName, String idCol1, String idCol2, int id1, int id2)
+        {
+            int rowsAffected = 0;
+            SqlCeCommand insertQuery = this.con.CreateCommand();
+            insertQuery.CommandText = "INSERT INTO @TableName (@IdCol1, @IdCol2) VALUES (@Id1, @Id2)";
+            insertQuery.Parameters.Clear();
+            insertQuery.Parameters.Add("@TableName", tableName);
+            insertQuery.Parameters.Add("@IdCol1", idCol1);
+            insertQuery.Parameters.Add("@IdCol2", idCol2);
+            insertQuery.Parameters.Add("@Id1", id1);
+            insertQuery.Parameters.Add("@Id2", id2);
             rowsAffected = insertQuery.ExecuteNonQuery();
         }
     }
@@ -149,39 +514,13 @@ namespace PARSE
             con = connection;
         }
 
-        //not necessary hopefully
-        public int getLastPatientID()
+        //selecting all patients
+        public Tuple<LinkedList<int>,LinkedList<String>,LinkedList<String>> AllPatients()
         {
-            int lastID = 0;
 
-            int pSize = 0;
-            int[] ids = new int[pSize];
-
-            SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT patientID FROM PatientInformation";
-            selectQuery.Parameters.Clear();
-            SqlCeDataReader reader = selectQuery.ExecuteReader();
-
-            while (reader.Read())
-            {
-                pSize = pSize + 1;
-                ids[pSize] = reader.GetInt32(0);
-            }
-            reader.Close();
-
-            lastID = ids[pSize - 1];
-
-            return lastID;
-        }
-
-        public Object[] SelectAllPatients()
-        {
-            Object[] allPatients = new Object[3];
-
-            //int pSize = 0;
             LinkedList<int> ids = new LinkedList<int>();
             LinkedList<String> names = new LinkedList<String>();
-            LinkedList<int> nhsNos = new LinkedList<int>();
+            LinkedList<String> nhsNos = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
             selectQuery.CommandText = "SELECT patientID, name, nhsNo FROM PatientInformation";
@@ -190,25 +529,44 @@ namespace PARSE
 
             while (reader.Read())
             {
-                //pSize = pSize + 1;
                 ids.AddLast(reader.GetInt32(0));
                 names.AddLast(reader.GetString(1));
-                nhsNos.AddLast(reader.GetInt32(2));
+                nhsNos.AddLast(reader.GetString(2));
             }
             reader.Close();
 
-            allPatients[0] = ids;
-            allPatients[1] = names;
-            allPatients[2] = nhsNos;
-
-            return allPatients;
+            return Tuple.Create(ids, names, nhsNos);
         }
 
-        public Object[] SelectAllConditions()
+        //selecting all patients with location timestamps
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<int>, LinkedList<DateTime>> AllPatientsWithLocTimestamps()
         {
-            Object[] allConditions = new Object[3];
 
-            //int cSize = 0;
+            LinkedList<int> ids = new LinkedList<int>();
+            LinkedList<String> names = new LinkedList<String>();
+            LinkedList<int> scanLocID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT PatientInformation.patientID, name, ScanLocations.scanLocID, timestamp FROM PatientInformation join PointRecognitionScans on PatientInformation.patientID=PointRecognitionScans.patientID join ScanLocations on PointRecognitionScans.scanLocID=ScanLocations.scanLocID";
+            selectQuery.Parameters.Clear();
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+
+            while (reader.Read())
+            {
+                ids.AddLast(reader.GetInt32(0));
+                names.AddLast(reader.GetString(1));
+                scanLocID.AddLast(reader.GetInt32(2));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(3).ToString()));
+            }
+            reader.Close();
+
+            return Tuple.Create(ids, names,scanLocID, timestamp);
+        }
+
+        //selecting all conditions
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> AllConditions()
+        {
             LinkedList<int> ids = new LinkedList<int>();
             LinkedList<String> conditions = new LinkedList<String>();
             LinkedList<String> descriptions = new LinkedList<String>();
@@ -227,85 +585,484 @@ namespace PARSE
             }
             reader.Close();
 
-            allConditions[0] = ids;
-            allConditions[1] = conditions;
-            allConditions[2] = descriptions;
-
-            return allConditions;
+            return Tuple.Create(ids, conditions, descriptions);
         }
 
-        public Object[] SelectPatientInformation(int patientID)
+        //table type 1 queries
+
+        //patient information
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<String>> PatientInformation(String colName, String criterion)
         {
-            Object[] patient = new Object[6];
+            LinkedList<int> patientID = new LinkedList<int>();
+            LinkedList<String> name = new LinkedList<String>();
+            LinkedList<DateTime> dob = new LinkedList<DateTime>();
+            LinkedList<String> nationality = new LinkedList<String>();
+            LinkedList<String> nhsNo = new LinkedList<String>();
+            LinkedList<String> address = new LinkedList<String>();
+            LinkedList<String> weight = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT * FROM PatientInformation WHERE patientID LIKE @PatientID";
+            selectQuery.CommandText = "SELECT * FROM PatientInformation WHERE patientID = " + criterion;
+            selectQuery.Parameters.Clear();
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                patientID.AddLast(reader.GetInt32(0));
+                name.AddLast(reader.GetString(1));
+                dob.AddLast(Convert.ToDateTime(reader.GetDateTime(2).ToString()));
+                nationality.AddLast(reader.GetString(3));
+                nhsNo.AddLast(reader.GetString(4));
+                address.AddLast(reader.GetString(5));
+                weight.AddLast(reader.GetString(6));
+            }
+            reader.Close();
+
+            return Tuple.Create(patientID, name, dob, nationality, nhsNo, address, weight);
+        }
+
+        //scan location
+        public Tuple<LinkedList<String>, LinkedList<String>, LinkedList<String>, LinkedList<double>, LinkedList<double>, LinkedList<double>, LinkedList<DateTime>> ScanLocations(String colName, String criterion)
+        {
+            LinkedList<int> scanLocID = new LinkedList<int>();
+            LinkedList<String> boneName = new LinkedList<String>();
+            LinkedList<String> jointName1 = new LinkedList<String>();
+            LinkedList<String> jointName2 = new LinkedList<String>();
+            LinkedList<double> distJoint1 = new LinkedList<double>();
+            LinkedList<double> distJoint2 = new LinkedList<double>();
+            LinkedList<double> jointsDist = new LinkedList<double>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT * FROM ScanLocations WHERE @ColName LIKE @Criterion";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ColName", colName);
+            selectQuery.Parameters.Add("@Criterion", criterion);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanLocID.AddLast(reader.GetInt32(0));
+                String b;
+                try
+                {
+                    b = reader.GetString(1);
+                } catch(Exception e)
+                {
+                    b = "null";
+                }
+                boneName.AddLast(b);
+                jointName1.AddLast(reader.GetString(2));
+                String j2;
+                try
+                {
+                    j2 = reader.GetString(3);
+                }
+                catch (Exception e)
+                {
+                    j2 = "null";
+                }
+                jointName2.AddLast(j2);
+                distJoint1.AddLast(reader.GetDouble(4));
+                distJoint2.AddLast(reader.GetDouble(5));
+                double d;
+                try
+                {
+                    d = reader.GetDouble(6);
+                }
+                catch (Exception e)
+                {
+                    d = 0;
+                }
+                jointsDist.AddLast(d);
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(7).ToString()));
+            }
+            reader.Close();
+
+            //scanLocID not returned (to keep it under 8) !!!
+            return Tuple.Create(boneName, jointName1, jointName2, distJoint1, distJoint2, jointsDist, timestamp);
+        }
+
+        //scan location timestamps
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> locTimestamps()
+        {
+            LinkedList<int> scanLocID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT scanLocID, timestamp FROM ScanLocations";
+            selectQuery.Parameters.Clear();
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanLocID.AddLast(reader.GetInt32(0));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(1).ToString()));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanLocID, timestamp);
+        }
+
+        //scan location cut
+        public Tuple<int, String, double, double, DateTime> ScanLocationsCut(int id, DateTime time)
+        {
+            int scanLocID = id;
+            String jointName1 = "default";
+            double distJoint1 = 0;
+            double distJoint2 = 0;
+            DateTime timestamp = new DateTime();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT scanLocID, jointName1, distJoint1, distJoint2, timestamp FROM ScanLocations WHERE scanLocID LIKE @ID AND timestamp LIKE @Time";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ID", id);
+            selectQuery.Parameters.Add("@Time", time.Date.ToString("yyyy-MM-dd HH:mm:ss"));
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanLocID = reader.GetInt32(0);
+                jointName1 = reader.GetString(1);
+                distJoint1 = reader.GetDouble(2);
+                distJoint2 = reader.GetDouble(3);
+                timestamp = Convert.ToDateTime(reader.GetDateTime(4).ToString());
+            }
+            reader.Close();
+
+            return Tuple.Create(scanLocID, jointName1, distJoint1, distJoint2, timestamp);
+        }
+
+        //scans
+        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<String>, LinkedList<String>, LinkedList<DateTime>> Scans(String colName, String criterion)
+        {
+            LinkedList<int> scanID = new LinkedList<int>();
+            LinkedList<int> scanTypeID = new LinkedList<int>();
+            LinkedList<String> pointCloudFileReference = new LinkedList<String>();
+            LinkedList<String> description = new LinkedList<String>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT * FROM Scans WHERE scanID = " + criterion;
+            selectQuery.Parameters.Clear();
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanID.AddLast(reader.GetInt32(0));
+                scanTypeID.AddLast(reader.GetInt32(1));
+                pointCloudFileReference.AddLast(reader.GetString(2));
+                description.AddLast(reader.GetString(3));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(4).ToString()));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanID, scanTypeID, pointCloudFileReference, description, timestamp);
+        }
+
+        //records
+        public Tuple<LinkedList<int>, LinkedList<int>, LinkedList<double>> Records(String colName, String criterion)
+        {
+            LinkedList<int> scanID = new LinkedList<int>();
+            LinkedList<int> scanTypeID = new LinkedList<int>();
+            LinkedList<double> value = new LinkedList<double>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT * FROM Records WHERE @ColName LIKE @Criterion";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ColName", colName);
+            selectQuery.Parameters.Add("@Criterion", criterion);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanID.AddLast(reader.GetInt32(0));
+                scanTypeID.AddLast(reader.GetInt32(1));
+                value.AddLast(reader.GetDouble(2));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanID, scanTypeID, value);
+        }
+
+
+        //table type 2 queries
+
+        //conditions, scanTypes
+        public Tuple<int, String, String> selectType2(String tableName, String colName, String criterion)
+        {
+            int id = 0;
+            String text1 = "default";
+            String text2 = "default";
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT * FROM @TableName WHERE @ColName LIKE @Criterion";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@TableName", tableName);
+            selectQuery.Parameters.Add("@ColName", colName);
+            selectQuery.Parameters.Add("@Criterion", criterion);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                id = reader.GetInt32(0);
+                text1 = reader.GetString(1);
+                text2 = reader.GetString(2);
+            }
+            reader.Close();
+
+            return Tuple.Create(id, text1, text2);
+        }
+
+
+        //table type 3 queries
+
+        //patientCondition, patientScans, pointRecognitionScans
+        public Tuple<LinkedList<int>, LinkedList<int>> selectType3(String tableName, String colName, String criterion)
+        {
+            LinkedList<int> id1 = new LinkedList<int>();
+            LinkedList<int> id2 = new LinkedList<int>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT * FROM @TableName WHERE @ColName LIKE @Criterion";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@TableName", tableName);
+            selectQuery.Parameters.Add("@ColName", colName);
+            selectQuery.Parameters.Add("@Criterion", criterion);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                id1.AddLast(reader.GetInt32(0));
+                id2.AddLast(reader.GetInt32(1));
+            }
+            reader.Close();
+
+            return Tuple.Create(id1, id2);
+        }
+
+        //generalised method for getting one id
+        public LinkedList<int> selectID(String columnNeeded, String tableName, String column, String criterion)
+        {
+            LinkedList<int> id = new LinkedList<int>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "SELECT @ColumnNeeded FROM @TableName WHERE @Column LIKE @Criterion";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ColumnNeeded", columnNeeded);
+            selectQuery.Parameters.Add("@TableName", tableName);
+            selectQuery.Parameters.Add("@Column", column);
+            selectQuery.Parameters.Add("@Criterion", criterion);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                id.AddLast(reader.GetInt32(0));
+            }
+
+            reader.Close();
+
+            return id;
+        }
+
+        public Tuple<LinkedList<int>, LinkedList<double[]>, LinkedList<double[]>, LinkedList<String[]>, LinkedList<String[]>> limbCoordinates(int ScanID)
+        {
+            LinkedList<int> scanID = new LinkedList<int>();
+
+            double[] d = new double[3];
+            LinkedList<double[]> joint1 = new LinkedList<double[]>();
+            LinkedList<double[]> joint2 = new LinkedList<double[]>();
+
+            String[] s = new String[3];
+            LinkedList<String[]> joint3 = new LinkedList<String[]>();
+            LinkedList<String[]> joint4 = new LinkedList<String[]>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "Select * from limbCoordinates where scanID = @ScanID";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ScanID", ScanID);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanID.AddLast(reader.GetInt32(0));
+                d[0] = reader.GetDouble(1);
+                d[1] = reader.GetDouble(2);
+                d[2] = reader.GetDouble(3);
+                joint1.AddLast(d);
+                d[0] = reader.GetDouble(4);
+                d[1] = reader.GetDouble(5);
+                d[2] = reader.GetDouble(6);
+                joint2.AddLast(d);
+                System.Type type = reader.GetFieldType(4);
+
+                if (Type.GetTypeCode(type) == TypeCode.String)
+                {
+                    s[0] = reader.GetString(7);
+                    s[1] = reader.GetString(8);
+                    s[2] = reader.GetString(9);
+                    joint3.AddLast(s);
+                }
+                else if (Type.GetTypeCode(type) == TypeCode.Double)
+                {
+                    s[0] = reader.GetDouble(7).ToString();
+                    s[1] = reader.GetDouble(8).ToString();
+                    s[2] = reader.GetDouble(9).ToString();
+                    joint3.AddLast(s);
+                }
+                type = reader.GetFieldType(10);
+                if (Type.GetTypeCode(type) == TypeCode.String)
+                {
+                    s[0] = reader.GetString(10);
+                    s[1] = reader.GetString(11);
+                    s[2] = reader.GetString(12);
+                    joint3.AddLast(s);
+                }
+                else if (Type.GetTypeCode(type) == TypeCode.Double)
+                {
+                    s[0] = reader.GetDouble(10).ToString();
+                    s[1] = reader.GetDouble(11).ToString();
+                    s[2] = reader.GetDouble(12).ToString();
+                    joint3.AddLast(s);
+                }
+            }
+            reader.Close();
+
+            return Tuple.Create(scanID, joint1, joint2, joint3, joint4);
+        }
+
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<String>> patientConditions(int patientID)
+        {
+            LinkedList<int> conditionID = new LinkedList<int>();
+            LinkedList<String> condition = new LinkedList<String>();
+            LinkedList<String> description = new LinkedList<String>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "Select PatientCondition.ConditionID, condition, description from PatientCondition join Conditions on PatientCondition.conditionID = Conditions.conditionID where patientID = @PatientID";
             selectQuery.Parameters.Clear();
             selectQuery.Parameters.Add("@PatientID", patientID);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
-                patient[0] = reader.GetInt32(0);
-                patient[1] = reader.GetString(1);
-                patient[2] = reader.GetString(2);
-                patient[3] = reader.GetString(3);
-                patient[4] = reader.GetInt32(4);
-                patient[5] = reader.GetString(5);
+                conditionID.AddLast(reader.GetInt32(0));
+                condition.AddLast(reader.GetString(1));
+                description.AddLast(reader.GetString(2));
             }
             reader.Close();
 
-            return patient;
-        }
+            return Tuple.Create(conditionID, condition, description);
+        } 
 
-        //generalised method for all table data
-        public String[] SelectStringTableData(String tableName, String column, int value)
+        public Tuple<LinkedList<int>, LinkedList<String>> scanTypesForPatient(int patientID)
         {
-            String[] tableData = new String[2];
-
-            tableData[0] = "Default";
-            tableData[1] = "Default";
+            LinkedList<int> scanTypeID = new LinkedList<int>();
+            LinkedList<String> scanType = new LinkedList<String>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT * FROM @TableName WHERE @Column LIKE @Value";
+            selectQuery.CommandText = "Select ScanTypes.scanTypeID, scanType from ScanTypes join Scans on ScanTypes.scanTypeID = Scans.scanTypeID join PatientScans on PatientScans.scanID = Scans.scanID where PatientScans.patientID = @PatientID";
             selectQuery.Parameters.Clear();
-            selectQuery.Parameters.Add("@TableName", tableName);
-            selectQuery.Parameters.Add("@Column", column);
-            selectQuery.Parameters.Add("@Value", value);
+            selectQuery.Parameters.Add("@PatientID", patientID);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
-                tableData[0] = reader.GetString(1);
-                tableData[1] = reader.GetString(2);
+                scanTypeID.AddLast(reader.GetInt32(0));
+                scanType.AddLast(reader.GetString(1));
             }
-            Console.WriteLine(tableData[0] + tableData[1]);
-
             reader.Close();
 
-            return tableData;
+            return Tuple.Create(scanTypeID, scanType);
         }
 
-        //generalised method for getting ids
-        public int SelectID(String columnNeeded, String tableName, String column, int value)
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatient(int scanTypeID)
         {
-            int id = 0;
+            LinkedList<int> scanID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
 
             SqlCeCommand selectQuery = this.con.CreateCommand();
-            selectQuery.CommandText = "SELECT @ColumnNeeded FROM @TableName WHERE @Column LIKE @Value";
+            selectQuery.CommandText = "Select Scans.scanID, timestamp from Scans join PatientScans on Scans.scanID = PatientScans.scanID where scanTypeID = @ScanTypeID";
             selectQuery.Parameters.Clear();
-            selectQuery.Parameters.Add("@ColumnNeeded", columnNeeded);
-            selectQuery.Parameters.Add("@TableName", tableName);
-            selectQuery.Parameters.Add("@Column", column);
-            selectQuery.Parameters.Add("@Value", value);
+            selectQuery.Parameters.Add("@ScanTypeID", scanTypeID);
             SqlCeDataReader reader = selectQuery.ExecuteReader();
             while (reader.Read())
             {
-                id = reader.GetInt32(1);
+                scanID.AddLast(reader.GetInt32(0));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(1).ToString()));
             }
-            Console.WriteLine(id);
-
             reader.Close();
 
-            return id;
+            return Tuple.Create(scanID, timestamp);
+        }
+
+        public Tuple<LinkedList<int>, LinkedList<String>, LinkedList<DateTime>, LinkedList<double>> scanValueForPatient(int ScanID)
+        {
+            LinkedList<int> scanID = new LinkedList<int>();
+            LinkedList<String> pointCloudFileReference = new LinkedList<String>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+            LinkedList<double> value = new LinkedList<double>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "Select Scans.scanID, pointCloudFileReference, timestamp, Records.value from Scans join Records on Scans.scanID = Records.scanID where Scans.scanID = @ScanID;";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@ScanID", ScanID);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanID.AddLast(reader.GetInt32(0));
+                pointCloudFileReference.AddLast(reader.GetString(1));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(2).ToString()));
+                value.AddLast((double)reader.GetFloat(3));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanID, pointCloudFileReference, timestamp, value);
+        }
+
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientScans(int patientID)
+        {
+            LinkedList<int> scanID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            this.con = new SqlCeConnection();
+            this.con.ConnectionString = "Data Source=|DataDirectory|\\Patients.sdf";
+            this.con.Open();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "Select Scans.scanID, timestamp from Scans join PatientScans on Scans.scanID = PatientScans.scanID where patientID = @PatientID;";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@PatientID", patientID);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanID.AddLast(reader.GetInt32(0));
+                System.Diagnostics.Debug.WriteLine(reader.GetInt32(0));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(1).ToString()));
+                System.Diagnostics.Debug.WriteLine(reader.GetDateTime(1));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanID, timestamp);
+        }
+
+        public Tuple<LinkedList<int>, LinkedList<DateTime>> timestampsForPatientLocScans(int patientID)
+        {
+            LinkedList<int> scanLocID = new LinkedList<int>();
+            LinkedList<DateTime> timestamp = new LinkedList<DateTime>();
+
+            SqlCeCommand selectQuery = this.con.CreateCommand();
+            selectQuery.CommandText = "Select ScanLocations.scanLocID, timestamp from ScanLocations join PointRecognitionScans on ScanLocations.scanLocID = PointRecognitionScans.scanLocID where patientID = @PatientID;";
+            selectQuery.Parameters.Clear();
+            selectQuery.Parameters.Add("@PatientID", patientID);
+            SqlCeDataReader reader = selectQuery.ExecuteReader();
+            while (reader.Read())
+            {
+                scanLocID.AddLast(reader.GetInt32(0));
+                timestamp.AddLast(Convert.ToDateTime(reader.GetDateTime(1).ToString()));
+            }
+            reader.Close();
+
+            return Tuple.Create(scanLocID, timestamp);
         }
     }
 }

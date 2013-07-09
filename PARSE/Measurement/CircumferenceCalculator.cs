@@ -28,17 +28,32 @@ namespace PARSE
         //provide depth z at a given joint co-ordinate and a pointcloud with that particular information.
         public static double calculate(List<List<Point3D>> planes, int planeNo)
         {
+
+            List<Point3D> plane3D;
             double circum = 0;
+            
+            //sometimes the bounding can be quite poor depending on skeleton bounding
+            //check if any planes have been returned before passing to circum. calc.
 
-            List<Point3D> plane3D = planes[planeNo];
+            if (planes.Count != 0)
+            {
 
-            System.Diagnostics.Debug.WriteLine(Environment.CurrentDirectory);
+                if (planeNo == 1)
+                {
+                    plane3D = planes[planeNo - 1];
+                }
+                else
+                {
+                    plane3D = planes[planeNo];
+                }
 
-            circum = CircumferenceCalculator.calculate(plane3D);
+                circum = CircumferenceCalculator.calculate(plane3D);
 
-            Console.WriteLine("Circum Pre Multi: " + circum);
-            circum = UnitConvertor.convertPCM(circum,1);
-            Console.WriteLine("Circum: " + circum);
+                Console.WriteLine("Circum Pre Multi: " + circum);
+                circum = UnitConvertor.convertPCM(circum, 1);
+                Console.WriteLine("Circum: " + circum);
+            }
+
             return circum;
         }
 

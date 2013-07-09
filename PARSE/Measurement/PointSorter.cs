@@ -8,6 +8,12 @@ namespace PARSE
 {
     public static class PointSorter
     {
+        /// <summary>
+        /// compares two points to see which one is further around the clockface with (0,0,0) as an origin. Returns 1 if it is a, -1 if it is b, 0 if points are equal in position. Ignores y co-ordinate.
+        /// </summary>
+        /// <param name="a">Point3D</param>
+        /// <param name="b">Point3D</param>
+        /// <returns>int</returns>
         private static int compareTwoPoints(Point3D a, Point3D b)
         {
             double aTanA, aTanB;
@@ -22,6 +28,11 @@ namespace PARSE
             return 0;
         }
 
+        /// <summary>
+        /// sorts a list of points into a clockwise sorted list
+        /// </summary>
+        /// <param name="input">List(Point3D)</param>
+        /// <returns>List(Point3D)</returns>
         public static List<Point3D> clockSort(List<Point3D> input)
         {
             double xmax = double.MinValue;

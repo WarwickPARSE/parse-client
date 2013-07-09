@@ -27,14 +27,20 @@ namespace PARSE
 
         //persistently store our list of planes
         private List<List<Point3D>> storedPlanes;
-
+        private List<List<Point3D>> storedLimbPlanes;
+        private List<Tuple<double, double, List<List<Point3D>>>> rawlimbData;
+        private String persistentBMI;
+        private String persistentSiri;
+   
         //publicly accessible area list from previous calculations
         public List<double> areaList;
+        public System.Windows.Shapes.Path path;
         
         public HistoryLoader()
         {
             InitializeComponent();
             storedPlanes = new List<List<Point3D>>();
+            storedLimbPlanes = new List<List<Point3D>>();
             this.Loaded += new RoutedEventHandler(HistoryLoader_Loaded);
         }
 
@@ -43,13 +49,20 @@ namespace PARSE
             //place relative to coreloader
             this.Left = this.Owner.Left + 20;
             this.Width = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - 30;
-            this.Height = this.Owner.Width * 0.2;
+            this.Height = this.Owner.Width * 0.225;
             this.Top = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - this.Height;
+
+            this.limbselect.SelectedItem = 0;
+
+            //set persistent variables
+            persistentBMI = scanfileref.Content.ToString();
+            persistentSiri = scanvoxel.Content.ToString();
 
             //check if a scan event is in place
             if (storedPlanes.Count == 0)
             {
                 //in the case when we have no planes to show, modify the ui.
+                //Volume Label Setting
                 bodyimg.Visibility = Visibility.Collapsed;
                 planeNo.Visibility = Visibility.Collapsed;
                 viewborder.Visibility = Visibility.Collapsed;
@@ -73,15 +86,37 @@ namespace PARSE
                 btnresults.Visibility = Visibility.Collapsed;
                 btnrescan.Visibility = Visibility.Collapsed;
 
-            }
+                //Circumference Label Setting
+                circumlabel.Visibility = Visibility.Collapsed;
+                circumoutput.Visibility = Visibility.Collapsed;
+                limbselect.Visibility = Visibility.Collapsed;
+                limbselecthdr.Visibility = Visibility.Hidden;
+                planelabel.Visibility = Visibility.Collapsed;
+                scanlabel.Visibility = Visibility.Collapsed;
+                viewborder2.Visibility = Visibility.Collapsed;
 
-            this.scanvoxel.Content = "VH Ratio: " + ((Convert.ToDouble(this.voloutput.Content) / Convert.ToDouble(this.heightoutput.Content)));
-            this.scanfileref.Content = "BMI Measure: " + (66 / (Convert.ToDouble(this.heightoutput.Content)));
+                hvpcanvas2.Visibility = Visibility.Collapsed;
+
+                scanno2.Visibility = Visibility.Collapsed;
+                scantime2.Visibility = Visibility.Collapsed;
+                scanfileref2.Visibility = Visibility.Collapsed;
+                scanvoxel2.Visibility = Visibility.Collapsed;
+                maxarea2.Visibility = Visibility.Collapsed;
+                totalarea2.Visibility = Visibility.Collapsed;
+                totalperimiter2.Visibility = Visibility.Collapsed;
+                btnresults2.Visibility = Visibility.Collapsed;
+                btnrescan2.Visibility = Visibility.Collapsed;
+
+                //this.scanvoxel.Content = "VH Ratio: " + ((Convert.ToDouble(this.voloutput.Content) / Convert.ToDouble(this.heightoutput.Content)));
+                //this.scanfileref.Content = "BMI Measure: " + (66 / (Convert.ToDouble(this.heightoutput.Content)));
+
+            }
 
         }
 
         public void visualisePlanes(List<List<Point3D>> planes, double planeIndex)
         {
+
             //Set relevant UI components to visisble
             bodyimg.Visibility = Visibility.Visible;
             planeNo.Visibility = Visibility.Visible;
@@ -107,6 +142,7 @@ namespace PARSE
             //Set relevant ui components to collapsed
             noresults.Visibility = Visibility.Collapsed;
             newscan.Visibility = Visibility.Collapsed;
+            scanno.Content = "Scan No: 1";
 
             planeNo.Text = "Plane Outline: " + (int)planeIndex;
 
@@ -175,15 +211,131 @@ namespace PARSE
             System.Diagnostics.Debug.WriteLine("zmin: " + zmin);
             System.Diagnostics.Debug.WriteLine("xmax: " + xmax);
             System.Diagnostics.Debug.WriteLine("zmax: " + zmax);
+        }
 
-            //setData
-            ((LineSeries)(volchart.Series[0])).ItemsSource =
-                new KeyValuePair<DateTime, int>[]{
-                    new KeyValuePair<DateTime,int>(DateTime.Now, 100),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(1), 130),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(2), 150),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(3), 125),
-                    new KeyValuePair<DateTime,int>(DateTime.Now.AddMonths(4),155) };
+        public void visualiseLimbs(List<Tuple<double, double, List<List<Point3D>>>> limbData, int limbIndex, double planeIndex)
+        {
+            System.Diagnostics.Debug.WriteLine("Opening Limb Visualisation Panel");
+            rawlimbData = limbData;
+            maxarea2.Content = "Plane Region: " + planeIndex;
+
+            circumlabel.Visibility = Visibility.Visible;
+            circumoutput.Visibility = Visibility.Visible;
+            limbselect.Visibility = Visibility.Visible;
+            limbselecthdr.Visibility = Visibility.Visible;
+            planelabel.Visibility = Visibility.Visible;
+            scanlabel.Visibility = Visibility.Visible;
+            viewborder2.Visibility = Visibility.Visible;
+            noresults2.Visibility = Visibility.Visible;
+            newscan2.Visibility = Visibility.Visible;
+            scanno2.Visibility = Visibility.Visible;
+            scantime2.Visibility = Visibility.Visible;
+            scanfileref2.Visibility = Visibility.Visible;
+            scanvoxel2.Visibility = Visibility.Visible;
+            maxarea2.Visibility = Visibility.Visible;
+            totalarea2.Visibility = Visibility.Visible;
+            totalperimiter2.Visibility = Visibility.Visible;
+            hvpcanvas2.Visibility = Visibility.Visible;
+            btnresults2.Visibility = Visibility.Visible;
+            btnrescan2.Visibility = Visibility.Visible;
+
+            //Set relevant ui components to collapsed
+            noresults2.Visibility = Visibility.Collapsed;
+            newscan2.Visibility = Visibility.Collapsed;
+
+            circumoutput.Content = limbData[limbIndex].Item1+"cm"; 
+            totalarea2.Content = "Total Area: " + limbData[limbIndex].Item2;
+            totalperimiter2.Content = "Perimeter Approx: " + limbData[limbIndex].Item1+"cm";
+
+            //set ellipse visualisation circumference
+            //TODO: add flag for diplaying historic ellipse vis.
+            //historicEllipse.Visibility = Visibility.Collapsed;
+            historysel.Visibility = Visibility.Collapsed;
+            changesel.Visibility = Visibility.Collapsed;
+
+            /*Current Limb Visualisation Code */
+
+            circumsel.Text = "Circum Approx: " + limbData[limbIndex].Item1 + "cm";
+            limbsel.Text = "Limb No: " + limbIndex;
+
+            //Set limb view
+            limbView.Height = 486 * (limbData[limbIndex].Item1 / 100);
+            limbView.Width = 216 * (limbData[limbIndex].Item1 / 100);
+
+            //Set limb visualisation centre
+            EllipseGeometry eg = new EllipseGeometry();
+            eg.Center = new Point(limbView.Width / 2, limbView.Height / 2);
+            
+            scantime2.Content = "Scan Time: " + DateTime.Now.ToString("dd/MM/yy HH:mm");
+            scanvoxel2.Content = persistentSiri;
+            scanfileref2.Content = persistentBMI;
+
+            //VisCanvas.SetTop(currentEllipse, (VisCanvas.Height/2) - currentEllipse.Height / 2);
+            //Canvas.SetLeft(currentEllipse, (VisCanvas.Width/2) - currentEllipse.Width / 2);
+
+            /*End of current limb visualisation code */
+            
+
+            //visualise planes
+            planeNo.Text = "Plane Outline: " + (int) planeIndex;
+
+            if (storedLimbPlanes.Count == 0)
+            {
+                storedLimbPlanes = limbData[limbIndex].Item3;
+                storedLimbPlanes.Reverse();
+                planeChooser.Maximum = storedLimbPlanes.Count;
+            }
+
+            double xmin = 0;
+            double xmax = 0;
+            double zmin = 0;
+            double zmax = 0;
+
+            int i = (int)planeIndex;
+
+            double[] x = new double[storedLimbPlanes[i].Count];
+            double[] z = new double[storedLimbPlanes[i].Count];
+
+            for (int j = 0; j < storedLimbPlanes[i].Count; j++)
+            {
+
+                //Boundary check of points.
+                if (storedLimbPlanes[i][j].X > xmax)
+                {
+                    xmax = storedLimbPlanes[i][j].X;
+                }
+
+                if (storedLimbPlanes[i][j].Z > zmax)
+                {
+                    zmax = storedLimbPlanes[i][j].Z;
+                }
+
+                if (storedLimbPlanes[i][0].X < xmin)
+                {
+                    xmin = storedLimbPlanes[i][0].X;
+                }
+                if (storedLimbPlanes[i][j].X < xmin)
+                {
+                    xmin = storedLimbPlanes[i][j].X;
+                }
+
+                if (storedLimbPlanes[i][0].Z < zmin)
+                {
+                    zmin = storedLimbPlanes[i][0].Z;
+                }
+                if (storedLimbPlanes[i][j].Z < zmin)
+                {
+                    zmin = storedLimbPlanes[i][j].Z;
+                }
+
+                //assign to arrays
+                x[j] = storedLimbPlanes[i][j].X;
+                z[j] = storedLimbPlanes[i][j].Z;
+
+            }
+
+            //write points to plane renderer class for visualisation.
+            this.DataContext = new PlaneVisualisation(x, z);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -199,6 +351,12 @@ namespace PARSE
             this.maxarea.Content = "Plane " + (int) e.NewValue;
             this.totalperimiter.Content = "Circumference: " + circum + "m";
 
+        }
+
+
+        private void limbselect_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            visualiseLimbs(rawlimbData, (sender as ComboBox).SelectedIndex, 0);
         }
     }
 }

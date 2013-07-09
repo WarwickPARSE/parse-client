@@ -4,8 +4,16 @@
         xmlns:shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation/shell"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         Title="Visualiser" Height="400" Width="600">
-    <Grid Height="337">
-    <Image Height="337" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="578" Name="kinectImager" />
-    <Canvas Grid.Row="1" Height="337" HorizontalAlignment="Left" Name="vpcanvas2" VerticalAlignment="Top" Width="578"></Canvas>
+    
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Image Height="337" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="578" Name="kinectImager" />
+        <Canvas Grid.Row="0" Grid.Column="0" Height="Auto" HorizontalAlignment="Stretch" Name="vpcanvas2" VerticalAlignment="Stretch" Width="Auto"></Canvas>
     </Grid>
+    
 </Window>

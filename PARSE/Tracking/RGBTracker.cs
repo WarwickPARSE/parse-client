@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -19,33 +20,26 @@ namespace PARSE.Tracking
         private byte[] colorpixelData;
         private byte[] processedcolorpixelData;
         private byte[] colorFrameRGB;
-        private WriteableBitmap outputColorBitmap;
         private WriteableBitmap processedBitmap;
-        private ColorImageFormat rgbImageFormat;
-
-        //RGB Constants
-        private  int RedIndex = 2;
-        private  int GreenIndex = 1;
-        private  int BlueIndex = 0;
 
         //frame sizes
-        private  int width = 640;
-        private  int height = 480;
+        private int width = 640;
+        private int height = 480;
+        private int[] rowHeaders;
 
-        // Kinecty things
-        //private int[] realDepthCollection;
-        //private int realDepth;
+        // Sensor Position
         private int x;
         private int y;
         private double angle;
-        //private int s = 4;
-        //private bool pc = false;
-
-        //Kinect sensor
-        KinectSensor kinectSensor;
 
         public RGBTracker()
         {
+            // Get row pointers
+            rowHeaders = new int[height];
+            for (int row = 0; row < height; row++)
+            {
+                rowHeaders[row] = row * width * 4;
+            }
         }
 
         public void ProcessFrame(byte[] byteFrame, out int x, out int y, out double angle)
@@ -63,6 +57,8 @@ namespace PARSE.Tracking
             x = this.x;
             y = this.y;
             angle = this.angle;
+
+            //Console.WriteLine("RGBScanner returning: " + this.x + ", " + this.y);
         }
 
         private byte[] RGBProcessor(byte[] image)
@@ -72,9 +68,9 @@ namespace PARSE.Tracking
             for (int i = 0; i < (image.Length / 4); i += 1)
             {
                 if (
-                    image[i * 4 + 2] > 155 & image[i * 4 + 2] < 225 &     // RED
-                    image[i * 4 + 1] > 155 & image[i * 4 + 1] < 225 &   // GREEN
-                    image[i * 4] > 0 & image[i * 4] < 70             // BLUE
+                    image[i * 4 + 2] > 150 & image[i * 4 + 2] < 210 &     // RED
+                    image[i * 4 + 1] > 150 & image[i * 4 + 1] < 210 &   // GREEN
+                    image[i * 4] > 25 & image[i * 4] < 80             // BLUE
                     )
                 {
                     processedcolorpixelData[i * 4] = 255;
@@ -82,6 +78,9 @@ namespace PARSE.Tracking
                     processedcolorpixelData[1 * 4 + 2] = 255;
                     processedcolorpixelData[i * 4 + 3] = image[i * 4 + 3];
                 }
+
+                // was 190, 190, 35 +- 35
+                // Try 160, 160, 30 +- 30
             }
 
             return processedcolorpixelData;
@@ -98,13 +97,6 @@ namespace PARSE.Tracking
             int centroidY = 0;
             List<int> xList = new List<int>();
             List<int> yList = new List<int>();
-
-            // Get row pointers
-            int[] rowHeaders = new int[height];
-            for (int row = 0; row < height; row++)
-            {
-                rowHeaders[row] = row * width * 4;
-            }
 
             // Convolve!
             for (int row = 0; row < height - 4; row++)
@@ -135,8 +127,8 @@ namespace PARSE.Tracking
                 }
             }
 
-            // New >10 threshold in place, to help prevent noise.
-            if (featurePixelCount > 10)
+            // New >10 Threshold in place, to help prevent noise.
+            if (featurePixelCount > 1)
             {
                 //centroidX = featureX / featurePixelCount;
                 xList.ForEach(delegate(int element)

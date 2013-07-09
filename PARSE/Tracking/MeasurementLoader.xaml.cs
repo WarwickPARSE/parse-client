@@ -15,6 +15,10 @@ namespace PARSE
     {
         // Reference to the tracking class.
         SensorTracker tracker;
+        private enum CaptureModes {Capture_New, Capture_Existing};
+        private int CaptureMode = 0;
+
+        private SkeletonPosition sharedPosition;
 
         public MeasurementLoader()
         {
@@ -53,27 +57,68 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
+            this.CaptureMode = (int)CaptureModes.Capture_New;
+
             // hide buttons from form
             //cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
+            rescanButton.Visibility = Visibility.Collapsed;
                         
             // show image & instructions
             Visualisation.Visibility = Visibility.Visible;
             instructionblock.Visibility = Visibility.Collapsed;
             instructionblock2.Text = "Loading...";
             instructionblock2.Visibility = Visibility.Visible;
+
+            // TODO move the button to the edge but keep it visible
+            cancel_scan.Visibility = Visibility.Hidden;
             
             System.Diagnostics.Debug.WriteLine("Starting measurement window...");
 
             // Start tracking
-            tracker = new SensorTracker(Visualisation, this, true, instructionblock2);
+            tracker = new SensorTracker(Visualisation, this, instructionblock2);
             tracker.captureNewLocation();
             //tracker.captureAtLocation();
+            
+            // Hook up to the capture event, fired by the tracker.
+            tracker.Capture += new SensorTracker.CaptureEventHandler(capture);
         }
 
-        internal void capture(int x, int y, double angleXY, double angleZ)
+        /// <summary>
+        /// Capture and act upon the 'capture' event, fired by the tracker.
+        /// Can use this method to actually collect a value from the sensor.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="skel"></param>
+        internal void capture(object sender, SkeletonPosition skel)
         {
             System.Diagnostics.Debug.WriteLine("Scan captured! END");
+
+            if (this.CaptureMode == (int)CaptureModes.Capture_New)
+            {
+                // Write location and timestamp to the database
+                
+                //initialise database class
+                DatabaseEngine db = new DatabaseEngine();
+
+                DateTime timestamp = DateTime.Now;
+
+                sharedPosition = skel;
+
+                ((CoreLoader)(this.Owner)).savedLocation = sharedPosition;
+
+                //add record to database
+                //db.insertScanLocations("null", skel.jointName1, "null", skel.offsetXJ1, skel.offsetYJ1, "0", timestamp);
+
+                Console.WriteLine("Writing to database! Values = " + skel.jointName1 + ", " + skel.offsetXJ1 + ", " + skel.offsetYJ1 + ", " + timestamp);
+            }
+
+            
+            if (this.CaptureMode == (int)CaptureModes.Capture_Existing)
+            {
+                // Capture data from the scanner....
+            }
+           
             tracker.stop();
             this.Close();
         }
@@ -85,6 +130,48 @@ namespace PARSE
                 tracker.stop();
                 tracker.close();
             }
+        }
+
+        private void scan_existing_Click(object sender, RoutedEventArgs e)
+        {
+            this.CaptureMode = (int)CaptureModes.Capture_Existing;
+
+            // hide buttons from form
+            //cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
+            rescanButton.Visibility = Visibility.Collapsed;
+
+            // show image & instructions
+            Visualisation.Visibility = Visibility.Visible;
+            instructionblock.Visibility = Visibility.Collapsed;
+            instructionblock2.Text = "Loading...";
+            instructionblock2.Visibility = Visibility.Visible;
+
+            // TODO move the button to the edge but keep it visible
+            cancel_scan.Visibility = Visibility.Hidden;
+
+            System.Diagnostics.Debug.WriteLine("Starting measurement window...");
+
+            // Start tracking
+            tracker = new SensorTracker(Visualisation, this, instructionblock2);
+            //tracker.captureNewLocation();
+
+            // Get a position from the database
+            SkeletonPosition targetLocation = new SkeletonPosition();
+
+            /*DatabaseEngine db = new DatabaseEngine();
+            Tuple<int, String, double, double, DateTime> scanloc = db.getLatestScanLoc();
+
+            targetLocation.jointName1 = scanloc.Item2;
+            targetLocation.offsetXJ1 = scanloc.Item3;
+            targetLocation.offsetYJ1 = scanloc.Item4;*/
+
+            targetLocation = ((CoreLoader)(this.Owner)).savedLocation;
+
+            tracker.captureAtLocation(targetLocation);
+
+            // Hook up to the capture event, fired by the tracker.
+            tracker.Capture += new SensorTracker.CaptureEventHandler(capture);
         }
     }
 }

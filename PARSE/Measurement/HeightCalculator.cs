@@ -7,14 +7,17 @@ namespace PARSE
 {
     static class HeightCalculator
     {
+        /// <summary>
+        /// Returns the height of a point cloud in real world measurements, aka metres
+        /// </summary>
+        /// <param name="pc">PointCloud</param>
+        /// <returns>double</returns>
         public static double getHeight(PointCloud pc)
         {
             double ymin = pc.getyMin();
             double ymax = pc.getyMax();
             double height = ymax - ymin;
-            //Console.WriteLine(height);
             height = UnitConvertor.convertPCM(height,1);
-            //Environment.Exit(1);
             return height;
         }
     }

@@ -8,6 +8,11 @@ namespace PARSE
 {
     static class GiftWrapper
     {
+        /// <summary>
+        /// returns a convex hull of the given list using the gift wrapping algorthim
+        /// </summary>
+        /// <param name="input">List(Point3D)</param>
+        /// <returns>(Point3D)</returns>
         public static List<Point3D> wrap(List<Point3D> input)
         {
             List<Point3D> output = new List<Point3D>();
@@ -40,6 +45,13 @@ namespace PARSE
             return output;
         }
 
+        /// <summary>
+        /// PAY NO ATTENTION TO THE METHOD BEHIND THE METHOD!!!
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         private static int Orientation(Point3D p1, Point3D p2, Point3D p)
         {
             // Determinant
