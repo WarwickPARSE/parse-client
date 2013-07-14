@@ -139,8 +139,8 @@ namespace PARSE
                     case KinectStatus.InsufficientBandwidth: sandra.Speak("Your USB connection has insufficient Bandwidth "); break;
                     case KinectStatus.NotPowered: sandra.Speak("Your Kinect is not powered"); break;
                     case KinectStatus.NotReady: sandra.Speak("Your Kinect is not ready"); break;
-                    case KinectStatus.Error: sandra.Speak("Your Kinect is has errored in some way"); break;
-                    case KinectStatus.Undefined: sandra.Speak("Your Kinect is has errored in an undefined way"); break;
+                    case KinectStatus.Error: sandra.Speak("Your Kinect has encountered an error"); break;
+                    case KinectStatus.Undefined: sandra.Speak("Your Kinect has encountered an undefined error"); break;
                     default: sandra.Speak("Call Technical Support."); break;
                 }
                 Environment.Exit(1);
