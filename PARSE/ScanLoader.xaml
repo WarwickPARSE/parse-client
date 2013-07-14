@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         Title="Scan Viewer" Height="400" Width="600" Name="scanloader"
-        xmlns:local="clr-namespace:PARSE">
+        xmlns:local="clr-namespace:PARSE" IsEnabled="True" ShowInTaskbar="True" Topmost="False" Visibility="Visible">
     <Grid>
         <h:HelixViewport3D CameraRotationMode="Trackball" Name="hvpcanvas" Visibility="Collapsed">
             <h:HelixViewport3D.Camera>
@@ -19,7 +19,20 @@
         </h:HelixViewport3D>
         <Button Name="start_scan" Content="Start Scan Process" Width="120" Height="25" Margin="154,242,0,94" HorizontalAlignment="Left" Click="start_scan_Click" />
         <Button Name="cancel_scan" Content="Cancel Scan Process" Width="120" Height="25" Margin="293,242,165,94" Click="cancel_scan_Click" />
-        <Canvas Name="skeloutline" />
+        <Canvas Name="skeloutline">
+            <Button Canvas.Left="293" Canvas.Top="292" Content="Complete" Height="24" Name="complete_scan" Width="120" Visibility="Hidden" />
+            <ComboBox Canvas.Left="154" Canvas.Top="293" Height="23" Name="numberOfScans" Width="120" SelectionChanged="comboBox1_SelectionChanged" ItemsSource="{Binding}" SelectedIndex="0">
+                <ComboBoxItem Content="4 scan">
+                    
+                </ComboBoxItem>    
+                <ComboBoxItem Content="8 scan">
+                    
+                </ComboBoxItem>
+                <ComboBoxItem Content="Arbitrary Scan">
+                    
+                </ComboBoxItem>
+            </ComboBox>
+        </Canvas>
         <TextBlock Height="93" HorizontalAlignment="Left" TextWrapping="Wrap" TextAlignment="Center" Margin="62,108,0,0" Name="instructionblock" Text="Please prepare patient for scanning " VerticalAlignment="Top" FontSize="32" Width="451" />
         <StatusBar Name="scannerStatus" VerticalAlignment="Bottom">
             <StatusBarItem Name="viewertext">

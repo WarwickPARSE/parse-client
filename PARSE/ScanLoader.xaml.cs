@@ -669,5 +669,19 @@ namespace PARSE
                 this.instructionblock.Text = "Click on an area of the body";
             }
         }
+
+#region events 
+        private void comboBox1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //show the "complete scan" button if an arbitrary-type scan has been selected, otherwise hide it 
+            if (numberOfScans.SelectedIndex == 2) {
+                complete_scan.Visibility = System.Windows.Visibility.Visible;
+            }
+            else {
+                complete_scan.Visibility = System.Windows.Visibility.Hidden; 
+            }
+        }
+#endregion 
+
     }
 }
