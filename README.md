@@ -41,3 +41,5 @@ We are currently making use of the following 3rd party libraries (subject to cha
 - Emgu CV (Image processing)
 - Helix 3D (3D Modelling)
 - Kinect SDK (Kinect)
+- VTK 6 (Visual Toolkit)
+- Python 3.3.2 (Interface to visual toolkit)
