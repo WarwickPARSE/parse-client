@@ -358,5 +358,14 @@ namespace PARSE
         {
             visualiseLimbs(rawlimbData, (sender as ComboBox).SelectedIndex, 0);
         }
+
+        private void btnresults2_Click(object sender, RoutedEventArgs e)
+        {
+
+            MessageBoxResult result = System.Windows.MessageBox.Show(this, "Limb circumferences have been recorded.", "Limb Circumferences Recorded", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            previousScans.Items.Add(DateTime.Now.ToString("dd/MM/yy HH:mm") + " - LimbCapture");
+  
+        }
     }
 }
