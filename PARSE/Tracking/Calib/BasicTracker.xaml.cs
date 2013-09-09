@@ -772,6 +772,13 @@ namespace PARSE.Tracking.Calib
                 );
         }
     }
+
+    private void BasicTrackerWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        takeFrame = false;
+        frames = 1;
+        kinectSensor.Stop();
+    }
     
     
     }

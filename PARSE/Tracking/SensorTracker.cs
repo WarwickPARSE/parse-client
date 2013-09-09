@@ -42,7 +42,7 @@ namespace PARSE.Tracking
         // Position matching
         SkeletonPosition PositionTarget = new SkeletonPosition();   // The target position for capture
         SkeletonPosition CurrentPosition = new SkeletonPosition();  // The current skeleton-relative position of the sensor
-        double DistanceThreshold = 5;                               // The distance below which the positions may be considered the same
+        double DistanceThreshold = 1.2;                               // The distance below which the positions may be considered the same
         Color TargetHighlightColor = Brushes.Yellow.Color;          // The colour to highlight the target position with
 
         // Output
@@ -88,6 +88,12 @@ namespace PARSE.Tracking
         private int dy = 0;                             // change in y between frames
         public double angleXY = 0;                      // the angle of the sensor in the x/y plane, from the RGB feed
         public double angleZ = 0;                       // the angle of the sensor in the z plane
+
+        /*   // // // // // //  //   */
+        // // Allows the system to run in self-scan mode 
+        // // (so you don't need another person)
+        bool one_skeleton_hack = true;
+        /*   // // // // // // //    */
 
         #endregion 
 
@@ -143,7 +149,7 @@ namespace PARSE.Tracking
         {
             this.Capture_Mode = (int)Capture_Modes.Capture_At_Position;
             this.PositionTarget = target;
-            this.capture_timer_running = false;
+            this.capture_timer_running = true;
             this.start();
         }
 
@@ -410,7 +416,8 @@ namespace PARSE.Tracking
             IEnumerable<Skeleton> temp = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
             if (temp.Count() == 1)
             {
-                CurrentPosition.updatePosition(this.x, this.y, this.angleXY, this.angleZ, temp.First());
+                capturePosition();
+                //CurrentPosition.updatePosition(this.x, this.y, this.angleXY, this.angleZ, temp.First());
             }
         }
 
@@ -435,7 +442,7 @@ namespace PARSE.Tracking
                 // Highlight target position, if in Capture_At_Position mode
                 if (this.Capture_Mode == (int)Capture_Modes.Capture_At_Position)
                 {
-                    highlight(this.CurrentPosition.getXinRGBCoords(), this.CurrentPosition.getYinRGBCoords(), 5, this.TargetHighlightColor);
+                    //highlight(this.CurrentPosition.getXinRGBCoords(), this.CurrentPosition.getYinRGBCoords(), 5, this.TargetHighlightColor);
                 }
 
                 // Highlight sensor. Apply after highlighting the target, so it appears on top!
@@ -447,9 +454,12 @@ namespace PARSE.Tracking
 
                 // Update text!
                 // If not enough skeletons, not enough people. Wait for them!
-                if (activeSkeletons < 2)
+                if (activeSkeletons < 2 & !one_skeleton_hack)
                 {
                     this.displayText.Text = "Waiting for doctor and patient";
+                    patientSkeletonID = 0;
+                    doctorSkeletonID = 0;
+                    skeletonsIdentified = false;
                 }
                 // If enough people (exactly)...
                 else if (activeSkeletons == 2)
@@ -472,11 +482,36 @@ namespace PARSE.Tracking
                         }
                     }
                 }
+                else if (activeSkeletons < 2 & one_skeleton_hack==true)
+                {
+                    if (skeletonsIdentified)
+                    {
+                        if ((capture_timer_length - captureTimer) < 10)
+                        {
+                            this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                        }
+                        else
+                        {
+                            this.displayText.Text = "Hold scanner still to capture";
+                        }
+                    }
+                }
             }
             else if (Capture_Mode == (int)Capture_Modes.Capture_At_Position)
             {
-                this.displayText.Text = "Distance to target: " + CurrentPosition.distanceTo(PositionTarget).ToString();
-
+                if ((capture_timer_length - captureTimer) < 10)
+                {
+                    this.displayText.Text = (capture_timer_length - captureTimer).ToString();
+                }
+                else
+                {
+                    double dist = CurrentPosition.distanceTo(PositionTarget);
+                    //this.displayText.Text = "Distance to target: " + CurrentPosition.distanceTo(PositionTarget).ToString();
+                    if (dist > DistanceThreshold)
+                        this.displayText.Text = CurrentPosition.getDirections(PositionTarget);
+                    else
+                        this.displayText.Text = dist.ToString();
+                }
 
             }
 
@@ -516,7 +551,11 @@ namespace PARSE.Tracking
                 // If the scanner hasn't moved too much, and there are still two skeletons in the frame!
                 if ((this.dx < 10 & this.dy < 10 & this.x != 0 & this.y != 0)
                     &&
-                     (temp_activeSkeletons == 2)
+                     (
+                        (!one_skeleton_hack & (temp_activeSkeletons == 2))
+                        |
+                        (one_skeleton_hack & (temp_activeSkeletons == 1))
+                     )
                     &&
                     skeletonsIdentified == true
                     )
@@ -565,7 +604,7 @@ namespace PARSE.Tracking
                     else
                     {
                         this.captureTimer = 0;
-                        this.displayText.Text = "Move the sensor closer to the target position";
+                        //this.displayText.Text = "Move the sensor closer to the target position";
                         // TODO display instructions for moving the sensor closer?
                     }
                 }
@@ -579,7 +618,14 @@ namespace PARSE.Tracking
         {
             System.Diagnostics.Debug.WriteLine("Identifying skeletons...");
 
-            if (skeletonFrame != null & activeSkeletons == 2 & x != 0 & y != 0)
+
+            if (one_skeleton_hack == true & activeSkeletons == 1)
+            {
+                Skeleton[] frame = skeletonFrame;
+                patientSkeletonID = (byte)frame.Where(Skeleton => Skeleton.TrackingState == SkeletonTrackingState.Tracked).First().TrackingId;
+                skeletonsIdentified = true;
+            }
+            else if (skeletonFrame != null & activeSkeletons == 2 & x != 0 & y != 0)
             {
                 Skeleton[] frame;
 
@@ -698,17 +744,15 @@ namespace PARSE.Tracking
         {
             Console.WriteLine("Capture position!!!");
 
-            SkeletonPosition skeletonPos = new SkeletonPosition();
-
             // Update patient position
             IEnumerable<Skeleton> patient = (skeletonFrame.Where(x => x.TrackingId == this.patientSkeletonID));
             Console.WriteLine("Patient ID:  " + this.patientSkeletonID);
             if (patient.Count() == 1)
             {
-                skeletonPos.patient = patient.First();
-                findPosition(skeletonPos);
-                skeletonPos.angleXY = angleXY;
-                skeletonPos.angleZ = angleZ;
+                CurrentPosition.patient = patient.First();
+                findPosition(CurrentPosition);
+                CurrentPosition.angleXY = angleXY;
+                CurrentPosition.angleZ = angleZ;
 
                 return true;
             }
@@ -721,7 +765,6 @@ namespace PARSE.Tracking
             }
         }
 
-        //experiment
         private void findPosition(SkeletonPosition sp)
         {
             SkeletonPoint scannerPos = new SkeletonPoint();
@@ -747,6 +790,7 @@ namespace PARSE.Tracking
             }
 
             sp.joint1 = closestJoint;
+            sp.jointType1 = closestJoint.JointType;
             sp.jointName1 = closestJoint.JointType.ToString();
             sp.distanceJ1 = minDist;
             sp.offsetXJ1 = scannerPos.X - closestJoint.Position.X;
@@ -766,13 +810,12 @@ namespace PARSE.Tracking
             if (capturePosition() == true)
                 RaiseCaptureEvent();
 
-            //this.ScanProcessManager.capture(this.x, this.y, this.angleXY, this.angleZ);
         }
 
         private void RaiseCaptureEvent()
         {
             // Raise a 'Capture' event
-            // Should contain the current skeletonposition (clone)
+            // Should contain the current skeletonposition
             Capture(this, CurrentPosition);
         }
 

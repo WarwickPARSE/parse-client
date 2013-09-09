@@ -250,38 +250,22 @@ namespace PARSE
 
         private void start_scan_Click(object sender, RoutedEventArgs e)
         {
+
+            //instantiate a synthesiser if it has not already been instantiated 
             if (sandra == null)
             {
-                //initalize speech sythesizer
                 sandra = new SpeechSynthesizer();
                 sandra.Rate = 1;
                 sandra.Volume = 100;
             }
             
-            //init kinect
-
-            //start scanning procedure
-           // kinectInterp = new KinectInterpreter(skeloutline);
-
-
-            /*if ((wantKinect) && (!this.kinectInterp.isSkeletonEnabled()))
-            {
-                this.kinectInterp.startSkeletonStream();
-                this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
-            } */
-
+            //display the various kinect feeds, if they are active 
             if (!this.kinectInterp.isSkeletonEnabled())
             {
                 System.Diagnostics.Debug.WriteLine("skel enabled");
                 this.kinectInterp.startSkeletonStream();
                 this.kinectInterp.kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(SkeletonFrameReady);
             } 
-
-          /*  if (!wantKinect)
-            {
-                System.Diagnostics.Debug.WriteLine("AHH HELP " + kinectInterp.skelDepthPublic);
-                kinectInterp.stopStreams();
-            } */
 
             if (!this.kinectInterp.isDepthEnabled())
             {
@@ -295,45 +279,47 @@ namespace PARSE
                 this.kinectInterp.kinectSensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(ColorImageReady);
             }
 
+            //callibrate the interpreter 
             kinectInterp.calibrate();
 
             System.Diagnostics.Debug.WriteLine("Depth now: " + kinectInterp.skelDepthPublic);
 
-            /*if (kinectInterp.tooFarForward())
-            {
-                sandra.Speak("Step Backward");
-                Console.WriteLine("Step Backward");
-            }
-            else if (kinectInterp.tooFarBack())
-            {
-                sandra.Speak("Step Forward");
-                Console.Write("Step Forward");
-            }
-            else
-            {*/
-                sandra.Speak("Your positioning is optimal.");
-                Console.WriteLine("Your posiitoning is optimal, have some cake.");
-                fincloud = new List<PointCloud>();
+            sandra.Speak("Your positioning is optimal.");
+            Console.WriteLine("Your posiitoning is optimal, have some cake.");
+            fincloud = new List<PointCloud>();
 
-                //hide buttons from form
-                cancel_scan.Visibility = Visibility.Collapsed;
-                start_scan.Visibility = Visibility.Collapsed;
+            //hide buttons from form
+            cancel_scan.Visibility = Visibility.Collapsed;
+            start_scan.Visibility = Visibility.Collapsed;
 
-                //create new list of pc's
-                fincloud = new List<PointCloud>();
+            //create new list of pc's
+            fincloud = new List<PointCloud>();
 
-                //start new scanning timer.
-                pcTimer = new System.Windows.Forms.Timer();
-                pcTimer.Tick += new EventHandler(pcTimer_tick);
+            //start new scanning timer.
+            pcTimer = new System.Windows.Forms.Timer();
+            pcTimer.Tick += new EventHandler(pcTimer_tick);
                 
-                sandra.Speak("Please face the camera.");
-                this.instructionblock.Text = "Please face the camera";
+            sandra.Speak("Please face the camera.");
+            this.instructionblock.Text = "Please face the camera";
 
-                //Initialize and start timerr
-                pcTimer.Interval = 10000;
+            //Initialize timer
+            pcTimer.Interval = 10000;
+
+            //Set timer parameters and start 
+            if (numberOfScans.SelectedIndex == 0) {
                 countdown = 3;
                 pcTimer.Start();
-            //}
+            }
+            else if (numberOfScans.SelectedIndex == 1) {
+                sandra.Speak("This has not been fully implemented yet");
+                countdown = 7;
+                pcTimer.Start();
+            } else {
+                sandra.Speak("This has not been fully implemented yet");
+                countdown = 15;
+                pcTimer.Start(); 
+            }
+
         }
 
         private void pcTimer_tick(Object sender, EventArgs e)
@@ -398,9 +384,6 @@ namespace PARSE
 
                 //stop streams
                 kinectInterp.stopStreams();
-
-                //Console.WriteLine(((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).windowPatient.nameLabel.Content.ToString());
-                //Environment.Exit(1);
 
                 if ((((CoreLoader)((PatientLoader)((OptionLoader)(this.Owner)).Owner).Owner).windowPatient.nameText.Text.CompareTo("Greg Corbett")) == 0)
                 {
@@ -672,5 +655,19 @@ namespace PARSE
                 this.instructionblock.Text = "Click on an area of the body";
             }
         }
+
+#region events 
+        private void comboBox1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //show the "complete scan" button if an arbitrary-type scan has been selected, otherwise hide it 
+            if (numberOfScans.SelectedIndex == 2) {
+                complete_scan.Visibility = System.Windows.Visibility.Visible;
+            }
+            else {
+                complete_scan.Visibility = System.Windows.Visibility.Hidden; 
+            }
+        }
+#endregion 
+
     }
 }

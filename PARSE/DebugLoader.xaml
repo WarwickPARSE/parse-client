@@ -7,6 +7,6 @@
         xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
         Title="DebugLoader" Height="300" Width="500">
     <Grid>
-        <RichTextBox Height="250" Name="debugBox" Width="450" />
+        <RichTextBox Height="250" Name="debugBox" Width="450" IsEnabled="True" IsReadOnly="True" />
     </Grid>
 </Window>

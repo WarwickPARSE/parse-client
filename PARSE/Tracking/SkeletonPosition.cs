@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using Microsoft.Kinect;
 
-namespace PARSE.Tracking
+namespace PARSE
 {
-    class SkeletonPosition
+    public class SkeletonPosition
     {
         public Skeleton patient { get; set; }
 
         public Joint joint1 { get; set; }
+        public JointType jointType1 { get; set; }
         public String jointName1 { get; set; }
         public double distanceJ1 { get; set; }
         public double offsetXJ1 { get; set; } //if (-) then position of scanner smaller than position of joint
@@ -40,20 +41,22 @@ namespace PARSE.Tracking
         /// </remarks>
         /// <param name="skeletonPosition"></param>
         /// <returns></returns>
-        internal double distanceTo(SkeletonPosition skeletonPosition)
+        internal double distanceTo(SkeletonPosition targetPosition)
         {
             double distance = 50;
+            System.Diagnostics.Debug.WriteLine("JN1 " + this.jointName1);
+            System.Diagnostics.Debug.WriteLine("SPJN1 " + targetPosition.jointName1);
 
-            if (this.jointName1 != skeletonPosition.jointName1)
+            if (this.jointName1 != targetPosition.jointName1)
                 return 100;
 
             else
             {
-                double dx = this.offsetXJ1 - skeletonPosition.offsetXJ1;
-                double dy = this.offsetYJ1 - skeletonPosition.offsetYJ1;
+                double dx = this.offsetXJ1 - targetPosition.offsetXJ1;
+                double dy = this.offsetYJ1 - targetPosition.offsetYJ1;
 
                 distance = Math.Pow(dx, 2) + Math.Pow(dy, 2);
-                distance = Math.Pow(distance, -2);
+                distance = Math.Pow(distance, 1/2);
             }
 
             return distance;
@@ -101,9 +104,37 @@ namespace PARSE.Tracking
         /// <param name="angleXY"></param>
         /// <param name="angleZ"></param>
         /// <param name="skeleton"></param>
-        internal void updatePosition(int x, int y, double angleXY, double angleZ, Skeleton skeleton)
+        /*internal void updatePosition(int x, int y, double angleXY, double angleZ, Skeleton skeleton)
         {
             // Update the position?
+        }*/
+
+        internal string getDirections(SkeletonPosition targetPosition)
+        {
+            String output = "";
+            if (this.jointName1 != targetPosition.jointName1)
+            {
+                output += "Wrong joint: Current=" + this.jointName1 + "  - target the " + targetPosition.jointName1;
+            }
+            else
+            {
+                double dx = this.offsetXJ1 - targetPosition.offsetXJ1;
+                double dy = this.offsetYJ1 - targetPosition.offsetYJ1;
+                double dist = Math.Pow(dx, 2) + Math.Pow(dy, 2);
+                dist = Math.Pow(dist, 1/2);
+
+                output += "X: " + Math.Round(dx, 1);
+                output += ", Y: " + Math.Round(dy, 1);
+                output += " d: " + Math.Round(dist, 2);
+
+                Console.WriteLine("Offsets: " +
+                    "this: X: " + this.offsetXJ1
+                    + ", Y: " + this.offsetYJ1 +
+                    " Target: X: " + targetPosition.offsetXJ1
+                    + ", Y: " + targetPosition.offsetYJ1);
+            }
+
+            return output;
         }
     }
 }

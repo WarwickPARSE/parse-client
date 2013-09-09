@@ -18,6 +18,8 @@ namespace PARSE
         private enum CaptureModes {Capture_New, Capture_Existing};
         private int CaptureMode = 0;
 
+        private SkeletonPosition sharedPosition;
+
         public MeasurementLoader()
         {
             System.Diagnostics.Debug.WriteLine("Measurement Window Starting...");
@@ -95,15 +97,20 @@ namespace PARSE
             if (this.CaptureMode == (int)CaptureModes.Capture_New)
             {
                 // Write location and timestamp to the database
-            
                 
                 //initialise database class
                 DatabaseEngine db = new DatabaseEngine();
 
-                DateTime timestamp = new DateTime();
+                DateTime timestamp = DateTime.Now;
+
+                sharedPosition = skel;
+
+                ((CoreLoader)(this.Owner)).savedLocation = sharedPosition;
 
                 //add record to database
-                db.insertScanLocations(null, skel.jointName1, null, skel.offsetXJ1, skel.offsetYJ1, null, timestamp);
+                //db.insertScanLocations("null", skel.jointName1, "null", skel.offsetXJ1, skel.offsetYJ1, "0", timestamp);
+
+                Console.WriteLine("Writing to database! Values = " + skel.jointName1 + ", " + skel.offsetXJ1 + ", " + skel.offsetYJ1 + ", " + timestamp);
             }
 
             
@@ -150,7 +157,17 @@ namespace PARSE
             //tracker.captureNewLocation();
 
             // Get a position from the database
-            SkeletonPosition targetLocation = null;
+            SkeletonPosition targetLocation = new SkeletonPosition();
+
+            /*DatabaseEngine db = new DatabaseEngine();
+            Tuple<int, String, double, double, DateTime> scanloc = db.getLatestScanLoc();
+
+            targetLocation.jointName1 = scanloc.Item2;
+            targetLocation.offsetXJ1 = scanloc.Item3;
+            targetLocation.offsetYJ1 = scanloc.Item4;*/
+
+            targetLocation = ((CoreLoader)(this.Owner)).savedLocation;
+
             tracker.captureAtLocation(targetLocation);
 
             // Hook up to the capture event, fired by the tracker.
