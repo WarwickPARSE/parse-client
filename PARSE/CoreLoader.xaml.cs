@@ -25,6 +25,8 @@ using System.Windows.Shapes;
 using System.Reflection;
 using System.Xml.Serialization;
 using HelixToolkit.Wpf;
+using SharpGL;
+using SharpGL.WPF;
 using System.Windows.Controls.DataVisualization.Charting;
 
 //Kinect imports
@@ -141,9 +143,10 @@ namespace PARSE
                     case KinectStatus.NotReady: sandra.Speak("Your Kinect is not ready"); break;
                     case KinectStatus.Error: sandra.Speak("Your Kinect has encountered an error"); break;
                     case KinectStatus.Undefined: sandra.Speak("Your Kinect has encountered an undefined error"); break;
-                    default: sandra.Speak("Call Technical Support."); break;
+                    default: sandra.Speak(kinectInterp.kinectSensor.Status.ToString()); break;
                 }
-                Environment.Exit(1);
+                //Reintroduce later
+                //Environment.Exit(1);
             }
         }
 
@@ -1316,6 +1319,28 @@ namespace PARSE
             else
             {
                 System.Diagnostics.Debug.WriteLine("Please connect a Kinect Device");
+            }
+        }
+
+        private void GLViewer_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (this.pcd == null)
+            {
+                //load up demo
+                GLLoader glloader = new GLLoader(null);
+                glloader.Owner = this;
+                glloader.Show();
+
+            }
+            else
+            {
+
+                //load up with a different constructor
+                GLLoader glloader = new GLLoader(this.pcd);
+                glloader.Owner = this;
+                glloader.Show();
+
             }
         }
     }

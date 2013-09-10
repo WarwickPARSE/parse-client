@@ -112,7 +112,7 @@
                         <ModelVisual3D x:Name="planePlot2" Content="{Binding Model}" />
                         <!--<h:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>-->
                     </h:HelixViewport3D>
-                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="525,40,0,0" Name="btnresults2" VerticalAlignment="Top" Width="75" />
+                    <Button Content="Save Results" Height="23" HorizontalAlignment="Left" Margin="525,40,0,0" Click="btnresults2_Click"  Name="btnresults2" VerticalAlignment="Top" Width="75" />
                     <Button Content="Rescan" Height="23" HorizontalAlignment="Left" Margin="610,40,0,0" Name="btnrescan2" VerticalAlignment="Top" Width="75" />
                     <Label HorizontalAlignment="Left" VerticalAlignment="Top" Name="scanhistory" Height="20" Content="Scan History" Margin="525,88,8,8" Foreground="CornflowerBlue" FontFamily="Arial" FontWeight="Bold" FontSize="16" />
                     <ListBox Margin="525,110,0,13" Name="previousScans" HorizontalAlignment="Left"
