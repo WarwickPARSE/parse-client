@@ -165,6 +165,7 @@
     <Compile Include="ICP\Stitchers\SimpleStitcher.cs" />
     <Compile Include="ICP\PCR.cs" />
     <Compile Include="ICP\Stitcher.cs" />
+    <Compile Include="ICP\Stitchers\vtkICP.cs" />
     <Compile Include="ICP\SubRegionOutOfBoundsException.cs" />
     <Compile Include="ICP\VoxelGrid.cs" />
     <Compile Include="Library\Visualisation\GroupVisualiser.cs" />
