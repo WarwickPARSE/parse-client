@@ -112,6 +112,9 @@ namespace PARSE
                 this.instructionblock.Visibility = Visibility.Collapsed;
                 this.loadingwidgetcontrol.Visibility = Visibility.Visible;
 
+                //hide combobox 
+                numberOfScans.Visibility = Visibility.Collapsed; 
+
                 //center appropriately
                 WindowStartupLocation = System.Windows.WindowStartupLocation.Manual;
                 this.Top = 60;
