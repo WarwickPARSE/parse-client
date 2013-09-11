@@ -82,6 +82,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\HelixToolkit.2012.4.14.1\lib\NET40\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Kitware.mummy.Runtime">
+      <HintPath>..\packages\VTK\Kitware.mummy.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Kitware.VTK">
+      <HintPath>..\packages\VTK\Kitware.VTK.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\packages\MathNet.Numerics.2.4.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
