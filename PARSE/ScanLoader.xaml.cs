@@ -292,6 +292,9 @@ namespace PARSE
             cancel_scan.Visibility = Visibility.Collapsed;
             start_scan.Visibility = Visibility.Collapsed;
 
+            //hide input box from form 
+            numberOfScans.Visibility = Visibility.Collapsed; 
+
             //create new list of pc's
             fincloud = new List<PointCloud>();
 
