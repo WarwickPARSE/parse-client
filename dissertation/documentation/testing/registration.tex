@@ -1,0 +1,8 @@
+\section{Registration}
+\label{testing:registration}
+This section deals with the testing of the registration functionality, as described in Section \ref{design:registration}. 
+
+\subsection{Methodology}
+Testing this sub-system was not a trivial exercise due to the interdependence with volume estimation. That is, correct volume estimation requires correct registration but the correctness of registration can only be measured by observing correct values of volume estimation.\\
+
+The best way of determining the accuracy of stitching is by analying the deviance of the Toolkit Volume Measurement from the Gold Standard Volume measurement, which can be read in Section \ref{testing:vol est}. The first data point, Bernard, is a control and the error is irrelevant. \\

@@ -1,0 +1,74 @@
+\section{Volume Estimation}
+\label{design:volume estimation}
+There are many techniques for estimating an arbitrary metric of a given 3-dimensional shape, including the volume of the shape.
+Focus will first be on height estimation to see if the methods can be extended to calculate volume, before moving to methods specifically designed for volume estimation.\\
+
+\subsection{Estimating the Height of Trees}
+LIDAR has previously been used to estimate the height of trees from above \cite{Maltamo2006}. Three laser scanning-based methods were used to compute the height of the trees: a direct prediction model for the stem volume at plot level, a volume prediction system based on the modelled percentiles of the basal area diameter distribution and a parameter prediction method used to determinate Weibull based basal area diameter distributions \cite{Frechet1927} for the plot-level stem volume prediction. The best results were obtained with the first method, i.e. the model that predicts plot-level stem volumes directly \cite{Maltamo2006}.\\
+
+In order to calculate the height, the laser reflections from non-ground objects, such as trees and buildings were classified as non-ground hits using TerraScan software \cite{Solid2013}. Conversely, other points were classified as ground hits. Canopy height of a non-ground object is then calculated as the difference between the height of the non-ground object and the neighbouring ground points. The accuracy of this method was found to be better than $\pm$15cm \cite{Maltamo2006}, when compare to field-measured volumes obtained with the Finnish conventional method Inventory by Compartments \cite{Koivuniemi2006}.\\
+
+It should be noted that in this method the LIDAR emitter was above the target \cite{Maltamo2006}, rather than in front, as is likely in the case of this project. This method then translates to use the top and the bottom most point of the cloud to calculate height. However it may be extendable to calculate metrics such as depth and breath, from which a minimum bounding box could be determined.\\
+
+A minimum bounding box is defined as follows in Figure \ref{fig:bounding_box_definition}.\\
+
+\begin{figure}[h]
+\textit{Definition: For a point set in N dimensions, it refers to the box with the smallest measure (area, volume, or hypervolume in higher dimensions) within which all the points lie} \cite{Barequet2001}.
+\caption {Minimum bounding box definition}
+\label{fig:bounding_box_definition}
+\end{figure}\\
+
+For the purposes of the project, the bounding box would be three dimensional and the volume of the minimum bounding box calculated as in equation \ref{eq:calculating_the_volume_of_the_minimum_bounding_box}.\\
+
+\begin{equation}
+    \label{eq:calculating_the_volume_of_the_minimum_bounding_box}
+    Volume = (xmax -xmin) * (ymax - ymin) * (zmax - zmin)
+\end{equation}\\
+
+Such a box may be useful in calculating an upper bound on the volume of the patient.\\
+
+\subsection{Determination of prostate volume by transrectal ultrasound}
+The volumes of prostates have previously been calculated from ultrasound scans using many methods, including step-section planimetry and the elliptical volume method. After the volume of the prostate was estimated, all patients in the study underwent subsequent radical prostatectomy or cystoprostatectomy and prostate specimen weights were compared with the results of each volume estimation method \cite{K1991}.\\ 
+
+\subsubsection{Step-Section Planimetry}
+\label{research:ssp}
+Step-Section Planimetry (SSP) is so called because of the planimeter, a measuring instrument used to determine the area of an arbitrary two-dimensional shape by traversing the perimeter \cite{Bryant2011}. 
+The method calculates the area at each step, uses these areas to calculate the volume of a step and then sums these volume to determine the total volume. SSP is similar to the technique of volume rendering, which uses multiple two-dimensional slices to build up a three-dimensional image.\\
+
+For simplicity's sake, let $O(p) \in O(p)$, where $p$ is the number of points in the point cloud.\\
+
+The method traverses the point cloud representation of an object, requiring again at most $O(y)$ where y is the number of points in the y axis. Again for simplicity, let $O(y) \in O(p)$. Hence, the total SSP method will run in $O(p^2)$. Whilst the area/volume is being calculated, other useful metrics could be determined, such as the perimeters of the steps\footnote{or planes}.\\
+
+Algorithmically, the area/volume could be calculated with the Shoelace formula \cite{Pretzsch2009}. The Shoelace formula states that, given a polygon made up of points $\{(x_1,y_1),(x_2,y_2)...(x_n,y_n)\}$ ordered clock-wise\footnote{or anti-clockwise}, the area can be calculated as in equation \ref{eq:the shoelace formula}. The Shoelace formula is the mathematical equivalent of a planimeter.\\
+
+\begin{equation}
+\label{eq:the shoelace formula}
+Area = \left|\frac{(x_1y_2 - x_2y_1) + (x_2y_3 - x_3y_2) + ... + (x_ny_1 - x_1y_n)}{2}\right|
+\end{equation}\\
+
+Similar methods to SSP have been used in other areas of medicine, such as measuring brain, heart and fetal lung volumes \cite{Rosen1990,Rypens2001,Graham1971}.\\
+
+\subsubsection{Elliptical volume}
+Much like a bounding box, an ellipsoid can be formed around a person using their height, depth and breadth and the volume of this ellipsoid is then calculated using the formula in equation \ref{eq:calculating the volume of an ellipse}, where $a,b,c$ are the lengths of the axis.\\
+
+\begin{equation}
+Volume = \frac{4}{3}\pi abc
+\label{eq:calculating the volume of an ellipse}
+\end{equation}\\
+
+For prostates, the elliptical volume method demonstrated a correlation coefficient of 0.90 \cite{K1991}. Again, this suggests a high accuracy. However, this high performance may be due to the roughly walnut shaped nature of a prostate \cite{D2003}. 
+On a less spherical object, such as a person, the elliptical method may output a higher volume than the true value, as with the bounding box.\\
+
+If the min and max values of a object were stored in it's point cloud, the ellipsoid could be computed in $O(1)$, similar to the bounding box. 
+If the min and max values need to be computed on the fly, this would bring the complexity up to $O(p)$, putting the ellipsoid method's complexity less than the step-section method. As elliptical volume is less accurate and cannot give other information, such as perimeter, step-section will be the basis of volume calculation design.\\
+
+\subsubsection{Convex Hulls}
+Because the Kinect depth data has high level of noise, it may be necessary to compute the convex hull of a plane in order to obtain more accurate results. Three convex hull methods were researched, Gift-Wrapping \cite{Cormen2001}, Quick Hull \cite{Barber1996} and the Kirkpatrick--–Seidel algorithm \cite{kirkpatrick1986}.\\
+
+Gift-Wrapping (GW), also known as Jarvis' march \cite{Jarvis1973}, is similar in two dimensions to the process of winding a string around the set of points. 
+GW runs in $O(nh)$ \cite{Cormen2001} where $n$ is the number of points in the input and $h$ is the number of points in the hull. In the case of this project, it is likely that $O(h) \in O(n)$ as the points are expected to already be almost hull like. 
+Hence GW can be, for the purposes of the project, said to run in $O(n^2)$. However, GW is simple to implement so may be the method chosen by the group.\\
+
+Quick Hull (QH) uses a divide and conquer approach similar to that of QuickSort, which it's name derives from. Its average case complexity is considered to be $O(n * log(n))$, whereas in the worst case it takes $O(n^2)$ \cite{Barber1996}. As previously stated, project data is likely to be near to the worst case. Hence, QH may perform no better than GW and may be more difficult to implement. The convex hull is unique for a given point set \cite{Sedgewick2012}, so accuracy is not a concern when picking an algorithm.\\
+
+The Kirkpatrick--–Seidel algorithm runs strictly in $O(n*log(h))$, for the purposes of the project, this becomes $O(n*log(n))$. Whilst KS has a lower complexity than GW, it may be more time-consuming to implement. As such, the group may opt for GW if a convex hull algorithm is indeed needed.\\

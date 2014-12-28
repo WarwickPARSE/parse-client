@@ -1,0 +1,26 @@
+\chapter{Testing and Analysis}
+\label{testing}
+
+This section of the report outlines the testing necessary in order to evaluate the accuracy and robustness of the volume reconstruction, volume and limb circumference calculation and the recording and recall of medical scanner postioning on the human body. This testing informs our evaluation of the project. It is the intention of the group to demonstrate that this non-invasive and 'hands-free' Kinect based methodology provides at least a good approximation of measurements achieved through more accurate means of testing. 
+
+\input{testing/test_plan}
+\input{testing/person_isolation}
+\input{testing/registration}
+\input{testing/volume}
+\input{testing/limb}
+\input{testing/recognition}
+
+\newpage
+\section{Summary}
+This section summarises the testing undertaken.\\
+
+\subsubsection{Person Isolation}
+The person isolation has been shown to successfully isolate a variety of people and the floor can be isolated at a point cloud level.\\
+
+\subsubsection{Volume Estimation}
+An average transform constant has been calculated to be 0.81 (to two decimal places). The height estimation has an error of $\pm$4.25\% within the range tested and can repeatedly measure a subject to within $\pm$2\% on average.\\
+
+The volume estimation could be said to have a minimum accuracy of between $\pm$1.06\% and $\pm$9.12\%. Whereas in practice the average error is 23.05\%, although this may be down to clothing and the relative ratios of subject volume is preserved to 0.62\%, but more test subjects are needed before any real conclusions can be made.\\
+
+\subsubsection{Markerless Recognition}
+Even with motion smoothing, the result from the RGB-based tracking mechanism is very shaky, and is strongly affected by lighting and the environment. Tracking is possible, but is not very reliable. The translation to real-world coordinates is largely accurate when the target tracking is stable, but only to +/- 2mm due to the resolution of the imagery.\\

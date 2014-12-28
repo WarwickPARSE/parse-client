@@ -1,0 +1,48 @@
+\section{Requirements}
+\label{spec:requirements}
+This section enumerates the functional and non-functional requirements of the projects and presents the rationale behind them.\\
+
+
+\subsection{Functional}
+\label{spec:functional}
+
+Our functional requirements have been maintained throughout the project and subject to minor alterations, have been satisfied to a reasonable extent. The meeting of these requirements is discussed in the evaluation section of the report.
+
+\begin{longtable}{|p{0.5cm}|p{5cm}|p{6cm}|} \hline
+   & Requirement & Rationale \\ \hline
+  1 & The system should be able to retrieve a point cloud representation from the Kinect sensor by mapping the colour stream onto points of a depth map. &
+    We wish to estimate volume based on the data from the depth and RGB colour camera. A coarse point cloud will produce a reasonable approximation of the volume. \\ \hline
+      2 & The system should be capable of identifying both large and small objects within a relatively complex scene which may be subject to noise or partial occlusion and extract that from the scene. &
+    To estimate the volume of the human body or be able to register the presence of an object in the scene used for patient scanning, we need to effectively segment the scene into it's constituent parts. \\ \hline
+      3 & The system should be capable of storing point clouds in a data structure that allows efficient access. &
+    Point clouds will be subject to operations that are computationally complex for the purposes of rendering and manipulation. A suitable data structure will need to be selected that supports efficient operation. \\ \hline
+      4 & The system should be capable of dealing with both partial and complete body scans. &
+    A complete body scan will be required to generate an overall approximation of body volume subject to environmental interference. Partial scans will be requied in the context of scanning where full volume estimation isn't required, such as in the instance of point registration on the patient. \\ \hline
+      5 & The system should be capable of recognising, storing and recalling the location and orientation of a known mobile object or scanning device relative to a static object. &
+    The scanning of various areas of the body for the monitoring of size and body variation over time (such as periodic ultrasound scanning) relies on the scan being taken from the same location with a similar orientation to the previous scan, hence requiring accurate location and positioning for repeated measurements. \\ \hline
+      6 & The system should be capable of directing the user to place the sensor at the previous measurement point on the body and detecting when the sensor has been positioned and oriented correctly. &
+    To obtain measurements useful for comparison, the measurement should be taken at precisely the same point on the body, with the sensor at the same orientation. \\ \hline
+      7 & The system should be capable of measuring circumferences and local volumes for particular areas of the  body. &
+    The measurements of limb circumferences will be useful for the monitoring of local changes in size or depth on the surface of the body. \\ \hline
+    
+\end{longtable}
+
+\pagebreak 
+
+\subsection{Non Functional}
+\label{spec:non functional}
+
+The non functional criteria for the project have been tested and evaluated later in the Evaluation and testing section of the report.
+
+\begin{longtable}{ | p{0.5cm}|p{5cm}|p{6cm}|} \hline
+   & Requirement & Rationale \\ \hline 
+  1 & The system should provide an intuitive and easy to use mechanism for scanning. &
+    The scanning method should have a limited training overhead so that it can be used effectively and widely adopted amongst the user base. \\ \hline
+      2 & The system should be efficient, aiming to return rendered results in real time. &
+    Computation performed on the point cloud is likely to be expensive but results from processing should be returned as quickly as possible for usability purposes. \\ \hline
+      3 & The system should be able to estimate measurements accurately. &
+    Body volume and circumferences of the body need to be reasonably estimated in order to provide a clear indicator for future scans. \\ \hline
+      4 & The system should be capable of being installed with minimal pre-requisite software/hardware. &
+    The system will likely be deployed in a number of medical contexts and apart from the requirement of a Microsoft Kinect and a capable graphics card, pre-requisite software will be bundled as part of the system. \\ \hline
+    
+\end{longtable}

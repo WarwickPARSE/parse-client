@@ -1,0 +1,16 @@
+\chapter{Legal, Social, Ethical and Professional Issues}
+\label{legal, social, ethical and professional issues}
+
+\section{Legal Issues}
+
+As mentioned in Section \ref{design:database}, the toolkit retains information about a patients, for example their name, NHS number and address, to uniquely identify them. As a result, if the PARSE toolkit ever became a NHS standard, this data storage would be legally required to comply with the Data Protection Act \cite{hmso1998}. For example, the act would demand that the data collected only be used for the purposes of identifying them within the PARSE environment and stored adequately to prevent a third party harvesting the data \cite{hmso1998}. In terms of the licensing arrangement for the software, it is currently available on Github and therefore has been open sourced. Were the project to go closed source, we would then license it appropriately based on the principles of the LGPL.
+
+\section{Social Issues}
+\label{social}
+Body volume is only one metric upon which a persons health can be judged \cite{charnock1999}. There are many others such as blood pressure \cite{group1998}, blood sugar \cite{hopkins1915} and alcohol intake \cite{klatsky1977} to name a few. As the toolkit only gives information on body volume the toolkit should not replace other the broader picture other medical tests and the years of experience that medical professionals have in judging a persons overall health and fitness.  Nor should it be marketed as such.\\
+
+\section{Ethical Issues}
+As noted in Section \ref{errors in volume measurement}, for greatest accuracy scans should be taken when the patient is only wearing their underwear. Such a condition raises modesty concerns as a patient may not wish to undress in a doctor's surgery. Also people of certain faiths, such as Islam \cite{maqsood2006}, may have strong religious reasons not to undress. Gender issues may also come into play, with patients preferring to undress in presence of a doctor of the same sex \cite{zelek2003}. Patients may also have moral concerns regarding there 3D point cloud being stored. As a result of these issues, the toolkit should not be the only method on offer to a doctor to determine body volumes of patients.\\
+
+\section{Professional Issues}
+The design and implementation of the software must adhere to appropriate professional standards. This means that any pre-existing software must be integrated in a standard fashion and original code should be well structured. It may well be that other people will use the program code in the future and so a well-delineated structure with clearly defined interfaces between program sections is essential for future maintainability and extensibility, potentially by other people.

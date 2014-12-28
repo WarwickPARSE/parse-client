@@ -1,0 +1,131 @@
+\chapter{Research}
+
+\label{research}
+
+\section{Introduction}
+
+The use of image processing and its associated computational techniques for the analysis, enhancement, compression and reconstruction of images has been used in the medical domain since the late 1960's and early 1970's to develop an understanding of the processes and composition of the human body \cite{Various2000}. 
+More recently, technological innovations in the area of determining body composition accurately have become more mature \cite{Weyers2000} and thus more relevant to the study of the human body as health conditions and the research of disease behaviour has been identified as being dependent on the body's internal composition \cite{Steinkamp1968}. 
+Techniques that use MRI scanning or other radiation based techniques offer significant insight into the composition of the body's internal structure. 
+Particular studies have utilised whole body MRI scanning to produce images that can then be used to determine composition due to its large coverage, low impact and ability to repeatedly acquire images \cite{Kullberg2010}. \\
+
+Image processing has also been used as a means of calibrating the scanning procedure for patients who require repeated ultrasound or other similar non-intrusive scans of a particular area of the body during a course of treatment or for the diagnosis or analysis of a course of therapy or weight loss programme. 
+Previous research has provided the basis for markerless recognition by using points of reference on the human body for automated feature extraction \cite{Iat-FaiLeong2007}. 
+The identification of components of the human body without markers forms the basis for the research into identification of sites for ultrasound scanning without the use of significant cues or markers.\\
+
+Range Imaging, especially HDR is a relatively new technique being used in the context of image processing. 
+Range Imaging produces 2D images with depth cues and while their relative applications in Medical Imaging have been small to date their potential is evident in previous applications outside of the context of medicine with pixel values corresponding to distance from the device already being used in the calibration of patient positioning for MRI scans using range imaging sensor devices.\\
+
+This research section will consider the use of Body Composition in the analysis and diagnosis of medical state and conditions that a patient may be subject to. 
+It will consider the current standards for the determination and analysis of Body Composition and what the future direction of image processing for the determination of body composition is.
+Markerless recognition in the context of scan registration and patient calibration will also be explored and technologies and practices identified where the standards are implemented. 
+Range Imaging techniques and devices will also be introduced within the context of these previous two medical sub-domains in order to inform our research into related work and project design and implementation.\\
+
+\section{Body Composition}
+
+The composition of the human body as determined by the physical fitness of a person is the relative percentages of fat, muscle, bone and other tissues in the body. 
+This ratio of muscle to fat tissue is typically responsible for the outward appearance of a person and determines their leanness with respect to their body fat percentage. 
+Body mass and volume is most commonly determined using the Body Mass Index (BMI) and this measurement has been used in clinical trials for a number of years in the determination of health conditions and disease proliferation linked to a person's height and weight \cite{Flegal2012}. However, BMI is limited by the lack of information that can be gained from the correlation of height and weight in the determination of mass and is unable to detect excess body adiposity of people in the intermediate range of the BMI scale who may have reasonable weight to height ratios but excessive weight distribution or abdominal volume. \\
+
+There are 2 commonly used models for assessing body composition. The \emph{2 component model} by Siri and Brozek \cite{SiriAndBrozek} divides the body into a fat component and a fat free component with assumptions made about the constancy of the density of the body and the hydration fraction of the fat free mass. The fat free component exists of bone, muscle and organs in the body. As a means for determining body fat percentage and volume, the 2 component model provides a straightforward means of determining body fat using the \emph{Siri} equation. Importantly, the validity of the 2 component model has been called into account in cases where patients are of an enhanced age or different ethnicity \cite{Guerra2010, Wagner2001}. The 4 component model follows on from concept of dividing the body up into its respective parts but is less commonly used due to the additional complexity of the processes involved in accurately measuring not only fat content but also water, protein and mineral content. Further discussion of the 4C model is outside of the scope of this report. 
+
+\begin{figure}[t]
+\label{bmi30}
+	\centering
+	\includegraphics[scale=0.6]{images/bmi30women.JPG}
+	\caption{8 Women with a BMI of 30 but with different weight distribution}
+\end{figure}
+
+\subsection{3D Photonic Scanning}
+
+A new measure of body composition is the Body Volume Index (BVI) launched in 2010 as an improved anthropometric measurement for the discovery of weight information and distribution on the human body. BVI is ascertained using a 3D scanner to calculate measurements and risk factors that could be associated with a person's body shape and type through the capturing of their weight, volume and body fat. These 3D scanners typically use an array of cameras in a configuration which allows for the capture and rendering of the body so that volume can be calculated. These scans are typically captured under ideal control conditions imposed on the patient such as lighting, pose and restriction on the degree of patient movement. \\ 
+
+The calculation of a person's Body Volume Index in cases of obese patients with moderately high volume readings correlated against the increase of bio markers of cardiovascular disease. This  highlights the benefits associated with methods of acquiring 3D images of the body in the motivation of measuring patient volume for weight monitoring and control purposes. The use of 3D scanning of patients is also suitable where the gross body composition of a patient may deem other means of volume measurement unsuitable. However, the calculation of Body Volume in the diagnosis and prognosis of abnormal body composition in patients has so far remained experimental and hasn't resulted in widespread acceptance by the medical community. This is partially due to the expensive nature of the body scanning equipment, where high specification scanners require 32 cameras, 16 sensors and trained operators \cite{BVIAcceptance}. \\
+
+\subsection{Densitometry}
+
+The Archimedes principle that the volume of an object is equal to the object's loss of weight in water with appropriate correction for the density of the water, has been used as a means for determining the volume of patients since research began into its use as a means to determine patient density in the late 1960s \cite{katch1967} .To this day, the use of this principle is still considered the `gold standard' \cite{anderson2012} when estimating body volume with an average error of 1-2\% under ideal conditions over repeated intervals \cite{Rolland2012}. \\
+
+\subsection{Air Displacement Plethysmography}
+
+Hydrostatic displacement, or air displacement, uses the same principles of densitometry but measures the displaced air within a known volume of air using the ideas of plethysmorgraphy. A plethysmograph measures changes to volume within an organ or in an entire body. In studies, air displacement plethysmography has been used for the assessment of body composition in children and adults. The BOD POD, a hydrostatic weighing chamber, is considered the only commercially viable implementation that is used for this purpose \cite{Fields2004}. \\
+
+\begin{figure}[t]
+\label{2c4cerror}
+    \centering
+    \includegraphics[scale=0.4]{images/2c4cgraph.png}
+	\caption[Changes in \% body fat, comparing Bod Pod to a 4-compartment model]{Changes in \% body fat, comparing Bod Pod to a 4-compartment model. R=0 represents no correlation between these composition measures over time.}
+\end{figure}
+
+Patients enter into the chamber which consists of 2 sub chambers with approximately 300-400L of capacity. A diaphragm moves between these chambers creating sinusoidal volume perturbations which result in very small pressure changes that can then be detected by transducers in the hull of the primary chamber in which the patient sits. This measurement takes place in non isothermal conditions and the volume measurement recorded taking into account the surrounding pressure in the chamber using Poisson's law. Poisson's Law states that $\gamma$ is the ratio of the specific heat of the gas at constant pressure to that of constant volume and is equal to 1.4 for air and p represents the pressure in each chamber. \\
+
+\begin{equation}
+    \label{eq:poissonlaw}
+    P_1/P_2 = (V_2/V_1)^\gamma
+\end{equation} 
+
+These pressure changes are subject to error if the chamber itself is improperly sealed, if the patient moves or breathes irregularly or has significant pulmonary activity. It is also poor for measuring changes over time as each scan is subject to a number of variable factors such as humidity and what the patient is wearing.\\
+
+However, statistically significant variations of the volume measurement of a single patient over time, even where elements of the scan are tightly controlled, such as breathing; environment and clothing, have been observed. This has meant that the relative error between the 2 models of measurement mean that measurements over time have shown little to no correlation of the volumes captured \cite{Mahon2007}. This has caused some academics to call for further research into the issues surrounding the two compartment body composition approach where a 4 compartment model may be more accurate. The inaccuracies of the air displacement  methodology that the BodPod advocates may be due to the assumptions made by these models \cite{Lifemeasurement1997}. \\
+
+\subsection{Limb Circumference}
+
+Aside from these technologies used for the reconstruction and evaluation of body volume, the role of limb circumferences as a reflection of body composition should not be overlooked. The distribution of muscle density and subcutaneous fat deposits manifests itself around particular areas of the body. Measuring the circumference can give a reasonable idea of the changes to muscle and fat composition in limbs over time \cite{Frisancho1981}. These areas are often measured and monitored in order to aid in the prognosis of particular conditions or treatment plans. \\
+
+Conventional measurement makes use of spring tape or skinfold calipers. Martin et al highlight the need to take several measurements when using calipers due to the variability of adipose tissue patterning in areas of the body. Strict guidelines govern caliper usage making it susceptible to error \cite{Martin1985}. The application of image processing to this domain is apparant in localized MRI scanning where the composition of these areas can be analysed for body fat ratio and estimation of circumferences across the body; MRI however is costly and often inaccessible for such means \cite{Reeves2004}. \\
+
+\begin{figure}[t]
+\centering
+        \begin{subfigure}(a)
+            \label{volLED}
+            \centering
+            \includegraphics[scale=0.4]{images/volumetry.PNG}
+            \end{subfigure}
+            \begin{subfigure}(b)
+                \label{volWATER}
+                \centering
+                \includegraphics[scale=0.4]{images/waterdisplacement.jpg}
+        \end{subfigure}
+        \caption{Volumeter configuration for scanning the lower leg (left). Conventional water displacement method on (right).}
+\end{figure} \\
+
+Technology that does not use direct limb circumference measurement but rather extrapolates it from a given volume has been shown to produce accurate anthropometric measurements for each limb. The volumeter captures the volume of local limbs using an array of infra-red sensors. These sensors capture the contours and overall volume of a limb and this gives its equivalent circumference. Heinz et al found a $0.60$ average variance from the spring tape measurement and under ideal patient setup, provided an effective means of monitoring changes in volume and circumference of limbs \cite{Heinz2000}. A clear drawback in the majority of these technologies is the required setup and calibration required for such equipment \cite{Bauer2011}.\\
+
+There is little research to suggest that a range imaging implementation with little previous calibration or setup would be suitable nor unsuitable. The work of Heinz suggests that circumference calculations that use volume-based estimation are likely to be biased towards larger estimations when compared to spring tape, although the error is evaluated as not significant to the overall accuracy of the method, and the relationship between them, postively linear \cite{Heinz2000}. \\
+
+\input{research/range_imaging}
+
+\input{research/skeletal_pose_estimation}
+
+\input{research/person_isolation}
+
+\input{research/registration}
+
+\input{research/volume_estimation}
+
+\input{research/image_recognition}
+
+\pagebreak
+
+\input{research/related_work}
+
+\newpage
+\section{Summary}
+This section summarises the above research.\\
+
+\subsubsection{Person Isolation}
+MOG \cite{Stauffer1999} and KDE \cite{Elgammal2000} will be the methods attempted to be implemented later. These two were chosen because their high accuracy and low computation complexity. \\
+
+\subsubsection{Point Cloud Registration}
+There are two main methods currently used for registration and ICP has demonstrated to be more flexible and reliable in the domains for which it is intended on being used \cite{chen92}. Hence, this will be the registration method used throughout the design phase of this project. \\
+
+\subsubsection{Volume Estimation}
+Step-Section Planimetry \cite{K1991} will be the basis for volume estimation and will use the Shoelace formula \cite{Pretzsch2009} to calculate the necessary metrics. If required, Gift-Wrapping \cite{Cormen2001} will be used to determine a convex hull. \\
+
+\subsubsection{Limb Circumference}
+
+Adapting the step-section planimetry methods cited in the Volume Estimation, Limb circumference will be calculated by taking the circumference of these planes using the Gift-wrapping method \cite{Cormen2001}. Firstly however the representative point clouds will be partitioned in a novel application of the Kinect Skeleton SDK to point cloud space. \\
+
+\subsubsection{Markerless Recognition}
+
+Our markerless recognition functionality has explored a number of algorithms suitable for the use of detecting a sensor in a noisy image space. As a result of these findings and our prototyping of several solutions we have opted to use blob detection using the RGB color space, in a simplification similar to the efforts of Ma and Ming. \cite{blob_detection_MingMa} \\

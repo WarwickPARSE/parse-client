@@ -1,0 +1,63 @@
+\section{Background Subtraction and Person Isolation}
+\label{background subtraction and person isolation}
+In order to create a point cloud of a person, the toolkit must be able to isolate the person being scanned from the background environment. The act of removing the background environment is known as \emph{Background Subtraction} and is a well researched problem for many applications in the computer vision field such as surveillance \cite{McIvor2000}. Even though many background subtraction algorithms have been proposed in the literature, the problem of identifying moving objects in complex environment is still far from being completely solved \cite{Cheung2007}.\\
+
+There are many algorithms for isolating generic objects but very few algorithms specifically designed to isolate a person. Therefore, research focused on generic isolation algorithms as any person isolation algorithm must share some similarities with generic object isolation algorithms. The similarities between the algorithms for object isolation and person isolation are that both should \cite{Cheung2007}:\begin{itemize}
+  \item Be robust against changes in illumination
+  \item Avoid detecting non-stationary background objects such as swinging leaves
+  \item React quickly to changes
+\end{itemize}
+
+\subsection{General Approaches, Properties and Steps}
+A common approach for isolating general objects is to identify the portion of a video frame that differs significantly from a background model \cite{Cheung2007}.\\
+
+In general, the four major steps in a background subtraction algorithm are preprocessing, background modelling, foreground detection and data validation. Preprocessing consists of a collection of simple image processing tasks that change the raw input video into a format that can be processed by subsequent steps and can involve noise reduction and frame size/rate reductions \cite{Cheung2007}.\\
+
+Background modelling uses the new video frame to calculate and update a background model. This background model provides a statistical description of the entire background scene and can be either non-recursive or recursive \cite{Cheung2007}.\\
+
+One non-recursive technique uses a sliding-window approach for background estimation. The technique stores a buffer of the previous $L$ video frames, and estimates the background image based on the temporal variation of each pixel within the buffer. Non-recursive techniques are highly adaptive as they do not depend on the history beyond those frames stored in the buffer \cite{Cheung2007}, which may make them ideal for the toolkit. On the other hand, the storage requirement can be significant if a large buffer is needed to cope with slow-moving objects \cite{Cheung2007}, although that should not be a problem for the toolkit.\\ 
+
+Recursive techniques differ as they do not use a buffer but maintain a single background model based on each input frame. As a result, input frames from distant past could have an effect on the current background model \cite{Cheung2007} and hence may not be suitable for the toolkit as the patient is expected to be required to move.\\
+
+Foreground detection then identifies pixels in the video frame that cannot be adequately explained by the background model and outputs them as a binary candidate foreground mask \cite{Cheung2007}.\\
+
+Finally, data validation examines the candidate mask and attempt to reduce false-positive or false-negative regions and eliminates those pixels that do not correspond to actual moving objects, and outputs the final foreground mask \cite{Cheung2007}.\\
+
+\subsection{Specific Algorithms}
+\label{person_isolation:specific algorithms}
+Approaches to object isolation vary from simple techniques such as Frame Differencing and Approximate Median Filtering, to more sophisticated probabilistic modelling techniques. While complicated techniques often produce superior performance, experiments \cite{Cheung2007} show that simple techniques such as approximate median filtering can produce good results with much lower computational complexity. This section will give an overview of several background isolation algorithms and detail their running time complexity and accuracy.\\
+
+Two studies were looked at to determine the effectiveness of each method. Cheung's \cite{Cheung2007} focused on frame differencing, approximate median filtering, Kalman Filtering and Median Filtering whilst Piccardi's study \cite{Piccardi2004} focused on the methods Mixture of Gaussian, Running Gaussian Average, Temporal Median Filtering, Kernel Density Estimation, Sequential Kernel Density Approximation, Cooccurence of Image Variations and Eigenbackgrounds \\
+
+\subsubsection{Mixture of Gaussian}
+The Mixture of Gaussian (MOG) method \cite{Stauffer1999} has $O(m)$ complexity, where $m$ is the number of Gaussian distributions used; typically 3 to 5. MOG has a high accuracy \cite{Piccardi2004}. In Cheung's experiments \cite{Cheung2007}, MOG performed the best. The high accuracy and relatively low complexity may make MOG the perfect candiate for the project.\\
+
+\subsubsection{Running Gaussian Average}
+The fastest amongst the methods reviewed by Piccardi was the Running Gaussian Average (RGA) method \cite{Wren1997,Koller1994}, having a time complexity of $O(1)$. RGA is a real-time system for tracking people and interpreting their behaviour. It is capable of running at 10Hz on a standard computer, and has performed reliably on thousands of people in many different physical locations \cite{Wren1997}. RGA has a low/medium accuracy \cite{Piccardi2004}. The low accuracy may exclude RGA from use in the project.\\
+
+\subsubsection{Temporal Median Filtering}
+Temporal Median Filtering (TMF) \cite{Lo2001,Cucchiara2003} has a similar classification cost to RGA, but updating the model is approximated as linear in the number of samples, $n$, therefore the corresponding complexity is consider $O(n)$. TMF also has a similar accuracy to RGA, low/medium \cite{Piccardi2004}. As with RGA, the low accuracy may exclude TMF from use in the project.\\
+
+\subsubsection{Kernel Density Estimation}
+The Kernel Density Estimation model (KDE) \cite{Elgammal2000} computes its value in the Gaussian kernels centred on the past $n$ frames, thus the complexity is $O(n)$, where $n$ is typically as high as 100. However, efficient implementation through the Fast Gauss transform can limit the actual execution time \cite{Elgammal2003}. KDE has a high accuracy \cite{Piccardi2004}. The high accuracy of KDE suggests the method warrants consideration.\\
+
+\subsubsection{Sequential Kernel Density Approximation}
+The Sequential Kernel Density Approximation (SKDA) \cite{Han2004} method has $O(m)$ complexity, where $m$ is the number of modes of the approximated posterior density function. The precise number depends on the actual data samples, however this number has been shown to vary between 3 and 11 for video \cite{Han2007}. SDKA has a medium/high accuracy \cite{Piccardi2004}.\\
+
+\subsubsection{Cooccurence of Image Variations}
+The complexity for the Cooccurence of Image Variations (CIV) \cite{Seki2003} method has been estimated as $O(8*(n+L^4+L)/n^2)$, where $n$ is accounted for searching the nearest neighbours amongst the $n$ variations, $L^4$ is the estimated cost for computing the interpolation coefficients and $L$ is the cost of applying them to the current block. CIV has a medium accuracy \cite{Piccardi2004}. The relatively high comlexity of CIV and the medium accuracy may exclude CIV from use in the project.\\
+
+\subsubsection{Eigenbackgrounds}
+The Eigenbackgrounds method (EB) \cite{Oliver2000} has an estimated complexity per pixel of $O(m)$, where $m$ is the number of the best eigenvectors. EB has a medium accuracy \cite{Piccardi2004}. The medium accuracy may exclude EB from use in the project.\\
+
+\subsubsection{Frame Differencing}
+Arguably the simplest background modelling technique, Frame Differencing (FD) \cite{rodriguez1995} uses the video frame at time $t_1$ as the background model for the frame at time $t$. Since it uses only a single previous frame, FD may not be able to identify the interior pixels of a large, uniformly-coloured moving object \cite{Cheung2007}. This is commonly known as the aperture problem \cite{pack2001,Cheung2007} and may be a problem as people may wear single coloured clothing. This alone excludes FD from use in the project. FD was also significantly worse than all the other schemes in Cheung's experiments \cite{Cheung2007}.\\
+
+\subsubsection{Approximate Median Filtering} 
+Even though Approximate Median Filtering (AMF) \cite{justusson1981} performed worse than MOG and MF, it produced a good performance with an extremely simple implementation. The only drawback of AMF was that it adapts slowly toward a large change in background \cite{Cheung2007}. However this is not expected to be a problem for the toolkit as there should not be any large changes in the background of a doctor's office. The benefits of a  simple implementation may out weight the performance gain of using MOG or MF instead.\\
+
+\subsubsection{Kalman Filtering}
+Visually, Kalman Filtering (KF) \cite{haykin2001} produced the worst foreground masks among all the schemes, even with a large foreground threshold and slow adapting rates. As a result, it typically left a long trail after a moving object \cite{Cheung2007}. Slow updating may be an issue if the person is required to move at all during the scan - which they are expected to. As the project is motivated by the use of a single Kinect, the subject is likely to be required to move. This may exclude KF from use in the project.\\
+
+\subsubsection{Median Filtering}
+Median Filtering (MF) \cite{huang1979} is one of the most commonly-used background modelling techniques. The background estimate is defined to be the median at each pixel location of all the frames in the buffer. The assumption is that the pixel stays in the background for more than half of the frames in the buffer \cite{Cheung2007}. Median Filtering has been extended to colour by replacing the median with the medoid \cite{Cucchiara2003}. The time complexity of computing the median is $O(L*log(L))$ for each pixel. MF was a very close second in Cheung's experiments \cite{Cheung2007}.\\

@@ -1,0 +1,16 @@
+\section{External Libraries}
+A number of external libraries have been used to provide data abstraction and optimised functionality. This section will explore details about their licensing and usage within the PARSE toolkit. \\
+
+\subsection{Kinect SDK}
+The Kinect SDK was the basis for the development of the project but the group only utilised a subset of it's functionality as our specialist point cloud reconstruction and volume estimation required access to the raw depth feed as necessitated for reconstructing the body. The SDK itself provided a means of accessing functions which allowed data to be mapped onto different coordinate spaces for the reconstruction of the point cloud. The Skeletal tracking technology also provided by the Kinect was used extensively in order to when a body is in view of the kinect for calibration, scanning, and markerless recognition purposes. It has also been used for the basis of isolation as it provided useful cues as to the appropriate level at which to perform a depth cut off. \\ 
+
+\subsection{Math.NET}
+A library called Math.NET was utilised extensively in the ICP portion of the solution to make up for the lack of support for data structures representing matrices and their associated operations within C# and the .NET framework \cite{mathdotnet}. The framework only contained basic operations such as additive and multiplicative operations and contained only a small subset of the operations that are available in an application such as MatLAB. Due to the lack of free matrix manipulation libraries Math.NET was used as a compromise and much of the matrix manipulation functionality was re-implemented in a specialised manner for this project. It is available under the MIT/X11 license which is a permissive licence allowing the usage of the software in both free and commercial applications as long as attribution is given \footnote{Fulltext available at: http://www.xfree86.org/3.3.6/COPYRIGHT2.html}. \\
+
+\subsection{Helix3D}
+Helix3D is a WPF based visualisation framework which adds a number of helper functions and viewport interactivity to the existing WPF3D framework \footnote{HelixLink}. Since it's inception, WPF3D has generally been considered a poor alternative to more established high performance frameworks such as OpenGL \cite{WpfPoor} but due to our language choice and the declining support of DirectX, WPF3D combined with Helix provided an adequate means of visualising the reconstructed point clouds and planes extracted from segmented point clouds after volume calculation and limb circumference determination. \\  
+
+\subsection{WpfToolkit}
+\label{design:wpf}
+
+WpfToolkit added further functionality to the Windows Presentation Framework such as charting and visualisation for Markerless recognition/recall tasks. \\

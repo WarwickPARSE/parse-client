@@ -1,0 +1,199 @@
+\subsection{Database}
+\label{design:database}
+The database consists of ten tables, each one either corresponding to different sets of information that need to be stored about the patient, or assisting the normalisation of the database, aiming to avoid duplication of information and make the database simpler and easily accessible.\\
+
+\emph{\bf{Tables}}\\
+
+\emph{1) Table name: PatientInformation}\\
+
+This table contains all the information about the patient required for administrative purposes. Aside from keeping a record of the patients personal details, the patient is assigned a patientID which is used for associating the patient with other data stored related to them, such as different types of scans.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+patientID & int & No & Yes \\\hline
+name & nvarchar & No & No \\\hline
+dateOfBirth & datetime & No & No \\\hline
+nationality & nvarchar & No & No \\\hline
+nhsNo & nvarchar & No & No \\\hline
+description & nvarchar & No & No \\\hline
+\end{tabular}
+\label{table:patientInformation}
+\caption[Database: patientInformation]{}
+\end{table}
+
+\emph{2) Table name: Conditions}\\
+
+A table designed to contain the list of conditions that would require the patient to potentially undergo some of the examinations related to this system. This is useful for comparing the results acquired with respect to each condition. Information in this table will be inserted by the main user of the system after the initial setup and it will be updated when it is deemed necessary to use the system for additional conditions.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+conditionID & int & No & Yes \\\hline
+condition & nvarchar & No & No \\\hline
+description & nvarchar & No & No \\\hline
+\end{tabular}
+\label{table:conditions}
+\caption[Database: Conditions]{}
+\end{table}
+
+\emph{3) Table name: PatientCondition}\\
+
+This table's purpose is matching the patients to their respective conditions. Each patient may have more than one condition. The patientID and conditionID fields form a composite key.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+patientID & int & No & Yes \\\hline
+conditionID & int & No & Yes \\\hline
+\end{tabular}
+\label{table:patientCondition}
+\caption[Database: PatientCondition]{}
+\end{table}
+
+\emph{4) Table name: ScanTypes}\\
+
+A table containing all the types of scans that can be performed using this system. This excludes the point recognition scans as they are stored separately to the rest of the types. Information in this table will not need to be inserted by any of the users, but it will be inserted at the initialisation of the system.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+scanTypeID & int & No & Yes \\\hline
+scanType & nvarchar & No & No \\\hline
+description & nvarchar & No & No \\\hline
+\end{tabular}
+\label{table:scanTypes}
+\caption[Database: ScanTypes]{}
+\end{table}
+
+\emph{5) Table name: Scans}\\
+
+This table will contain all the scans stored in the database. Each scan will have a designated scanID and a scan type, as well as a point cloud file reference (a reference to a file containing the scan in point cloud form) and a timestamp of the time the scan was performed\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+scanID & int & No & Yes \\\hline
+scanTypeID & int & No & No \\\hline
+pointCloudFileReference & nvarchar & No & No \\\hline
+description & nvarchar & No & No \\\hline
+timestamp & datetime & No & No \\\hline
+\end{tabular}
+\label{table:scans}
+\caption[Database: Scans]{}
+\end{table}
+
+\emph{6) Table name: Records}\\
+
+The records' table contains values calculated from the scans where applicable (for example the value calculated to be the body volume of a patient). This table also contains the scan type ID of the scans for evaluation and research purposes, for analysing the record values with respect to their scan type. The scanID and scanTypeID fields form a composite key as different values can be calculated from a scan, depending on the scan type.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+scanID & int & No & Yes \\\hline
+scanTypeID & int & No & Yes \\\hline
+value & real & No & No \\\hline
+\end{tabular}
+\label{table:records}
+\caption[Database: Records]{}
+\end{table}
+
+\emph{7) Table name: PatientScans}\\
+
+Table mapping the Scans stored in the database to the patients. Each patient can have more than one scan (of the same or different type). This table was formed to map the scans to the patient without having duplicated patient information. The patientID and scanID fields form a composite key.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+patientID & int & No & Yes \\\hline
+scanID & int & No & Yes \\\hline
+\end{tabular}
+\label{table:patientScans}
+\caption[Database: PatientScans]{}
+\end{table}
+
+\emph{8) Table name: ScanLocations}\\
+
+This table contains all the necessary information for the markerless point recognition scans. Data to this table is stored when performing each scan and used when a follow-up scan is needed for obtaining the same location. For each scan the system stores the positions of the joints nearest to it and the scan's position's distance from them, as well the distance between them for evaluation purposes(where applicable).  The table also contains the names of the joints and the bone(where applicable, as in some cases the joints used may not be part of the same bone), for quick display purposes when the scan is accessed.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+scanLocID & int & No & Yes \\\hline
+boneName & nvarchar & Yes & No \\\hline
+jointName1 & nvarchar & No & No \\\hline
+jointName2 & nvarchar & No & No \\\hline
+distJoint1 & real & No & No \\\hline
+distJoint2 & real & No & No \\\hline
+jointsDist & real & Yes & No \\\hline
+timestamp & datetime & No & No \\\hline
+\end{tabular}
+\label{table:scanLocations}
+\caption[Database: ScanLocations]{}
+\end{table}
+
+\emph{9) Table name: PointRecognitionScans}\\
+
+This table is similar to the Patient Scans table but maps the position scans to the patients instead. Patients are very likely to have more than one scan each, or be due to have more in the future. The patientID and scanLocID fields form a composite key.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+patientID & int & No & Yes \\\hline
+scanLocID & int & No & Yes \\\hline
+\end{tabular}
+\label{table:pointRecognitionScans}
+\caption[Database: PointRecognitionScans]{}
+\end{table}
+
+\emph{10) Table name: LimbCoordinates}\\
+
+A table designed to store additional information that would aid the limb circumference estimation. As well as the scanID of the relevant scan stored in the Scans table, the table also contains the x, y and z coordinates of four joints close the relevant limb, two of which can be null where applicable.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{| l | l | l | l |}
+\hline
+\emph{\bf{Column Name}} & \emph{\bf{Data Type}} & \emph{\bf{Allow Nulls}} & \emph{\bf{Primary Key}} \\\hline \hline
+limbCoordID & int & No & Yes \\\hline
+scanID & int & No & No \\\hline
+joint1x & real & No & No \\\hline
+joint1y & real & No & No \\\hline
+joint1z & real & No & No \\\hline
+joint2x & real & No & No \\\hline
+joint2y & real & No & No \\\hline
+joint2z & real & No & No \\\hline
+joint3x & real & Yes & No \\\hline
+joint3y & real & Yes & No \\\hline
+joint3z & real & Yes & No \\\hline
+joint4x & real & Yes & No \\\hline
+joint4y & real & Yes & No \\\hline
+joint4z & real & Yes & No \\\hline
+\end{tabular}
+\label{table:limbCoordinates}
+\caption[Database: LimbCoordinates]{}
+\end{table}
+
+\emph{\bf{Database normalisation}}\\
+
+The database design has been normalised to comply with the normalisation rules up to Third Normal Form (3NF). There are therefore no repeating groups of related data, as all groups are contain within there own table that is identified by its own ID (primary key). If some data is related to more than one record, there has been a separate table created for it. Such tables are connected through foreign keys or, in the cases of PatientScans and PointRecognitionScans tables, a separate table has been created to to map a specific record of the PatientInformation table to many records of the Scans and ScanLocations tables. Additionally, there are no values in the tables that do not depend on the key. In the cases that there were some, they have been combined and a composite key is in place instead.\\
+
+There is however one exception. Even though the fields scanID and scanTypeID both exist in the Records table and form the composite key, they do not form a composite key in the Scans table. This was to avoid the creation of another extra table with additional types of values that could be calculated but use the scanTypes table for that purpose instead.\\

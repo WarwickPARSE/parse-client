@@ -1,0 +1,83 @@
+\chapter{Evaluation}
+\label{evaluation}
+
+In this section we summarise and evaluate the results of the testing of the various components of the system.
+
+\section{Evaluation Against Requirements}
+
+At the start of the project we specified a number of functional and non-functional requirements that expressed the intentions of our project from the outset. Now that development of the project has been completed, these requirements are revisited and justified against the progress made.
+
+\subsection{Meeting Functional Requirements}
+\label{eval:functional}
+
+\begin{longtable}{|p{5cm}|p{5cm}|p{2.1cm}|}
+    \hline
+    \emph{\bf{Requirement}} & \emph{\bf{Evaluation}} & \emph{\bf{Conclusion}} \hline 
+    %1)
+    The system should be able to retrieve a point cloud representtion from the Kinect sensor by mapping the colour stream onto points of a depth map. & The system is capable of retrieving multiple point clouds and registering them against each other using a bounding box method, this hasn't required a mapping between the colour stream and depth map as part of the final deliverable and thus this functionality has been ommitted. & Satisfied \hline
+    %2)
+    The system should be capable of identifying both large and small objects within a relatively complex scene which may be subject to noise or partial occlusion and extracting them from that scene. & The software is capable of segmenting parts of the scene through isolation of the subject so that the point clouds captured are free from background intereference. This works on subjects of varying size and height. & Satisfied \hline 
+    %3)
+    The system should be capable of storing point clouds in a data structure that allows efficient access. & The project features a robust point cloud data structure and algorithms that allow for efficient indexing, querying and translation of point clouds. These point clouds can also be stored offline in a our .PARSE file format, or industry standard model formats such as .PCD. & Satisfied \hline
+    %4)
+    The system should be capable of dealing with both partial and complete body scans. & The system has two modes of capture. The first is for the complete capture of the body for volume and limb circumference estimation. The second is the partial capture of the body for the purposes of point registration. & Satisfied \hline 
+    %5)
+    The system should be capable of directing the user to place the sensor at the previous measurement point on the body and detecting when the sensor has been positioned and oriented correctly. & The system records the position of the measurement device by referencing it's position with respect to the persons tracked skeleton. & Satisfied \hline
+    %6)
+    The system should be capable of recognising, storing and recalling the location and orientation of a known mobile object or scanning device relative to a static object. & The system is able to highlight the position of the scanner when recalled and identified on the static subject. & Satisfied \hline
+    %7)
+    The system should be capable of measuring circumferences and local volumes for particular areas of the body. & The system is able to calculate circumference and volume from a single scan configuration to a degree of accuracy. (Volume, $\pm23\%$; Circumference, $\pm10\%$). & Satisfied \hline 
+
+\end{longtable}
+
+\subsection{Meeting Non-Functional Requirements}
+
+\begin{longtable}{|p{5cm}|p{5cm}|p{2.1cm}|}
+    \hline
+    Requirement & Evaluation & Conclusion \hline
+    %1)
+    The system should provide an intuitive and easy to use mechanism for scanning. & The colour based verification of correct scan position and 4 scan capturing process along with 3rd party feedback highlighted that the scanning process was alot simpler for both the patient and the operator. & Satisfied \hline
+    %2)
+    The system should be efficient, aiming to return rendered result in real-time. & Efficiency has been analysed for each of the measurement and visualisation algorithms and has been an important consideration. The majority of results have been returned in real-time but the visualisation is returned after a period of time. & Partially Satisfied \hline
+    %3)
+    The system should be able to estimate measurements accurately. & The software's volume and limb circumference calculation component is reasonably accurate and produces measurements that are within their previously discussed accuracies. These variations are similar to those in equipment which also measures these metrics. & Partially Satisfied \hline
+    %4)
+    The system should be capable of being installed with minimal prerequisite software/hardware & Apart from the requirement of a Kinect and the installation of the PARSE software, there are no further requirements. & Satisfied \hline
+
+\end{longtable}
+
+\section{Evaluation Against Legal, Social, Ethical and Professional Issues}
+This section evaluates the toolkit in terms of the issues described in Section \ref{legal, social, ethical and professional issues}.
+
+\subsection{Legal Issues}
+
+For the purposes of CS407 \cite{ouroboros2007} the data used is dummy data. Therefore the Data Protection act does not apply, however this will be a consideration for any future deployment strategy. We will also have to consider how to license the software as part of our deployment strategy. At current, the source code is currently open source and available on Github\footnote{PARSE Git repository, https://github.com/WarwickPARSE/parse-client}. If this software was to be deployed in medical institutions, it would need to be license appropriately and the various limitations and warnings related to the software made clear to the interested parties.
+
+\subsection{Social Issues}
+As the ``subjects" scanned were being scanned for testing purposes and not to receive diet changing information, the social issues highlighted previously do not apply. Once again, this will be a consideration for any future deployment strategy. As referred to in Section \ref{social}, there is a potential impact on scanning patients and overestimating particular aspects of their volume or body fat, precautions and guidelines of operation would need to be put in place to ensure that the limitations and experimental nature of the software were made clear.\\
+
+\subsection{Ethical Issues}
+The modesty concerns did have an impact upon the testing of the project. When a subject was being scanned in DCS, naturally they were fully clothed. This lead to the volume estimation over estimating. Also, fear of having their 3D point cloud stored may have stopped some people from volunteering to be scanned. This concern will also be valid in a doctor's surgery.\\
+
+\subsection{Professional Issues}
+All necessary libraries are included with the PARSE toolkit, and integrated well, ensuring an ease of install. The modular structure of the code means that components can be removed, reworked and improved without adversely effecting the entire toolkit. An example of this design is KinectInterpreter which abstracts the exact nature of the Kinect from the rest of the toolkit. This abstraction means the Kinect could be replaced for another depth camera with relative ease. The code is also well commented to allow a new group of people to pick up the project where the PARSE group left off.\\
+
+\section{Evaluation Of Project Management}
+
+Throughout the project, it's management has been consistent and based off of the roles that each team member was assigned during it's initial planning stages. Due to the research led nature of the project, alot of the work had to be carried out independently during the initial and prototyping phases and then findings reported back to the rest of the group for discussion. At the start of the project, we had a number of ideas that were still evolving so frequent meetings were held between the team, supervisor and customer. This was to ensure that we were able to establish a proposal that could be worked on for the remainder of Term 1. The many short meetings and pair programming sessions that were held during this period were invaluable in determining the algorithms and components that were to be used as part of the project. \\
+
+During the remainder of the project, meetings with our supervisor and customer were held on an ad-hoc basis when a particular development goal had been achieved or a particular progress point had been reached such as the progress poster phases of the project. This allowed us to review the status of our prototyping and our overall development efforts. One particular area where we struggled to make progress in the early stages of development was in the development of image recognition algorithms, significant amounts of time had been invested in the exploration of image processing frameworks to facilitate the functionality we required but further meetings with our supervisor and customer ascertained that we should have used a simpler approach. Fortunately, due to the progress that had then been made with other components of the system aided by the subdivision of work items, we were able to integrate the image recognition components along side the other functionality contained in the system. \\
+
+We found the project management tools that we used, such as a centralised Git repository provided visibility and accountability for each stage of the development. We also made use of a PARSE Facebook group when messages or research needed to be distributed across group members when we were geographically dispersed. \\
+
+\section{Team Assessmennt}
+
+The team worked well together. This was due to the flexibility of roles within the group and the multiple skills that each person possessed. This was useful when pair development was required for particularly integrated parts of the system. Our frequent consultations with our project supervisor and customer meant that the team was able to keep on track in terms of our planned project time line and meet each of the requirements as defined in the specification.
+
+\section{Evaluation of Project Components}
+
+The height estimation has an accuracy of $\pm$4.25\%. This value is based on the fact that height is often assumed to be normally distributed \cite{chali1995} and ~95\% of the values of a normal distribution typically lie within 2 standard deviations of the mean value \cite{pukelsheim1994}. Height and error have a Pearson product-moment correlation coefficient of 0.61, suggesting a medium strength correlation \cite{cohen88,buda2011} between the two quantities. As a result, the ``less average" a person is, the less accurate the toolkit performs. These errors are not soley down to the toolkit however. Other sources of error include that the real world measurements must be calculated by hand, using a tape measure. Such a process is inherently error prone, as highlighted in Section \ref{spec:motivation}. Repeated scans of a person have an maximum error of 4\%\\ 
+
+The volume estimation has a lower bound hypothetical accuracy of between $\pm$1.06\% and $\pm$9.12\%, dependant on the patient. The Bod Pod has been shown to have similar error ratings \cite{fields2001,collins2004}. However in practice, the volume estimation has been shown to have an average error measure of 23.05\%. Such a high error may be down to clothing. Clothing can artificially inflate a subjects volume \cite{shafer2008} when scanned. It must be noted that the gold standard for a subject was determined whilst the subject was in a state of undress, whereas the scan were taken in a public work area hence clothes were worn, this may be the reason for the volume estimation consistently overestimating by approximately 20\%. The relative volumes of people are preserved quite well by the toolkit, to within 0.62\%.\\
+
+The circumference estimation could be said to be accurate to within $\pm$10\%. As previously mentioned, clothing can increase the error on a circumference measure, a t-shirt sleeve suitable positioned can add 10cm to the circumference value so the true error rating may be less than this.\\

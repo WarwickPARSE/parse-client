@@ -1,0 +1,35 @@
+\section{Markerless Recognition}
+The markerless recognition problem was approached in two phases. First, the sensor's location was to be tracked using the video image feed from the Kinect. Then, this location would be translated into 3D space using information from the depth feed, and finally the sensor's position relative to the body could be calculated. This mechanism could then be used either just once, to register a new position, or on every frame, to guide the sensor to a target position.\\
+
+Three different algorithms were tested for effectiveness in the application: one robust algorithm - SURF, a non-robust algorithm - Haar classification, and a simple colour search.\\
+
+\subsection{Colour Search}
+The colour search tests intend to answer three questions:
+\begin{enumerate}
+\item How effective is searching for a specific colour?
+\item How much difference is there between searching the RGB and HSL colour spaces?
+\item What is a ‘good’ colour to search for?
+\end{enumerate}
+
+In order to answer these questions, the colour searching mechanism must allow for ranges of colours to be searched for, and in either of the RGB or HSL colour spaces. \\
+
+For testing, a separate application was designed, which would analyse the video feed from the Kinect. A simple check highlighted values in the output image on a binary basis: matches in white, the rest in black. A more efficient algorithm, if needed, would be put in place during any further development.\\
+
+\subsection{Haar}
+Early in the project, Haar classifiers were considered to be a viable option. Highly rated by users of the imaging library PCL, in use by the project at that time, the Haar classifier appeared worthy of testing. The premise was that, once trained on sufficient data, a Haar classifier could be applied to imagery in real time, thus giving a highly responsive tracking system.\\
+
+The PCL imaging library provides numerous algorithms written in C, available within a C# wrapper. This gives the user the potential to create a highly efficient program. Such usage does however expose the library’s C heritage with the requirement in many places to pass in memory allocations and pointers, which is a drawback for some. \\
+
+The initial design plan was to first learn the classifier generation procedure, and then run basic tests on its effectiveness. If sufficiently reliable, a system would then be devised which could use a collection of classifiers in parallel. One of the drawbacks of Haar classifiers is their sensitivity to rotational variance. This is acceptable in many situations, for example face detection in photographs, but would not be helpful in the defined situation of this project. Thus, a system would be devised and tested, which would utilise a collection of classifiers generated for the target at different rotations.\\
+
+\subsection{SURF}
+The OpenCV library provides an implementation of the SURF algorithm, and this was used to create a classifier suitable for testing. This, combined with SURF's reputation for high speed, led to it's use over SIFT. In reality, however, it was not possible to run this SURF implementation in real time. Each SURF run took a few seconds, which made video or real-time testing impossible. The SURF classifier was therefore tested only on static images. \\
+
+The default parameters were investigated, and the setup was deemed sufficient for the tests.\\
+
+The program was configured to output a single image containing, on the right side, the target image with its features highlighted, and on the left side the input image with its features highlighted. Any correspondences between the two images’ features are indicated with lines, and any target identified is indicated by a rectangle.\\
+
+\subsection{Scan Process}
+The method for taking a tracked scan needed to be as simple as possible, and make intuitive actions where possible. One such measure is to allow automatic triggering of the capture event when the scanner is held still. This should mean that, once started, no further interaction with the computer is necessary to complete the scan process - an important time-saving feature, should the operator be working alone.\\
+
+Once initiated, the scan process will immediately begin searching for and tracking the target sensing device, the operator and the patient. After determining the operator and the patient, the program will wait for the sensing device to be held still for a number of seconds before automatically triggering the capture routine, and closing the window.\\

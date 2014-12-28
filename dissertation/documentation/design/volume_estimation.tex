@@ -1,0 +1,25 @@
+\section{Volume Estimation}
+\label{design:volume estimation}
+This section will focus on the group's algorithm design for volume estimation. Following researched in Section \ref{research:ssp}, SSP and planimetry were the basis for the groups design
+
+\subsection{Planimetry}
+\label{design:planimetry}
+SSP produces high accuracy approximations to volumes. The group decided to design an algorithm based on the volume rendering approach of SSP. The algorithm would pull successive planes out of the point cloud and apply the Shoelace formula to determine the area of a plane.\\
+
+As any volume would be calculated in ``point cloud space", the volume would not necessarily correspond directly to SI units such as meters. Hence, the volumes returned by the SSP method may need to by multiplied by a constant in order for an accurate volume to be returned. This multiplicative can only be determined through testing.\\
+
+\subsection{Algorithm Running Time}
+For a given plane, the Shoelace formulae is applied to the sorted list of points in $O(p')$, where $p'$ is the number of points in the plane and $p' \in O(p)$. Hence, the area of an individual plane can be calculated in $O(p)$.\\ 
+
+There are $O(y)$ number of planes, where $y$ is the number of points in the y axis (the axis corresponding to height) and $O(y) \in O(p)$ for simplicities sake. Hence the volume calculation runs with complexity $O(p^2)$. As circumference and area can also be calculated using variations of the Shoelace formula, area and circumference of planes will run with the same complexity.\\
+
+From this bound, if it takes time $t$ to compute the volume of a person $P$, it would take at most $4t$ to compute the volume of a person twice the size of $P$.\\
+
+The above bounds are in no way a tight upper bound for the algorithm, as there have been many simplifying assumptions, such as $O(y) , O(p') \in O(p)$. This bound can most likely be tightened, perhaps to something akin to $O(y),O(p') \in O(\sqrt[3]{p})$ which would lower the running complexity to $O(\sqrt[3]{p}^2)$.\\
+
+This analysis has not taken into account the cost of pulling each plane from the point cloud or sorting the data. These were omitted from the volume calculation analysis because they will be required for many operations, such as area and circumference calculation.\\
+
+\subsection{Accessing the KD-tree and Sorting}
+Querying the KD-tree to retrieve the necessary plane will take $O(p*log(p))$. These points will then need to be sorted so they are ordered in a circular fashion, taking $O(p'*log(p'))$ using quicksort. For quicksort, the worst case occurs when the algorithm consistently picks the worst pivot each iteration.\\
+
+The probability of this happening is $O(\frac{1}{p^2})$, as such it is unlikely to occur in general use. In the case of PARSE, $p$ the order of $10^6$, such a large $p$ means the worst case is extremely unlikely to occur in practice. With the population of the UK being approximately $6 * 10^7$ \cite{UnitedKingdomofGreatBritain2011}, the entire population would have to be scanned 10,000 times before a worst case scenario is likely to have happened.\\

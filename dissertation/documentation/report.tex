@@ -1,0 +1,184 @@
+\documentclass[11pt,english,twoside,openright]{report}
+\usepackage[british]{babel}
+\usepackage[nodayofweek]{datetime}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\pagestyle{fancy}
+\usepackage{babel}          %English cultural norms
+\usepackage{todonotes}
+%\usepackage{float}
+\usepackage{cite}
+\usepackage{import}
+\usepackage[none]{hyphenat}
+\usepackage{gensymb} %for various symbols, such as degrees
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{graphicx} %for slightly different figure configs.
+
+\lhead{\footnotesize \parbox{11cm}{PARSE}}
+\rhead{}
+\parindent=0pt
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\fancyhf{}
+\fancyhead[LO]{\slshape \nouppercase \leftmark}
+\fancyhead[RE]{\slshape \nouppercase \rightmark}
+\cfoot{\fancyplain{}{\thepage}}
+ 
+%\pagestyle{fancy}
+
+%front matter
+
+%\title{PARSE} 
+%\author{
+%Greg Corbett \and 
+%Robin Janssens \and 
+%Nathan Page \and \\ \\ 
+%Stefania Papaconstantinou \and
+%\\ \\ Bernard Sexton
+%}
+%\date{}                     %remove this line if we want the date, personally I find it annoying
+
+%dirty filthy hack
+\let\tmp\oddsidemargin
+\let\oddsidemargin\evensidemargin
+\let\evensidemargin\tmp
+\reversemarginpar
+
+%another dirty hack 
+\raggedbottom
+
+\begin{document}
+\sloppy % this is needed as some text is overfilling into the right margin.
+\pagestyle{fancy}
+
+\setcounter{page}{2}
+\begin{titlepage}
+\begin{center}
+
+% Upper part of the page
+
+\includegraphics[scale=0.3]{warwickcrest.png}\\
+
+\textsc{\LARGE University of Warwick}\\[1.5cm]
+
+\textsc{\Large Fourth Year Project}\\[0.5cm]
+
+% Title
+\HRule \\[0.9cm]
+{ \huge \bfseries PARSE: Body Scanning \& Recognition Environment}\\[0.6cm]
+
+\HRule \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Authors:}\\
+Greg \textsc{Corbett}\\
+Robin \textsc{Janssens}\\
+Nathan \textsc{Page}\\
+Stefania \textsc{Papaconstantinou}\\
+Bernard \textsc{Sexton}\\
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+Dr.~Abhir \textsc{Bhalerao}\\
+\emph{Customer:} \\
+Dr.~Matthew \textsc{Leeke}\\
+\end{flushright}
+\end{minipage}\\
+\begin{center}
+Copy 2 of 2\\
+\end{center}
+
+\vfill
+
+% Bottom of the page
+{\large April 2013}
+
+\end{center}
+
+\end{titlepage}
+
+\pagenumbering{roman}
+
+%hack
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\include{abstract}
+\newpage
+
+%hack
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\include{ack}
+\newpage
+
+%hack
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+%hack
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+\setcounter{page}{1}
+\tableofcontents
+\newpage
+
+\listoffigures
+\newpage
+
+\listoftables
+\cleardoublepage
+
+\include{specification}
+\cleardoublepage
+
+\include{requirements}
+\cleardoublepage
+
+\include{research}
+\cleardoublepage
+
+\include{design}
+\cleardoublepage
+
+\include{implementation}
+\cleardoublepage
+
+\include{testing}
+\cleardoublepage
+
+\include{project_management}
+\cleardoublepage
+
+\include{legal_social_ethical}
+\cleardoublepage
+
+\input{evaluation/evaluation}
+\cleardoublepage
+
+\include{conclusion}%and summary
+\cleardoublepage
+
+\include{user_manual}
+\cleardoublepage
+
+\bibliography{parse}
+\bibliographystyle{unsrt}
+\cleardoublepage
+
+\include{appendices}
+\newpage
+\end{document}

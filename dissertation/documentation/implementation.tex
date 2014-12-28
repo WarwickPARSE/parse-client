@@ -1,0 +1,32 @@
+\chapter{Implementation}
+\label{implementation}
+
+The implementation section outlines the features that have been implemented from the designs outlined in the previous chapter. It also covers the technical details of how particular components of the system operates including algorithm breakdowns and results from preliminary testing where necessary. \\
+
+\input{implementation/system}
+
+%\input{implementation/external_libraries}
+%\input{implementation/database}
+
+\input{implementation/person_iso}
+\input{implementation/point_clouds}
+\input{implementation/cloud_stitching}
+\input{implementation/volume}
+\input{implementation/limb_circum}
+\input{implementation/image_recognition}
+
+\newpage
+\section{Summary}
+This section summaries the implementation phase of the project.\\
+
+\subsubsection{Person Isolation}
+The depth and colour based isolation, described in Section \ref{design:person isolation}, was implemented with out change to the design. However, colour based isolation was insufficient to create a point cloud and did not map well into depth space. Hence, the depth based isolation was chosen to proceed with.\\
+
+\subsubsection{Registration}
+From the data provided by the \emph{person isolation} algorithm the registration algorithm, described in Section \ref{design:registration}, produced good results that were usable in subsequent algorithms. The results from this algorithm were then saved and utilised by the \emph{volume estimation} and \emph{limb circumference} subsystems. 
+
+\subsubsection{Volume Estimation}
+The volume estimation has been implemented as designed with sub-sampling and averaging to reduce noise. From the planes pulled out for volume estimation also had their circumference measured, to do this, the sub-sampled and averaged plane was then turned into a convex hull.\\ 
+ 
+\subsubsection{Markerless Recognition}
+Test rigs were implemented to assess the effectiveness of the chosen algorithms. As testing later showed that robust algorithms perform poorly in this application, the RGB colour space search was chosen as the basis for the end product. Problems such as coordinate space conversion and subject \& operator identification were solved.

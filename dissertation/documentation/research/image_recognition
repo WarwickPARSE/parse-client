@@ -1,0 +1,122 @@
+\section{Markerless Recognition}
+\label{res:image recognition}
+
+A key goal of the project is to provide a mechanism for ensuring that repeated measurements on the body are taken at the same location. The ability to not only measure subcutaneous fat accurately, but to do so repeatably, is important. Although informally the positioning could be done by eye, research requiring such accuracy, such as \cite{location_with_calipers}, typically uses calipers, which is a time-consuming exercise.\\
+
+The requirement for this project is that the sensor be tracked optically in 3D space, which is a problem that can be tackled in a variety of manners. We approached it as a recognition problem, which can be broken down into the following stages:\\
+
+\begin{enumerate}
+\item Define the target by a set of features
+\item Search the image for features
+\item Attempt to match the image features with the target features
+\item Translate the target into real space coordinates
+\item Record the target's position in relation to skeletal joints
+\end{enumerate}
+
+The actual feature representations used by different methods are highly varied. Projects such as ASIMO \cite{ASIMO} use highly complex representations combining 2D and 3D data in bespoke \footnote{Secretive} mechanisms, which also must span many different layers of agent architecture in order to provide meaning.\\
+
+The computational power required to perform such tasks is formidable, especially for real-time applications, though the rapid development of mobile computing platforms means that basic algorithms, with some alterations, can be run on low-power devices \cite{Nayar96real-time100} \cite{Wagner10real-timedetection}; albeit a lot slower.\\
+
+A number of different methodologies are available for consideration, starting first with simple colour search, ranging up to three-dimensional feature analysis.\\
+
+\subsection{Colour space search - Blob detection}
+Searching the colour space of an image for an object, also known as blob detection, is a method regularly applied to video feeds in order to track objects in 2D space. Trivial methods have allowed searching for specific colours for a number of years, but more recently  Ma and Ming\cite{blob_detection_MingMa} proposed a Hessian-Laplace based blob detector, which applies the more formal Hessian and Laplace principles to colour information rather than just luminance. Modern applications even include blob detection and tracking to allow augmentation of live video feeds \cite{blob_detection_enrichment}.\\
+
+In contrast to many other methods, which discard colour information and work in grayscale with the luminance information, it is possible to work with any of a large number of colour spaces. The predominantly used colour spaces are the RGB and HSL spaces, which each provide advantages \cite{colormodels}. RGB is simple in representation, and is the default output format for the majority of imaging hardware. HSL (Hue, Saturation, Lightness), on the other hand, allows more easily for variance in lighting to be permitted.\\
+
+\subsection{High Dimensional Search - Eigenfaces}
+The concept of Eigenfaces is that, despite their high dimensionality, all faces comprise of elements or features from some basis set; just as a multidimensional dataset can be broken down into its principal components. At its root, the Eigenfaces idea was that all faces can be described as specific mixtures of some base faces; much like multidimensional data sets can be broken down into principal components, faces comprise a set of ‘component’ faces or features.\\
+
+Eigenfaces have featured strongly in the artistic arena also, with emphasis on visualising averages of collections of images \cite{artisticvisualisations}. Turk and Pentland \cite{eigenfaces} designed an early face recognition system based on Eigenfaces, which could operate in real time. Eigenface-based classifiers have been shown to work very well on faces, but their application in other domains (and even on faces) is decidedly limited as they are not robust to variance in lighting, rotation or pose.\\
+
+\subsection{Feature-based Search}
+Over the development of digital imaging, algorithms and ideas have grown rapidly, making a huge shift in focus from “low level” image and pixel analysis to “high level” feature and information analysis. Various feature types have been used throughout this development, and each has its own advantages and disadvantages.\\
+
+McConnell’s work \cite{mcconnell}, upon which Freeman \& Roth’s \cite{Freeman213orientationhistograms} is based, came at the start of this shift, with its emphasis on the use of gradient histograms as features to represent information about the image contents. This represents part of a paradigm shift toward the more mathematical, information-theory-based way that we view and tackle image processing and analysis today.\\
+
+There are numerous features now in use in digital imaging, ranging from simple mathematical properties to the more complex results of convolutions. Each though can be found in composite forms within more recent algorithms.\\
+
+\subsubsection{Gradients}
+Simple to compute, by performing a first order differentiation across the image, gradients are performed typically on grayscale images to show variations in brightness. Alone they are somewhat limited in application, but if the gradient information about a point is collected, then a feature can be derived which is invariant to rotation - a highly valuable property.\\
+
+\subsubsection{Lines / Edges}
+Performing a second order differentiation across an image, it is possible to see clearly the edges. This is practically achieved normally via convolution. There are a number of different mechanisms, with new contributions almost annually and comparisons frequently undertaken. Among the best-known detectors are the Sobel and Canny \cite{Canny_86} detectors.\\
+
+This type of processing is frequently used  as the basis for the "sketch" effect in common consumer imaging applications. The ability to detect edges is important for a number of applications outside image recognition, including image measurement.\\
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[scale=0.2]{images/Untitled1}
+\caption{Artistic use of line detection to create a pencil-sketched effect}
+}
+\end{center}
+\end{figure}
+
+Edge detectors have been used for image recognition, in a few situations. One more prominent usage is Bowyer’s \cite{edgedetectors} use of the image recognition application to test a selection of edge detectors’ performance.\\
+
+\subsubsection{Corners}
+Corners are a highly useful feature to be able to obtain from an image. They provide a lot of information to an image processor, just as they are important in human perception.\\
+
+\subsubsection{Orientation Histograms}
+In their paper, Freeman and Roth \cite{Freeman213orientationhistograms} investigate the merits of applying McConnell’s work \cite{mcconnell}to real-time analysis and recognition of hand gestures. Their approach therefore needed to provide an algorithm simple enough to allow processing of several frames per second; more an issue then than now, given the hardware available at the time. The system needed to use an algorithm that was tolerant to variance in lighting, position and pose. The use of a gradient histogram to represent features in the image was a suitable option to try for several reasons.\\
+
+Firstly, histogram data is compact. Essentially comprising of a set of quantised domain values, each with a frequency, histograms can represent a set of features using much less data than the original bitmap. This also means that comparison of histograms, perhaps represented as vectors, can be much faster than comparison of actual pixel values, assuming you have an efficient way to obtain them.\\
+
+Secondly, gradient orientations are robust to small amounts of variance in lighting; there is relatively little variation in the gradient histogram between images with different lighting, though it still warrants the use of reference images with different lighting.\\
+
+\begin{figure}[h!]
+\begin{center}
+    \includegraphics[scale=0.4]{images/Freeman_Figure.png}
+    \caption{Showing the robustness of local orientation to lighting changes}
+\end{center}
+\end{figure}
+
+Thirdly, gradient histograms are robust against minor gesture variations. As the intention is to recognise human interactions, it is important that the system be able to cope with slight variations in gesture. As discussed in their paper, it proved sufficiently robust to allow gesture recognition despite such problems.\\
+
+Histogram analysis is still used today in image processing, though largely in a different area; the use of histograms to represent feature sets never really took off. Today they are regularly applied to the colour space of an image, and used by Internet search providers to help users find images with similar colour content to that of some target image. The widespread use of histograms in their raw form has remained low because better methods of quantising and representing images and features have been devised. Algorithms such as SURF and SIFT represent more-intelligently selected subsets of image features in efficient, reusable manners far more robust to variance in colour, scale and orientation. Therefore, although an interesting foray into image features, histograms used alone have major practical downfalls, which prevented Freeman and Roth’s work becoming the user interaction system they envisioned.\\
+
+\subsubsection{Scale Invariant Feature Transform (SIFT)}
+In 2004 Lowe presented a number of papers investigating the use of features for both 2D and 3D recognition tasks. The first of these was SIFT \cite{lowe2004distinctive}, which for several years was highly popular and remains today as a performance benchmark when developing new algorithms. The paper first describes the mechanism for extracting distinctive invariant features from images, and then proceeds to describe an approach for using those features in a recognition task. Later, Lowe \cite{whatandwhere3drecog} would apply similar techniques and ideas to 3-dimensional objects, and indeed the feature-extraction ideals used by SIFT have been developed further by a number of others in the following decade.\\
+
+SIFT builds upon the use of gradients as features, but goes further by  adding directionality to those gradients. By attaching local gradient information to interest points already decided to be invariant to scale and orientation, it is possible to define the object as a set of “keypoints” which, despite significant distortions to the image, will still be present and, crucially, will be found by the algorithm.\\
+
+The use of gradient information around stable feature points is a sensible combination to make, and has remained at the forefront of feature-based algorithms since. Furthermore, since the features can be found efficiently, recent work has even seen SIFT computed on mobile devices \cite{realtimeonphones}.\\
+
+\subsubsection{Speeded-Up Robust Features (SURF)}
+SURF \cite{surfMain} aimed to increase the speed at which SIFT operated. Changing the mechanisms used in each step, they cut down operation time significantly. Building further on the use of gradients in combination with feature points, SURF features store gradient histograms for the local gradients around the feature point. This adds a lot more information to each feature, allowing less features to be needed in order to store the same amount of information – thus reducing the number of features needed for recognition tasks. SURF therefore reduces the set of features initially found by its faster Hessian filter, by using the RANSAC algorithm \cite{RANSAC}. This does though affect slightly its repeatability.\\
+
+There are numerous studies which attempt to quantify SURF’s performance against SIFT. In general, the results are mixed, with areas of better and poorer performance \cite{SIFTvsSURF]. Computation time aside, the “best” algorithm really depends on the application.\\
+
+\subsubsection{Other Robust Algorithms - FAST}
+A number of algorithms take the concept of feature filtering in order to find those which are more robust, as seen in SURF, and take it one step further. In particular, a number of different feature filters have been tried over the years. \\
+
+For example, corner detectors have long been in use in feature extraction; in digital imaging corners are important features and hold useful information, just as they do in human vision. Thus, there was a lot of interest in corner detection in early years of feature extraction. \\
+
+The first detector, and perhaps the most well-known, is the Harris corner detector \cite{Harris_Corners}. Rather than using a wide-ranging feature detector, it uses a corner detector – namely, the Fast Corner Detector. Trajkovic and Hedley’s Fast corner detector \cite{fastCorner} is significantly faster, requiring as few as 7.8 operations per pixel, in comparison to Harris' 55. This increased speed does lead to a change in results, however, with some loss of stability. It is this speed that makes it well suited to be used in a feature extraction algorithm.\\
+
+Using corners as the base features, rather than just gradients and lines as found by other filters, means the FAST algorithm is more likely to find features which are stable (will be repeatedly found, even with some alteration to the image). Thus, combining with gradient histogram information, as per SURF, an effective feature description is obtained.\\
+
+\subsubsection{Haar Classifiers}
+Using a Haar filter gives again a different feature response. Such responses can be combined by machine learning techniques to create a classifier. It can, however, be a difficult task to generate a successful classifier – as with any machine-learning problem. The generator must 'learn' a classifier from processed sample data sets, which are typically very large, requiring thousands of positive samples with the target regions indicated. Furthermore, the sample data must be typical of the actual data to be input, which makes the creation of Haar classifiers for specific applications quite laborious.\\
+
+Haar classifiers are today used in simple recognition tasks, such as face detection, because the contextual properties of faces make them relatively simple to detect. Faces in photographs are almost always in approximately the same orientation (people are rarely upside-down), which removes the need for the classifier's performance to be robust to rotational variance. Once generated, the classifier is very simple to apply to new samples, and can operate in real time.\\
+
+
+\subsection{3D features}
+\label{research:3d features}
+Algorithms and methods for application to three-dimensional data are notoriously much more complex than those that operate in just two dimensions. On one hand, it is possible to reduce the data to features in a similar manner as with 2D data. Most take this approach, though the resulting representations vary.\\
+
+Hetzel et. al created a classifier using histograms of features to recognise objects in a database, for example \cite{3dhistograms}. Chua \& Jarvis \cite{3Dregistrationrecognition} used 2.5  dimensions, by reducing the 3D data to a wire frame, which could then be searched for features. Whilst this worked reasonably well for their system, one of the primary holdbacks was resolution. Fortunately, advancements in hardware have helped over the following two decades, but still it may be an issue for this application.\\
+
+The Kinect's colour image resolution of 640x480 gives, at 2.2m distance, a horizontal resolution of around 2mm/pixel. Although such frame resolutions allow clear object imagery at close range, the increased distance presents quite a challenge – particularly for the relatively small size of ultrasound sensors. The BK Medical 8830 ultrasound transducer for abdominal use is just 77 x 104 x 27mm in size, for example, \cite{bkmed-transducer8830}, which means it would cover at most 35 x 52 pixels of a frame, without any occlusions from the hand holding it. Combined with the noisy data actually provided by the Kinect, as previously discussed, this could make working with the depth data quite challenging.\\
+
+\begin{figure}
+\begin{center}
+\centering
+    \includegraphics[scale=0.35]{images/Ultrasound_Transducer.jpg}\\
+    \caption{
+    The 8830 ultrasound transducer - Image from \cite{bkmed-transducer8830}.
+    }
+\end{center}
+\end{figure}
+\end{figure}

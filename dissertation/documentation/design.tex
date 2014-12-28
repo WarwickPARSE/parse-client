@@ -1,0 +1,29 @@
+\chapter{Design}
+\label{design}
+This Chapter outlines the overall design of the PARSE toolkit and the design choices made by the group. Each aspect of the system has required prototyping in order to evaluate the best approach to overall integration of the system and so that the requirements in the specification can be met. A high level system overview is presented along with detailed design discussions of each functional part of the system. These include reference to key algorithms, operations and run-time analysis where appropriate. The design section concludes with a consideration of the interface design of the system.
+
+\input{design/system}
+\input{design/person_isolation}
+\input{design/point_clouds}
+\input{design/volume_estimation}
+\input{design/limb_circum}
+\input{design/cloud_stitching}
+\input{design/image_recognition}
+\input{design/external_libraries}
+\input{design/interface_design}
+
+\newpage
+\section{Summary}
+This section summarises the above design decisions.\\
+
+\subsubsection{Person Isolation}
+The depth and colour based isolation, described in \ref{design:depth based isolation} based on Kinect skeleton data was used over KDE and MOG. This route was taken because similar computation complexity of depth based isolation, the capability to isolate stationary people and the ease of implementation.\\
+
+\subsubsection{Registration}
+Point clouds will be stitched together using the Iterative Closest Point algorithm due to its proven good quality results over the past decades. This has been explained further in Section \ref{research:registration}. Initial alignment will assist the ICP algorithm using the bounding box methodology. These two steps should produce a point cloud that can be used by the calculations explained in this section to a satisfactory degree of accuracy. \\
+
+\subsubsection{Volume Estimation}
+The volume estimation continues to build on the SSP methodologies originally researched. The algorithm will split the point cloud into planes and calculate the area of each, using the Shoelace formula. Each area will then be multiplied by the distance between the planes to give a volume. These volumes will then be summed to give the final output. Not only is the volume calculated, but the circumference of each plane used has been calculated to provide additional information.\\
+
+\subsubsection{Markerless Recognition}
+Testing will reveal the effectiveness of three image search methodologies, RGB colour space search, SURF, and Haar-based classification. The most effective will be used as the basis for the scanner tracking. From there, translation to the real coordinate space and use of the Kinect's skeleton tracking API should allow the calculation of skeleton-relative positions.

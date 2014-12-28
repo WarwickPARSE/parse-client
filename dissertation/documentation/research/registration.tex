@@ -1,0 +1,190 @@
+\section{3D Reconstruction and Registration}
+\label{research:registration}
+\label{research:reconstruction}
+%and reconstruction? so possibly open this up to technologies for visualising depth maps 3d scenes? (bernie)
+
+One of the preconditions for some of the measurement techniques discussed in this chapter is that there is some form of representation of the 3D object held in the machine that is performing the calculations. To achieve this some form of image \emph{3D reconstruction} must take place. 3D reconstruction methods can be split into two categories: \emph{passive} and \emph{active}. Passive reconstruction generally relies solely upon the ambient light available in the environment and active reconstruction utilises more invasive measurement of depth, such as the IR projector in the Microsoft Kinect. Passive reconstruction has generally fallen out of favour due to being less accurate and, with the consumerisation of range imaging devices such as the Kinect, is no longer even the cheapest way of reconstructing a 3D image \cite{ide2012}. \\
+
+\emph{Registration} has become almost synonymous with 3D reconstruction in literature. The aim of registration is to match two or more images together which could have been taken at different times, at different viewpoints or even with different sensors at different resolutions or with different qualities. Two terminologies are used frequently in literature and will be used throughout this section for the purpose of consistency. First of all the ultimate aim of registration is to produce a 3D \emph{model} of the world or an object. This model is then built up using the \emph{data} from multiple scans \cite{besl92}. \\
+
+%could do with a few more citations in this section 
+\subsection{Data Capture} 
+A typical range imaging camera creates 2D images with depth data associated with each pixel in the image \cite{stamos2000}. This is true of the Microsoft Kinect. Because of this, the sensor is only able to provide data about the surfaces of any objects that are directly facing the camera and not, for example, the back of the object or anything that has been occluded. \\
+
+There are multiple ways to capture an entire object but, they all involve capturing multiple range images of a subject \cite{bernardini2002}. \\
+
+The first solution towards obtaining multiple scans is to have multiple sensors in a room, which capture an image simultaneously at the time of scanning. The benefit of this setup is that the exact position of the sensors can be determined within a coordinate system and then sensor data can then be simply placed within this coordinate system. This will provide a very accurate initial alignment which can then be refined with less effort. The main disadvantage is that multiple sensors must be purchased, leading to a higher initial outlay. Additionally the system is not very portable as it requires that the sensors remain static within the room. Finally, the number of sensors determines the number of scans that can be captured of the subject. \\
+
+Another solution is to have a single static sensor facing the subject, who is standing on some form of turntable. If the sensor and turntable are able to communicate with each other it is possible to transform captured images into a uniform coordinate space to obtain a reasonable initial estimate \cite{turk94}. The advantages of this method over the previous one discussed are that only a single sensor is required and the equipment is more portable and will require less setup time. A disadvantage is that the top and the bottom of the subject may not be considered. \\
+
+Both of the above techniques provide good initial alignment but can suffer due to the inflexibility of camera positioning. This is especially true in the case of self-occluding subjects \cite{bernardini2002}. \\
+
+A final solution is to have the sensor completely free to move around the subject. This is the most flexible technique as it allows any number of range images to be taken and then registered. Where self-occlusion occurs the sensor can be moved into a position so that additional data may be captured about the subject, leading to the eventual creation of a complete model \cite{bernardini2002}. \\
+
+\subsubsection{A Formal Definition}
+Registration is used when it is desirable to have an accurate transformation between two overlapping views of an object. Chen et al. \cite{chen92} wrote a formal definition for registration which has been used by most authors since. During the merging process if we have two range images, $P$ and $Q$, then for any two points, $(p_i, q_j)$, on those range data images that are supposed to represent the same point in the model, there should be a transformation that satisfies equation \ref{eq:registration tx}. \\
+
+\begin{equation}
+    \label{eq:registration tx}
+    \forall p_i \in P,\ \exists q_j \in Q\ | \left\Vert T(p_i) - q_j \right\Vert = 0
+\end{equation} \\
+
+An additional equation is required to fully describe the problem of registration. Equation \ref{eq:registration tx2} holds true where $p(u,v) \in P, q(u,v) \in Q$, $P$ and $Q$ are two views of the same surface, $(u, v) \in \mathfrak{R} \times \mathfrak{R}$ is the parameter space for $P$ and $Q$, $f$ and $g$ are correspondence mapping functions, $T(p_i)$ is the result of applying $T$ to $p_i$ and $\Omega$ is the overlap region of $P$ and $Q$. Proofs of correctness can be found in \cite{chen92}. \\ 
+
+\begin{equation}
+    \label{eq:registration tx2}
+    D(P,Q) = \int \int_\Omega \left\Vert T(p(u,v)) - q(f(u,v),g(u,v))\right\Vert^2 dudv = 0
+\end{equation} \\
+
+The essence of equations \ref{eq:registration tx} and \ref{eq:registration tx2} is that when we have two scans with overlapping data then we want to search the transform parameter space for a transform function that results in there being no difference in the location of two corresponding points. \\
+
+The act of finding the transform function can, again, be formalised to be the reduction of $D(P,Q)$ in \ref{eq:registration tx2} solving of the equations in \ref{eq:registration tx3} with respect to the equations in \ref{eq:registration tx} and \ref{eq:registration tx2}. \\
+
+\begin{equation}
+    \label{eq:registration tx3}
+    \frac{\delta D}{\delta \alpha} = 0, \frac{\delta D}{\delta \beta} = 0, \frac{\delta D}{\delta \gamma} = 0, \frac{\delta D}{\delta t_x} = 0, \frac{\delta D}{\delta t_y} = 0, \frac{\delta D}{\delta t_z} = 0
+\end{equation} \\
+
+A flaw in these formal definitions, when taken at face value, is that they assume an ideal world where the data captured is not noisy and the subject being captured remains static. This is, of course, not possible in a clinical setting where a living patient will move naturally as a result of their breathing or natural tremor \cite{stiles67}. \\
+
+An approach suited to medical applications has been discussed by Maguire et al \cite{maguire97} where the transformation functions are performed using a fuzzy and probabilistic approach \cite{brown92}. \\
+
+\subsection{Medical Imaging}
+The utilisation of registration in medical imaging is by no means a new idea. It is, in fact, used in some way by nearly all medical imaging devices. These applications can be roughly split into two categories: \emph{anatomical} and \emph{functional}. Some well-known anatomical applications where registration are used are x-ray, CT, MRI, Ultrasound and portal image & video sequences. On the functional side fMRI, EEG and MEG can be found. \\  
+
+The imaging techniques discussed may be used during certain specific stages of the clinical pathway or from diagnosis through to monitoring during aftercare. These different applications lead to two different uses for registration. The first is the construction of a single model from multiple data points and the second is the comparison of models throughout a patient's treatment pathway \cite{maintz98}. \\
+
+The first usage of registration, building a model from various data points, occurs when an overlay of image is not possible. This may be caused by inconsistencies in sensor location, different resolutions of images from different sensors or temporal changes. With this application registration can be seen as the process of finding a transformation applied to an image to align it with another image where a subset of pixels overlap \cite{maintz98}. \\
+
+The second usage of registration is more concerned with determining how different two images are by finding the best alignment possible and then using the squares error measure as a metric for measuring change in the patient \cite{maintz98}. This application of registration is beyond the scope of this project.  \\
+
+\subsection{Registration Quality}
+Before developing a registration algorithm it is important to consider the quality of registration for a particular algorithm. We have already discussed that one of the uses for registration is measuring the difference between two images. If the accuracy and the tolerance of the algorithms are not known then the model produced may not be reliable as a diagnostic tool \cite{pennec98}. Similarly, within the context of the PARSE project, if the accuracy of the registration algorithms are not known then the body volume measurements will have little meaning. \\
+
+\subsection{Iterative Closest Point (ICP) Algorithm}
+\label{res:icp}
+Almost all modern literature about registration makes some mention of the ICP algorithm and most make some utilisation of the algorithm, or a derivative thereof, in their work. Different sources cite different authors as the original creators of the algorithm, but three specific papers are frequently referenced in the literature \cite{zhang94, besl92, chen92} and will be discussed in this section. \\
+
+The algorithm was designed for a diverse array of applications but was unique in that it was the first known algorithm to be able to register arbitrary shapes with freeform curves, taken from sensors with six degrees of freedom \cite{zhang94, besl92}. These conditions mean that the original algorithm is able to register arbitrary real-world objects under the correct conditions \cite{stuart65}. \\
+
+The ICP algorithm can be considered to be the the middle part of a three step pipeline. Before the ICP algorithm there is some acquisition process, and after there is an integration process. The acquisition process has already been discussed in the \emph{Range Imaging} section (\ref{res:range imaging}). \\
+
+Some form of initial alignment is necessary if the algorithm is to be able to find a correct alignment. This can be achieved by searching the transform parameter space, but this is not desirable as it adds additional computational and programming complexity to a problem that can be solved through predictable input image locations \cite{chen92}. \\
+
+The literature has explained ICP in a rather convoluted way in varying levels of detail. This section will present a condensed and uniform way. 
+
+\subsubsection{The Algorithm}
+The algorithm itself can be split into four components. Different literature implements the components in slightly different ways, but there is some agreement about the functional components. For consistency's sake all notation has been homogenised.  
+
+\paragraph{Problem statement}
+We start with a point set, P, with $N_p$ points ${\{\vec{p_i}\}}$ from the \emph{model}, $Q$ (with $N_x$ points in the depth image). The key is to model \ref{eq:registration tx} as a series of rotations and translations. This has been set out in \ref{eq:icp problem}.   \\
+
+\begin{equation}
+    \label{eq:icp problem}
+    \mathcal{F}(R,t) = \frac{1}{\sum^m_{i=1}}\sum\limits^m_{i=1}t_id^2(Rp_i+t, Q')
+\end{equation} \\
+
+Where $p_i \in P$ is a point on the first 3-D map, $t$ is a parameter that determines whether the two points are close enough, $R$ is a rotation, $t$ is a translation and $Q$ is a second point cloud. 
+
+\paragraph{Initialisation}
+The iteration value shall be known as $k$. To start; $P_0=P$, $\vec{q_0} = [1,0,0,0,0,0,0]^t$ and $k=0$. The registration vectors that will be generated will be in terms of $P_0$. \\
+
+\paragraph{Compute closest points}
+First we need to find a set of closest points $\mathcal{C} = {(p_i, q_i)|p_i \in P ^ q_i \in Q ^ p_i}$ \\
+
+The most common way of finding the distance between two points is by calculating the Euclidean distance. The closest point can be discovered by finding a $q_j$ for every $p_i$ that minimises the function $d$ in \ref{eq:icp euclid} \cite{besl92,zhang94}. \\
+
+\begin{equation}
+    \label{eq:icp euclid}
+    d(p_i,q_j) = \sqrt{(p_i_x - q_j_x)^2 + (p_i_y - q_j_y)^2 + (p_i_z - q_j_z)^2}
+\end{equation} \\
+
+It is always possible to find a closest point pairing between $p_i$ and $q_i$ but it is not always desirable as statistical outliers can result in spurious pairings. Zhang \cite{zhang94} provides two heuristic-based approaches that can be used to mitigate this problem: \\
+
+\subparagraph{Maximum tolerable distance}
+If we have deemed two points, $p_i$ and $q_i$, to be closest points then we can use \ref{eq:icp euclid} to calculate the distance between two points and process the result as in \ref{eq:min tolerable distance} where $t$ represents whether the points distance is tolerable. \\
+
+\begin{equation}
+    \label{eq:min tolerable distance}
+    d(p_i,q_j) > D_{MAX}
+        \begin{cases} 
+        t=0 & \mbox{if} \ true \\
+        t=1 & \mbox{if} \ false
+        \end{cases}
+\end{equation} \\
+
+\subparagraph{Orientation consistency}
+Zhang proved that if we compute the surface normal at points $p_i$ and $q_i$, the angle between the two surface normals cannot be above the angle between the two scans. This can be defined as $\theta$ and set as an upper bound of surface normal angle between $p_i$ and $p_i$. \\
+
+\paragraph{Compute registration}
+The registration is calculated by minimising the mean-squared error objective function in \ref{eq:computing registration}. This has been directly derived from the equation in \ref{eq:icp problem}.
+
+\begin{equation}
+    \label{eq:computing registration}
+    \mathcal{F}(R,t) = \frac{1}{N}\sum\limits_{i=1}^N\|Rp_i+t-q_i\|^2
+\end{equation}
+
+\paragraph{Apply registration}
+This is a simple process. At each stage the translations and rotations that have been found are applied on the second point cloud, $Q$. Subsequent iterations will now operate on the translated data eventually converging towards a minimum. \\
+
+\paragraph{Termination}
+The algorithm terminates when the change in output of some evaluation function falls below a certain threshold, $\tau$. This is formalised in \ref{eq:icp termination}. \\
+
+\begin{equation}
+    \label{eq:icp termination}
+    d_k - d_{k-1} < \tau
+\end{equation} \\
+
+An evaluation function needs to be devised so that the algorithm can determine the success of an iteration. There are a number of approaches that can be taken towards the creation of an evaluation function but it is important that it doesn't result in the creation of another optimisation problem \cite{chen92}. When some initial alignment transformation, $T_0$, that brings $P$ in near registration with $Q$ is already known; which is the case if there is an initial alignment; then the process of creating a function is much simpler. \\
+
+If, every $(p_i,q_i)$ pairing is summed to create a new variable, $e$, then the sum at iteration $k$ is $e^k$. From this information Chen defined a convergence function that can be used to measure the alignment, as in (\ref{eq:chen eval}).\\
+
+\begin{equation}
+    \label{eq:chen eval}
+     \delta = \frac{\|e^k - e^{k+1} \|}{N'} \leq \epsilon_e, (\epsilon_e > 0)
+\end{equation}
+
+%stick chen's equation here + evaluate and criticise the man... we should love him really%
+
+\subsection{Running Time}
+Besl provided an analysis of the running time for various parts of the algorithm. They are presented in tabular form in Table \ref{tab:icp run time}
+
+\begin{table}
+    \label{tab:icp run time}
+    \centering
+    \begin{tabular}{| c | c | c| }
+    \hline
+    Stage & Cost \\ \hline
+    Compute closest points & $\Omega (N_pN_x), O(NplogNx)$ \\ \hline
+    Compute registration & $O(N_p)$\\ \hline
+    Apply registration & $O(N_p)$\\ \hline
+    \end{tabular}
+    \caption{The computational complexities of each step in the ICP algorithm}
+\end{table} \\
+
+\subsubsection{Discussion}
+In the papers by Besl and McKay \cite{besl92}; and Chen and Medioni \cite{chen92} the algorithms were devised with the intention of registering static rigid objects, such as statues. These types of objects would be easier to register than human subjects as there is no scope for accidental movement. Without more specialised algorithms this could cause issues, especially if the scans are not all taken simultaneously. \\
+
+Besl states that the ICP algorithm is robust and provides good results in almost all cases without the need for preprocessing of 3D information. This, however, may be because the equipment used in the study provided depth maps with almost zero statistical outliers. Besl admits that in the presence of large statistical outliers there are likely to be problems encountered and that the algorithm may fail \cite{besl92}. \\
+
+The algorithm is recommended only in instances where it is not possible to easily find features in an image. Within the context of human depth data, this is likely to be the case as people are generally made out of reasonably smooth surfaces. In some isolated cases the ICP algorithm may degenerate to a brute-force method. In this case feature matching would definitely be a better approach to registration. \\
+
+Zhang's \cite{zhang94} paper discusses using the ICP algorithm in an inherently unpredictable environment: the outside world. If the body of work that he set upon doing was a success then the developments seen in his paper may provide a more general purpose version of the algorithm that could account for peculiarities in the environment as well as movement. While Besl's work does not specifically aim to achieve this, he sets upon the creation of a global matching algorithm where unpredictable data sets may be registered \cite{besl92}.\\
+
+\subsubsection{Improvements on ICP}
+We have yet to discuss methods that have the properties required for the project. That is, an algorithm that is capable of registering reasonably ($\pm 5\%$) accurate models of a human figure where there may be inconsistencies in the different data scans. The ICP papers that have been discussed so far help to lay out some of the theory that subsequent papers have built upon. We will now discuss a modification that has been made by researchers to make the algorithm more relevant to the domain that we are exploring. \\
+
+Zhang suggested that the ICP algorithm may be sped up by using a K-D tree instead of an arbitrary data structure for finding the nearest neighbours to a given point \cite{zhang94}. It is argued that both the creation and storage of a K-D tree is optimal and that a nearest neighbour search can be performed in $O(log(N))$ as opposed to $O(N)$. \\
+
+\subsection{Feature Matching}
+Another method for registration, feature matching, has been described in literature quite frequently. Feature matching refers to the process of matching features, such as corners or contours, on an image, $P$ with similar features in a second image, $Q$ \cite{lv2008, mount99}. \\
+
+Like ICP, feature matching has seen use in some medical applications but is commonly used where depth information is unavailable and where successive images are of a known distance apart from the previous one. In a study by Pennec et al. \cite{pennec98}, feature matching was used to align images taken by an MRI scanner. The methods used produced an error of only 1\%, but could only be applied to 2D image slices where variation between subsequent images is small and order of scanning is known.\\
+
+The feature matching process of registration can be split up into two stages. The first stage is finding correspondence between features in multiple images (the matched) and the second is computing the transformation so that the matched features can be brought together. The process of finding corresponding features will not be discussed in great detail here as an in-depth analysis on how features may be found in an image has already been made in Section \ref{res:image recognition} with 3-D specific discussion in Section \ref{research:3d features}. \\
+
+It was difficult to find any literature that provided a feature matching approach to registration that had produced satisfactory results on images taken with a range camera. This suggests that the gold-standard method for registering 3D images is the ICP algorithm. There is, however, some scope for using feature matching to produce an initial alignment. With multiple high resolution range images, the presence of statistical outliers is likely to cause problems with feature finding. Additionally, the human body is not likely to contain many features as it is a smooth construct; making the use of feature matching hard even in initial alignment. The search space space in such a large dataset would have to be reduced to bring the search time to an acceptable level. This would be likely to further reduce the likelihood of finding acceptable features to match on. \\
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

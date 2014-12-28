@@ -1,0 +1,104 @@
+\section{Limb Circumference}
+\label{testing:limb circumference}
+This section details the testing of the limb circumference algorithms. Circumference testing in the context of volume estimation is discussed and the equivalent accuracy of partitioned plane circumference estimation examined to validate whether such practice produces a reliable means for estimating limb size.
+
+\subsection{Calculating Limb Bounds}
+
+The 20 feature points provided by the skeleton are used to simplify the bounding of by referencing the minimal and maximal feature points of the interested limb. An assumption is made that the detected skeletal positions are reasonably aligned with the respective limb locations captured by the point cloud. \\
+
+\begin{table}[!htb]
+\begin{center}
+  \begin{tabular}{| l | p{4cm} | r | r | r | r |}
+    \hline
+    Limb & Feature Points & $X_{min}$ & $X_{max}$ & $Y_{min}$ & $Y_{max}$ \\ \hline 
+    Left Arm & ShoulderLeft, WristLeft & 0.250 & 0.267 & 0.0779 & 0.778  \\ \hline
+    Right Arm & ShoulderRight, WristRight & -0.191 & -0.1652 & 0.03 & 0.808  \\ \hline
+    Shoulders & ShoulderRight, ShoulderLeft & -0.61 & 0.251 & 0.462 & 0.947 \\ \hline
+    Waist & HipRight, HipLeft, HipCenter & -0.053 & 0.138 & 0.270 & 0.371  \\ \hline
+    Right Leg & HipCenter, HipRight, KneeRight, FootRight & -0.051 & 0.040 & -0.523 & 0.280  \\ \hline
+    Left Leg & HipCenter, HipLeft, KneeLeft, FootLeft & 0.045 & 0.131 & -0.519 & 0.270  \\ \hline
+  \end{tabular}
+\end{center}
+\caption{Feature points for each limb as recorded by Corbett Subject}
+\label{testing: feature points used for each limb}
+\end{table}
+
+These limbs bounds are determined based on the anatomical reference points that the Kinect Skeleton SDK attaches to the tracked skeleton when undergoing a scanning procedure. The bounding is identified when the person is facing the front as the SDK is only capable of inferring skeletal cues when the subject is in a frontal configuration. The depth of the subject is defined in terms of the stitched point cloud where the minimum depth is recorded at the front and the maximal depth offset against the rear scan.
+
+\subsection{Identifying Transform Constants}
+
+As discussed in Section \ref{volume estimation}, there is a need for identifying transform constants between the circumferences calculated in terms of point cloud units and real-world and meaningful SI units. Using the height transform constant for the purposes of scaling circumference still provides a valid basis for accurate limb measurement as there is a broadly positive correlation between the height of an individual and in the cited cases, their arm circumference \cite{Todorovic2003}. However, on a local limb circumference measurement level, factors such as clothing, point cloud quality and the stability during of the person during scanning influences the integrity and accuracy of the planes extracted from the partitioned point clouds. \\
+
+After bounding the limbs, the circumference of the subsampled planes is calculated. This circumference value represents the circumference with respect to the point cloud coordinate system and even when converted to standard units, the value is comparably small due to the lack of associated scale associated with it. A number of experiments have been carried out on subjects in order to determine these scale factors across a fairly representative spread of size and shape. The transform constants have been established from a subsample of the original sample of test subjects and classified according to below average, average and above average weight and overall size. \emph{Below Average} is determined as below 60kg and/or less than 1.6m in height. \emph{Average} is determined as between 60kg and 90kg and/or between 1.6 and 1.9m in height. \emph{Above Average} is determined as over 90kg or over 1.9m in height.  $Rw$ refers to the raw circumference as determined from calculation in the point cloud space, $Ac$ refers to the circumference as defined by spring tape measurement with a constant calculated from the difference.
+
+\begin{table}[!htb]
+\begin{center}
+\begin{tabular}{| l | l | l | l | l |}
+\hline
+Subject & Limb & $Circum_{Rw}$ & $Circum_{Ac}$ & Transform Constant \\ \hline
+    Below Average & Left Arm & 21.341 & 25.8 & 1.21 \\ \hline
+    & Right Arm & 22.34 & 23.4 & 1.05\\ \hline
+    & Shoulders & 57.22 & 82 & 1.43\\ \hline
+    & Chest & 49.3 & 80 & 1.62\\ \hline
+    & Waist & 11.3 & 75 & 6.63\\ \hline
+    & Left Leg & 9.2 & 35.6 & 3.89\\ \hline
+    & Right Leg & 12.3 & 36.5 & 2.96\\ \hline \hline
+    Average & Left Arm & 23.195 & 25 & 1.07 \\ \hline
+    & Right Arm & 24.12 & 25.5 & 1.05 \\ \hline
+    & Shoulders & 64.39 & 92 & 1.41\\ \hline
+    & Chest & 61.19 & 91.5 & 1.42\\ \hline
+    & Waist & 14.82 & 88 & 5.94\\ \hline
+    & Left Leg & 13.05 & 40.5 & 3.10\\ \hline
+    & Right Leg & 14.9 & 44.0 & 2.95\\ \hline \hline
+    Above Average & Left Arm & 35.443 & 32.5 & 0.91\\ \hline
+    & Right Arm & 34.53 & 31 & 0.89\\ \hline
+    & Shoulders & 68.123 & 104.5 & 1.53\\ \hline
+    & Chest & 67.980 & 99.5 & 1.46\\ \hline
+    & Waist & 22.3 & 101 & 4.529\\ \hline
+    & Left Leg & 16.501 & 56 & 3.39\\ \hline
+    & Right Leg & 16.091 & 56.5 & 3.51 \\ \hline \hline
+\end{tabular}
+\end{center}
+\caption{Transform constants calculated for the required correction of different subject circumferences based on spring tape measurements.}
+\label{testing: transform constants}
+\end{table}
+
+\subsection{Errors and Limb Circumference}
+
+As shown in each person classification above, there is in some cases, a requirement for significant correction of the the recorded point cloud circumference when compared to the circumferences recorded using spring tape measurement. The need for this correction is particularly profound around the lower extremities of the body with the worst case being recorded in the lower than average person on the waist necessitating a 6.5 scaling factor to align the toolkit's measurement with what is realistically expected. Through further testing it was ascertained that the patient scanning configuration where the legs were positioned close together was not an optimal configuration for mapping the skeletal co-ordinates into point cloud space. This was due to the Kinect API's inability to infer both the left and right legs properly and inferring the waist from the straight arm configuration in the upper extremities. In some cases this lead to a deviation of $[-0.5,0.5]$ from the original assumed centre of the limb in point cloud space from the inaccurate recording of limb positioning from the Kinect SDK. \\
+
+Obviously further refinements were needed to the point cloud partitioning bearing in mind the sometimes erroneous or imprecise mapping of the skeletal world coordinates to point cloud space. When refinements were added so that tighter bounds were specified over particular limbs, a marked improvement was seen in the circumference calculation of upper extremities such that an average error of $10\%/15\%$ was observed. There was also an improvement on waist measurements due to the incorrect bounding method that was originally applied. Given these refinements, an average error over upper extremities (in the present results, the left arm) ranged between $2.0\% - 17\%$ and lower extremities varied between $10\%-36.6\%$. \\
+
+\begin{table}[!htb]
+\begin{center}
+  \begin{tabular}{| l | r | r | r | r | r | r |}
+    \hline
+    Person & $Arm_{Ac}$ & $Waist_{Ac}$ & $Arm_{Ki}$ & $Waist_{Ki}$ & $Error_{arm}$ & $Error_{waist}$  \\ \hline
+    Corbett & 27 & 84 & 25.9 & 69.33 & 4.2\% & 21.1\% \\ \hline
+    Eddie & 27.2 & 81.9 & 23.1 & 59.3 & 17\% & 36\% \\ \hline
+    Page & 24.5 & 82 & 24 & 72 & 2.01\% & 13.8\% \\ \hline
+    Papas & 23.5 & 89 & 26.13 & 65.13 & 11.1\% & 36.6\% \\ \hline
+    Rodolis & 25 & 91 & 29 & 73.4 & 16\% & 23.9\% \\ \hline
+    Sexton & 26.4 & 83 & 24.80 & 72.1 & 6.5\% & 15.1\%\\ \hline
+  \end{tabular}
+\end{center}
+\caption{Errors measured over 6 test subjects.}
+\label{testing: table of data for limb transform constants}
+\end{table}
+
+\subsection{Sources of error}
+
+There are a number of potential error sources that result in the error observed in these results and some have already been alluded to. There are 3 primary areas where error is introduced into the limb circumference calculation:
+
+\begin{enumerate}
+    \item \emph{Poor point cloud registration}; where the stitching algorithms for registering each of the 4 point cloud scans returned poor results, the circumference measurements were affected by the lack of the required ring of points needed for circumference calculation so the gift wrapping algorithm would often calculate the circumference for a subset of possible points returning results that were infeasibly small as a result.
+    \item \emph{Clothing}; normal clothing or baggy items of clothing often obscure the true value of the circumference, especially around the waist, leg and arm areas. It is likely that in the case of some subjects that their circumferences were over-estimated due to the amount of clothing that may have been present in some areas of the body during scanning.
+    \item \emph{Noise and Sensor Distance}; the amount of noise present in the Kinect meant that our Point Cloud combined with the sensor distance from the subject was of a low resolution and this meant that the gift wrapping algorithm sometimes calculated the circumference around a ring of points selectively or overestimated where there were outliers in the plane.
+    
+\end{enumerate}
+
+\subsection{Monitoring Limb Changes}
+
+The ongoing monitoring of limb circumference based on this method is considered reasonably accurate for cases where the variation in the circumference is sufficient enough to highlight a difference between it and a previous circumference scan over a period of time. Local changes in the limb such as body fat distribution in particular areas of interest such as the upper arm where the study of the distribution of body fat and skin folds in this area can reveal information about medical conditions or ongoing weight gain/loss from a particular treatment program are harder to identify using this method. This is due to the limitations already outlined with the noise and low resolution of the depth map at local levels of the point cloud unless the limb is of sufficient size.
+
+\pagebreak

@@ -1,0 +1,46 @@
+\section{Test Plan}
+
+We prepared a test plan at the start of the project which acted as motivation for defining the internal deliverable deadlines. Along with this test plan, we have outlined a strategy by which to test each component of the system thoroughly.
+
+\subsection{Test Strategy}
+
+\label{test strategy}
+
+Each functional aspect of the system has been unit tested by their respective group member with their results and analysis presented in each section of this chapter. The unit tests are concerned with the operation of: \emph{\bf{person isolation, registration, volume calculation, limb circumference, image recognition and database functionality.}} Integration testing is then performed and the functionality of respective modules tested against one another, for example, the scanning of patients being used along side the database engine and visualisation module. System-wide testing is then examined with a number of test cases that aim to evaluate the toolkit as one coherent system.
+
+\subsection{Test Controls}
+
+The environment in which subjects are to be captured must be as consistent as possible. As such the group have defined a number of controls that is imposed upon persons being scanned that will return the results with reasonable consistency and accuracy.\\
+
+\emph{\bf{Distance from Kinect}} - In order to capture the entire body and to ensure consistent positioning between volume scans, the subject will stand at approximately 2.2m away from the Kinect. This distance was chosen, despite the fact it is outside of the Kinect's \emph{recommend play space} \cite{xbox2010}, as it is far enough away to accommodate subjects who are at the upper bound of test patients in terms of height without compromising too much on the quality of the captured depth map associated with the subject. Our configuration means that for each side of the patient that is scanned, this distance is maintained. The reconstruction process then does not need to take into account global scaling of the point cloud when translating and rotating it into position. \\
+
+\emph{\bf{Position of the Kinect}} - In order to ensure fair test conditions, when a volume scan is taken the Kinect must be positioned 71cm off the floor. The scanning process will automatically change the elevation of the Kinect to 0 when a new scan is initiated.\\
+
+\emph{\bf{Lighting Conditions}} - Scans were taken in the same environment where lighting was adequate but not too bright so as to interfere with the CMOS sensor's ability to track different levels of depth in the scene. Lighting was also important for the purposes of skeletal tracking as the SDK's algorithms relied on tracking the human body in RGB space for this purpose. \\
+
+\emph{\bf{Occlusion and Noise}} - During development we found that the Kinect was particularily sensitive to noise leading to distorted depth maps where lighting was in adequate or there were objects in the foreground of the subject to be scanned. Occlusion was also an issue if the background was particularly crowded. We aimed to minimise the amount of noise and foreground interference by removing objects in the scene that may have otherwise interfered with the scan process. \\
+
+\emph{\bf{Scan Process}} - The scan process itself is controlled by how it has been implemented. The subject is given 10 seconds to position themselves between each capture and by maintaining the ideal depth; a reasonably accurate scan can be captured permitting other influencing factors. \\
+
+\emph{\bf{Clothing}} - Clothing presents an issue where the volume measurement or limb circumference measurement may be overly affected by a subject that is wearing baggy clothes or clothes that enlarge certain areas of the body. This has been identified as problematic in other 3D body scanning applications where the presence of clothing has interfered with the landmarking of particular areas of the body \cite{Dekker1999}. For the purposes of scanning we have requested that each subject remove any clothing apart from T-shirts and trousers in order to gain more accurate volume measurements and minimise subject discomfort. \\
+
+\subsection{Test Schedule}
+
+A test schedule was devised so that adequate testing of the volume estimation, limb circumference and marker-less tracking components of the system could be performed and changes made to them in order to ensure correct working functionality and accuracy when the system is eventually delivered to the customer. 
+
+\begin{figure}
+\centering
+\begin{tabular}[htb]{| l | l | l |}
+    \hline
+    Unit Test & Date Started & Date Completed \\ \hline \hline
+    Volume Estimation & 23/02/13 & 01/04/13 \\ \hline
+    Limb Circumference & 25/03/13 & 23/04/13 \\ \hline
+    Markerless Recognition & 01/04/13 & 20/04/13 \\ \hline
+    Database Integration & 04/04/13 & 21/04/13 \\ \hline
+    Unit Integration & 01/03/13 & 20/04/13 \\ \hline
+    System Functionality & 05/04/13 & 21/04/13 \\ \hline
+\end{tabular}
+
+\caption{Test plan for the PARSE System}
+\end{figure}
+

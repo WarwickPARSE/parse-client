@@ -1,0 +1,32 @@
+%complete
+\section{Point Clouds}
+The term \emph{Point Cloud} describes both a conceptual object and a data structure. The conceptual object is either the model or the data which has been described in Sections \ref{research:registration} and \ref{res:range imaging} respectively. The Point Cloud data structure and class design will now be considered, as its functionality forms an integral part of many of the algorithms that will follow. \\
+
+\subsection{Data Structures}
+A number of data structures exist within the point cloud. The primary data structure represents a point cloud and there are various secondary data structures containing meta-information. The point cloud itself consisted of numerous \texttt{PointRGB} data structures. \\
+
+Initially depth data from the Kinect device is structured in a single-dimensional array of x, y, z coordinates as well as some un-needed data. This data structure is by no means easy to directly access and some abstraction was required. Texture data is stored in an entirely different data structure in the form of a buffered Bitmap image. \\
+
+The first solution was to place the data in an $N \times 3$ matrix. This created a relatively intuitive access method although finding a nearest neighbour would take $O(N)$ time which was unacceptable considering the large amount of point data coming from the Kinect device. This would have resulted in some of the algorithms operating in $O(N^2)$ time. \\
+
+The second solution was created to satisfy the needs of the algorithms to be implemented. Point data is stored in a \emph{K-Dimensional} (K-D) tree. In addition to standard operations such as \emph{addition} and \emph{deletion}; the K-Dimensional tree supports \emph{exact matching}, \emph{partial matching}, \emph{range queries} and \emph{nearest neighbour searches} \cite{bentley90}. \\
+
+\subsubsection{PointRGB}
+\label{pointrgb}
+The point cloud data structure could only store \emph{key, value} pairs. The data that was required, however consisted of individual \emph{red}, \emph{blue}, \emph{green} and \emph{Point} data items. This issue was overcome by encapsulating these data items into a C# \texttt{struct}.\\ % I refuse to acknowledge that data is the plural of data
+
+\subsection{Algorithms}
+\paragraph{Converting streams to K-D trees}
+As discussed in the previous section, depth data arrives from the Kinect device in quite an unmanageable form. This data then has to be processed so that it can be easily imported into a K-D tree data structure. It was anticipated that the point cloud data structure may be used in different ways and so storage of texture information is optional. \\
+
+The simplest and computationally cheapest way to insert the data into the K-D tree was to convert the texture information into a form that is similar to the input depth data, that is multiple arrays representing each of the primary colours. \\
+
+The depth and texture arrays are then input into a method that converts the Kinect co-ordinate system into real-world coordinates and then wraps the information for each point into a \texttt{PointRGB} (Section \ref{pointrgb}). \\
+
+Finally, the point data is inserted into the K-D tree using the point $x$, $y$ and $z$ coordinates as the key. 
+
+\subsection{Visualisation}
+To determine the quality of registration and for aesthetic reasons a visualisation of the point cloud was designed. The visualisation was to model each depth point in the point cloud as a uniform 3-D shape that is pleasing to the eye. 
+
+\subsection{Interim Summary}
+The data structures and algorithms required for efficient point cloud processing, while increasing code reusage, are all stored within the Point Cloud data structure. \\ 

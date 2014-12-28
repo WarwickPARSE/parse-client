@@ -1,0 +1,56 @@
+\section{Point Clouds}
+\label{impl:point clouds}
+\subsection{Data Structure}
+The K-D tree data structure, discussed in section was partially implemented by a third party open source library, which was then generalised to accommodate the point structures. \\
+
+Additional C\# primitive data structures were utilised to maintain meta information about the point cloud such as maximum and minimum values; information about the resolution of the image from the input device and data about the input device. \\ 
+
+\subsection{Conversion to real world coordinates}
+The conversion from a depth map to the real-world coordinate system is as follows. The depth map is scanned, progressively incrementing $i_x$ and $i_y$. At every stage the calculations in \ref{eq:pc conv x}, \ref{eq:pc conv y} and \ref{eq:pc conv z} are performed and then inserted into a \texttt{PointRGB} data structure along with the \emph{red}, \emph{green} and \emph{blue} values. An explanation of the variables in the equations just mentioned can be found in Table \ref{fig:pc conv meaning}. \\
+
+\begin{equation}
+    z = depthValue * scale
+    \label{eq:pc conv z}
+\end{equation} \\
+\begin{equation}
+    x = (centre_x - i_x) * z * f_{xinv}
+    \label{eq:pc conv x}
+\end{equation} \\
+\begin{equation}
+    y = (centre_y - i_y) * z * f_{yinv}
+    \label{eq:pc conv y}
+\end{equation} \\
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{ |c | c | c |}
+    \hline
+        Variable   & Meaning                  & Value \\ \hline
+        $centre_x$ & centre of depth map (x)  & $\frac{640}{2}$ * \\
+        $centre_y$ & centre of depth map (y)  & $\frac{480}{2}$ * \\
+        $scale$    & fiddle factor            & $0.001$ \\
+        $f_{xinv}$ & fiddle factor            & $\frac{1}{476}$ \\
+        $f_{yinv}$ & fiddle factor            & $\frac{1}{476}$ \\  
+        \hline
+    \end{tabular}
+    \caption[The meaning behind variables used in the depth map to point cloud algorithm]{The meaning behind variables used in the depth map to point cloud algorithm. * denotes a value that is specific to the PARSE implementation} 
+    \label{fig:pc conv meaning}
+\end{table} \\
+
+\subsection{Merging point clouds}
+There is no trivial way to attach on point cloud to another due to the way in which the K-D tree is structured. It is therefore necessary to take the points from one point cloud and then add them to the second one-by-one. Sometimes there are collisions, a point is defined in exactly the same place in the point cloud - especially in the overlapping areas after a good registration has taken place. When this happens the second point is simply discarded. \\
+
+\subsection{Transformation}
+To aid the registration process a number of key transformation functions have been implemented which operate directly on the data stored within the point cloud data structures. \\
+
+\subsubsection{Translation}
+The translation method simply works by translating all data in the point cloud and then translating the maximum and minimum values in each coordinate. \\
+
+\subsubsection{Rotation}
+The rotation method is slightly more complicated as rotation in a 3-D space necessitates the usage of the complex plane. The rotation is achieved through the utilisation of a quaternion and a rotation matrix. \\
+
+\subsection{Floor removal}
+A problem that occurred during the registration process was the floor getting in the way. This can be mitigated by calling the \texttt{removeFloor} method. The method simply removes the lower plane in the point cloud. \\
+
+\subsection{Visualisation}
+The visualisation was implemented using the Windows Presentation Framework with Helix 3D as a helper library. Each depth point in the point cloud was modelled as a small cube so that they may be displayed in a pleasing manner. Examples of visualisations may be seen throughout this report but specifically in section \ref{imp:stitching}.

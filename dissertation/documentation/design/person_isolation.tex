@@ -1,0 +1,20 @@
+\section{Person Isolation}
+\label{design:person isolation}
+The group decided to make use of the Kinect's abilty to generate a skeleton frame associated with a person to aid in isolation. This decision meant the group stepped away from the generic computer vision algorithms discussed in Section \ref{person_isolation:specific algorithms}, such as KDE and MOG.\\
+
+Two possible methods of person isolation were designed by the group. The first method made use of the Kinect colour stream whereas the second used the Kinect depth stream. Both methods described operate on a per pixel basis, have a complexity of $O(n)$ where $n$ is the number of pixels in a frame and are theoretically capable of isolation stationary people, which the reserached methods may not be able to do.\\
+
+\subsection{Colour Based Isolation}
+\label{design:colour based isolation}
+In this algorithm, the pre processing is handled by the Kinect API, converting the raw infra red depth data into a byte array. The foreground mask is calculated using the Kinect API to determine whether a colour pixel is associated with a detected skeleton. If a pixel is associated with a skeleton, the pixel is a foreground pixel. And conversely, an unassociated pixel is a background pixel. There is no data validation in this algorithm.\\
+
+At this stage it was expected that colour based isolation would preform well, but it was unknown if a point cloud could be constructed using this method, as the colour data contains no depth.\\
+
+\subsection{Depth Based Isolation}
+\label{design:depth based isolation}
+
+In this algorithm, the pre processing is again handled by the Kinect API, converting the raw infra red depth data into a byte array. This algorithm then make use of the skeleton to determine the approximate depth of the person. Any pixel whose depth value is outside a delta of the skeleton's depth would be considered a background pixel. Cutting off based on depth alone is not enough, as doing so would leave a ring of equidistant points in-line with the person.\\
+
+To eliminate this ring, the positions of left and right most point of the person (i.e. the HandLeft joint and the HandRight joint) would also be used for cut off and anything outside of this range would also be classified as a background pixel and discarded. All other pixels would be considered foreground and again there is no data validation phase.\\ 
+
+This method would leave a square of floor under the person, but at the design stage it was hoped this could be removed at the point cloud level. Whilst a depth based cut off may not be as effective at removing all the miscellaneous non-person data, i.e. the floor, it may be better suited to creating a point cloud than colour based isolation.\\
